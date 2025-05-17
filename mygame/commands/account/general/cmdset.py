@@ -2,6 +2,7 @@ from typing import Sequence, Type
 from engine.core.command import Command
 from engine.core.commandset import CommandSet
 from mygame.commands.account.general.cmd_ic import CmdIC
+from mygame.commands.account.general.cmd_login import CmdLogin
 
 
 class GeneralAccountCommands(CommandSet):
@@ -12,4 +13,5 @@ class GeneralAccountCommands(CommandSet):
     def commands() -> Sequence[Type[Command]]: 
         return [
             CmdIC,
+            CmdLogin,
         ]

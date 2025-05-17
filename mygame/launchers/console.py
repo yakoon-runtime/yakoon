@@ -21,7 +21,7 @@ async def run_console(engine):
 
         # each message is a own task.
         asyncio.create_task(
-            engine.enter("1", msg, error, on_session))
+            engine.enter(None, msg, error, on_session))
 
 if __name__ == "__main__":
     engine = Engine()

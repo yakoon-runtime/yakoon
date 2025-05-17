@@ -1,4 +1,5 @@
 from typing import Coroutine, Callable, TypeVar
+from uuid import uuid4
 
 from engine.runtime.game_context import GameContext
 from mygame.models.account import Account
@@ -14,13 +15,17 @@ class Session(object):
     out: PrintMessage
     err: PrintError
 
-    def __init__(self, session_id: str):
+    def __init__(self, id: str):
         """
         Constructs a new session.
         """
-        self.id = session_id
-        self._account = Account(id="1", name="Stefan")
+        self.id = id or str(uuid4())
+        self._account = None  # Account(id="1", name="Stefan")
         self._character = None # = Character(id="c1", name="Du", location="forest")
+
+    def update_data(self, source: "Session"):
+        self.account = source.account
+        self.character = source.character
 
     @property
     def ctx(self) -> GameContext:
@@ -29,14 +34,25 @@ class Session(object):
     @property
     def account(self) -> Account:
         return self._account
+    @account.setter
+    def account(self, value):
+        self._account = value
     
     @property
     def character(self):
         return self._character
-
     @character.setter
     def character(self, value):
         self._character = value
+
+    def is_anonymous(self) -> bool:
+        return self.account is None
+
+    def is_ic(self) -> bool:
+        return self.character is not None
+
+    def is_ooc(self) -> bool:
+        return self.account is not None and self.character is None
 
     def bind_context(self, context: GameContext):
         self._context = context
