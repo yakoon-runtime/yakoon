@@ -30,4 +30,4 @@ class CmdMove(Command):
         char.location = dest_room.id
         session.ctx.update_dynamic_commands(session)
         await session.out(f"Du gehst nach |w{dest_room.name}|n.")
-        await session.out(room.render())
+        await session.out(room.render(session))

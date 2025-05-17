@@ -17,3 +17,8 @@ class BaseGameDefinition(ABC):
     @abstractmethod
     def character_store(self): ...
 
+    @property
+    @abstractmethod
+    def object_store(self): ...
+
+

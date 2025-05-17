@@ -15,4 +15,4 @@ class CmdLook(Command):
         if not room:
             return await session.err("Du bist nirgendwo.")
 
-        await session.out(room.render())
+        await session.out(room.render(session))

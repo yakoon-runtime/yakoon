@@ -23,7 +23,7 @@ class DirectionCommand(Command):
         session.ctx.update_dynamic_commands(session, room)
 
         await session.out(f"Du gehst nach |w{room.name}|n.")
-        await session.out(room.render())
+        await session.out(room.render(session))
 
     
 def get_exit_direction_commands(room) -> list[Command]:

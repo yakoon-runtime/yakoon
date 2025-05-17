@@ -20,7 +20,7 @@ class Session(object):
         """
         self.id = session_id
         self._account = Account(id="1", name="Stefan")
-        self._character = Character(id="c1", name="Du", location="forest")
+        self._character = None # = Character(id="c1", name="Du", location="forest")
 
     @property
     def ctx(self) -> GameContext:
