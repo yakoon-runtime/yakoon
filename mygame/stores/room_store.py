@@ -1,5 +1,5 @@
 # services/room_store.py
-from engine.data.models.room import Room
+from mygame.models.room import Room
 
 forest = Room(
     id="forest",

@@ -4,20 +4,27 @@ from engine.core.command import Command
 
 class CommandRouter:
     
-    def __init__(self, engine):
-        self._commands: dict[str, Type[Command]] = {}
-        self._session_commands = {}
-        self._aliases: dict[str, str] = {}
-        self._engine = engine
+    def __init__(self):
+       self._aliases: dict[str, str] = {}
+       self._session_commands = {}
+       self._commands_by_mode = {
+            "account": {},
+            "character": {},
+            "system": {},
+            "dynamic": {},  # optional: per session.id
+        }
+            
+    def register(self, cmd_cls, mode: str = "system", session=None):
+        key = cmd_cls.key.lower()
+        group = self._commands_by_mode.setdefault(mode, {})
 
-    def register(self, command_cls: Type[Command], dynamic=False, session=None):
-        command_cls._engine = self._engine
-        if dynamic and session:
-            self._session_commands.setdefault(session.id, []).append(command_cls)
+        if session and mode == "dynamic":
+            sid = session.id
+            self._session_commands.setdefault(sid, []).append(cmd_cls)
         else:
-            self._commands[command_cls.key] = command_cls
-            for alias in getattr(command_cls, "aliases", []):
-                self._aliases[alias] = command_cls.key
+            group[key] = cmd_cls
+            for alias in getattr(cmd_cls, "aliases", []):
+                self._aliases[alias] = key
 
     def remove_dynamic_commands_for_session(self, session):
         self._session_commands[session.id] = []
@@ -25,13 +32,18 @@ class CommandRouter:
     def resolve(self, cmd_name: str, session=None) -> Command | None:
         key = cmd_name.lower().strip()
         resolved = self._aliases.get(key, key)
-        # 1. try: globale Commands
-        if resolved in self._commands:
-            return self._commands[resolved]()
-        # 2. try: dynamic commands for these session
+
+        modes = ["system"]
+
         if session:
+            modes.append("character" if session.character else "account")
             for cmd_cls in self._session_commands.get(session.id, []):
                 if resolved == cmd_cls.key or resolved in getattr(cmd_cls, "aliases", []):
-                    return cmd_cls  # important: get an instance
+                    return cmd_cls
+
+        for mode in modes:
+            group = self._commands_by_mode.get(mode, {})
+            if resolved in group:
+                return group[resolved]()
 
         return None

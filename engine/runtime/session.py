@@ -1,19 +1,8 @@
-#
-# Copyright 2021 The MindCastle Authors. All Rights Reserved.
-#
-# Licensed under the MIT License.
-# You may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://opensource.org/licenses/MIT
-#
-# ==============================================================================
-
-import asyncio
 from typing import Coroutine, Callable, TypeVar
 
-from engine.data.models.account import Account
-from engine.data.models.character import Character
+from engine.runtime.game_context import GameContext
+from mygame.models.account import Account
+from mygame.models.character import Character
 
 Text = TypeVar('Text', str, bytes)
 PrintMessage = Callable[[Text], Coroutine]
@@ -30,17 +19,27 @@ class Session(object):
         Constructs a new session.
         """
         self.id = session_id
-        self._account = Account()
+        self._account = Account(id="1", name="Stefan")
         self._character = Character(id="c1", name="Du", location="forest")
 
     @property
-    def character(self) -> Character:
-        return self._character
+    def ctx(self) -> GameContext:
+        return self._context
 
     @property
     def account(self) -> Account:
         return self._account
+    
+    @property
+    def character(self):
+        return self._character
 
+    @character.setter
+    def character(self, value):
+        self._character = value
+
+    def bind_context(self, context: GameContext):
+        self._context = context
 
 OnGetSession = Callable[[Session], Coroutine]
 
@@ -50,11 +49,12 @@ class Sessions(object):
     Manages all sessions
     """
 
-    def __init__(self):
+    def __init__(self, engine):
         """
         Creates a new instance of class Sessions.
         """
         self._session = {}
+        self._engine = engine
 
     async def create_session(self, session_id: str, on_create: OnGetSession):
         """
@@ -68,4 +68,5 @@ class Sessions(object):
         """
         if session_id not in self._session:
             self._session[session_id] = Session(session_id)
+        self._session[session_id].bind_context(GameContext(self._engine))
         await on_create(self._session[session_id])

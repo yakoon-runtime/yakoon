@@ -1,5 +1,6 @@
 
 class Request:
+
     def __init__(self, raw: str):
         self.raw = raw.strip()
         self.cmd = ""
@@ -13,11 +14,14 @@ class Request:
         # Command + optional subcommand
         if parts:
             self.cmd = parts[0].lower()
-        if len(parts) > 1 and not parts[1].startswith(("/", "--")):
+        if len(parts) > 2 and not parts[1].startswith(("/", "--")):
             self.subcmd = parts[1].lower()
+            remaining = parts[2:]
+        else:
+            remaining = parts[1:]
 
         # Parse remaining parts
-        for part in parts[2:]:
+        for part in remaining:
             if part.startswith("/"):
                 self.switches.append(part[1:])
             elif "=" in part:

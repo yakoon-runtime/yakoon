@@ -2,7 +2,6 @@
 from engine.core.command import Command
 from engine.core.parser import Request
 from engine.runtime.session import Session
-from mygame.stores.room_store import RoomStore
 
 
 class CmdLook(Command):
@@ -12,7 +11,7 @@ class CmdLook(Command):
 
     async def run(self, session: Session, request: Request):
         char = session.character
-        room = RoomStore.get(char.location)
+        room = session.ctx.game.room_store.get(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
 

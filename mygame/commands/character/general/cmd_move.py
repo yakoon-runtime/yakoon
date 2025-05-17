@@ -2,7 +2,7 @@
 from engine.core.command import Command
 from engine.core.parser import Request
 from engine.runtime.session import Session
-from mygame.stores.room_store import RoomStore
+
 
 class CmdMove(Command):
     key = "go"
@@ -10,12 +10,12 @@ class CmdMove(Command):
 
     async def run(self, session: Session, request: Request):
 
-        target = request.subcmd or (request.args[0] if request.args else None)
+        target = request.args[0] if request.args else None
         if not target:
             return await session.err("Wohin willst du gehen?")
 
         char = session.character
-        room = RoomStore.get(char.location)
+        room = session.ctx.game.room_store.get(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
 
@@ -23,10 +23,11 @@ class CmdMove(Command):
         if not dest_id:
             return await session.err(f"Hier geht es nicht nach '{target}'.")
 
-        room = RoomStore.get(dest_id)
-        if not room:
+        dest_room = session.ctx.game.room_store.get(dest_id)
+        if not dest_room:
             return await session.err(f"Zielraum '{dest_id}' existiert nicht.")
 
-        char.location = room.id
-        await session.out(f"Du gehst nach |w{room.name}|n.")
+        char.location = dest_room.id
+        session.ctx.update_dynamic_commands(session)
+        await session.out(f"Du gehst nach |w{dest_room.name}|n.")
         await session.out(room.render())

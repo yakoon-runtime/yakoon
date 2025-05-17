@@ -12,3 +12,8 @@ class BaseGameDefinition(ABC):
     @property
     @abstractmethod
     def room_store(self): ...
+
+    @property
+    @abstractmethod
+    def character_store(self): ...
+
