@@ -11,7 +11,7 @@ class ObjectStore:
         return cls._objects.get(obj_id)
 
     @classmethod
-    def add(cls, obj: Object):
+    def put(cls, obj: Object):
         cls._objects[obj.id] = obj
 
     @classmethod
@@ -19,7 +19,11 @@ class ObjectStore:
         return [o for o in cls._objects.values() if o.location == location_id]
 
 
-ObjectStore.add(Object(id="zettel", name="Zettel", desc="Ein alter Zettel.", location="umschlag"))
-ObjectStore.add(Object(id="umschlag", name="Umschlag", desc="Versiegelt.", location="kiste", contains=["zettel"]))
-ObjectStore.add(Object(id="kiste", name="Holzkiste", desc="Sieht schwer aus.", location="schank", contains=["umschlag"]))
-ObjectStore.add(Object(id="schrank", name="Schrank", desc="Ein hölzernes Möbelstück.", location="hall", contains=["kiste"]))
+ObjectStore.put(
+    Object(id="zettel", name="Zettel", desc="Ein alter Zettel.", location="umschlag"))
+ObjectStore.put(
+    Object(id="umschlag", name="Umschlag", desc="Versiegelt.", location="kiste", contains=["zettel"]))
+ObjectStore.put(
+    Object(id="kiste", name="Holzkiste", desc="Sieht schwer aus.", location="schank", contains=["umschlag"]))
+ObjectStore.put(
+    Object(id="schrank", name="Schrank", desc="Ein hölzernes Möbelstück.", location="hall", contains=["kiste"]))

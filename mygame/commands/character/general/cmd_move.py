@@ -28,6 +28,6 @@ class CmdMove(Command):
             return await session.err(f"Zielraum '{dest_id}' existiert nicht.")
 
         char.location = dest_room.id
-        session.ctx.update_dynamic_commands(session)
+        session.ctx.game.update_room_commands(session)
         await session.out(f"Du gehst nach |w{dest_room.name}|n.")
         await session.out(room.render(session))

@@ -1,4 +1,7 @@
+- Defs für services.
+
 - CmdInventory
 - CmdGet, CmdPut 
+- Dann Permissions.
 
-- Und dann Permissions.
+- Dann --init game...

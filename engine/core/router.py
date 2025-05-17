@@ -26,6 +26,9 @@ class CommandRouter:
             for alias in getattr(cmd_cls, "aliases", []):
                 self._aliases[alias] = key
 
+    def register_dynamic_commands(self, cmd, session):
+        self.register(cmd, "dynamic", session=session)         
+
     def remove_dynamic_commands_for_session(self, session):
         self._session_commands[session.id] = []
 

@@ -1,6 +1,5 @@
 
 from engine.core.dialog.manager import DialogManager
-from engine.core.direction import get_exit_direction_commands
 from engine.core.game.definition import BaseGameDefinition
 from engine.core.parser import Request, request_to_debug_dict
 from engine.core.router import CommandRouter
@@ -17,6 +16,10 @@ class Engine():
       self._game: BaseGameDefinition = None
       self._sessions = Sessions(self)
       self._router = CommandRouter()
+
+   @property
+   def router(self) -> CommandRouter:
+        return self._router
 
    async def enter(self, session_id: str,
                    on_print_msg: PrintMessage,
@@ -44,15 +47,7 @@ class Engine():
          return await session.err(f"Unbekannter Befehl: {request.cmd}")
 
       await command.run(session, request)
-
-   def update_dynamic_commands(self, session: Session, room):
-      char = session.character
-      if char:
-         room = self._game.room_store.get(char.location)
-      self._router.remove_dynamic_commands_for_session(session)
-      for cmd in get_exit_direction_commands(room):
-            self._router.register(cmd, "dynamic", session=session)            
-            
+               
    def load_game(self, game: BaseGameDefinition):
       self._game = game
       for commands_set in game.commandsets:

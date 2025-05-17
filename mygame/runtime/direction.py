@@ -1,5 +1,3 @@
-
-
 from engine.core.command import Command
 from engine.core.parser import Request
 from engine.runtime.session import Session
@@ -20,7 +18,7 @@ class DirectionCommand(Command):
         char.location = self._target
 
         room = session.ctx.game.room_store.get(self._target)
-        session.ctx.update_dynamic_commands(session, room)
+        session.ctx.game.update_room_commands(session, room)
 
         await session.out(f"Du gehst nach |w{room.name}|n.")
         await session.out(room.render(session))

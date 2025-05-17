@@ -24,5 +24,5 @@ class CmdIC(Command):
         await session.out(f"Du wirst zu {char.name}.")
         room = session.ctx.game.room_store.get(char.location)
         if room:
-            session.ctx.update_dynamic_commands(session, room)
+            session.ctx.game.update_room_commands(session, room)
             await session.out(room)

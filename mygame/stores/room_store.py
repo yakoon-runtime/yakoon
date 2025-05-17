@@ -10,14 +10,13 @@ class RoomStore:
         return cls._rooms.get(room_id)
     
     @classmethod
-    def add(cls, obj: Room):
+    def put(cls, obj: Room):
         cls._rooms[obj.id] = obj
 
 
-RoomStore.add(Room(id="forest", name="Waldlichtung", desc="Zwischen alten Bäumen.",
-    exits={"n": "hall", "tür": "hall", "norden": "hall"}
-    ))
-
-RoomStore.add(Room(id="hall", name="Große Halle", desc="Ein weiter Raum.",
-    exits={"s": "forest", "süden": "forest"}
-    ))
+RoomStore.put(
+    Room(id="forest", name="Waldlichtung", desc="Zwischen alten Bäumen.",
+    exits={"n": "hall", "tür": "hall", "norden": "hall"}))
+RoomStore.put(
+    Room(id="hall", name="Große Halle", desc="Ein weiter Raum.",
+    exits={"s": "forest", "süden": "forest"}))

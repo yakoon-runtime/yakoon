@@ -1,21 +1,27 @@
 from typing import Dict, Optional
 from mygame.models.character import Character
 
-# Beispiel-Datenbank
-CHARACTERS: Dict[str, Character] = {
-    "stefan": Character(id="stefan", name="Stefan", location="forest"),
-    "lara": Character(id="lara", name="Lara", location="hall"),
-}
 
 class CharacterStore:
-    @staticmethod
-    def get(char_id: str) -> Optional[Character]:
-        return CHARACTERS.get(char_id)
+    _chars: dict[str, Character] = {}
 
-    @staticmethod
-    def all() -> list[Character]:
-        return list(CHARACTERS.values())
+    @classmethod
+    def get(cls, char_id: str) -> Optional[Character]:
+        return cls._chars.get(char_id)
 
-    @staticmethod
-    def exists(char_id: str) -> bool:
-        return char_id in CHARACTERS
+    @classmethod
+    def put(cls, obj: Character):
+        cls._chars[obj.id] = obj
+
+    @classmethod
+    def all(cls) -> list[Character]:
+        return list(cls._chars.values())
+
+    @classmethod
+    def exists(cls, char_id: str) -> bool:
+        return char_id in cls._chars
+
+CharacterStore.put(
+    Character(id="stefan", name="Stefan", location="forest"))
+CharacterStore.put(
+    Character(id="lara", name="Lara", location="hall"))
