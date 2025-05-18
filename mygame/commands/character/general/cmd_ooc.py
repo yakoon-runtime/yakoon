@@ -14,4 +14,5 @@ class CmdOOC(Command):
         name = session.character.name
         session.character = None
         session.ctx.game.update_room_commands(session)
+        session.command_groups = ["account"]
         await session.out(f"Du bist nun OOC. Charakter '{name}' wurde verlassen.")

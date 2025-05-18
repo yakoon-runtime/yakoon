@@ -1,4 +1,5 @@
 from engine.core.command import Command
+from engine.core.commandset import CommandSet
 from engine.core.parser import Request
 from engine.runtime.session import Session
 
@@ -24,9 +25,8 @@ class DirectionCommand(Command):
         await session.out(room.render(session))
 
     
-def get_exit_direction_commands(room) -> list[Command]:
+def get_exit_direction_commandset(room) -> CommandSet:
     exits = getattr(room, "exits", {})
-    return [
+    return CommandSet.build_command_set([
         DirectionCommand(key=dir, target=room_id)
-        for dir, room_id in exits.items()
-    ]
+        for dir, room_id in exits.items()])

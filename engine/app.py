@@ -26,12 +26,13 @@ class Engine():
                    on_print_err: PrintError,
                    on_get_session: OnGetSession):      
 
-      async def _on_result_session(session: Session):
+      async def _on_create_new(session: Session):
          session.out = on_print_msg
          session.err = on_print_err
+         session.command_groups = self._game.default_command_groups or []
          await on_get_session(session)
  
-      await self._sessions.create_session(session_id, _on_result_session)
+      await self._sessions.create_session(session_id, _on_create_new, on_get_session)
 
    async def listen(self, session: Session, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):
@@ -42,7 +43,7 @@ class Engine():
          return await session.err("Kein Befehl erkannt.")
       await session.out(request_to_debug_dict(request))
 
-      command = self._router.resolve(request.cmd, session)
+      command = self._router.resolve(request.cmd, session.command_groups)
       if not command:
          return await session.err(f"Unbekannter Befehl: {request.cmd}")
 
@@ -52,6 +53,5 @@ class Engine():
       self._game = game
       for commands_set in game.commandsets:
          mode = getattr(commands_set, "mode", "system")
-         for cmd_cls in commands_set.commands():
-            self._router.register(cmd_cls, mode=mode)
+         self._router.register(mode, commands_set)
 

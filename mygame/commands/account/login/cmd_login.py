@@ -19,11 +19,14 @@ class CmdLogin(Command):
     
         stored = session.ctx.game.session_store.restore(session.id)
         if stored:
+            session.account = account
+            session.command_groups = ["account"]
             session.update_data(stored)
             return await session.out("Willkommen zurück.")
 
         # TODO: Hier könnten wir noch nach den character fragen ask_choice....
 
         session.account = account
+        session.command_groups = ["account"]
         session.ctx.game.session_store.persist(session)
         await session.out(f"Du bist angemeldet als {account.name}.")

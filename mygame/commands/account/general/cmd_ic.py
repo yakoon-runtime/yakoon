@@ -21,6 +21,7 @@ class CmdIC(Command):
             return await session.err(f"Charakter '{char_id}' nicht gefunden.")
 
         session.character = char
+        session.command_groups = ["character"]
         await session.out(f"Du wirst zu {char.name}.")
         room = session.ctx.game.room_store.get(char.location)
         if room:

@@ -5,6 +5,8 @@ from engine.core.commandset import CommandSet
 
 class BaseGameDefinition(ABC):
 
+    default_command_groups = []     
+
     @property
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...

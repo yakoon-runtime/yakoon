@@ -1,4 +1,4 @@
-from typing import Coroutine, Callable, TypeVar
+from typing import Coroutine, Callable, Sequence, Type, TypeVar
 from uuid import uuid4
 
 from engine.runtime.game_context import GameContext
@@ -22,6 +22,7 @@ class Session(object):
         self.id = id or str(uuid4())
         self._account = None  # Account(id="1", name="Stefan")
         self._character = None # = Character(id="c1", name="Du", location="forest")
+        self._command_groups = []
 
     def update_data(self, source: "Session"):
         self.account = source.account
@@ -32,11 +33,11 @@ class Session(object):
         return self._context
 
     @property
-    def account(self) -> Account:
-        return self._account
-    @account.setter
-    def account(self, value):
-        self._account = value
+    def command_groups(self) -> list[Type[str]]:
+        return self._command_groups
+    @command_groups.setter
+    def command_groups(self, value):
+        self._command_groups = value
     
     @property
     def character(self):
@@ -44,6 +45,13 @@ class Session(object):
     @character.setter
     def character(self, value):
         self._character = value
+
+    @property
+    def account(self) -> Account:
+        return self._account
+    @account.setter
+    def account(self, value):
+        self._account = value        
 
     def is_anonymous(self) -> bool:
         return self.account is None
@@ -72,7 +80,7 @@ class Sessions(object):
         self._session = {}
         self._engine = engine
 
-    async def create_session(self, session_id: str, on_create: OnGetSession):
+    async def create_session(self, session_id: str, on_create: OnGetSession, on_found: OnGetSession):
         """
         Creates a new session by given session_id if session not exists or returns
         the session with given session_id by the event 'on_create'.
@@ -83,6 +91,9 @@ class Sessions(object):
 
         """
         if session_id not in self._session:
-            self._session[session_id] = Session(session_id)
-        self._session[session_id].bind_context(GameContext(self._engine))
-        await on_create(self._session[session_id])
+            session = Session(session_id)
+            session.bind_context(GameContext(self._engine))
+            self._session[session_id] = session
+            await on_create(self._session[session_id])
+        else:
+            await on_found(self._session[session_id])
