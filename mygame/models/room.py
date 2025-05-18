@@ -10,7 +10,7 @@ class Room:
     desc: str = ""
     exits: dict[str, str] = field(default_factory=dict) 
 
-    def render(self, session:Session) -> str:
+    async def render(self, session:Session) -> str:
         parts = [f"|w{self.name}|n", self.desc]
 
         objects = session.ctx.game.object_store.contents_of(self.id)

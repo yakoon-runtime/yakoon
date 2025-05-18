@@ -1,7 +1,22 @@
 from dataclasses import dataclass
 
+from mygame.runtime.direction import get_exit_direction_commandset
+
 @dataclass
 class Character:
     id: str = ""
     name: str = ""
     location: str = "" # room_id
+
+    async def move_to(self, session, new_location_id):        
+        room = session.ctx.game.room_store.get(new_location_id)
+        if room:        
+            self.location = new_location_id
+            self._update_room_commands(session, room) 
+            await session.out(f"Du gehst nach {room.name}.")
+            await session.out(await room.render(session))
+
+    def _update_room_commands(self, session, room):
+        router = session.ctx.router
+        router.unregister(session.id) # TODO: Check: oder room_id / Pro User eigene Engine?
+        router.register(session.id, get_exit_direction_commandset(room))

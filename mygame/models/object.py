@@ -11,6 +11,6 @@ class Object:
     contains: list[str] = field(default_factory=list)
     movable: bool = True
 
-    def render(self, session:Session) -> str:
+    async def render(self, session:Session) -> str:
         session.ctx.game.character_store
         return f"|c{self.name}|n\n{self.desc}"

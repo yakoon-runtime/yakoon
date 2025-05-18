@@ -26,8 +26,4 @@ class CmdMove(Command):
         dest_room = session.ctx.game.room_store.get(dest_id)
         if not dest_room:
             return await session.err(f"Zielraum '{dest_id}' existiert nicht.")
-
-        char.location = dest_room.id
-        session.ctx.game.update_room_commands(session)
-        await session.out(f"Du gehst nach |w{dest_room.name}|n.")
-        await session.out(room.render(session))
+        await session.character.move_to(session, dest_room.id)
