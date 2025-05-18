@@ -11,6 +11,8 @@ class CmdLook(Command):
 
     async def run(self, session: Session, request: Request):
         char = session.character
+        #from mygame.game import GameDefinition
+        #game: GameDefinition = session.ctx.game 
         room = session.ctx.game.room_store.get(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
