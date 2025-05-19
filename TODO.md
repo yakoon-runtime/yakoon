@@ -1,14 +1,16 @@
 
-
-
-get_season() → Tag % 360 etc.
-get_weather() → Stunde auswerten
+__pycache__ - aus Git entfernen
+- Frage: Passt game namespace noch? Oder braucht es einen anderen Namen.
 
 
 - CmdInventory
 - CmdGet, CmdPut 
 
 - Dann --init game...
+
+
+# Erste später
+get_weather() → Stunde auswerten
 
 
 
