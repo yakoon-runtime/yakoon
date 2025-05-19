@@ -5,7 +5,7 @@ from mygame.stores.season_store import SeasonStore
 
 
 def get_season(clock: Clock) -> Season | None:
-    day = clock.get_time()["day"] % 360
+    day = clock.get_time()["day"] % 360 # mathematische Spielwelt
 
     for s in SeasonStore.all():
         if s.start_day <= s.end_day:
