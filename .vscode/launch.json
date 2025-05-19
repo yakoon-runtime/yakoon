@@ -5,7 +5,7 @@
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
-            "module": "mygame.launchers.console",
+            "module": "yakoon.apps.console.app",
             "console": "integratedTerminal"
         }
     ]
