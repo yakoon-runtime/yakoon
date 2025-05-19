@@ -1,9 +1,9 @@
 
-- CmdTime -> FÜr Zeitstruktur & später Welt
-    - Wie setzen wir das um:  2x, 4x Time?
-    - Dann legen wir die timephase fest
 
-- Dann Permissions.
+
+get_season() → Tag % 360 etc.
+get_weather() → Stunde auswerten
+
 
 - CmdInventory
 - CmdGet, CmdPut 

@@ -2,16 +2,20 @@ from engine.core.game.definition import BaseGameDefinition
 from mygame.commands.account.general.cmdset import GeneralAccountCommands
 from mygame.commands.account.login.cmdset import LoginAccountCommands
 from mygame.commands.character.general.cmdset import GeneralCharacterCommands
+from mygame.runtime.clock import Clock
 from mygame.runtime.session import GameSession
 
 
 class GameDefinition(BaseGameDefinition):
 
+    clock = Clock()
+    """ Defines the game clock. """
+
     session_cls = GameSession
-    """ Defines the game session object """
+    """ Defines the game session object. """
 
     default_command_groups = ["login"]     
-    """ Defines the default command group"""
+    """ Defines the default command group. """
 
     commandsets = [
         LoginAccountCommands, 
