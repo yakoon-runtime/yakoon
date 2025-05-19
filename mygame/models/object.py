@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from engine.runtime.session import Session
+from mygame.runtime.session import GameSession
 
 @dataclass
 class Object:
@@ -11,6 +11,5 @@ class Object:
     contains: list[str] = field(default_factory=list)
     movable: bool = True
 
-    async def render(self, session:Session) -> str:
-        session.ctx.game.character_store
+    async def render(self, session:GameSession) -> str:
         return f"|c{self.name}|n\n{self.desc}"

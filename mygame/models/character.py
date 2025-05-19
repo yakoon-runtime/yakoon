@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 from mygame.runtime.direction import get_exit_direction_commandset
+from mygame.stores.room_store import RoomStore      
+
 
 @dataclass
 class Character:
@@ -8,8 +10,8 @@ class Character:
     name: str = ""
     location: str = "" # room_id
 
-    async def move_to(self, session, new_location_id):        
-        room = session.ctx.game.room_store.get(new_location_id)
+    async def move_to(self, session, new_location_id):  
+        room = RoomStore.get(new_location_id)
         if room:        
             self.location = new_location_id
             self._update_room_commands(session, room) 

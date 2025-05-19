@@ -1,14 +1,14 @@
 
 from uuid import uuid4
-from engine.runtime.session import Session
+from mygame.runtime.session import GameSession
 
 
 class SessionStore:
     
     @classmethod
-    def persist(cls, session: Session):
+    def persist(cls, session: GameSession):
         pass
 
     @classmethod
-    def restore(cls, session_id: str) -> Session | None:
+    def restore(cls, session_id: str) -> GameSession | None:
        pass

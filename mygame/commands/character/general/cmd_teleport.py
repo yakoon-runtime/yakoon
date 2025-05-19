@@ -1,7 +1,7 @@
 
 from engine.core.command import Command
 from engine.core.parser import Request
-from engine.runtime.session import Session
+from mygame.runtime.session import GameSession
 
 
 class CmdTeleport(Command):
@@ -9,6 +9,6 @@ class CmdTeleport(Command):
     key = "teleport"
     aliases = ["tel", "tp"]
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
 
         await session.out("teleport done!")

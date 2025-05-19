@@ -1,7 +1,7 @@
 from typing import List
 from dataclasses import dataclass, field
-from engine.runtime.session import Session
-
+from mygame.runtime.session import GameSession
+from mygame.stores.object_store import ObjectStore
 
 @dataclass
 class Room:
@@ -10,10 +10,10 @@ class Room:
     desc: str = ""
     exits: dict[str, str] = field(default_factory=dict) 
 
-    async def render(self, session:Session) -> str:
+    async def render(self, session: GameSession) -> str:
         parts = [f"|w{self.name}|n", self.desc]
 
-        objects = session.ctx.game.object_store.contents_of(self.id)
+        objects = ObjectStore.contents_of(self.id)
         if objects:
             parts.append(f"└─ Objekte: {', '.join(o.name for o in objects)}")
 

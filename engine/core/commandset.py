@@ -1,6 +1,9 @@
+from __future__ import annotations
 from typing import Protocol, Sequence, Type
 
-from engine.core.command import Command
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from engine.core.command import Command
 
 class CommandSet(Protocol):
     

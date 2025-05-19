@@ -2,14 +2,14 @@
 from engine.core.command import Command
 from engine.core.dialog import confirm
 from engine.core.parser import Request
-from engine.runtime.session import Session
+from mygame.runtime.session import GameSession
 
 
 class CmdDelete(Command):
     key = "delete"
     aliases = ["del"]
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
         target_id = request.args[0] if request.args else None
         if not target_id:
             return await session.err("Bitte gib eine Objekt-ID an.")

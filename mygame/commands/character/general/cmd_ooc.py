@@ -1,13 +1,13 @@
 from engine.core.command import Command
 from engine.core.parser import Request
-from engine.runtime.session import Session
+from mygame.runtime.session import GameSession
 
 
 class CmdOOC(Command):
 
     key = "ooc"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
         if not session.character:
             return await session.err("Du bist bereits OOC.")
 

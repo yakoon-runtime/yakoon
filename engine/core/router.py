@@ -1,6 +1,10 @@
-
+from __future__ import annotations
 from engine.core.command import Command
-from engine.core.commandset import CommandSet
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from engine.core.commandset import CommandSet
+
 
 class CommandRouter:
 

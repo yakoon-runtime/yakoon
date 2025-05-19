@@ -1,4 +1,3 @@
-# services/room_store.py
 from mygame.models.room import Room
 
 

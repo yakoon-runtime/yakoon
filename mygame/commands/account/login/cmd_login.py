@@ -1,23 +1,24 @@
 from engine.core.command import Command
 from engine.core.parser import Request
-from engine.runtime.session import Session
-
+from mygame.runtime.session import GameSession
+from mygame.stores.account_store import AccountStore
+from mygame.stores.session_store import SessionStore 
 
 class CmdLogin(Command):
 
     key = "login"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
         if not request.args:
             return await session.err("Wen willst du anmelden?")
 
         name = request.args[0]
 
-        account = session.ctx.game.account_store.get_by_name(name)
+        account = AccountStore.get_by_name(name)
         if not account:
             return await session.err(f"Account '{name}' nicht gefunden.")
     
-        stored = session.ctx.game.session_store.restore(session.id)
+        stored = SessionStore.restore(session.id)
         if stored:
             session.account = account
             session.command_groups = ["account"]
@@ -28,5 +29,5 @@ class CmdLogin(Command):
 
         session.account = account
         session.command_groups = ["account"]
-        session.ctx.game.session_store.persist(session)
+        SessionStore.persist(session)
         await session.out(f"Du bist angemeldet als {account.name}.")

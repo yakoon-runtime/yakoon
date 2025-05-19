@@ -1,18 +1,18 @@
 from engine.core.command import Command
 from engine.core.parser import Request
-from engine.runtime.session import Session
-
+from mygame.runtime.session import GameSession
+from mygame.stores.character_store import CharacterStore
 
 class CmdIC(Command):
 
     key = "ic"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
         if not request.args:
             return await session.err("Wen willst du spielen?")
 
         char_id = request.args[0]
-        char = session.ctx.game.character_store.get(char_id)
+        char = CharacterStore.get(char_id)
         if session.character and char.id == session.character.id:
             await session.out(f"Du bist bereits {char.name}.")
             return

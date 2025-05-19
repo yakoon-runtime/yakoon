@@ -5,6 +5,7 @@ from engine.core.commandset import CommandSet
 
 class BaseGameDefinition(ABC):
 
+    session_cls = None
     default_command_groups = []     
 
     @property
@@ -15,3 +16,4 @@ class BaseGameDefinition(ABC):
         pass
     async def on_after_run_command(session, request):
         pass
+

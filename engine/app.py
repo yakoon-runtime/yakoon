@@ -4,7 +4,7 @@ from engine.core.game.definition import BaseGameDefinition
 from engine.core.parser import Request, request_to_debug_dict
 from engine.core.router import CommandRouter
 from engine.runtime.session import (
-   Session, OnGetSession, PrintError, PrintMessage, Sessions)
+   BaseSession, OnGetSession, PrintError, PrintMessage, Sessions)
 
 
 class Engine():
@@ -26,7 +26,7 @@ class Engine():
                    on_print_err: PrintError,
                    on_get_session: OnGetSession):      
 
-      async def _on_create_new(session: Session):
+      async def _on_create_new(session: BaseSession):
          session.out = on_print_msg
          session.err = on_print_err
          session.command_groups = self._game.default_command_groups or []
@@ -34,7 +34,7 @@ class Engine():
  
       await self._sessions.create_session(session_id, _on_create_new, on_get_session)
 
-   async def listen(self, session: Session, input_str: str):   
+   async def listen(self, session: BaseSession, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):
          return
 

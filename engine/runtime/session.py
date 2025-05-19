@@ -1,16 +1,17 @@
-from typing import Coroutine, Callable, Sequence, Type, TypeVar
+from __future__ import annotations
+from typing import Coroutine, Callable, Type, TypeVar
 from uuid import uuid4
 
-from engine.runtime.game_context import GameContext
-from mygame.models.account import Account
-from mygame.models.character import Character
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from engine.runtime.game_context import GameContext
 
 Text = TypeVar('Text', str, bytes)
 PrintMessage = Callable[[Text], Coroutine]
 PrintError = Callable[[Exception], Coroutine]
 
 
-class Session(object):
+class BaseSession(object):
     
     out: PrintMessage
     err: PrintError
@@ -20,11 +21,9 @@ class Session(object):
         Constructs a new session.
         """
         self.id = id or str(uuid4())
-        self._account = None  # Account(id="1", name="Stefan")
-        self._character = None # = Character(id="c1", name="Du", location="forest")
         self._command_groups = []
 
-    def update_data(self, source: "Session"):
+    def update_data(self, source: "BaseSession"):
         self.account = source.account
         self.character = source.character
 
@@ -39,33 +38,10 @@ class Session(object):
     def command_groups(self, value):
         self._command_groups = value
     
-    @property
-    def character(self):
-        return self._character
-    @character.setter
-    def character(self, value):
-        self._character = value
-
-    @property
-    def account(self) -> Account:
-        return self._account
-    @account.setter
-    def account(self, value):
-        self._account = value        
-
-    def is_anonymous(self) -> bool:
-        return self.account is None
-
-    def is_ic(self) -> bool:
-        return self.character is not None
-
-    def is_ooc(self) -> bool:
-        return self.account is not None and self.character is None
-
     def bind_context(self, context: GameContext):
         self._context = context
 
-OnGetSession = Callable[[Session], Coroutine]
+OnGetSession = Callable[[BaseSession], Coroutine]
 
 
 class Sessions(object):
@@ -91,8 +67,10 @@ class Sessions(object):
 
         """
         if session_id not in self._session:
-            session = Session(session_id)
-            session.bind_context(GameContext(self._engine))
+            from engine.runtime.game_context import GameContext
+            context = GameContext(self._engine)
+            session = context.game.session_cls(session_id)
+            session.bind_context(context)
             self._session[session_id] = session
             await on_create(self._session[session_id])
         else:

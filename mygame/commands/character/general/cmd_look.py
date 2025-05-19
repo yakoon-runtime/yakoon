@@ -1,19 +1,17 @@
 
 from engine.core.command import Command
 from engine.core.parser import Request
-from engine.runtime.session import Session
-
+from mygame.runtime.session import GameSession
+from mygame.stores.room_store import RoomStore
 
 class CmdLook(Command):
 
     key = "look"
     aliases = ["see"]
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: GameSession, request: Request):
         char = session.character
-        #from mygame.game import GameDefinition
-        #game: GameDefinition = session.ctx.game 
-        room = session.ctx.game.room_store.get(char.location) if char else None
+        room = RoomStore.get(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
 
