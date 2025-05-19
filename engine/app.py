@@ -47,11 +47,12 @@ class Engine():
       if not command:
          return await session.err(f"Unbekannter Befehl: {request.cmd}")
 
+      await self._game.on_before_run_command(session, request)
       await command.run(session, request)
+      await self._game.on_after_run_command(session, request)
                
    def load_game(self, game: BaseGameDefinition):
       self._game = game
       for commands_set in game.commandsets:
          mode = getattr(commands_set, "mode", "system")
          self._router.register(mode, commands_set)
-

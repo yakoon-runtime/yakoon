@@ -12,12 +12,20 @@ from mygame.stores.room_store import RoomStore
 class GameDefinition(BaseGameDefinition):
 
     default_command_groups = ["login"]     
-    commandsets = [LoginAccountCommands, GeneralAccountCommands, GeneralCharacterCommands] 
+    commandsets = [
+        LoginAccountCommands, 
+        GeneralAccountCommands, 
+        GeneralCharacterCommands
+    ]
+     
+    async def on_before_run_command(session, request):
+        pass
+    async def on_after_run_command(session, request):
+        if session.account and not session.character: 
+             session.ctx.router.unregister(session.id)
 
     room_store = RoomStore
     character_store = CharacterStore
     object_store = ObjectStore
     account_store = AccountStore
     session_store = SessionStore
-
-    # optional: template_renderer, ask_handler, etc.

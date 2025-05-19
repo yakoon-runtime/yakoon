@@ -11,16 +11,7 @@ class BaseGameDefinition(ABC):
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
 
-    @property
-    @abstractmethod
-    def room_store(self): ...
-
-    @property
-    @abstractmethod
-    def character_store(self): ...
-
-    @property
-    @abstractmethod
-    def object_store(self): ...
-
-
+    async def on_before_run_command(session, request):
+        pass
+    async def on_after_run_command(session, request):
+        pass

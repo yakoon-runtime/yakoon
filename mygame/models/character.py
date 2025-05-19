@@ -15,8 +15,8 @@ class Character:
             self._update_room_commands(session, room) 
             await session.out(f"Du gehst nach {room.name}.")
             await session.out(await room.render(session))
-
+     
     def _update_room_commands(self, session, room):
         router = session.ctx.router
-        router.unregister(session.id) # TODO: Check: oder room_id / Pro User eigene Engine?
+        router.unregister(session.id)
         router.register(session.id, get_exit_direction_commandset(room))
