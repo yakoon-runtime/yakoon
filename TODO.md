@@ -17,6 +17,10 @@ get_weather() → Stunde auswerten
 Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit Fortsezen können.
 
 
+# SETUP
+- Im ProjektRoot: pip install -e .
+- C:\Bibliothek\yakoon>  python -m yakoon --init smurf
+
 
 # Application Plan
 yakoon/               ← die Engine (pip install yakoon)
