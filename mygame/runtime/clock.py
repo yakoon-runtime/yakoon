@@ -6,7 +6,7 @@ class Clock:
     """
     1.0	    1 Sekunde Realzeit = 1 Spielsekunde (Echtzeit-Modus)
     10.0	1 Sekunde Realzeit = 10 Spielsekunden
-    60.0	1 Sekunde Realzeit = 1 Spielminute → 🌗 realistischer Tagesverlauf
+    *60.0	1 Sekunde Realzeit = 1 Spielminute → 🌗 realistischer Tagesverlauf
     3600.0	1 Sekunde Realzeit = 1 Spielstunde → kompletter Tag in 24 Sekunden
     0.0	Pause - Zeit steht still    
     """
