@@ -1,12 +1,11 @@
-- Dann --init game...
-
-
+TODO:
+- Logs 
+- Webservice
 
 - Namespaces
 
 - CmdInventory
 - CmdGet, CmdPut 
-
 
 
 # Erste später

@@ -3,6 +3,7 @@ from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.game.definition import BaseGameDefinition
 from yakoon.engine.core.parser import Request, request_to_debug_dict
 from yakoon.engine.core.router import CommandRouter
+from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.session import (
    BaseSession, OnGetSession, PrintError, PrintMessage, Sessions)
 
@@ -53,6 +54,7 @@ class Engine():
          await self._game.on_after_run_command(session, request, command)
 
       except PermissionError as exc:
+         LogService.permission(session, "command", command.key)
          await session.err(str(exc))
 
       except ValueError as exc:
@@ -60,13 +62,8 @@ class Engine():
 
       except Exception as exc:
          await session.err("Ein interner Fehler ist aufgetreten.")
-         self._log_exception(exc)
+         LogService.error(exc)
                   
-   def _log_exception(self, exc: Exception):
-      import traceback
-      print("[Yakoon-Engine] FEHLER:")
-      print("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
-
    def load_game(self, game: BaseGameDefinition):
       self._game = game
       for commands_set in game.commandsets:
