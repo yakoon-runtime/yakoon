@@ -3,6 +3,7 @@ from engine.core.command import Command
 from engine.core.dialog import confirm
 from engine.core.parser import Request
 from mygame.runtime.session import GameSession
+from mygame.stores.object_store import ObjectStore
 
 
 class CmdDelete(Command):
@@ -10,17 +11,17 @@ class CmdDelete(Command):
     aliases = ["del"]
 
     async def run(self, session: GameSession, request: Request):
-        target_id = request.args[0] if request.args else None
-        if not target_id:
+        obj_id = request.args[0] if request.args else None
+        if not obj_id:
             return await session.err("Bitte gib eine Objekt-ID an.")
 
-        if await confirm(session, f"Wirklich löschen? (y/n) → {target_id}"):
-            await session.out(f"Objekt '{target_id}' gelöscht.")
-        else:
-            await session.out("Abgebrochen.")
+        obj = ObjectStore.get(obj_id)
+        if not obj:
+            return await session.out(f"Objekt {obj_id} nicht gefunden.")
+        if not obj.has_perm(session, "delete"):
+            raise PermissionError("Keine Berechtigung zum Löschen.")
 
-        answer = await confirm(session, f"Neu anlegen? (y/n) → {target_id}")
-        if answer:
-            await session.out(f"Objekt '{target_id}' angelegt.")
+        if await confirm(session, f"Wirklich löschen? (y/n) → {obj_id}"):
+            await session.out(f"Objekt '{obj_id}' gelöscht.")
         else:
             await session.out("Abgebrochen.")

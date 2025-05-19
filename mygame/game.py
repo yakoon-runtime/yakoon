@@ -19,9 +19,11 @@ class GameDefinition(BaseGameDefinition):
         GeneralCharacterCommands]
     """ The collection of all commands. """
      
-    async def on_before_run_command(session: GameSession, _):
-        pass
+    async def on_before_run_command(session: GameSession, request, command):
+        if required := getattr(command, "requires", []):
+            if not set(required).issubset(set(session.permissions)):
+                raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
     
-    async def on_after_run_command(session: GameSession, _):
+    async def on_after_run_command(session: GameSession, request, command):
         if session.account and not session.character: 
              session.ctx.router.unregister(session.id)

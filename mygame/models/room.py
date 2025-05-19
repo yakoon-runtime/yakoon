@@ -1,10 +1,12 @@
 from typing import List
 from dataclasses import dataclass, field
+from mygame.models.secured import Secured
 from mygame.runtime.session import GameSession
 from mygame.stores.object_store import ObjectStore
 
+
 @dataclass
-class Room:
+class Room(Secured):
     id: str = ""
     name: str = ""
     desc: str = ""

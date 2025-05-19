@@ -12,3 +12,4 @@
 
 
 
+Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit Fortsezen können.

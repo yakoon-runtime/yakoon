@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
 
+from mygame.models.secured import Secured
 from mygame.runtime.session import GameSession
 
+
 @dataclass
-class Object:
+class Object(Secured):
     id: str = ""
     name: str = ""
     desc: str = ""

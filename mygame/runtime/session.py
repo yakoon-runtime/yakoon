@@ -14,6 +14,15 @@ class GameSession(BaseSession):
         super().__init__(id)
         self._account = None
         self._character = None
+        self._permissions = []
+
+    @property
+    def permissions(self) -> list[str]:
+        return self._permissions or []
+
+    @permissions.setter
+    def permissions(self, value: list[str]):
+        self._permissions = value
 
     @property
     def account(self) -> Account | None:

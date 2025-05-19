@@ -12,8 +12,8 @@ class BaseGameDefinition(ABC):
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
 
-    async def on_before_run_command(session, request):
+    async def on_before_run_command(session, request, command):
         pass
-    async def on_after_run_command(session, request):
+    async def on_after_run_command(session, request, command):
         pass
 
