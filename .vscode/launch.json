@@ -3,15 +3,6 @@
     "configurations": [
 
         {
-            "name": "Yakoon: Run WebAPI",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/yakoon/apps/webapi/app.py",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-
-        {
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
@@ -26,6 +17,16 @@
             "module": "yakoon.apps.telnet.app",
             "console": "integratedTerminal"
         },
+
+        {
+            "name": "Yakoon: Run WebAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/yakoon/apps/webapi/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+
 
     ]
 }

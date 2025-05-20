@@ -1,4 +1,15 @@
 
+- Templates für die Räume (Jinja2)
+- Persistieren aller Objekte
+- Und jede Menge Commands (die habe ich schon für Evennia entwickelt. Sind aber
+  alle noch anzupassen.
+- Unittests (oder besseres - Yukoon-Style)
+- Alles Dokumentieren im Code auf Englisch (Docstrings)
+- Zudem brauchen wir noch einen Webclient. Warum zu dieser Zeit?
+  - Die Entwicklung wird einfacher, wenn wir den Client nicht ständig starten und stoppen
+    müssen. Ausserdem tun wir uns im Design mit den Templates später einfacher.
+
+
 - Namespaces 
   - alles 
 
@@ -27,12 +38,6 @@ git commit -m "feat(cli): add project init command"
 Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit fortsezen können.
 
 
-
-
-# UFT-8 - aktivieren
-cmd.exe -> chcp 65001
-
-
 # Application Plan
 yakoon/               ← die Engine (pip install yakoon)
 minddojo/             ← ein Spielprojekt, erzeugt mit `yakoon --init`
@@ -43,9 +48,6 @@ minddojo/             ← ein Spielprojekt, erzeugt mit `yakoon --init`
 │       └── templates/
 ├── requirements.txt  ← eigene Abhängigkeiten
 ├── yakoon.conf.py    ← Konfiguration (tickrate, hooks, etc.)
-
-
-
 
 
 # GIT-CONVENTIONS:
