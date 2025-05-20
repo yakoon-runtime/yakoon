@@ -1,8 +1,10 @@
 
+from yakoon.engine.settings import Settings
 from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.game.definition import BaseGameDefinition
 from yakoon.engine.core.parser import Request, request_to_debug_dict
 from yakoon.engine.core.router import CommandRouter
+from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.session import (
    BaseSession, OnGetSession, PrintError, PrintMessage, Sessions)
@@ -43,6 +45,11 @@ class Engine():
          session_id, _on_create_new, _on_ready_internal)
 
    async def send(self, session: BaseSession, input_str: str):   
+      inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
+      for raw in inputs:
+         await self._send_one(session, raw.strip())
+
+   async def _send_one(self, session: BaseSession, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):
          return
 

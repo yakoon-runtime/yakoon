@@ -9,6 +9,8 @@
   - Die Entwicklung wird einfacher, wenn wir den Client nicht ständig starten und stoppen
     müssen. Ausserdem tun wir uns im Design mit den Templates später einfacher.
 
+git commit -m "refactor(engine): extract batch command splitting to utility module"
+
 
 - Namespaces 
   - alles 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..core.command import Command
+from yakoon.engine.core.command import Command
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
