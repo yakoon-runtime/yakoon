@@ -3,6 +3,8 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
+from yakoon.apps.webapi.session_manager import handle_input
+
 router = APIRouter()
 
 class CommandRequest(BaseModel):
@@ -11,5 +13,5 @@ class CommandRequest(BaseModel):
 
 @router.post("/run")
 async def run_command(data: CommandRequest):
-    # TODO: Dispatch command to Yakoon engine
-    return {"status": "ok", "input": data.input}
+    result = await handle_input(data.session_id, data.input)
+    return {"output": result}

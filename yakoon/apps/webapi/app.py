@@ -10,3 +10,7 @@ def init_routes():
     app.include_router(command.router, prefix="/command")
 
 init_routes()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("yakoon.apps.webapi.app:app", host="127.0.0.1", port=8000, reload=False)

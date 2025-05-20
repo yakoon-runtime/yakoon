@@ -1,12 +1,23 @@
 {
     "version": "0.2.0",
     "configurations": [
+
+        {
+            "name": "Yakoon: WebAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/yakoon/apps/webapi/app.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+
         {
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
             "module": "yakoon.apps.console.app",
             "console": "integratedTerminal"
-        }
+        },
+
     ]
 }

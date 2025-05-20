@@ -13,19 +13,18 @@ async def msg(text: str):
     print(text)
 
 
-async def run_application(gamedef_cls: GameDefinition):
+async def run_application(GameDef: GameDefinition):
 
-    engine = Engine()
-    engine.load_game(gamedef_cls)
+    engine = Engine(GameDef)
 
     while True:
         command = await ainput("|:> ")
-        async def on_session(session):
-            await engine.listen(session, command)
+        async def on_ready(session):
+            await engine.send(session, command)
 
         # each message is a own task.
         asyncio.create_task(
-            engine.enter(None, msg, error, on_session))
+            engine.enter(None, msg, error, on_ready))
 
 
 if __name__ == "__main__":

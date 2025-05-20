@@ -20,12 +20,17 @@ get_weather(): Er genügt, das erstmal auf Abruf zu tun.
 git commit -m "feat(cli): add project init command"
 
 
+# Start RestService
+- uvicorn yakoon.app.webapi.app:app --reload
+
+# Install Yakon as component
+- Im ProjektRoot: pip install -e .
+- C:\Bibliothek\yakoon>  python -m yakoon --init smurf
+
+# Zusammenfassung -> Chatgpt
 Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit fortsezen können.
 
 
-# SETUP
-- Im ProjektRoot: pip install -e .
-- C:\Bibliothek\yakoon>  python -m yakoon --init smurf
 
 
 # Application Plan
