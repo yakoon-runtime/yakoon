@@ -1,19 +1,25 @@
 TODO:
-- Logs 
 - Webservice
 
-- Namespaces
+
+
+- Namespaces 
+  - alles 
 
 - CmdInventory
-- CmdGet, CmdPut 
+- CmdGet, CmdPut -> Legen in Boxen / Inventar....
 
 
-# Erste später
-get_weather() → Stunde auswerten
+get_weather(): Er genügt, das erstmal auf Abruf zu tun.
+1. Die Wetter-Phasen 
+2. Die Wetter-Events (Ereignisse pro Zone)
 
 
+# GIT Konvention:
+git commit -m "feat(cli): add project init command"
 
-Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit Fortsezen können.
+
+Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit fortsezen können.
 
 
 # SETUP
