@@ -29,6 +29,10 @@ Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konz
 
 
 
+# UFT-8 - aktivieren
+cmd.exe -> chcp 65001
+
+
 # Application Plan
 yakoon/               ← die Engine (pip install yakoon)
 minddojo/             ← ein Spielprojekt, erzeugt mit `yakoon --init`
