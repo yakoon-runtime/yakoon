@@ -1,3 +1,4 @@
+from yakoon.apps.telnet.utils.translate import translate_ansi
 from yakoon.engine.runtime import Engine
 from yakoon.game.definition import GameDefinition
 
@@ -12,11 +13,12 @@ async def handle_client(reader, writer):
     print(f"[Telnet] Verbindung von {session_id}")
 
     async def out(msg: str):
-        writer.write((str(msg) + "\r\n").encode("utf-8"))
+        msg_str = translate_ansi(str(msg))  
+        writer.write((msg_str + "\r\n").encode("utf-8"))  
         await writer.drain()
 
     async def on_ready(session):
-        await session.out("Willkommen bei Yakoon!")  
+        await out("|wWillkommen bei Yakoon!|n")  
         while True:
             line = await reader.readline()
             if not line:

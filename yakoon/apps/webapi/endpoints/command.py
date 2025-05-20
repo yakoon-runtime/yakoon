@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
-from yakoon.apps.webapi.session_manager import handle_input
+from yakoon.apps.webapi.sessions.handler import handle_input
 
 router = APIRouter()
 

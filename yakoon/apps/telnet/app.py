@@ -1,7 +1,7 @@
 
 import asyncio
 
-from yakoon.apps.telnet.session_bridge import handle_client
+from yakoon.apps.telnet.bridge import handle_client
 
 async def main():
 
