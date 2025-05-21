@@ -1,3 +1,8 @@
+- pip venv anlegen
+- Open AI
+
+
+
 
 - Templates für die Räume (Jinja2)
 - Persistieren aller Objekte
@@ -35,6 +40,9 @@ git commit -m "feat(cli): add project init command"
 
 # Zusammenfassung -> Chatgpt
 Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit fortsezen können.
+
+# Später
+- Alles Dockern
 
 
 # Application Plan

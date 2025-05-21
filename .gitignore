@@ -6,3 +6,4 @@ yakoon.egg-info/
 *.pyc
 dist/
 build/
+.venv/
