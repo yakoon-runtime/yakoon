@@ -27,6 +27,14 @@
             "justMyCode": true
         },
 
+         {
+            "name": "MindDojo: Run Console",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "minddojo.app",
+            "console": "integratedTerminal"
+        },
+
 
     ]
 }

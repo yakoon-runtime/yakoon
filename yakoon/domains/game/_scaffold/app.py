@@ -1,6 +1,6 @@
 import asyncio
 from yakoon.apps.console.app import run_application
-from yakoon.domains.game.definition import GameDefinition
+from .game.definition import GameDefinition
 
 
 if __name__ == "__main__":

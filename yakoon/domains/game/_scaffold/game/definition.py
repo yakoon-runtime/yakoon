@@ -23,10 +23,10 @@ class GameDefinition(BaseDefinition):
         # DebugCommands, AdminCommands, etc. later
     ]
 
-    async def on_before_run_command(session: GameSession, request, command):
+    async def on_before_run_command(self, session: GameSession, request, command):
         # IMPORTANT: Call super() to retain base lifecycle behavior
-        await super().on_before_run_command(session, request)
+        await super().on_before_run_command(session, request, command)
 
-    async def on_after_run_command(session: GameSession, request, command):
+    async def on_after_run_command(self, session: GameSession, request, command):
         # IMPORTANT: Call super() to retain base lifecycle behavior
-        await super().on_after_run_command(session, request)
+        await super().on_after_run_command(session, request, command)
