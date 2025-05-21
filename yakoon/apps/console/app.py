@@ -2,7 +2,8 @@
 import asyncio
 from aioconsole import ainput
 from yakoon.engine.runtime import Engine
-from yakoon.domains.game.definition import GameDefinition
+from yakoon.platform.definition import PlatformDefinition
+#from yakoon.domains.game.definition import GameDefinition
 
 
 async def error(exc: Exception):
@@ -13,7 +14,7 @@ async def msg(text: str):
     print(text)
 
 
-async def run_application(GameDef: GameDefinition):
+async def run_application(GameDef: PlatformDefinition):
 
     engine = Engine(GameDef)
 
@@ -28,4 +29,4 @@ async def run_application(GameDef: GameDefinition):
 
 
 if __name__ == "__main__":
-    asyncio.run(run_application(GameDefinition))
+    asyncio.run(run_application(PlatformDefinition))

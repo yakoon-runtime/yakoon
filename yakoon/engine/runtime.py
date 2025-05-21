@@ -16,7 +16,7 @@ class Engine():
       """
       Creates a new instance of the class engine.
       """
-      self._domain = domain_def
+      self._domain = domain_def()
       self._sessions = Sessions(self)
       self._router = CommandRouter()
       for commands_set in domain_def.commandsets:

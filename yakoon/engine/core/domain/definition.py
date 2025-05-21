@@ -13,8 +13,8 @@ class DomainDefinition(ABC):
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
 
-    async def on_before_run_command(session, request, command):
+    async def on_before_run_command(self, session, request, command):
         pass
-    async def on_after_run_command(session, request, command):
+    async def on_after_run_command(self, session, request, command):
         pass
 
