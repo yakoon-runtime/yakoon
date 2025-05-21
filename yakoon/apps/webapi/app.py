@@ -1,16 +1,13 @@
 # yakoon/app/webapi/app.py
 
 from fastapi import FastAPI
-from yakoon.apps.webapi.endpoints import command
+from yakoon.apps.webapi.tools.middleware import setup_CORS
+from yakoon.apps.webapi.tools.routes import init_routes
+
 
 app = FastAPI()
- 
-
-# Include routes
-def init_routes():
-    app.include_router(command.router, prefix="/command")
-
-init_routes()
+setup_CORS(app) 
+init_routes(app)
 
 if __name__ == "__main__":
     import uvicorn
