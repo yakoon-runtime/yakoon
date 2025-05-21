@@ -52,3 +52,7 @@ export default tseslint.config({
   },
 })
 ```
+
+
+### INFO
+- https://www.tailwind-config.com/
