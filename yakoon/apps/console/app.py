@@ -2,7 +2,7 @@
 import asyncio
 from aioconsole import ainput
 from yakoon.engine.runtime import Engine
-from yakoon.game.definition import GameDefinition
+from yakoon.domains.game.definition import GameDefinition
 
 
 async def error(exc: Exception):

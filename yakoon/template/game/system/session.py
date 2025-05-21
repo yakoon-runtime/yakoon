@@ -1,4 +1,4 @@
-from yakoon.game.runtime.session import GameSession as BaseSession
+from yakoon.domains.game.runtime.session import GameSession as BaseSession
 
 
 class GameSession(BaseSession):

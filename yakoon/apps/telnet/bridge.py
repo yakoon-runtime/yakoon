@@ -1,6 +1,6 @@
 from yakoon.apps.telnet.utils.translate import translate_ansi
 from yakoon.engine.runtime import Engine
-from yakoon.game.definition import GameDefinition
+from yakoon.domains.game.definition import GameDefinition
 
 
 _engine = Engine(GameDefinition)

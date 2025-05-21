@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from yakoon.engine.system.game_context import GameContext
+    from yakoon.engine.system.context import Context
 
 Text = TypeVar('Text', str, bytes)
 PrintMessage = Callable[[Text], Coroutine]
@@ -28,7 +28,7 @@ class BaseSession(object):
         self.character = source.character
 
     @property
-    def ctx(self) -> GameContext:
+    def ctx(self) -> Context:
         return self._context
 
     @property
@@ -38,7 +38,7 @@ class BaseSession(object):
     def command_groups(self, value):
         self._command_groups = value
     
-    def bind_context(self, context: GameContext):
+    def bind_context(self, context: Context):
         self._context = context
 
 OnGetSession = Callable[[BaseSession], Coroutine]
@@ -67,9 +67,9 @@ class Sessions(object):
 
         """
         if session_id not in self._session:
-            from yakoon.engine.system.game_context import GameContext
-            context = GameContext(self._engine)
-            session = context.game.session_cls(session_id)
+            from yakoon.engine.system.context import Context
+            context = Context(self._engine)
+            session = context.definition.session_cls(session_id)
             session.bind_context(context)
             self._session[session_id] = session
             await on_create(self._session[session_id])

@@ -1,8 +1,8 @@
 
 from yakoon.engine.settings import Settings
+from yakoon.engine.core.parser import Request
 from yakoon.engine.core.dialog.manager import DialogManager
-from yakoon.engine.core.game.definition import BaseGameDefinition
-from yakoon.engine.core.parser import Request, request_to_debug_dict
+from yakoon.engine.core.domain.definition import DomainDefinition
 from yakoon.engine.core.router import CommandRouter
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
@@ -12,14 +12,14 @@ from yakoon.engine.system.session import (
 
 class Engine():
      
-   def __init__(self, game_def: BaseGameDefinition):
+   def __init__(self, domain_def: DomainDefinition):
       """
       Creates a new instance of the class engine.
       """
-      self._game = game_def
+      self._domain = domain_def
       self._sessions = Sessions(self)
       self._router = CommandRouter()
-      for commands_set in game_def.commandsets:
+      for commands_set in domain_def.commandsets:
          mode = getattr(commands_set, "mode", "system")
          self._router.register(mode, commands_set)
 
@@ -38,7 +38,7 @@ class Engine():
          await on_ready(session)
 
       async def _on_create_new(session: BaseSession):
-         session.command_groups = self._game.default_command_groups or []
+         session.command_groups = self._domain.default_command_groups or []
          await _on_ready_internal(session)
        
       await self._sessions.create_session(
@@ -62,9 +62,9 @@ class Engine():
          return await session.err(f"Unbekannter Befehl: {request.cmd}")
 
       try:
-         await self._game.on_before_run_command(session, request, command)
+         await self._domain.on_before_run_command(session, request, command)
          await command.run(session, request)
-         await self._game.on_after_run_command(session, request, command)
+         await self._domain.on_after_run_command(session, request, command)
 
       except PermissionError as exc:
          LogService.permission(session, "command", command.key)

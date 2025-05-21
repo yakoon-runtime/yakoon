@@ -1,8 +1,8 @@
 # yakoon/app/webapi/session_manager.py
 
 from yakoon.engine.runtime import Engine
-from yakoon.game.definition import GameDefinition
-from yakoon.game.runtime.session import GameSession
+from yakoon.domains.game.definition import GameDefinition
+from yakoon.domains.game.runtime.session import GameSession
 
 
 _engine = Engine(GameDefinition)

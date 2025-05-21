@@ -1,5 +1,10 @@
 
 # MASTER-TODO's
+- System für Industrie - Command-Strukturen mit KI
+    - Automatisierung (Rechnungen, PPX, Mails, Produktionsabläufe....)
+    - Projekte ("Erstelle Neues Projekt X", "Lade Projekt X")
+    - Dokumentiere (Zugriff auf Lokale Version.)
+    
 
 ## Scripting
 - Scriptdateien (scripts/goblin.txt)

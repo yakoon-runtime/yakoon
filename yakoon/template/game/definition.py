@@ -1,4 +1,4 @@
-from yakoon.game.definition import GameDefinition as BaseDefinition
+from yakoon.domains.game.definition import GameDefinition as BaseDefinition
 
 from .system.session import GameSession
 from .commands.default_cmdsets import (
