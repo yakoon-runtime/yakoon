@@ -18,7 +18,7 @@ class PlatformDefinition(DomainDefinition):
     async def on_before_run_command(self, session: PlatformSession, request, command):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
-                raise PermissionError(f"Auftrag abgelegt. Erforderlich: {', '.join(required)}")
+                raise PermissionError(f"Auftrag abgelegt. Erforderliche Rollen: {', '.join(required)}")
 
     async def on_after_run_command(self, session, request, command):
         # IMPORTANT: Call super() to retain base lifecycle behavior
