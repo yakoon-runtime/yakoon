@@ -1,11 +1,14 @@
 from yakoon.engine.core.domain.definition import DomainDefinition
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.services.session_service import SessionService
+from yakoon.platform.stores.memory_session_store import InMemorySessionStore
 
 
 class PlatformDefinition(DomainDefinition):
 
-    session_cls = PlatformSession
+    sessions = SessionService(
+        store=InMemorySessionStore(session_cls=PlatformSession))
     """ Defines the platform session object. """
 
     default_command_groups = ["system"]     
@@ -20,6 +23,7 @@ class PlatformDefinition(DomainDefinition):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Auftrag abgelegt. Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_after_run_command(self, session, request, command):
-        # IMPORTANT: Call super() to retain base lifecycle behavior
-        await super().on_after_run_command(session, request, command)
+    async def on_after_send(self, session: PlatformSession):
+        await super().on_after_send(session)
+        if session.is_anonymous:
+            await self.sessions.delete(session.id)

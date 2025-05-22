@@ -6,8 +6,9 @@ from yakoon.engine.core.domain.definition import DomainDefinition
 from yakoon.engine.core.router import CommandRouter
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
+from yakoon.engine.system.context import Context
 from yakoon.engine.system.session import (
-   BaseSession, OnGetSession, PrintError, PrintMessage, Sessions)
+   BaseSession, OnGetSession, PrintError, PrintMessage)
 
 
 class Engine():
@@ -16,8 +17,7 @@ class Engine():
       """
       Creates a new instance of the class engine.
       """
-      self._domain = domain_def()
-      self._sessions = Sessions(self)
+      self._domain:DomainDefinition = domain_def()
       self._router = CommandRouter()
       for commands_set in domain_def.commandsets:
          mode = getattr(commands_set, "mode", "system")
@@ -31,23 +31,19 @@ class Engine():
                    on_print_msg: PrintMessage,
                    on_print_err: PrintError,
                    on_ready: OnGetSession):      
-
-      async def _on_ready_internal(session: BaseSession):
-         session.out = on_print_msg
-         session.err = on_print_err
-         await on_ready(session)
-
-      async def _on_create_new(session: BaseSession):
-         session.command_groups = self._domain.default_command_groups or []
-         await _on_ready_internal(session)
        
-      await self._sessions.create_session(
-         session_id, _on_create_new, _on_ready_internal)
+      session, _ = await self._domain.sessions.get_or_create(session_id)
+      session.bind_context(Context(self))
+      session.out = on_print_msg
+      session.err = on_print_err
+      await on_ready(session)
 
    async def send(self, session: BaseSession, input_str: str):   
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
+      await self._domain.on_before_send(session)
       for raw in inputs:
          await self._send_one(session, raw.strip())
+      await self._domain.on_after_send(session)
 
    async def _send_one(self, session: BaseSession, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):

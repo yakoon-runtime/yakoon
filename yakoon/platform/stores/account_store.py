@@ -1,5 +1,5 @@
 from typing import Optional
-from yakoon.domains.game.models.account import Account
+from yakoon.platform.models.account import Account
 
 
 class AccountStore:
@@ -7,20 +7,25 @@ class AccountStore:
 
     @classmethod
     def get_by_name(cls, name: str) -> Optional[Account]:
-        return cls._accounts.get(name.lower())
+        for key, value in cls._accounts.items:
+            if value == name.lower():
+                return cls._accounts[key]
 
     @classmethod
-    def all(clf) -> list[Account]:
+    def get_by_id(cls, account_id: str) -> Optional[Account]:
+        return cls._accounts.get(account_id)
+
+    @classmethod
+    def all(cls) -> list[Account]:
         return list(cls._accounts.values())
 
     @classmethod
     def exists(cls, name: str) -> bool:
-        return name.lower() in cls._accounts
+        return cls.get_by_name(name) != None
 
     @classmethod
     def add(cls, account: Account):
         cls._accounts[account.name.lower()] = account
-
 
 AccountStore.add(Account(id="acc-stefan", name="stefan"))
 AccountStore.add(Account(id="acc-lara", name="lara"))

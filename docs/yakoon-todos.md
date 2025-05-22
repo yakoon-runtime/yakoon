@@ -1,25 +1,53 @@
-- pip venv anlegen
+
+# Core 
+- Löschen der Session, wenn nach Command kein Account
+- Anmeldung an Plattform (OSLogin)
+  - Help alle Commands (übergeornete Domains)
+- Webclient - mit weißen Hintergrund und Eingabe fix. 
+  - Genau wie in ChatPGP
+- Test von Yield mit zwei Sessions
+- Templates:
+  - Wir wollen unsere Texte in Markdown anzeigen. 
+  - Funktion, um beliebite Bäume ├──;  │   └── darzustellen.
+    - Ist Core Funktion
+
+- Laden der Definition zur Laufeit per (OSCommand)
+- Game als Mind-Dojo registriert
+  - Login an Mind-Dojo (Login)
+- Assistenten: Domain
+  - Erinnern an Trinken
+  - Pausen
+  - ....
+
+# Platform
 - Open AI
+- Yakoon-06 (AI-key) -> comment_all_public_methods
+- Erstelle neues Projekt ....
+  -> Was bedeutet das? -> Neuer Chat. 
+      CmdGPTSession 
+- Drag & Drop am Webclient
+  - Daten können hier dann verarbeitet werden. 
+    - Request kann auch BINDATA / Chunks?
+- Konzept: Engabe -> Verarbeitung - > Ausgabe
+  - Antwort was getan wird; Antwort was getan wurde? 
+- Alles Dokumentieren im Code auf Englisch (Docstrings)
+- Unittests (oder besseres - Yukoon-Style)
 
 
 
+# Docker
+- Alles muss in einem Docker laufen
 
+# MUD
 - Templates für die Räume (Jinja2)
 - Persistieren aller Objekte
 - Und jede Menge Commands (die habe ich schon für Evennia entwickelt. Sind aber
   alle noch anzupassen.
-- Unittests (oder besseres - Yukoon-Style)
-- Alles Dokumentieren im Code auf Englisch (Docstrings)
-- Zudem brauchen wir noch einen Webclient. Warum zu dieser Zeit?
-  - Die Entwicklung wird einfacher, wenn wir den Client nicht ständig starten und stoppen
-    müssen. Ausserdem tun wir uns im Design mit den Templates später einfacher.
-
-- Namespaces 
-  - alles 
-
-- CmdInventory
-- CmdGet, CmdPut -> Legen in Boxen / Inventar....
-
+- Konzept: Namespaces 
+  - Modelle sind verwenden Namensberreiche
+- Commands:
+  - CmdInventory
+  - CmdGet, CmdPut -> Legen in Boxen / Inventar....
 
 # WETTER: CHAT: Yakoon-04
 get_weather(): Er genügt, das erstmal auf Abruf zu tun.

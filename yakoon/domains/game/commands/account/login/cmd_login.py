@@ -1,8 +1,8 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
 from yakoon.domains.game.runtime.session import GameSession
-from yakoon.domains.game.stores.account_store import AccountStore
-from yakoon.domains.game.stores.session_store import SessionStore 
+from yakoon.platform.models.account import Account
+from yakoon.platform.stores.account_store import AccountStore
 
 
 class CmdLogin(Command):
@@ -14,21 +14,14 @@ class CmdLogin(Command):
             return await session.err("Wen willst du anmelden?")
 
         name = request.args[0]
-
         account = AccountStore.get_by_name(name)
         if not account:
             return await session.err(f"Account '{name}' nicht gefunden.")
-    
-        stored = SessionStore.restore(session.id)
-        if stored:
-            session.account = account
-            session.command_groups = ["account"]
-            session.update_data(stored)
+        
+        session_service = session.ctx.definition.sessions
+        pers_session, created = session_service.get_or_create(session.id, account_id=account.id)
+        if not pers_session:
+            raise ValueError("Session cannot be None")
+        if not created:
             return await session.out("Willkommen zurück.")
-
-        # TODO: Hier könnten wir noch nach den character fragen ask_choice....
-
-        session.account = account
-        session.command_groups = ["account"]
-        SessionStore.persist(session)
         await session.out(f"Du bist angemeldet als {account.name}.")

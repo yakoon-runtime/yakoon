@@ -22,10 +22,7 @@ class BaseSession(object):
         """
         self.id = id or str(uuid4())
         self._command_groups = []
-
-    def update_data(self, source: "BaseSession"):
-        self.account = source.account
-        self.character = source.character
+        self._sessions = None
 
     @property
     def ctx(self) -> Context:
@@ -41,37 +38,5 @@ class BaseSession(object):
     def bind_context(self, context: Context):
         self._context = context
 
+    
 OnGetSession = Callable[[BaseSession], Coroutine]
-
-
-class Sessions(object):
-    """
-    Manages all sessions
-    """
-
-    def __init__(self, engine):
-        """
-        Creates a new instance of class Sessions.
-        """
-        self._session = {}
-        self._engine = engine
-
-    async def create_session(self, session_id: str, on_create: OnGetSession, on_found: OnGetSession):
-        """
-        Creates a new session by given session_id if session not exists or returns
-        the session with given session_id by the event 'on_create'.
-        Args:
-            session_id: The session id to get or to create.
-            on_create: Is called to returns the session.
-        Returns:
-
-        """
-        if session_id not in self._session:
-            from yakoon.engine.system.context import Context
-            context = Context(self._engine)
-            session = context.definition.session_cls(session_id)
-            session.bind_context(context)
-            self._session[session_id] = session
-            await on_create(self._session[session_id])
-        else:
-            await on_found(self._session[session_id])
