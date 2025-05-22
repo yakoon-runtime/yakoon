@@ -1,4 +1,3 @@
-# yakoon/platform/session_service.py
 from yakoon.platform.stores.account_store import AccountStore
 from yakoon.platform.stores.session_store import SessionStore
 from yakoon.engine.services.session_service import BaseSessionService
