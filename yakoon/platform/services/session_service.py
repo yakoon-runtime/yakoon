@@ -14,11 +14,9 @@ class SessionService(BaseSessionService):
         return await self.store.get_by_id(session_id)
 
     async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
-        session, created = await self.store.get_or_create(session_id)
-        if getattr(session, "account_id", None):
+        session, created = await self.store.get_or_create(session_id, **kwargs)
+        if session:
             await self.restore_account(session, **kwargs)
-        else:
-            session.command_groups = ["login"]
         return session, created
 
     async def persist(self, session: PlatformSession):
@@ -27,9 +25,11 @@ class SessionService(BaseSessionService):
     async def delete(self, session_id: str):
         await self.store.delete(session_id)
 
-    async def restore_account(session: PlatformSession, **kwargs):
-        if session.is_anonymous:
-            account = AccountStore.get_by_id(kwargs["account_id"])
+    async def restore_account(self, session: PlatformSession, **kwargs):
+        account_id = kwargs.get("account_id", session.account_id)
+        if account_id and session.is_anonymous:
+            account = AccountStore.get_by_id(account_id)
+            session.account_id = account_id
             session.account = account
         if session.account:
             session.command_groups = account.groups

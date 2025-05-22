@@ -13,9 +13,10 @@ class InMemorySessionStore(SessionStore):
         if session_id in self._sessions:
             return self._sessions[session_id]
 
-    async def get_or_create(self, session_id: str) -> tuple[PlatformSession, bool]:
+    async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         if session_id not in self._sessions:
             session: PlatformSession = self._session_cls(session_id)
+            session.account_id = kwargs.get("account_id")
             self._sessions[session.id] = session
             return self._sessions[session.id], True
         return self._sessions[session_id], False

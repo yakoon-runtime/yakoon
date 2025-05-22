@@ -1,6 +1,6 @@
 from yakoon.engine.core.domain.definition import DomainDefinition
 from .commands.account.general.cmdset import GeneralAccountCommands
-from .commands.account.login.cmdset import LoginAccountCommands
+
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
 from .runtime.session import GameSession
@@ -18,7 +18,6 @@ class GameDefinition(DomainDefinition):
     """ Defines the default command group. """
 
     commandsets = [
-        LoginAccountCommands, 
         GeneralAccountCommands, 
         GeneralCharacterCommands]
     """ The collection of all commands. """

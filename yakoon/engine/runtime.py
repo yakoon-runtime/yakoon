@@ -32,7 +32,9 @@ class Engine():
                    on_print_err: PrintError,
                    on_ready: OnGetSession):      
        
-      session, _ = await self._domain.sessions.get_or_create(session_id)
+      session, created = await self._domain.sessions.get_or_create(session_id)
+      if created:
+         session.command_groups = self._domain.default_command_groups
       session.bind_context(Context(self))
       session.out = on_print_msg
       session.err = on_print_err

@@ -12,7 +12,7 @@ class SessionStore(ABC):
         ...
 
     @abstractmethod
-    async def get_or_create(self, session_id: str) -> tuple[PlatformSession, bool]:
+    async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         ...
 
     @abstractmethod

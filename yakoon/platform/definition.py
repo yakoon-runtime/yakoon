@@ -1,5 +1,6 @@
 from yakoon.engine.core.domain.definition import DomainDefinition
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
+from yakoon.platform.commands.login.cmdset import LoginAccountCommands
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.services.session_service import SessionService
 from yakoon.platform.stores.memory_session_store import InMemorySessionStore
@@ -11,11 +12,12 @@ class PlatformDefinition(DomainDefinition):
         store=InMemorySessionStore(session_cls=PlatformSession))
     """ Defines the platform session object. """
 
-    default_command_groups = ["system"]     
+    default_command_groups = ["login"]     
     """ Defines the default command group. """
 
     commandsets = [
-        PlatformSystemCommands]
+        PlatformSystemCommands, 
+        LoginAccountCommands]
     """ The collection of all commands. """
      
     async def on_before_run_command(self, session: PlatformSession, request, command):

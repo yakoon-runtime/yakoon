@@ -10,7 +10,8 @@ class PlatformSession(BaseSession):
         super().__init__(id)
         self._permissions = ["system"]
         self._account = None
-        self._timestamp = None
+        self.timestamp = None
+        self.account_id = None
 
     @property
     def account(self) -> Account | None:
