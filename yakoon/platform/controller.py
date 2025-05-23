@@ -1,4 +1,5 @@
-from yakoon.engine.core.domain.definition import DomainDefinition
+from yakoon.engine.core.domain.controller import BaseController
+from yakoon.engine.system.session import BaseSession
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.platform.commands.login.cmdset import LoginAccountCommands
 from yakoon.platform.runtime.session import PlatformSession
@@ -6,11 +7,7 @@ from yakoon.platform.services.session_service import SessionService
 from yakoon.platform.stores.memory_session_store import InMemorySessionStore
 
 
-class PlatformDefinition(DomainDefinition):
-
-    sessions = SessionService(
-        store=InMemorySessionStore(session_cls=PlatformSession))
-    """ Defines the platform session object. """
+class PlatformController(BaseController):
 
     default_command_groups = ["login"]     
     """ Defines the default command group. """
@@ -28,4 +25,4 @@ class PlatformDefinition(DomainDefinition):
     async def on_after_send(self, session: PlatformSession):
         await super().on_after_send(session)
         if session.is_anonymous:
-            await self.sessions.delete(session.id)
+            await session.ctx.sessions.delete(session.id)

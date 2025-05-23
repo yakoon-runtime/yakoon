@@ -1,15 +1,24 @@
-from yakoon.engine.core.router import CommandRouter
-from yakoon.engine.core.domain.definition import DomainDefinition
+from yakoon.engine.core.domain.controller import BaseController
+from yakoon.engine.core.registry import DomainRegistry
+from yakoon.engine.services.session_service import BaseSessionService
 
 class Context:
 
-    def __init__(self, engine):
-        self._engine = engine
+    def __init__(self, registry: DomainRegistry):
+        self._registry = registry
+        self._controller = None
 
     @property
-    def router(self) -> CommandRouter:
-        return self._engine.router
-
+    def controller(self) -> BaseController:
+        return self._controller 
+    
     @property
-    def definition(self) -> DomainDefinition:
-        return self._engine._domain
+    def sessions(self) -> BaseSessionService:
+        return self._registry.sessions
+    
+    @property
+    def platform(self) -> BaseController:
+        return self._registry.system
+    
+    def bind_controller(self, controller: BaseController):
+        self._controller = controller

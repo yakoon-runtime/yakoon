@@ -4,7 +4,7 @@ from typing import Any, Sequence, Type
 
 from yakoon.engine.core.commandset import CommandSet
 from yakoon.engine.core.parser import Request
-from yakoon.engine.services.session_service import BaseSessionService
+from yakoon.engine.core.router import CommandRouter
 
 from typing import TYPE_CHECKING
 
@@ -13,10 +13,22 @@ if TYPE_CHECKING:
     from yakoon.engine.core.command import Command
 
 
-class DomainDefinition(ABC):
+class BaseController(ABC):
+    """
+    Abstract base for all domain/platform definitions.
+    Provides router and default session/command group config.
+    """
 
     default_command_groups = []     
-    sessions: BaseSessionService
+
+    def __init__(self):
+        self.router = CommandRouter()
+        self._register_all_commands()
+
+    def _register_all_commands(self):
+        for commands_set in self.commandsets:
+            mode = getattr(commands_set, "mode", "system")
+            self.router.register(mode, commands_set)
 
     @property
     @abstractmethod
@@ -24,11 +36,9 @@ class DomainDefinition(ABC):
 
     async def on_before_send(self, session: BaseSession):
         """
-        Hook that is called before any command(s) are processed.
-        Can be used to prepare or validate the session state.
-        This is triggered once per input string (before command batching).
+        Hook called before any input is processed by the engine.
+        Useful for logging, session validation, or input preprocessing.
         """
-        pass
 
     async def on_before_run_command(self, session: BaseSession, request: Request, command: Command):
         """
@@ -41,13 +51,6 @@ class DomainDefinition(ABC):
         """
         Hook called immediately after a single command has been executed.
         Can be used for cleanup, logging, or updating domain state.
-        """
-        pass
-
-    async def on_after_send(self, session: BaseSession):
-        """
-        Hook called after all commands for a given input string have been processed.
-        Useful for session cleanup or state finalization.
         """
         pass
 
@@ -64,3 +67,9 @@ class DomainDefinition(ABC):
         Allows the domain to persist state, release resources, or perform cleanup.
         """
         pass
+
+    async def on_after_send(self, session: BaseSession):
+        """
+        Hook called after input has been processed and all commands executed.
+        Can be used for cleanup, analytics, or session state updates.
+        """

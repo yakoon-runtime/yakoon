@@ -1,11 +1,11 @@
 # yakoon/app/webapi/session_manager.py
 
 from yakoon.engine.runtime import Engine
-from yakoon.domains.game.definition import GameDefinition
+from yakoon.domains.game.controller import GameController
 from yakoon.domains.game.runtime.session import GameSession
 
 
-_engine = Engine(GameDefinition)
+_engine = Engine(GameController)
 
 
 async def handle_input(session_id: str, input_str: str) -> str:

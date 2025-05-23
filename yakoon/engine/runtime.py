@@ -1,52 +1,50 @@
 
+from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
 from yakoon.engine.core.dialog.manager import DialogManager
-from yakoon.engine.core.domain.definition import DomainDefinition
-from yakoon.engine.core.router import CommandRouter
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.context import Context
-from yakoon.engine.system.session import (
-   BaseSession, OnGetSession, PrintError, PrintMessage)
+from yakoon.engine.system.session import BaseSession, PrintError, PrintMessage
 
 
 class Engine():
      
-   def __init__(self, domain_def: DomainDefinition):
+   def __init__(self, registry: DomainRegistry):
       """
       Creates a new instance of the class engine.
       """
-      self._domain:DomainDefinition = domain_def()
-      self._router = CommandRouter()
-      for commands_set in domain_def.commandsets:
-         mode = getattr(commands_set, "mode", "system")
-         self._router.register(mode, commands_set)
+      self._registry = registry
 
    @property
-   def router(self) -> CommandRouter:
-        return self._router
+   def registry(self) -> DomainRegistry:
+        return self._registry
 
-   async def enter(self, session_id: str,
-                   on_print_msg: PrintMessage,
-                   on_print_err: PrintError,
-                   on_ready: OnGetSession):      
-       
-      session, created = await self._domain.sessions.get_or_create(session_id)
-      if created:
-         session.command_groups = self._domain.default_command_groups
-      session.bind_context(Context(self))
-      session.out = on_print_msg
-      session.err = on_print_err
-      await on_ready(session)
-
-   async def send(self, session: BaseSession, input_str: str):   
+   async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError):   
+      """
+      Entry point for any user input.
+      Handles session lifecycle, context binding, output routing, and optional batch execution.
+      """
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
-      await self._domain.on_before_send(session)
+
+      session, _ = await self.registry.sessions.get_or_create(session_id)
+      session.bind_context(Context(self._registry)) 
+
+      groups = set()
+      session.command_groups = []
+      for controller in self.registry.controllers + [self.registry.system]:
+         groups.update(controller.default_command_groups)
+      session.command_groups = list(groups)
+   
+      session.out = on_msg
+      session.err = on_err
+
+      await self.registry.system.on_before_send(session)
       for raw in inputs:
          await self._send_one(session, raw.strip())
-      await self._domain.on_after_send(session)
-
+      await self.registry.system.on_after_send(session)
+         
    async def _send_one(self, session: BaseSession, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):
          return
@@ -55,14 +53,17 @@ class Engine():
       if not request.cmd:
          return await session.err("Kein Befehl erkannt.")
       
-      command = self._router.resolve(request.cmd, session.command_groups)
-      if not command:
-         return await session.err(f"Unbekannter Befehl: {request.cmd}")
+      result = self._registry.resolve(request.cmd, session)
+      if not result:
+         return await session.err(f"Befehl '{request.cmd}' nicht gefunden.")
+
+      controller, command = result
+      session.ctx.bind_controller(controller) 
 
       try:
-         await self._domain.on_before_run_command(session, request, command)
+         await controller.on_before_run_command(session, request, command)
          await command.run(session, request)
-         await self._domain.on_after_run_command(session, request, command)
+         await controller.on_after_run_command(session, request, command)
 
       except PermissionError as exc:
          LogService.permission(session, "command", command.key)

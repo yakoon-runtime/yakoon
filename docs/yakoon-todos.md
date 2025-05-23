@@ -1,7 +1,8 @@
 
 # Core 
-- Löschen der Session, wenn nach Command kein Account
-- Anmeldung an Plattform (OSLogin)
+
+- Hock: on_after_send -> muss wieder rein.
+
   - Help alle Commands (übergeornete Domains)
 - Webclient - mit weißen Hintergrund und Eingabe fix. 
   - Genau wie in ChatPGP

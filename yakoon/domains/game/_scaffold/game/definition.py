@@ -1,4 +1,4 @@
-from yakoon.domains.game.definition import GameDefinition as BaseDefinition
+from yakoon.domains.game.controller import GameController as BaseDefinition
 
 from .system.session import GameSession
 from .commands.default_cmdsets import (
@@ -8,7 +8,7 @@ from .commands.default_cmdsets import (
     )
 
 
-class GameDefinition(BaseDefinition):
+class GameController(BaseDefinition):
     """
     Core configuration for the Smurf game.
     Connects session class and active command sets.

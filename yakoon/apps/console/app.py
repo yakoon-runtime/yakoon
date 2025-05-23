@@ -1,12 +1,16 @@
 
 import asyncio
 from aioconsole import ainput
+from yakoon.domains.game.controller import GameController
+from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.runtime import Engine
-from yakoon.platform.definition import PlatformDefinition
-#from yakoon.domains.game.definition import GameDefinition
+from yakoon.platform.controller import PlatformController
+from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.services.session_service import SessionService
+from yakoon.platform.stores.memory_session_store import InMemorySessionStore
 
 
-async def error(exc: Exception):
+async def err(exc: Exception):
     print(exc)
 
 
@@ -14,19 +18,24 @@ async def msg(text: str):
     print(text)
 
 
-async def run_application(GameDef: PlatformDefinition):
+async def run_application():
 
-    engine = Engine(GameDef)
+    sessions = SessionService(
+        store=InMemorySessionStore(session_cls=PlatformSession))
+   
+    registry = DomainRegistry(
+        controllers=[
+            GameController(),
+        ],
+        system=PlatformController(),
+        sessions=sessions,
+        )
+  
+    engine = Engine(registry)
 
     while True:
         command = await ainput("|:> ")
-        async def on_ready(session):
-            await engine.send(session, command)
-
-        # each message is a own task.
-        asyncio.create_task(
-            engine.enter(None, msg, error, on_ready))
-
+        asyncio.create_task(engine.send("cli", command, msg, err))
 
 if __name__ == "__main__":
-    asyncio.run(run_application(PlatformDefinition))
+    asyncio.run(run_application())

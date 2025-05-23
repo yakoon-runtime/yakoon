@@ -1,9 +1,9 @@
 from yakoon.apps.telnet.utils.translate import translate_ansi
 from yakoon.engine.runtime import Engine
-from yakoon.domains.game.definition import GameDefinition
+from yakoon.domains.game.controller import GameController
 
 
-_engine = Engine(GameDefinition)
+_engine = Engine(GameController)
 
 
 async def handle_client(reader, writer):

@@ -3,6 +3,8 @@ from typing import Coroutine, Callable, Type, TypeVar
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
+
+from yakoon.engine.core.domain.controller import BaseController
 if TYPE_CHECKING:
     from yakoon.engine.system.context import Context
 
@@ -22,7 +24,7 @@ class BaseSession(object):
         """
         self.id = id or str(uuid4())
         self._command_groups = []
-        self._sessions = None
+        self._context = None
 
     @property
     def ctx(self) -> Context:
@@ -37,6 +39,3 @@ class BaseSession(object):
     
     def bind_context(self, context: Context):
         self._context = context
-
-    
-OnGetSession = Callable[[BaseSession], Coroutine]

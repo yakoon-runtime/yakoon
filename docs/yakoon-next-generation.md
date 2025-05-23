@@ -102,7 +102,7 @@ yakoon/
 │   ├── context.py        # BaseCommandContext
 │   ├── runtime.py        # Engine()
 │   ├── session.py        # GameSession etc.
-│   ├── definition.py     # BaseDomainDefinition
+│   ├── definition.py     # BaseBaseController
 │   └── hooks.py          # Lifecycle Hooks
 ├── domains/
 │   ├── mudgame/          # enthält nur mud-spezifische Commands/Templates

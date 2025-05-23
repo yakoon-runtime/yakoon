@@ -1,4 +1,4 @@
-from yakoon.engine.core.domain.definition import DomainDefinition
+from yakoon.engine.core.domain.controller import BaseController
 from .commands.account.general.cmdset import GeneralAccountCommands
 
 from .commands.character.general.cmdset import GeneralCharacterCommands
@@ -6,7 +6,7 @@ from .runtime.clock import Clock
 from .runtime.session import GameSession
 
 
-class GameDefinition(DomainDefinition):
+class GameController(BaseController):
 
     clock = Clock()
     """ Defines the game clock. """
