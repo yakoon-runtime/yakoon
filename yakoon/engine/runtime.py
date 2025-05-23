@@ -21,15 +21,18 @@ class Engine():
    def registry(self) -> DomainRegistry:
         return self._registry
 
-   async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError):   
+   async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError, depth=0):   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
+      if depth > Settings.max_dispatch_depth:
+        return await on_err("Command recursion limit reached.")
+
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
 
       session, _ = await self.registry.sessions.get_or_create(session_id)
-      session.bind_context(Context(self._registry)) 
+      session.bind_context(Context(self)) 
 
       groups = set()
       session.command_groups = []

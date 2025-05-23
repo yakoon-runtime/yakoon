@@ -39,3 +39,15 @@ class BaseSession(object):
     
     def bind_context(self, context: Context):
         self._context = context
+
+    async def send_msg(self, text: str):
+        await self.out(text)
+
+    async def send_status(self, text: str):
+        await self.out(f"[OK] {text}")
+
+    async def send_error(self, text: str):
+        await self.err(f"[FEHLER] {text}")
+
+    async def send_cmd(self, input_str: str):
+        await self.ctx.send(self, input_str, self.out, self.err)

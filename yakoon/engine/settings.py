@@ -13,6 +13,10 @@ class Settings:
     debug: bool = True
     """If True, enables verbose output and developer diagnostics."""
 
+    max_dispatch_depth: int = 10
+    """Maximum allowed depth for nested command dispatches (e.g. via session.send_cmd()).
+    Prevents infinite recursion when commands internally trigger other commands."""
+
     log_commands: bool = True
     """Logs every command issued by a session."""
 

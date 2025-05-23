@@ -1,8 +1,7 @@
 
 # Core 
 
-- Hock: on_after_send -> muss wieder rein.
-
+- alle send_cmd
   - Help alle Commands (übergeornete Domains)
 - Webclient - mit weißen Hintergrund und Eingabe fix. 
   - Genau wie in ChatPGP
