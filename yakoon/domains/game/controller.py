@@ -8,6 +8,9 @@ from .runtime.session import GameSession
 
 class GameController(BaseController):
 
+    name: str = "mud"
+    """Unique identifier used for command prefix resolution (e.g. mud:look, system:help)."""
+
     clock = Clock()
     """ Defines the game clock. """
 

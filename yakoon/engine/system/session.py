@@ -4,8 +4,8 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 
-from yakoon.engine.core.domain.controller import BaseController
 if TYPE_CHECKING:
+    from yakoon.engine.core.domain.controller import BaseController
     from yakoon.engine.system.context import Context
 
 Text = TypeVar('Text', str, bytes)
@@ -24,11 +24,19 @@ class BaseSession(object):
         """
         self.id = id or str(uuid4())
         self._command_groups = []
-        self._context = None
+        self._context:Context = None
+        self._domain:BaseController = None
 
     @property
     def ctx(self) -> Context:
         return self._context
+
+    @property
+    def domain(self) -> BaseController:
+        return self._domain
+    @domain.setter
+    def domain(self, value):
+        self._domain = value
 
     @property
     def command_groups(self) -> list[Type[str]]:

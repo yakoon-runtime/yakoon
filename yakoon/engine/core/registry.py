@@ -1,5 +1,7 @@
 # engine/core/registry.py
 
+from typing import Optional
+from yakoon.engine.core.command import Command
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.engine.services.session_service import BaseSessionService
 from yakoon.engine.system.session import BaseSession
@@ -18,13 +20,40 @@ class DomainRegistry:
         self.controllers = controllers
         self.sessions = sessions
 
-    def resolve(self, input_str: str, session: BaseSession):
+        # Check for duplicate controller names
+        all_controllers = [self.system] + self.controllers
+        names = [c.name for c in all_controllers]
+        if len(set(names)) != len(names):
+            raise ValueError(f"Duplicate controller names detected: {names}")
+
+
+    def resolve(self, input_str: str, session: BaseSession) -> Optional[tuple[BaseController, Command]]:
         """
-        Try to resolve the command using self or one of the registered domains.
-        Returns a tuple of (responsible definition, command) or None.
+        Resolves a command string based on:
+        1. Explicit prefix (e.g. office:print)
+        2. Current domain (if active)
+        3. System controller (only if no domain is active)
         """
-        for controller in [self.system] + self.controllers:
-            cmd = controller.router.resolve(input_str, session.command_groups)
+
+        # 1. Prefix (e.g. mud:look, system:help)
+        if ":" in input_str:
+            prefix, rest = input_str.split(":", 1)
+            for controller in [self.system] + self.controllers:
+                if controller.name == prefix:
+                    cmd = controller.router.resolve(rest, session.command_groups)
+                    if cmd:
+                        return controller, cmd
+
+        # 2. Active domain (IC mode)
+        if session.domain:
+            cmd = session.domain.router.resolve(input_str, session.command_groups)
             if cmd:
-                return controller, cmd
+                return session.domain, cmd
+
+        # 3. System controller (OOC mode only)
+        cmd = self.system.router.resolve(input_str, session.command_groups)
+        if cmd:
+            return self.system, cmd
+
         return None
+

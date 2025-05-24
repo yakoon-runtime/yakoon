@@ -1,25 +1,30 @@
 
 # Core 
+- Name für Commands - Domainübergreifend
+- Office: create project
+- office create Muster ->
 
-- alle send_cmd
-  - Help alle Commands (übergeornete Domains)
+- Help alle Commands (übergeornete Domains)
+   - Wir wollen ein Command Help, dass und alle Domains anzeigt
+   - Oder wollen wir, dass jede Domain seine Hilfe anzeigt. Über Hilfe
+     kommen wir dann zu den einzelnen Themen innerhalb der Domain. 
+
+    controller.inject_ooc_commands([
+        CmdSwitch(), CmdLogout(), CmdWho()
+    ])
+
+
 - Webclient - mit weißen Hintergrund und Eingabe fix. 
   - Genau wie in ChatPGP
-- Test von Yield mit zwei Sessions
 - Templates:
   - Wir wollen unsere Texte in Markdown anzeigen. 
   - Funktion, um beliebite Bäume ├──;  │   └── darzustellen.
     - Ist Core Funktion
+- Test von Yield mit zwei Sessions
 
-- Laden der Definition zur Laufeit per (OSCommand)
-- Game als Mind-Dojo registriert
-  - Login an Mind-Dojo (Login)
-- Assistenten: Domain
-  - Erinnern an Trinken
-  - Pausen
-  - ....
 
 # Platform
+
 - Open AI
 - Yakoon-06 (AI-key) -> comment_all_public_methods
 - Erstelle neues Projekt ....

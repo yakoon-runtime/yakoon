@@ -9,6 +9,9 @@ from yakoon.platform.stores.memory_session_store import InMemorySessionStore
 
 class PlatformController(BaseController):
 
+    name: str = "system"
+    """Unique identifier used for command prefix resolution (e.g. mud:look, system:help)."""
+
     default_command_groups = ["login"]     
     """ Defines the default command group. """
 

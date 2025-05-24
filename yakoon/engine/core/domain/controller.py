@@ -19,6 +19,9 @@ class BaseController(ABC):
     Provides router and default session/command group config.
     """
 
+    name: str = "unnamed"
+    """Unique identifier used for command prefix resolution (e.g. mud:look, system:help)."""
+
     default_command_groups = []     
 
     def __init__(self):
