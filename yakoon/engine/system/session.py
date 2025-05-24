@@ -23,7 +23,7 @@ class BaseSession(object):
         Constructs a new session.
         """
         self.id = id or str(uuid4())
-        self._command_groups = []
+        self._cmd_groups = []
         self._context:Context = None
         self._domain:BaseController = None
 
@@ -39,11 +39,11 @@ class BaseSession(object):
         self._domain = value
 
     @property
-    def command_groups(self) -> list[Type[str]]:
-        return self._command_groups
-    @command_groups.setter
-    def command_groups(self, value):
-        self._command_groups = value
+    def cmd_groups(self) -> list[Type[str]]:
+        return self._cmd_groups
+    @cmd_groups.setter
+    def cmd_groups(self, value):
+        self._cmd_groups = value
     
     def bind_context(self, context: Context):
         self._context = context
@@ -52,10 +52,10 @@ class BaseSession(object):
         await self.out(text)
 
     async def send_status(self, text: str):
-        await self.out(f"[OK] {text}")
+        await self.out(f"✅ {text}")
 
     async def send_error(self, text: str):
-        await self.err(f"[FEHLER] {text}")
+        await self.err(f"❌ {text}")
 
     async def send_cmd(self, input_str: str):
         await self.ctx.send(self, input_str, self.out, self.err)

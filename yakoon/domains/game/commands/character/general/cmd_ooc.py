@@ -13,5 +13,5 @@ class CmdOOC(Command):
 
         name = session.character.name
         session.character = None
-        session.command_groups = ["account"]
+        #session.cmd_groups = ["account"]
         await session.out(f"Du bist nun OOC. Charakter '{name}' wurde verlassen.")

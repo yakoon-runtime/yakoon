@@ -17,7 +17,7 @@ class GameController(BaseController):
     session_cls = GameSession
     """ Defines the game session object. """
 
-    default_command_groups = ["help", "account"]     
+    default_command_groups = []     
     """ Defines the default command group. """
 
     commandsets = [
@@ -32,5 +32,16 @@ class GameController(BaseController):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
     
     async def on_after_run_command(self, session: GameSession, request, command):
-        if session.account and not session.character: 
-             session.ctx.router.unregister(session.id)
+        pass
+        #if session.account and not session.character: 
+        #     session.ctx.router.unregister(session.id)
+
+    async def on_enter(self, session: GameSession):
+        """
+        Called after a user switches into this domain (e.g. via @switch).
+        Used to show welcome messages, check account requirements, or guide login flow.
+        Override this in each domain to define entry behavior.
+        """
+        await session.send_msg("Willkommen im MUD.")
+        # if not session.account_id:
+        #    await session.send_status("Melde dich mit `login <charakter>` an.")

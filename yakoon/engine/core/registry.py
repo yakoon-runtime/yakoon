@@ -25,7 +25,11 @@ class DomainRegistry:
         names = [c.name for c in all_controllers]
         if len(set(names)) != len(names):
             raise ValueError(f"Duplicate controller names detected: {names}")
-
+        
+    def get_controller_by_name(self, name:str) -> BaseController:
+        for controller in [self.system] + self.controllers:
+            if controller.name == name:
+                return controller
 
     def resolve(self, input_str: str, session: BaseSession) -> Optional[tuple[BaseController, Command]]:
         """
@@ -40,18 +44,18 @@ class DomainRegistry:
             prefix, rest = input_str.split(":", 1)
             for controller in [self.system] + self.controllers:
                 if controller.name == prefix:
-                    cmd = controller.router.resolve(rest, session.command_groups)
+                    cmd = controller.router.resolve(rest, session.cmd_groups)
                     if cmd:
                         return controller, cmd
 
         # 2. Active domain (IC mode)
         if session.domain:
-            cmd = session.domain.router.resolve(input_str, session.command_groups)
+            cmd = session.domain.router.resolve(input_str, session.cmd_groups)
             if cmd:
                 return session.domain, cmd
 
         # 3. System controller (OOC mode only)
-        cmd = self.system.router.resolve(input_str, session.command_groups)
+        cmd = self.system.router.resolve(input_str, session.cmd_groups)
         if cmd:
             return self.system, cmd
 

@@ -27,6 +27,10 @@ class AccountStore:
     def add(cls, account: Account):
         cls._accounts[account.id] = account
 
+default_groups = {
+   "group 1": ["mud:help","mud:login", "mud:system"]
+}
 
-AccountStore.add(Account(id="acc-stefan", name="stefan", groups=["system", "login"]))
-AccountStore.add(Account(id="acc-lara", name="lara", groups=["system"]))
+
+AccountStore.add(Account(id="acc-stefan", name="stefan", cmd_groups=default_groups["group 1"]))
+AccountStore.add(Account(id="acc-lara", name="lara", cmd_groups=["system"]))

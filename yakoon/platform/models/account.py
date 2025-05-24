@@ -5,4 +5,4 @@ from dataclasses import dataclass, field
 class Account:
     id: str = ""
     name: str = ""
-    groups: list[str] = field(default_factory=list)
+    cmd_groups: list[str] = field(default_factory=list)

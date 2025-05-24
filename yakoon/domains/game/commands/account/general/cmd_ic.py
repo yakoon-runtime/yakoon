@@ -22,7 +22,7 @@ class CmdIC(Command):
             return await session.err(f"Charakter '{char_id}' nicht gefunden.")
 
         session.character = char
-        session.command_groups = ["character", session.id]
+        #session.cmd_groups = ["character", session.id]
         await session.out(f"Du wirst zu {char.name}.")
         await session.character.move_to(session, char.location)
     

@@ -19,6 +19,20 @@ class PlatformController(BaseController):
         LoginAccountCommands]
     """ The collection of all commands. """
      
+    async def on_before_send(self, session: PlatformSession):
+        groups = set()
+        registry = session.ctx._registry  # access intern by design
+
+        for controller in registry.controllers + [registry.system]:
+            groups.update(controller.get_default_command_groups_with_prefix())
+        session.cmd_groups = list(groups)
+
+        def merge(lista: list[str], listb: list[str]) -> list[str]:
+            return list(dict.fromkeys(lista + listb))
+        if session.account:
+            session.cmd_groups = merge(session.cmd_groups, session.account.cmd_groups)
+        session.cmd_groups = sorted(session.cmd_groups)
+            
     async def on_before_run_command(self, session: PlatformSession, request, command):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):

@@ -28,7 +28,7 @@ class CommandRouter:
 
     def find_by_key_or_alias(self, name: str, groups: list[str] | None = None) -> Command | None:
         if not groups:
-            raise ValueError("No command groups provided. Did you forget to set session.command_groups?")
+            raise ValueError("No command groups provided. Did you forget to set session.cmd_groups?")
 
         key = name.lower().strip()
         resolved = self._aliases.get(key, key)

@@ -31,11 +31,12 @@ async def run_application():
         sessions=sessions,
         )
   
+    session_id = "cli"
     engine = Engine(registry)
 
     while True:
         command = await ainput("|:> ")
-        asyncio.create_task(engine.send("cli", command, msg, err))
+        asyncio.create_task(engine.send(session_id, command, msg, err))
 
 if __name__ == "__main__":
     asyncio.run(run_application())

@@ -82,3 +82,10 @@ class BaseController(ABC):
         Hook called after input has been processed and all commands executed.
         Can be used for cleanup, analytics, or session state updates.
         """
+
+    async def on_enter(self, session: BaseSession):
+        """
+        Called after a user switches into this domain (e.g. via @switch).
+        Used to show welcome messages, check account requirements, or guide login flow.
+        Override this in each domain to define entry behavior.
+        """

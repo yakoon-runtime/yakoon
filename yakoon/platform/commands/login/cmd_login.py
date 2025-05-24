@@ -1,7 +1,6 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
 from yakoon.domains.game.runtime.session import GameSession
-from yakoon.platform.models.account import Account
 from yakoon.platform.stores.account_store import AccountStore
 
 

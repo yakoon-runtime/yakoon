@@ -30,5 +30,5 @@ class SessionService(BaseSessionService):
             account = AccountStore.get_by_id(account_id)
             session.account_id = account_id
             session.account = account
-        if session.account:
-            session.command_groups = account.groups
+        #if session.account:
+            #session.cmd_groups = account.groups

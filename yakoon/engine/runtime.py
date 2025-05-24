@@ -31,22 +31,16 @@ class Engine():
 
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
 
-      session, _ = await self.registry.sessions.get_or_create(session_id)
+      session, _ = await self._registry.sessions.get_or_create(session_id)
       session.bind_context(Context(self)) 
-
-      groups = set()
-      session.command_groups = []
-      for controller in self.registry.controllers + [self.registry.system]:
-         groups.update(controller.get_default_command_groups_with_prefix())
-      session.command_groups = list(groups)
    
       session.out = on_msg
       session.err = on_err
 
-      await self.registry.system.on_before_send(session)
       for raw in inputs:
+         await self._registry.system.on_before_send(session)
          await self._send_one(session, raw.strip())
-      await self.registry.system.on_after_send(session)
+         await self._registry.system.on_after_send(session)
          
    async def _send_one(self, session: BaseSession, input_str: str):   
       if DialogManager.is_waiting_to_handle(session.id, input_str):

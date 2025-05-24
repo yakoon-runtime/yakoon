@@ -14,15 +14,16 @@ class PlatformSession(BaseSession):
         self.account_id = None
 
     @property
+    def is_anonymous(self) -> bool:
+        return self.account is None
+
+    @property
     def account(self) -> Account | None:
         return self._account
 
     @account.setter
     def account(self, value):
         self._account = value
-
-    def is_anonymous(self) -> bool:
-        return self.account is None
 
     @property
     def permissions(self) -> list[str]:

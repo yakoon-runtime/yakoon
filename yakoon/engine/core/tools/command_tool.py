@@ -11,7 +11,8 @@ def split_batch_input(input_str: str, prefix: str = "batch:", max_parts: int = 1
     Returns:
         A list of cleaned command strings.
     """
+    input_str = input_str.strip()
     if not input_str.startswith(prefix):
-        return [input_str.strip()]
+        return [input_str]
     parts = [s.strip() for s in input_str[len(prefix):].split(";") if s.strip()]
     return parts[:max_parts]
