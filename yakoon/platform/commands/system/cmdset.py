@@ -7,7 +7,7 @@ from yakoon.platform.commands.system.cmd_welcome import CmdWelcome
 
 class PlatformSystemCommands(CommandSet):
     
-    mode = "system"
+    category = "system"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

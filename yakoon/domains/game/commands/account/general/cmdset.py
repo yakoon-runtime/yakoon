@@ -6,7 +6,7 @@ from yakoon.domains.game.commands.account.general.cmd_ic import CmdIC
 
 class GeneralAccountCommands(CommandSet):
     
-    mode = "account"
+    category = "account"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

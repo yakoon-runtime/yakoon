@@ -30,8 +30,14 @@ class BaseController(ABC):
 
     def _register_all_commands(self):
         for commands_set in self.commandsets:
-            mode = getattr(commands_set, "mode", "system")
-            self.router.register(mode, commands_set)
+            category = getattr(commands_set, "category", "system")
+            self.router.register(self._get_value_with_prefix(category), commands_set)
+
+    def _get_value_with_prefix(self, value: str) -> str:
+        return f"{self.name}:{value}"
+    
+    def get_default_command_groups_with_prefix(self) -> list[str]:
+        return [self._get_value_with_prefix(group) for group in self.default_command_groups]
 
     @property
     @abstractmethod

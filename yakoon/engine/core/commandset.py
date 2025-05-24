@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 
 class CommandSet(Protocol):
     
+    category: str = "unnamed"
+
     @staticmethod
     def commands() -> Sequence[Type[Command]]: ...
 

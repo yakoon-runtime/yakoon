@@ -11,7 +11,7 @@ from yakoon.domains.game.commands.character.general.cmd_ooc import CmdOOC
 
 class GeneralCharacterCommands(CommandSet):
     
-    mode = "character"
+    category = "character"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

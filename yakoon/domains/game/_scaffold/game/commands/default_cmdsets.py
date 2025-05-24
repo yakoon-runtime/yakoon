@@ -9,7 +9,7 @@ class LoginAccountCommands(_LAC):
     Commands available before login (e.g. register, connect)
     """
 
-    #mode = "login"
+    #category = "login"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 
@@ -22,7 +22,7 @@ class GeneralAccountCommands(_GAC):
     Commands available to work in the account (e.g. createuser, password)
     """
     
-    #mode = "account"
+    #category = "account"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 
@@ -36,7 +36,7 @@ class GeneralCharacterCommands(_GCC):
     Commands available for the character (e.g. look, move, get)
     """
     
-    #mode = "character"
+    #category = "character"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

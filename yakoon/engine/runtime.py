@@ -37,7 +37,7 @@ class Engine():
       groups = set()
       session.command_groups = []
       for controller in self.registry.controllers + [self.registry.system]:
-         groups.update(controller.default_command_groups)
+         groups.update(controller.get_default_command_groups_with_prefix())
       session.command_groups = list(groups)
    
       session.out = on_msg

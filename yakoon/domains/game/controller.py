@@ -1,6 +1,6 @@
 from yakoon.engine.core.domain.controller import BaseController
 from .commands.account.general.cmdset import GeneralAccountCommands
-
+from .commands.help.cmdset import MudHelpCommands
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
 from .runtime.session import GameSession
@@ -17,10 +17,11 @@ class GameController(BaseController):
     session_cls = GameSession
     """ Defines the game session object. """
 
-    default_command_groups = ["login"]     
+    default_command_groups = ["help", "account"]     
     """ Defines the default command group. """
 
     commandsets = [
+        MudHelpCommands,
         GeneralAccountCommands, 
         GeneralCharacterCommands]
     """ The collection of all commands. """
