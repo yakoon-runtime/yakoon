@@ -3,8 +3,8 @@ from yakoon.engine.core.command import Command
 
 # Commands: Account Login/Registration
 
-from yakoon.domains.game.commands.account.login.cmdset import LoginAccountCommands as _LAC
-class LoginAccountCommands(_LAC):
+from yakoon.domains.game.commands.account.login.cmdset import PlatformAccountCommands as _LAC
+class PlatformAccountCommands(_LAC):
     """
     Commands available before login (e.g. register, connect)
     """

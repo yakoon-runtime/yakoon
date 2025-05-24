@@ -13,7 +13,7 @@ class Clock:
     0.0	Pause - Zeit steht still    
     """
     start_real_time: float = time.time()
-    tick_rate: float =  Settings.tick_rate  # 1 Sekunde Realtime = 1 Spielminute
+    tick_rate: float = Settings.tick_rate  # 1 Sekunde Realtime = 1 Spielminute
     offset_ticks: int = 0
 
     def now(self) -> int:

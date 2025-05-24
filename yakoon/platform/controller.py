@@ -1,7 +1,6 @@
 from yakoon.engine.core.domain.controller import BaseController
-from yakoon.platform.commands.help.cmdset import PlatformHelpCommands
+from yakoon.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
-from yakoon.platform.commands.login.cmdset import LoginAccountCommands
 from yakoon.platform.runtime.session import PlatformSession
 
 
@@ -10,13 +9,12 @@ class PlatformController(BaseController):
     name: str = "system"
     """Unique identifier used for command prefix resolution (e.g. mud:look, system:help)."""
 
-    default_command_groups = ["help", "login"]     
+    default_command_groups = ["system", "account"]     
     """ Defines the default command group. """
 
     commandsets = [
-        PlatformHelpCommands,
         PlatformSystemCommands, 
-        LoginAccountCommands]
+        PlatformAccountCommands]
     """ The collection of all commands. """
      
     async def on_before_send(self, session: PlatformSession):

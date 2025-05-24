@@ -34,6 +34,7 @@ async def run_application():
     session_id = "cli"
     engine = Engine(registry)
 
+    asyncio.create_task(engine.send(session_id, "batch: login stefan; switch mud; help", msg, err))
     while True:
         command = await ainput("|:> ")
         asyncio.create_task(engine.send(session_id, command, msg, err))

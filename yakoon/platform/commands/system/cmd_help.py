@@ -2,11 +2,10 @@
 from collections import defaultdict
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.commands.command import PlatformCommand
 from yakoon.platform.runtime.session import PlatformSession
 
 
-class CmdHelpSystem(PlatformCommand):
+class CmdHelpSystem(Command):
 
     key = "help"
 
@@ -18,7 +17,7 @@ class CmdHelpSystem(PlatformCommand):
         for controller in registry.controllers:
             await session.send_msg(f"- {controller.name:10}  →  @switch {controller.name}")
 
-        grouped = _get_grouped_commands(session.ctx.controller)
+        grouped = get_grouped_commands(session.ctx.controller)
 
         await session.send_msg(f"\nGlobale Befehle:")
         for category in sorted(grouped):
@@ -27,7 +26,7 @@ class CmdHelpSystem(PlatformCommand):
                 await session.send_msg(f"- {cmd.key}")
 
 
-class CmdHelpDomain(PlatformCommand):
+class CmdHelpDomain(Command):
 
     key = "help"
 
@@ -36,7 +35,7 @@ class CmdHelpDomain(PlatformCommand):
         controller = session.ctx.controller
         if not request.args:
             await session.send_msg(f"Hilfe für Domain: {controller.name}")
-            grouped = _get_grouped_commands(controller)
+            grouped = get_grouped_commands(controller)
             for category in sorted(grouped):
                 await session.send_msg(f"Kategorie: {category}")
                 for cmd in grouped[category]:
@@ -44,7 +43,7 @@ class CmdHelpDomain(PlatformCommand):
             return
 
         key = request.args[0]
-        cmd = controller.router.find_by_key(key, session.command_groups)
+        cmd = controller.router.find_by_key_or_alias(key, session.cmd_groups)
         if cmd:
             await session.send_msg(f"Hilfe zu: {cmd.key}")
             await session.send_msg(cmd.__doc__ or "Keine Beschreibung verfügbar.")
@@ -52,7 +51,7 @@ class CmdHelpDomain(PlatformCommand):
             await session.send_error(f"Befehl '{key}' nicht gefunden.")
     
 
-def _get_grouped_commands(controller) -> dict[str, list[Command]]:
+def get_grouped_commands(controller) -> dict[str, list[Command]]:
     grouped: dict[str, list[Command]] = defaultdict(list)
     for cmdset in controller.commandsets:
         for cmd in cmdset.commands():

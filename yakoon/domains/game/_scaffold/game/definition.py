@@ -2,7 +2,7 @@ from yakoon.domains.game.controller import GameController as BaseDefinition
 
 from .system.session import GameSession
 from .commands.default_cmdsets import (
-    LoginAccountCommands,
+    PlatformAccountCommands,
     GeneralAccountCommands, 
     GeneralCharacterCommands, 
     )
@@ -17,7 +17,7 @@ class GameController(BaseDefinition):
     session_cls = GameSession
 
     commandsets = [
-        LoginAccountCommands, 
+        PlatformAccountCommands, 
         GeneralAccountCommands, 
         GeneralCharacterCommands
         # DebugCommands, AdminCommands, etc. later
