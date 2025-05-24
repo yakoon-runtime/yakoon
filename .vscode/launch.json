@@ -22,10 +22,19 @@
             "name": "Yakoon: Run WebAPI",
             "type": "debugpy",
             "request": "launch",
+            "module": "yakoon.apps.webapi.app",
+            "console": "integratedTerminal"
+        },
+        
+        /*
+        {
+            "name": "Yakoon: Run WebAPI",
+            "type": "debugpy",
+            "request": "launch",
             "program": "${workspaceFolder}/yakoon/apps/webapi/app.py",
             "console": "integratedTerminal",
             "justMyCode": true
-        },
+        }, */
 
          {
             "name": "MindDojo: Run Console",

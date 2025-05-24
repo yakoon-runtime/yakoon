@@ -4,15 +4,6 @@
 - Office: create project
 - office create Muster ->
 
-- Help alle Commands (übergeornete Domains)
-   - Wir wollen ein Command Help, dass und alle Domains anzeigt
-   - Oder wollen wir, dass jede Domain seine Hilfe anzeigt. Über Hilfe
-     kommen wir dann zu den einzelnen Themen innerhalb der Domain. 
-
-    controller.inject_ooc_commands([
-        CmdSwitch(), CmdLogout(), CmdWho()
-    ])
-
 
 - Webclient - mit weißen Hintergrund und Eingabe fix. 
   - Genau wie in ChatPGP
