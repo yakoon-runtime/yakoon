@@ -4,7 +4,7 @@ type Props = {
 
 export function ConsoleOutput({ lines }: Props) {
   return (
-    <div className="bg-black text-green-400 font-mono p-4 h-96 overflow-y-auto rounded">
+    <div className="h-full border border-zinc-700 rounded-md p-4 bg-zinc-800 text-gray-100 font-mono space-y-1">
       {lines.map((line, i) => (
         <div key={i}>{line}</div>
       ))}

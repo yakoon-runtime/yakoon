@@ -2,6 +2,11 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-24]
+**Webclient - React & VITE **
+Der Webzugriff wurde mit React realisiert. 
+-> Modern und super schnell in der Entwicklung. Zudem stabil im Dev-Livecycle.
+-> npm run dev
 
 ---
 ## [2025-05-24]

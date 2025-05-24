@@ -21,7 +21,7 @@ export function InputBar({ onSubmit }: Props) {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        className="flex-1 border rounded p-2"
+        className="flex-1 border-zinc-700 rounded p-2 bg-zinc-800 text-gray-100"
         placeholder="Befehl eingeben..."
         autoFocus
       />
