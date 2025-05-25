@@ -2,12 +2,13 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+
 ## [2025-05-26]
 **Template-Rendering mit Markdown**
 Alle Ausgaben erfolgen über Jinja2-Templates mit Markdown-Syntax.
-> Grund: maximale Flexibilität, anpassbares Layout (auch für Kundenlösungen), markdown-kompatibel (z. B. Webclient, Chat-Ausgabe)
-> Struktur: gemeinsamer `templates/`-Ordner, unterteilt nach Domain (`templates/mud/`, `templates/system/`, etc.)
+> Grund: maximale Flexibilität, anpassbares Layout (auch für Kundenlösungen), markdown-kompatibel (z. B. Webclient, Chat-Ausgabe); Struktur: gemeinsamer `templates/`-Ordner, unterteilt nach Domain (`templates/mud/`, `templates/system/`, etc.)
 > Endung: .j2.md -> jinja2 + markdown -> (Syntax-Highlighting)
+> Zeilenumbrüche: zwei Leerzeichen am Ende / dreifaches Backtick
 
 ## [2025-05-25]
 **Yakoon als Lösungseinheit (Solution)**

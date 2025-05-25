@@ -1,14 +1,8 @@
 
 # Core 
-- Customizeable
-- scrollen bei eingabe
-- versoin -> umbrüche...
 
-- Templates:
-  - Wir wollen unsere Texte in Markdown anzeigen. 
-  - Funktion, um beliebite Bäume ├──;  │   └── darzustellen.
-    - Ist Core Funktion
 - Test von Yield mit zwei Sessions
+
 
 # Platform
 
