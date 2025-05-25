@@ -1,24 +1,22 @@
 
 # Core 
 
-- Test von Yield mit zwei Sessions
-
 
 # Platform
-
-- Open AI
-- Yakoon-06 (AI-key) -> comment_all_public_methods
 - Erstelle neues Projekt ....
-  -> Was bedeutet das? -> Neuer Chat. 
-      CmdGPTSession 
-- Drag & Drop am Webclient
-  - Daten können hier dann verarbeitet werden. 
-    - Request kann auch BINDATA / Chunks?
 - Konzept: Engabe -> Verarbeitung - > Ausgabe
   - Antwort was getan wird; Antwort was getan wurde? 
 - Alles Dokumentieren im Code auf Englisch (Docstrings)
 - Unittests (oder besseres - Yukoon-Style)
 
+# Open AI
+- Yakoon-06 (AI-key) -> comment_all_public_methods
+  -> Was bedeutet das? -> Neuer Chat. 
+      CmdGPTSession 
+
+# Drag & Drop am Webclient
+- Daten können hier dann verarbeitet werden. 
+- Request kann auch BINDATA / Chunks?
 
 
 # Docker
@@ -41,6 +39,7 @@ get_weather(): Er genügt, das erstmal auf Abruf zu tun.
 2. Die Wetter-Events (Ereignisse pro Zone)
 
 
+---
 # GIT Konvention:
 git commit -m "feat(cli): add project init command"
 

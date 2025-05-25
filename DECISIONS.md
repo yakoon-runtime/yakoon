@@ -2,8 +2,14 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-25]
+**Template-Splitting**
+Template-Splitting nach Format
+Jedes logische Template besteht aus drei eigenständigen Dateien: .md, .plain, .ansi. Je nach Client wird automatisch das passende Format gerendert.
+> Der Versuch, ein einziges Template dynamisch umzuwandeln (per Policy oder String-Strip) führte wiederholt zu inkonsistenten Ausgaben, 
+> erschwerter Wartung und unklarer Formatlogik. Die Trennung nach Format schafft Klarheit, bessere Testbarkeit und eine stabile Render-Pipeline.
 
-## [2025-05-26]
+## [2025-05-25]
 **Template-Rendering mit Markdown**
 Alle Ausgaben erfolgen über Jinja2-Templates mit Markdown-Syntax.
 > Grund: maximale Flexibilität, anpassbares Layout (auch für Kundenlösungen), markdown-kompatibel (z. B. Webclient, Chat-Ausgabe); Struktur: gemeinsamer `templates/`-Ordner, unterteilt nach Domain (`templates/mud/`, `templates/system/`, etc.)

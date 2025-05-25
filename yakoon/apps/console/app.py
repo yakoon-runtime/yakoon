@@ -2,7 +2,13 @@
 import asyncio
 from aioconsole import ainput
 from yakoon.engine.runtime import Engine
+from yakoon.platform.render.render_mode import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
+from yakoon.solution.settings import SolutionSettings
+
+
+# Set the global rendering mode to ansi text (no Markdown formatting)
+SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 
 async def err(exc: Exception):

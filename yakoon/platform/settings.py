@@ -1,7 +1,16 @@
+from dataclasses import dataclass
 from yakoon.engine.settings import Settings as BaseSettings
+from yakoon.platform.render.render_mode import RenderMode
+
+
+@dataclass
+class RuntimeSettings:
+    render_mode: str = RenderMode.MARKDOWN
 
 
 class Settings(BaseSettings):
+
+    runtime: RuntimeSettings = RuntimeSettings()
 
     # Debugging & Logging
     debug: bool = False

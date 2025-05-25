@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timezone
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.services.template_service import render
+from yakoon.platform.render.resolver import render_template_for
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.settings import Settings
 from yakoon.engine.core.command import Command
@@ -15,7 +15,7 @@ class CmdVersion(Command):
     key = "version"
 
     async def run(self, session: PlatformSession, request: Request):
-        output = render(Settings.cmd_platform_templates + "system/cmd_version.j2.md", {
+        output = render_template_for(Settings.cmd_platform_templates + "system/cmd_version", {
             "version": get_platform_version(),
             "python": platform.python_version(),
             "hostname": platform.node(),

@@ -9,8 +9,7 @@ def run_webclient():
     webclient_dir = yakoon_root / "apps" / "webclient"
 
     if not (webclient_dir / "package.json").exists():
-        print(f"❌ package.json not found in {webclient_dir}")
-        return
+        raise Exception(f"❌ package.json not found in {webclient_dir}")
 
     print(f"📦 Starting npm in: {webclient_dir}")
     subprocess.run(["npm.cmd", "run", "dev"], cwd=webclient_dir, shell=True)
