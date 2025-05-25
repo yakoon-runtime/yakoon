@@ -1,5 +1,5 @@
 
-from yakoon.domains.game.runtime.session import GameSession
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class Secured:
@@ -7,7 +7,7 @@ class Secured:
     deletable_by: list[str] = []  # z. B. ["builder"]
     viewable_by: list[str] = []  # z. B. ["player", "admin"]
 
-    def has_perm(self, session: GameSession, action: str) -> bool:
+    def has_perm(self, session: SolutionSession, action: str) -> bool:
         perms = {
             "edit": self.editable_by,
             "delete": self.deletable_by,

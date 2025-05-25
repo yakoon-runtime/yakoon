@@ -95,19 +95,3 @@ Yakoon kombiniert:
 
 ✅ Erledigt – durch Yakoon.
 
-
----
-yakoon/
-├── platform/             # Domänen-unabhängige Engine
-│   ├── context.py        # BaseCommandContext
-│   ├── runtime.py        # Engine()
-│   ├── session.py        # GameSession etc.
-│   ├── definition.py     # BaseBaseController
-│   └── hooks.py          # Lifecycle Hooks
-├── domains/
-│   ├── mudgame/          # enthält nur mud-spezifische Commands/Templates
-│   └── office/           # enthält office-Commands/Doku/Templates
-├── apps/
-│   ├── telnet/           # I/O: TCP
-│   ├── webapi/           # I/O: HTTP JSON
-│   └── console/          # I/O: Terminal CLI

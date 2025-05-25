@@ -1,10 +1,11 @@
+from yakoon.domains.game.runtime.data import RuntimeGameData
+from yakoon.domains.game.stores.character_store import CharacterStore
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.shared.cmdset import PlatformSharedCommands
+from yakoon.solution.platform.runtime.session import SolutionSession
 from .commands.account.general.cmdset import GeneralAccountCommands
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
-from .runtime.session import GameSession
-
 
 class GameController(BaseController):
 
@@ -13,9 +14,6 @@ class GameController(BaseController):
 
     clock = Clock()
     """ Defines the game clock. """
-
-    session_cls = GameSession
-    """ Defines the game session object. """
 
     default_command_groups = []     
     """ Defines the default command group. """
@@ -26,17 +24,23 @@ class GameController(BaseController):
         GeneralCharacterCommands]
     """ The collection of all commands. """
      
-    async def on_before_run_command(self, session: GameSession, request, command):
+    async def on_before_send(self, session: SolutionSession):
+        char_id = session.data_storage.get(self.name, "char_id")
+        if char_id:
+            character = CharacterStore.get(char_id)
+            session.data_storage = RuntimeGameData(character)
+ 
+    async def on_before_run_command(self, session: SolutionSession, request, command):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
     
-    async def on_after_run_command(self, session: GameSession, request, command):
+    async def on_after_run_command(self, session: SolutionSession, request, command):
         pass
         #if session.account and not session.character: 
         #     session.ctx.router.unregister(session.id)
 
-    async def on_enter(self, session: GameSession):
+    async def on_enter(self, session: SolutionSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.

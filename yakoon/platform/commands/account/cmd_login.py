@@ -1,14 +1,14 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.domains.game.runtime.session import GameSession
 from yakoon.platform.stores.account_store import AccountStore
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class CmdLogin(Command):
 
     key = "login"
 
-    async def run(self, session: GameSession, request: Request):
+    async def run(self, session: SolutionSession, request: Request):
         if not request.args:
             return await session.err("Wen willst du anmelden?")
 

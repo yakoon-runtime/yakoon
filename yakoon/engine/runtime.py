@@ -58,9 +58,16 @@ class Engine():
       session.ctx.bind_controller(controller) 
 
       try:
+         # Pre-execution hook: prepare session state (e.g., load character, context)
+         await controller.on_before_send(session)
+         # Pre-command hook: modify or validate request before execution
          await controller.on_before_run_command(session, request, command)
+         # Main command execution
          await command.run(session, request)
+         # Post-command hook: cleanup, logging, side effects
          await controller.on_after_run_command(session, request, command)
+         # Final hook: format output, update session if needed
+         await controller.on_after_send(session)
 
       except PermissionError as exc:
          LogService.permission(session, "command", command.key)

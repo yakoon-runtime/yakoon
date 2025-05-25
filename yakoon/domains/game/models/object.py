@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from yakoon.domains.game.models.secured import Secured
-from yakoon.domains.game.runtime.session import GameSession
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 @dataclass
@@ -13,5 +13,5 @@ class Object(Secured):
     contains: list[str] = field(default_factory=list)
     movable: bool = True
 
-    async def render(self, session:GameSession) -> str:
+    async def render(self, session: SolutionSession) -> str:
         return f"|c{self.name}|n\n{self.desc}"

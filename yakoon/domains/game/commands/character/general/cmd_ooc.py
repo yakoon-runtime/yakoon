@@ -1,13 +1,13 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.domains.game.runtime.session import GameSession
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class CmdOOC(Command):
 
     key = "ooc"
 
-    async def run(self, session: GameSession, request: Request):
+    async def run(self, session: SolutionSession, request: Request):
         if not session.character:
             return await session.err("Du bist bereits OOC.")
 

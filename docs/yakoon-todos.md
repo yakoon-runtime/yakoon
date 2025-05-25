@@ -1,6 +1,12 @@
 
 # Core 
+- Daten für Session-
 
+- Hilfesystem anbinden
+  - Templates für die Hilfe
+- Templates für Switch
+- Templates für Login
+- Danach Game - Commands funktionsfähig machen.
 
 # Platform
 - Erstelle neues Projekt ....

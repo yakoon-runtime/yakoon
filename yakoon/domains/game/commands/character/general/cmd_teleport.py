@@ -1,7 +1,7 @@
 
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.domains.game.runtime.session import GameSession
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class CmdTeleport(Command):
@@ -10,6 +10,6 @@ class CmdTeleport(Command):
     aliases = ["tel", "tp"]
     requires = ["admin"]
 
-    async def run(self, session: GameSession, request: Request):
+    async def run(self, session: SolutionSession, request: Request):
 
         await session.out("teleport done!")
