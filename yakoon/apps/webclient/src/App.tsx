@@ -20,6 +20,9 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-zinc-900 text-gray-100">
+      <header className="px-4 py-3 border-b border-zinc-700 text-lg font-semibold bg-zinc-800 shadow-sm">
+        Yakoon · Terminal 
+      </header>
       <div ref={containerRef} className="flex-1 overflow-y-auto p-4">
         <ConsoleOutput lines={output} />
       </div>

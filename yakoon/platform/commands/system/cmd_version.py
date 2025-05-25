@@ -4,6 +4,7 @@ import time
 from datetime import datetime, timezone
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
+from yakoon.platform.services.template_service import render
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.settings import Settings
 from yakoon.engine.core.command import Command
@@ -14,12 +15,14 @@ class CmdVersion(Command):
     key = "version"
 
     async def run(self, session: PlatformSession, request: Request):
-        await session.send_msg("📦 System Status")
-        await session.send_msg(f"└─ Platform Version  : {get_platform_version()}")
-        await session.send_msg(f"└─ Python            : {platform.python_version()}")
-        await session.send_msg(f"└─ Hostname          : {platform.node()}")
-        await session.send_msg(f"└─ Uptime            : {get_uptime()}")
-        await session.send_msg(f"└─ Current Time      : {datetime.now(timezone.utc).isoformat()}")
+        output = render(Settings.cmd_platform_templates + "system/cmd_version.j2.md", {
+            "version": get_platform_version(),
+            "python": platform.python_version(),
+            "hostname": platform.node(),
+            "uptime": get_uptime(),
+            "time": datetime.now(timezone.utc).isoformat()
+        })
+        await session.send_msg(output)
 
 
 _start_time = time.time()

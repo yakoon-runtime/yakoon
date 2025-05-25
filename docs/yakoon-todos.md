@@ -1,6 +1,8 @@
 
 # Core 
 - Customizeable
+- scrollen bei eingabe
+- versoin -> umbrüche...
 
 - Templates:
   - Wir wollen unsere Texte in Markdown anzeigen. 

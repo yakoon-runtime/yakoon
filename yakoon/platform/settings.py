@@ -25,3 +25,5 @@ class Settings(BaseSettings):
 
     cmd_category_debug: str = "debug"
     """Development-only commands used for testing, diagnostics, or inspection."""
+
+    cmd_platform_templates = "platform/commands/"

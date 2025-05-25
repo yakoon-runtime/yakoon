@@ -1,0 +1,9 @@
+# 📦 System Status
+
+```
+└─ Platform Version  : {{ version }}
+└─ Python            : {{ python }}
+└─ Hostname          : {{ hostname }}
+└─ Uptime            : {{ uptime }}
+└─ Current Time      : {{ time }}
+```
