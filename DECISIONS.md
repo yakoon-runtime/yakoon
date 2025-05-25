@@ -7,6 +7,7 @@
 Yakoon ist nun Solution
 > Platform -> Solution -> (Entry-points)
 > In Solution finden die Lösung statt
+> später: yakoon init solution my-app; yakoon dev; yakoon deploy --docker
 
 ## [2025-05-24]
 **Webclient - React & VITE **

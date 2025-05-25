@@ -1,26 +1,10 @@
 # yakoon/app/webapi/session_manager.py
 
-from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.runtime import Engine
-from yakoon.platform.services.session_service import SessionService
-from yakoon.platform.stores.memory_session_store import InMemorySessionStore
-from yakoon.solution.controller import SolutionMainController
-from yakoon.solution.domains.game.controller import SolutionGameController
-from yakoon.solution.platform.runtime.session import Session
+from yakoon.solution.platform.registry import SolutionRegistry
 
 
-sessions = SessionService(
-    store=InMemorySessionStore(session_cls=Session))
-
-registry = DomainRegistry(
-    controllers=[
-        SolutionGameController(),
-    ],
-    system=SolutionMainController(),
-    sessions=sessions,
-    )
-
-_engine = Engine(registry)
+_engine = Engine(SolutionRegistry())
 
 
 async def handle_input(session_id: str, input_str: str) -> str:
