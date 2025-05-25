@@ -1,7 +1,7 @@
-from yakoon.platform.controller import PlatformController
+from yakoon.domains.game.controller import GameController
 
 
-class SolutionMainController(PlatformController):
+class SolutionGameController(GameController):
     """
     Core configuration for the solution.
     Connects sessions and active command sets.

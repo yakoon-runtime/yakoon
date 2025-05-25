@@ -1,9 +1,25 @@
 from yakoon.apps.telnet.utils.translate import translate_ansi
+from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.runtime import Engine
-from yakoon.domains.game.controller import GameController
+from yakoon.platform.services.session_service import SessionService
+from yakoon.platform.stores.memory_session_store import InMemorySessionStore
+from yakoon.solution.controller import SolutionMainController
+from yakoon.solution.domains.game.controller import SolutionGameController
+from yakoon.solution.platform.runtime.session import Session
 
 
-_engine = Engine(GameController)
+sessions = SessionService(
+    store=InMemorySessionStore(session_cls=Session))
+
+registry = DomainRegistry(
+    controllers=[
+        SolutionGameController(),
+    ],
+    system=SolutionMainController(),
+    sessions=sessions,
+    )
+
+_engine = Engine(registry)
 
 
 async def handle_client(reader, writer):

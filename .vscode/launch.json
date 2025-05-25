@@ -6,7 +6,7 @@
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.apps.console.app",
+            "module": "yakoon.solution.apps.console.run",
             "console": "integratedTerminal"
         },
 
@@ -14,7 +14,7 @@
             "name": "Yakoon: Run Telnet",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.apps.telnet.app",
+            "module": "yakoon.solution.apps.telnet.run",
             "console": "integratedTerminal"
         },
 
@@ -22,28 +22,10 @@
             "name": "Yakoon: Run WebAPI",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.apps.webapi.app",
+            "module": "yakoon.solution.apps.webapi.run",
             "console": "integratedTerminal"
         },
-        
-        /*
-        {
-            "name": "Yakoon: Run WebAPI",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/yakoon/apps/webapi/app.py",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        }, */
-
-         {
-            "name": "MindDojo: Run Console",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "minddojo.app",
-            "console": "integratedTerminal"
-        },
-
+      
 
     ]
 }
