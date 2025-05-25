@@ -1,9 +1,9 @@
 
 import asyncio
 
-from yakoon.apps.telnet.bridge import handle_client
+from yakoon.apps.telnet.utils.bridge import handle_client
 
-async def main():
+async def run_telnet():
 
     server = await asyncio.start_server(handle_client, "0.0.0.0", 4000)
     print("✅ Yakoon Telnet läuft auf Port 4000")
@@ -11,4 +11,4 @@ async def main():
         await server.serve_forever()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(run_telnet())

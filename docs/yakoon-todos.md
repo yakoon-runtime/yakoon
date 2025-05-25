@@ -1,18 +1,12 @@
 
 # Core 
-- Name für Commands - Domainübergreifend
-- Office: create project
-- office create Muster ->
+- Customizeable
 
-
-- Webclient - mit weißen Hintergrund und Eingabe fix. 
-  - Genau wie in ChatPGP
 - Templates:
   - Wir wollen unsere Texte in Markdown anzeigen. 
   - Funktion, um beliebite Bäume ├──;  │   └── darzustellen.
     - Ist Core Funktion
 - Test von Yield mit zwei Sessions
-
 
 # Platform
 

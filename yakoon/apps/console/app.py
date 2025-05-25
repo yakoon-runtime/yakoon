@@ -18,7 +18,7 @@ async def msg(text: str):
     print(text)
 
 
-async def run_application():
+async def run_console():
 
     sessions = SessionService(
         store=InMemorySessionStore(session_cls=PlatformSession))
@@ -40,4 +40,4 @@ async def run_application():
         asyncio.create_task(engine.send(session_id, command, msg, err))
 
 if __name__ == "__main__":
-    asyncio.run(run_application())
+    asyncio.run(run_console())
