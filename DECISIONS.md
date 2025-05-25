@@ -3,6 +3,12 @@
 > Dokumentiert wird: Was? Und Warum?
 
 ## [2025-05-25]
+**Session Data**
+Wir unterscheiden zwischen RuntimeSessionData und StorageSessionData. RuntimeData nimmt ein Objekt auf, welches im Domain Hook für die Domain angehängt wird. Es enthält Daten wie Character oder Document.
+StorageSessionData beinhaltet die Daten welche durch den SessionService persistiert und geladen werden.  
+> Idee: Trennung der Daten zwischen Storage und Laufzeit.
+
+## [2025-05-25]
 **Template-Splitting**
 Template-Splitting nach Format
 Jedes logische Template besteht aus drei eigenständigen Dateien: .md, .plain, .ansi. Je nach Client wird automatisch das passende Format gerendert.

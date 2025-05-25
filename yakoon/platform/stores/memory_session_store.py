@@ -1,4 +1,5 @@
 from typing import Optional
+from yakoon.engine.system.data import StorageSessionData
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.stores.session_store import SessionStore
 
@@ -19,7 +20,9 @@ class InMemorySessionStore(SessionStore):
             session.account_id = kwargs.get("account_id")
             self._sessions[session.id] = session
             return self._sessions[session.id], True
-        return self._sessions[session_id], False
+        session = self._sessions[session_id]
+        session.data_storage = StorageSessionData() # to avoid runtime state leaks
+        return session, False
 
     async def delete(self, session_id: str) -> None:
         self._sessions.pop(session_id, None)

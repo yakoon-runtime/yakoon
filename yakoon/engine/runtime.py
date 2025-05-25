@@ -6,6 +6,7 @@ from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.context import Context
+from yakoon.engine.system.data import StorageSessionData
 from yakoon.engine.system.session import BaseSession, PrintError, PrintMessage
 
 
@@ -30,11 +31,14 @@ class Engine():
         return await on_err("Command recursion limit reached.")
 
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
-
+      
       session, _ = await self._registry.sessions.get_or_create(session_id)
+      # Bind the current controller context to the session.
+      # This allows commands to access controller-specific state (e.g. name, domain, config).
       session.bind_context(Context(self)) 
-   
+      # Assign the output callback used for sending standard messages to the client.
       session.out = on_msg
+      # Assign the error callback used for sending error or warning messages to the client.
       session.err = on_err
 
       for raw in inputs:

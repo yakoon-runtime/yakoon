@@ -45,6 +45,9 @@ class BaseSession(object):
         self.err: Optional[PrintError] = None
 
         # Persistent session state (e.g., account_id, domain flags)
+        #: Session-wide persistent data storage (domain-aware dictionary).
+        #: This is always reset before each command send to avoid runtime state leaks
+        #: when using stateless memory-based sessions (e.g., for testing or batch processing).
         self.data_storage: StorageSessionData = StorageSessionData()
         # Domain-specific runtime data (e.g., Character, Document, etc.)
         self.data_runtime: Optional[RuntimeSessionData] = None
