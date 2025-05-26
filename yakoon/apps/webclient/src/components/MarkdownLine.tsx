@@ -32,7 +32,7 @@ export const consoleMarkdownTheme: Components = {
     ),
     
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-green-600 pl-4 text-zinc-400 italic my-2">
+      <blockquote className="border-l-4 border-blue-600 pl-4 text-zinc-400 italic my-2">
         {children}
       </blockquote>
     ),

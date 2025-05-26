@@ -1,8 +1,6 @@
 
 # Core 
 
-- cmd_ooc
-
 - Hilfesystem anbinden
   - Templates für die Hilfe
 - Templates für Switch
