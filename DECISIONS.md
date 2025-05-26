@@ -3,6 +3,22 @@
 > Dokumentiert wird: Was? Und Warum?
 
 ## [2025-05-26]
+**Dynamische Commands per Domain-Hooks**
+Zur Unterstützung kontextsensitiver Commands (z. B. Raum-Exits)
+führt jede Domain zwei Lifecycle-Hooks:
+- on_before_resolve(session) → registriert dynamische Commands
+- on_after_send(session) → entfernt sie wieder
+Dadurch wird dynamisches Routing pro Session möglich, ohne den Resolver oder die Registry zu verändern.
+
+## [2025-05-26]
+**Festlegung von Ausführungsbedingungen für Commands**
+Commands können festlegen, ob ein geladener Charakter erforderlich ist: 
+requires_character = False
+> Fehlt das Attribut oder ist es True, prüft der Domain-Hook on_before_run_command(...), 
+ob session.data_runtime.character gesetzt ist – sonst wird die Ausführung blockiert.
+> Damit steuert das Command selbst die Anforderungen an den Session-Zustand.n
+
+## [2025-05-26]
 **Klickbare Links**
 Unterstützung von internen & externen Hyperlinks wurde wie folgt umgesetzt:
 > externe Links -> markdown: [Open Docs](https://example.com)

@@ -13,8 +13,7 @@ class Room(Secured):
     exits: dict[str, str] = field(default_factory=dict) 
 
     async def render(self, session: SolutionSession) -> str:
-        parts = [f"|w{self.name}|n", self.desc]
-
+        parts = [f"|w{self.name}|n", self.desc]        
         objects = ObjectStore.contents_of(self.id)
         if objects:
             parts.append(f"└─ Objekte: {', '.join(o.name for o in objects)}")

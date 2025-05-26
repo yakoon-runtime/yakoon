@@ -26,8 +26,13 @@ class CharacterStore:
     @classmethod
     def exists(cls, char_id: str) -> bool:
         return char_id in cls._chars
+    
+    @classmethod
+    def persist(cls, obj: Character):
+        pass
+    
 
 CharacterStore.add(
-    Character(id="char-stefan", name="Stefan", location="forest"))
+    Character(id="char-stefan", name="Stefan", location="id:forest"))
 CharacterStore.add(
-    Character(id="char-lara", name="Lara", location="hall"))
+    Character(id="char-lara", name="Lara", location="id:hall"))

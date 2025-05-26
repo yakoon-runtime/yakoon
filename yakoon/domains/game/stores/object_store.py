@@ -7,11 +7,11 @@ class ObjectStore:
     _objects: dict[str, Object] = {}
 
     @classmethod
-    def get(cls, obj_id: str) -> Optional[Object]:
+    def get_by_id(cls, obj_id: str) -> Optional[Object]:
         return cls._objects.get(obj_id)
 
     @classmethod
-    def put(cls, obj: Object):
+    def add(cls, obj: Object):
         cls._objects[obj.id] = obj
 
     @classmethod
@@ -19,11 +19,11 @@ class ObjectStore:
         return [o for o in cls._objects.values() if o.location == location_id]
 
 
-ObjectStore.put(
+ObjectStore.add(
     Object(id="zettel", name="Zettel", desc="Ein alter Zettel.", location="umschlag"))
-ObjectStore.put(
+ObjectStore.add(
     Object(id="umschlag", name="Umschlag", desc="Versiegelt.", location="kiste", contains=["zettel"]))
-ObjectStore.put(
+ObjectStore.add(
     Object(id="kiste", name="Holzkiste", desc="Sieht schwer aus.", location="schank", contains=["umschlag"]))
-ObjectStore.put(
+ObjectStore.add(
     Object(id="schrank", name="Schrank", desc="Ein hölzernes Möbelstück.", location="hall", contains=["kiste"]))

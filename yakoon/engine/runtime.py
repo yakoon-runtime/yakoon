@@ -53,15 +53,20 @@ class Engine():
       request = Request(input_str)
       if not request.cmd:
          return await session.err("Kein Befehl erkannt.")
-      
-      result = self._registry.resolve(request.cmd, session)
-      if not result:
-         return await session.err(f"Befehl '{request.cmd}' nicht gefunden.")
-
-      controller, command = result
-      session.ctx.bind_controller(controller) 
 
       try:
+         if session.domain:
+            # Hook called before command resolution.
+            await session.domain.on_before_resolve(session)
+
+         # resolve the commands
+         result = self._registry.resolve(request.cmd, session)
+         if not result:
+            return await session.err(f"Befehl '{request.cmd}' nicht gefunden.")
+
+         controller, command = result
+         session.ctx.bind_controller(controller) 
+
          # Pre-execution hook: prepare session state (e.g., load character, context)
          await controller.on_before_send(session)
          # Pre-command hook: modify or validate request before execution

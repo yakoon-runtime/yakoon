@@ -1,12 +1,15 @@
 
 # Core 
-- Daten für Session-
+
+- cmd_look
+- cmd_move
+- cmd_ooc
+- cmd_tel
 
 - Hilfesystem anbinden
   - Templates für die Hilfe
 - Templates für Switch
 - Templates für Login
-- Danach Game - Commands funktionsfähig machen.
 
 # Platform
 - Erstelle neues Projekt ....

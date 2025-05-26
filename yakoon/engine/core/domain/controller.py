@@ -43,6 +43,15 @@ class BaseController(ABC):
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
 
+    async def on_before_resolve(self, session: BaseSession):
+        """
+        Hook called before command resolution.
+
+        Use this to register dynamic commands for the current session,
+        e.g. exits, room-specific actions or context-sensitive shortcuts.
+        Executed regardless of whether a valid command is found.
+        """
+
     async def on_before_send(self, session: BaseSession):
         """
         Hook called before any input is processed by the engine.

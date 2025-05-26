@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from typing import Callable, Optional
 
-from yakoon.domains.game.runtime.direction import get_exit_direction_commandset
-from yakoon.domains.game.stores.room_store import RoomStore      
+from yakoon.domains.game.models.room import Room
+from yakoon.solution.platform.runtime.session import SolutionSession      
 
 
 @dataclass
@@ -10,15 +11,25 @@ class Character:
     name: str = ""
     location: str = "" # room_id
 
-    async def move_to(self, session, new_location_id):  
-        room = RoomStore.get(new_location_id)
-        if room:        
-            self.location = new_location_id
-            self._update_room_commands(session, room) 
-            await session.out(f"Du gehst nach {room.name}.")
-            await session.out(await room.render(session))
+    # THis two field were set by attach().
+    on_load_room: Optional[Callable[[str], "Room"]] = None
+    on_store_character: Optional[Callable[["Character"], None]] = None
+
+    async def move_to(self, session: SolutionSession, new_location_id):  
+        """
+        Moves the character to a new room by ID.
+
+        Updates internal location, persists the character state,
+        and sends appropriate output to the session (description, feedback).
+        """
+        room = self.on_load_room(new_location_id)        
+        if not room:
+            await session.err("Dieser Ort existiert nicht.")
+            return
+
+        self.location = new_location_id
+        self.on_store_character(self)
+
+        await session.send_msg(f"Du gehst in Richtung {room.name}.")
+        await session.send_msg(await room.render(session))
      
-    def _update_room_commands(self, session, room):
-        router = session.ctx.router
-        router.unregister(session.id)
-        router.register(session.id, get_exit_direction_commandset(room))

@@ -1,3 +1,4 @@
+from yakoon.domains.game.behavior import CharacterBehavior
 from yakoon.domains.game.runtime.data import RuntimeGameData
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
@@ -29,8 +30,9 @@ class CmdIC(Command):
         # store the character to session      
         session.data_storage.set(
             session.ctx.controller.name, "char_id", char.id)
-        await session.ctx.sessions.persist(session)
-        
+        await session.ctx.sessions.persist(session) 
+
+        CharacterBehavior.attach(char)
         await session.out(f"Du wirst zu {char.name}.")
-        #await session.character.move_to(session, char.location)
+        await char.move_to(session, char.location)
     

@@ -35,6 +35,7 @@ class BaseSession(object):
         """
         self.id = id or str(uuid4())
         self._cmd_groups = []
+        self._cmd_groups_dynamic = []
         self._context:Context = None
         self._domain:BaseController = None
 
@@ -69,7 +70,14 @@ class BaseSession(object):
     @cmd_groups.setter
     def cmd_groups(self, value):
         self._cmd_groups = value
-    
+
+    @property
+    def cmd_groups_dynamic(self) -> list[Type[str]]:
+        return self._cmd_groups_dynamic
+    @cmd_groups_dynamic.setter
+    def cmd_groups_dynamic(self, value):
+        self._cmd_groups_dynamic = value
+
     def bind_context(self, context: Context):
         self._context = context
 

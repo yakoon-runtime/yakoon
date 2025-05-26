@@ -39,23 +39,27 @@ class DomainRegistry:
         3. System controller (only if no domain is active)
         """
 
+        # Include the session-local command group for dynamic routing.
+        # This allows commands (e.g. exits or context actions) to be registered
+        cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
+        
         # 1. Prefix (e.g. mud:look, system:help)
         if ":" in input_str:
             prefix, rest = input_str.split(":", 1)
             for controller in [self.system] + self.controllers:
                 if controller.name == prefix:
-                    cmd = controller.router.resolve(rest, session.cmd_groups)
+                    cmd = controller.router.resolve(rest, cmd_groups)
                     if cmd:
                         return controller, cmd
 
-        # 2. Active domain (IC mode)
+        # 2. Active domain (switch mode)
         if session.domain:
-            cmd = session.domain.router.resolve(input_str, session.cmd_groups)
+            cmd = session.domain.router.resolve(input_str, cmd_groups)
             if cmd:
                 return session.domain, cmd
 
         # 3. System controller (OOC mode only)
-        cmd = self.system.router.resolve(input_str, session.cmd_groups)
+        cmd = self.system.router.resolve(input_str, cmd_groups)
         if cmd:
             return self.system, cmd
 

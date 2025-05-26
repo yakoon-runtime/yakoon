@@ -1,4 +1,5 @@
 
+from yakoon.domains.game.runtime.data import RuntimeGameData
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
 from yakoon.domains.game.stores.room_store import RoomStore
@@ -10,9 +11,10 @@ class CmdLook(Command):
     aliases = ["see"]
 
     async def run(self, session: SolutionSession, request: Request):
-        char = session.character
-        room = RoomStore.get(char.location) if char else None
+        runtime_data: RuntimeGameData = session.data_runtime
+        char = runtime_data.character
+        room = RoomStore.get_by_id(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
 
-        await session.out(await room.render(session))
+        await session.send_msg(await room.render(session))

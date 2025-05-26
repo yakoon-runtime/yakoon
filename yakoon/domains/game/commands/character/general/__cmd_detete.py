@@ -6,7 +6,7 @@ from yakoon.domains.game.stores.object_store import ObjectStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 
-class CmdDelete(Command):
+class __CmdDelete(Command):
     key = "delete"
     aliases = ["del"]
 

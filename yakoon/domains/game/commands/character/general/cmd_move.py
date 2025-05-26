@@ -1,4 +1,6 @@
 
+from yakoon.domains.game.behavior import CharacterBehavior
+from yakoon.domains.game.runtime.data import RuntimeGameData
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
 from yakoon.domains.game.stores.room_store import RoomStore
@@ -6,6 +8,7 @@ from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class CmdMove(Command):
+
     key = "go"
     aliases = ["move"]
 
@@ -15,8 +18,9 @@ class CmdMove(Command):
         if not target:
             return await session.err("Wohin willst du gehen?")
 
-        char = session.character
-        room = RoomStore.get(char.location) if char else None
+        runtime_data: RuntimeGameData = session.data_runtime
+        char = runtime_data.character
+        room = RoomStore.get_by_id(char.location) if char else None
         if not room:
             return await session.err("Du bist nirgendwo.")
 
@@ -24,7 +28,9 @@ class CmdMove(Command):
         if not dest_id:
             return await session.err(f"Hier geht es nicht nach '{target}'.")
 
-        dest_room = RoomStore.get(dest_id)
+        dest_room = RoomStore.get_by_id(dest_id)
         if not dest_room:
             return await session.err(f"Zielraum '{dest_id}' existiert nicht.")
-        await session.character.move_to(session, dest_room.id)
+
+        CharacterBehavior.attach(char)
+        await char.move_to(session, dest_room.id)
