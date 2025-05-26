@@ -1,5 +1,7 @@
 
 # Core 
+- WebApi? -> OutBufferManager? 
+
 
 - Hilfesystem anbinden
   - Templates für die Hilfe

@@ -9,6 +9,7 @@ class CmdTeleport(Command):
     key = "teleport"
     aliases = ["tel", "tp"]
     requires = ["admin"]
+    requires_character = True
 
     async def run(self, session: SolutionSession, request: Request):
 

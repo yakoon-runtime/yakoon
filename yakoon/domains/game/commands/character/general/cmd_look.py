@@ -9,6 +9,7 @@ class CmdLook(Command):
 
     key = "look"
     aliases = ["see"]
+    requires_character = True
 
     async def run(self, session: SolutionSession, request: Request):
         runtime_data: RuntimeGameData = session.data_runtime

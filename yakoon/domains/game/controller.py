@@ -80,7 +80,7 @@ class GameController(BaseController):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
 
         # default: character is required
-        if getattr(command, "requires_character", True):            
+        if getattr(command, "requires_character", False):            
             if not session.data_runtime or not session.data_runtime.character:
                 raise PermissionError("Du brauchst dazu einen Spieler: Verwende 'ic <character>'.")
 

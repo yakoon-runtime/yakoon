@@ -11,6 +11,7 @@ class CmdMove(Command):
 
     key = "go"
     aliases = ["move"]
+    requires_character = True
 
     async def run(self, session: SolutionSession, request: Request):
 

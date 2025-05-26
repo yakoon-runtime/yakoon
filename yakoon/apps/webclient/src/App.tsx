@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { InputBar } from "./components/InputBar";
 import { ConsoleOutput } from "./components/ConsoleOutput";
-import { sendCommand } from "./api/yakoon-api";
+//import { sendCommand } from "./api/yakoon-api";
 import { MarkdownContext } from "./components/MarkdownContext";
+import { initYakoonSocket, sendToYakoon } from "./api/yakoon-socket";
+
 
 export default function App() {
   const [output, setOutput] = useState<string[]>([
@@ -11,16 +13,28 @@ export default function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const handleSubmit = (input: string) => {
+    setOutput((prev) => [...prev, `> ${input}`]);
+    sendToYakoon(input);
+  };
+
+  /*
   const handleSubmit = async (input: string) => {
     setOutput((prev) => [...prev, `> ${input}`]);
     const result = await sendCommand(input);
     setOutput((prev) => [...prev, result]);
-  };
+  }; */
 
   useEffect(() => {
     // Scroll automatisch zum neuesten Output
     containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
   }, [output]);
+
+  useEffect(() => {
+    initYakoonSocket((msg: string) => {
+      setOutput((prev) => [...prev, msg]);
+    });
+  }, []);
 
   return (
     <MarkdownContext.Provider value={{ handleSubmit }}>
