@@ -8,7 +8,7 @@ class AccountStore:
     @classmethod
     def get_by_name(cls, name: str) -> Optional[Account]:
         for key, account in cls._accounts.items():
-            if account.name == name.lower():
+            if account.name.lower() == name.lower():
                 return cls._accounts[key]
 
     @classmethod
@@ -32,5 +32,5 @@ default_groups = {
 }
 
 
-AccountStore.add(Account(id="acc-stefan", name="stefan", cmd_groups=default_groups["group 1"]))
-AccountStore.add(Account(id="acc-lara", name="lara", cmd_groups=["system"]))
+AccountStore.add(Account(id="acc-stefan", name="Stefan", cmd_groups=default_groups["group 1"]))
+AccountStore.add(Account(id="acc-lara", name="Lara", cmd_groups=["system"]))

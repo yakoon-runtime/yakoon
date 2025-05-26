@@ -25,10 +25,20 @@ class GameController(BaseController):
     """ The collection of all commands. """
      
     async def on_before_send(self, session: SolutionSession):
+        """
+        Prepares the session's runtime state before any command is executed within this domain.
+
+        Typically used to:
+        - Load domain-specific objects (e.g., Character) into session.data_runtime
+        - Ensure the session is ready for domain-specific command execution
+
+        This method is called once per command dispatch cycle.
+        """
+        session.data_runtime = RuntimeGameData(None)
         char_id = session.data_storage.get(self.name, "char_id")
         if char_id:
-            character = CharacterStore.get(char_id)
-            session.data_storage = RuntimeGameData(character)
+            character = CharacterStore.get_by_id(char_id)
+            session.data_runtime = RuntimeGameData(character)
  
     async def on_before_run_command(self, session: SolutionSession, request, command):
         if required := getattr(command, "requires", []):

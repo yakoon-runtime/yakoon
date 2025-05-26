@@ -2,6 +2,13 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-26]
+**Klickbare Links**
+Unterstützung von internen & externen Hyperlinks wurde wie folgt umgesetzt:
+> externe Links -> markdown: [Open Docs](https://example.com)
+> interne Links -> werden zu Commands: 
+> [Show version](# "version"); [Show help version](# "help version")
+
 ## [2025-05-25]
 **Session Data**
 Wir unterscheiden zwischen RuntimeSessionData und StorageSessionData. RuntimeData nimmt ein Objekt auf, welches im Domain Hook für die Domain angehängt wird. Es enthält Daten wie Character oder Document.
