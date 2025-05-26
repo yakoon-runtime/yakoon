@@ -88,3 +88,7 @@ class Engine():
       except Exception as exc:
          await session.err("Ein interner Fehler ist aufgetreten.")
          LogService.error(exc)
+
+      finally:        
+         if session.domain:
+            await session.domain.on_cleanup(session)

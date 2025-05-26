@@ -7,8 +7,9 @@
 Zur Unterstützung kontextsensitiver Commands (z. B. Raum-Exits)
 führt jede Domain zwei Lifecycle-Hooks:
 - on_before_resolve(session) → registriert dynamische Commands
-- on_after_send(session) → entfernt sie wieder
+- on_cleanup(session) → entfernt sie wieder
 Dadurch wird dynamisches Routing pro Session möglich, ohne den Resolver oder die Registry zu verändern.
+Zudem werden nun Commands nur innerhalb eines Lifecycles angelegt und wieder entfernt.
 
 ## [2025-05-26]
 **Festlegung von Ausführungsbedingungen für Commands**

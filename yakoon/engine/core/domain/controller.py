@@ -98,3 +98,11 @@ class BaseController(ABC):
         Used to show welcome messages, check account requirements, or guide login flow.
         Override this in each domain to define entry behavior.
         """
+
+    async def on_cleanup(self, session: BaseSession):
+        """
+        Always called after a command cycle, even if exceptions occurred.
+
+        Use this to remove dynamic command groups, reset state,
+        or undo temporary session changes.
+        """

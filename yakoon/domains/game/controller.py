@@ -84,13 +84,6 @@ class GameController(BaseController):
             if not session.data_runtime or not session.data_runtime.character:
                 raise PermissionError("Du brauchst dazu einen Spieler: Verwende 'ic <character>'.")
 
-    async def on_after_send(self, session: SolutionSession):
-        """
-        Hook called after input has been processed and all commands executed.
-        Can be used for cleanup, analytics, or session state updates.
-        """
-        self.router.unregister(self.dynamic_prefix(session))
-
     async def on_enter(self, session: SolutionSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
@@ -99,3 +92,12 @@ class GameController(BaseController):
         """
         await session.send_msg("Willkommen im MUD.")
         await session.send_status("Melde dich mit `ic <charakter>` an.")        
+
+    async def on_cleanup(self, session: SolutionSession):
+        """
+        Always called after a command cycle, even if exceptions occurred.
+
+        Use this to remove dynamic command groups, reset state,
+        or undo temporary session changes.
+        """        
+        self.router.unregister(self.dynamic_prefix(session))
