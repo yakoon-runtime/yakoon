@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { InputBar } from "./components/InputBar";
 import { ConsoleOutput } from "./components/ConsoleOutput";
 import { sendCommand } from "./api/yakoon-api";
+import { MarkdownContext } from "./components/MarkdownContext";
 
 export default function App() {
   const [output, setOutput] = useState<string[]>([]);
@@ -19,6 +20,7 @@ export default function App() {
   }, [output]);
 
   return (
+    <MarkdownContext.Provider value={{ handleSubmit }}>
     <div className="flex flex-col h-screen bg-zinc-900 text-gray-100">
       <header className="px-4 py-3 border-b border-zinc-700 text-lg font-semibold bg-zinc-800 shadow-sm">
         Yakoon · Terminal 
@@ -30,5 +32,6 @@ export default function App() {
         <InputBar onSubmit={handleSubmit} />
       </div>
     </div>
+    </MarkdownContext.Provider>
   );
 }

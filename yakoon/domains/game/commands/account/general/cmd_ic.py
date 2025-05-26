@@ -24,6 +24,7 @@ class CmdIC(Command):
         # store the character to session      
         session.data_storage.set(
             session.ctx.controller.name, "char_id", char.id)
+        # stora the data.
         
         await session.out(f"Du wirst zu {char.name}.")
         await session.character.move_to(session, char.location)

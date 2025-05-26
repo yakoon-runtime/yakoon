@@ -1,6 +1,8 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
+import { useMarkdownContext  } from "./MarkdownContext";
+
 
 type Props = {
   content: string;
@@ -58,7 +60,32 @@ export const consoleMarkdownTheme: Components = {
     th: ({ children }) => (
       <th className="px-2 py-1 border border-zinc-700 bg-zinc-800">{children}</th>
     ),
-  };
+  
+    a: (props) => {
+      const { handleSubmit } = useMarkdownContext(); 
+      const { href, title, children } = props;
+
+      return (
+        <a
+          href={href}
+          title={title}
+          className="text-blue-400 underline cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            if (href === "#" && title) {
+              handleSubmit(title);
+            } else if (href) {
+              window.open(href, "_blank");
+            }
+          }}
+        >
+          {children}
+        </a>
+      );
+    }
+
+};
+
 
 export function MarkdownLine({ content }: Props) {
   return (
