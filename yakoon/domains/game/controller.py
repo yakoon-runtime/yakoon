@@ -44,7 +44,12 @@ class GameController(BaseController):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
-    
+
+        # default: character is required
+        if getattr(command, "requires_character", True):            
+            if not session.data_runtime or not session.data_runtime.character:
+                raise PermissionError("You must be in character to use this command.")
+
     async def on_after_run_command(self, session: SolutionSession, request, command):
         pass
         #if session.account and not session.character: 
@@ -57,5 +62,4 @@ class GameController(BaseController):
         Override this in each domain to define entry behavior.
         """
         await session.send_msg("Willkommen im MUD.")
-        # if not session.account_id:
-        #    await session.send_status("Melde dich mit `login <charakter>` an.")
+        await session.send_status("Melde dich mit `ic <charakter>` an.")        

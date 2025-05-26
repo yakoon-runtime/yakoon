@@ -9,6 +9,9 @@ class CmdIC(Command):
 
     key = "ic"
 
+    #: allows execution without an active character
+    requires_character = False  
+
     async def run(self, session: SolutionSession, request: Request):
         if not request.args:
             return await session.err("Wen willst du spielen?")
