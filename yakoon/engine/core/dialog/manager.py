@@ -1,29 +1,26 @@
 import asyncio
 
+
 class DialogManager:
-    def __init__(self):
-        self._waiting = {}  # session_id → Future
+    _waiting: dict[str, asyncio.Future] = {}
 
-    def is_waiting(self, session_id):
-        return session_id in self._waiting
-
-    def set_prompt(self, session):
+    @classmethod
+    def set_prompt(cls, session):
         fut = asyncio.get_event_loop().create_future()
-        self._waiting[session.id] = fut
+        cls._waiting[session.id] = fut
         return fut
 
-    def resolve(self, session_id, value):
-        fut = self._waiting.pop(session_id, None)
+    @classmethod
+    def is_waiting(cls, session_id: str) -> bool:
+        return session_id in cls._waiting
+
+    @classmethod
+    def resolve_prompt(cls, session_id: str, value: str) -> bool:
+        fut = cls._waiting.pop(session_id, None)
         if fut and not fut.done():
             fut.set_result(value)
-
-    @staticmethod
-    def is_waiting_to_handle(session_id, input_str:str):
-        if dialog_manager.is_waiting(session_id):
-            dialog_manager.resolve(session_id, input_str)
             return True
-
-dialog_manager = DialogManager()
+        return False
 
 
 

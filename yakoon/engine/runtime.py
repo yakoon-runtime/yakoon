@@ -2,11 +2,9 @@
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
-from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.context import Context
-from yakoon.engine.system.data import StorageSessionData
 from yakoon.engine.system.session import BaseSession, PrintError, PrintMessage
 
 
@@ -21,6 +19,7 @@ class Engine():
    @property
    def registry(self) -> DomainRegistry:
         return self._registry
+
 
    async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError, depth=0):   
       """
@@ -47,8 +46,6 @@ class Engine():
          await self._registry.system.on_after_send(session)
          
    async def _send_one(self, session: BaseSession, input_str: str):   
-      if DialogManager.is_waiting_to_handle(session.id, input_str):
-         return
 
       request = Request(input_str)
       if not request.cmd:
