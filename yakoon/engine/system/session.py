@@ -94,4 +94,4 @@ class BaseSession(object):
         await self.err(f"❌ {text}")
 
     async def send_cmd(self, input_str: str):
-        await self.ctx.send(self, input_str, self.out, self.err)
+        await self.ctx.send_cmd(self, input_str, self.out, self.err)

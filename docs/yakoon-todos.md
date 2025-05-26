@@ -1,10 +1,7 @@
 
 # Core 
 
-- cmd_look
-- cmd_move
 - cmd_ooc
-- cmd_tel
 
 - Hilfesystem anbinden
   - Templates für die Hilfe

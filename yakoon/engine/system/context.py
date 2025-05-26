@@ -5,6 +5,7 @@ from yakoon.engine.services.session_service import BaseSessionService
 class Context:
 
     def __init__(self, engine):
+        self.depth = 0
         self._engine = engine
         self._registry: DomainRegistry = engine.registry
         self._controller = None
