@@ -10,12 +10,12 @@ class CmdLogin(Command):
 
     async def run(self, session: SolutionSession, request: Request):
         if not request.args:
-            return await session.err("Wen willst du anmelden?")
+            return await session.fail("Wen willst du anmelden?")
 
         name = request.args[0]
         account = AccountStore.get_by_name(name)
         if not account:
-            return await session.err(f"Account '{name}' nicht gefunden.")
+            return await session.fail(f"Account '{name}' nicht gefunden.")
         
         session_service = session.ctx.sessions
         pers_session, created = await session_service.get_or_create(session.id, account_id=account.id)
@@ -24,5 +24,5 @@ class CmdLogin(Command):
 
         await session.ctx.platform.on_account_login(session, account)
         if not created:
-            return await session.out("Willkommen zurück.")
-        await session.out(f"Du bist angemeldet als {account.name}.")
+            return await session.emit("Willkommen zurück.")
+        await session.emit(f"Du bist angemeldet als {account.name}.")

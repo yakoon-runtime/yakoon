@@ -1,3 +1,4 @@
+from yakoon.engine.core.io import IOAdapter
 from yakoon.engine.runtime import Engine
 from yakoon.platform.render.render_mode import RenderMode
 from yakoon.platform.utils.ansi import format_codes_to_ansi
@@ -21,9 +22,11 @@ async def handle_client(reader, writer):
         writer.write((msg_str + "\r\n").encode("utf-8"))  
         await writer.drain()
 
-    await out("|wWillkommen bei Yakoon!|n")  
+    io = IOAdapter(out, out)
+
     while True:
         command = await reader.readline()
         if not command:
-            break
-        await _engine.send(session_id, command.decode("utf-8").strip(), out, out)
+            continue            
+        command = command.decode("utf-8").strip()
+        await _engine.send(session_id, command, io)

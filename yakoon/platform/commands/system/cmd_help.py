@@ -13,17 +13,17 @@ class CmdHelpSystem(Command):
 
         registry = getattr(session.ctx, "_registry")
 
-        await session.send_msg("Verfügbare Domains:")
+        await session.emit("Verfügbare Domains:")
         for controller in registry.controllers:
-            await session.send_msg(f"- {controller.name:10}  →  @switch {controller.name}")
+            await session.emit(f"- {controller.name:10}  →  @switch {controller.name}")
 
         grouped = get_grouped_commands(session.ctx.controller)
 
-        await session.send_msg(f"\nGlobale Befehle:")
+        await session.emit(f"\nGlobale Befehle:")
         for category in sorted(grouped):
-            await session.send_msg(f"Kategorie: {category}")
+            await session.emit(f"Kategorie: {category}")
             for cmd in grouped[category]:
-                await session.send_msg(f"- {cmd.key}")
+                await session.emit(f"- {cmd.key}")
 
 
 class CmdHelpDomain(Command):
@@ -34,21 +34,21 @@ class CmdHelpDomain(Command):
 
         controller = session.ctx.controller
         if not request.args:
-            await session.send_msg(f"Hilfe für Domain: {controller.name}")
+            await session.emit(f"Hilfe für Domain: {controller.name}")
             grouped = get_grouped_commands(controller)
             for category in sorted(grouped):
-                await session.send_msg(f"Kategorie: {category}")
+                await session.emit(f"Kategorie: {category}")
                 for cmd in grouped[category]:
-                    await session.send_msg(f"- {cmd.key}")
+                    await session.emit(f"- {cmd.key}")
             return
 
         key = request.args[0]
         cmd = controller.router.find_by_key_or_alias(key, session.cmd_groups)
         if cmd:
-            await session.send_msg(f"Hilfe zu: {cmd.key}")
-            await session.send_msg(cmd.__doc__ or "Keine Beschreibung verfügbar.")
+            await session.emit(f"Hilfe zu: {cmd.key}")
+            await session.emit(cmd.__doc__ or "Keine Beschreibung verfügbar.")
         else:
-            await session.send_error(f"Befehl '{key}' nicht gefunden.")
+            await session.fail(f"Befehl '{key}' nicht gefunden.")
     
 
 def get_grouped_commands(controller) -> dict[str, list[Command]]:

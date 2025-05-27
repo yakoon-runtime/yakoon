@@ -44,4 +44,4 @@ class CmdCreateDomainProject(Command):
         except Exception as e:
             raise ValueError(f"Fehler beim Erstellen: {e}")
 
-        await session.out(f"✅ Domain-Projekt '{name}' aus '{domain}' erstellt unter: {target_path}")
+        await session.emit(f"✅ Domain-Projekt '{name}' aus '{domain}' erstellt unter: {target_path}")

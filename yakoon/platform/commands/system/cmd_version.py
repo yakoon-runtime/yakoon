@@ -22,7 +22,7 @@ class CmdVersion(Command):
             "uptime": get_uptime(),
             "time": datetime.now(timezone.utc).isoformat()
         })
-        await session.send_msg(output)
+        await session.emit(output)
 
 
 _start_time = time.time()

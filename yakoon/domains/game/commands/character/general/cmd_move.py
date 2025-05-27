@@ -17,21 +17,21 @@ class CmdMove(Command):
 
         target = request.args[0] if request.args else None
         if not target:
-            return await session.err("Wohin willst du gehen?")
+            return await session.fail("Wohin willst du gehen?")
 
         runtime_data: RuntimeGameData = session.data_runtime
         char = runtime_data.character
         room = RoomStore.get_by_id(char.location) if char else None
         if not room:
-            return await session.err("Du bist nirgendwo.")
+            return await session.fail("Du bist nirgendwo.")
 
         dest_id = room.exits.get(target)
         if not dest_id:
-            return await session.err(f"Hier geht es nicht nach '{target}'.")
+            return await session.fail(f"Hier geht es nicht nach '{target}'.")
 
         dest_room = RoomStore.get_by_id(dest_id)
         if not dest_room:
-            return await session.err(f"Zielraum '{dest_id}' existiert nicht.")
+            return await session.fail(f"Zielraum '{dest_id}' existiert nicht.")
 
         CharacterBehavior.attach(char)
         await char.move_to(session, dest_room.id)

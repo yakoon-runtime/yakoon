@@ -24,12 +24,12 @@ class Character:
         """
         room = self.on_load_room(new_location_id)        
         if not room:
-            await session.err("Dieser Ort existiert nicht.")
+            await session.fail("Dieser Ort existiert nicht.")
             return
 
         self.location = new_location_id
         self.on_store_character(self)
 
-        await session.send_msg(f"Du gehst in Richtung {room.name}.")
-        await session.send_msg(await room.render(session))
+        await session.emit(f"Du gehst in Richtung {room.name}.")
+        await session.emit(await room.render(session))
      

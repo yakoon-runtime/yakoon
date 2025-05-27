@@ -1,6 +1,7 @@
 
 import asyncio
 from collections import deque
+from yakoon.engine.core.io import IOAdapter
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
@@ -23,30 +24,30 @@ class Engine():
    def registry(self) -> DomainRegistry:
         return self._registry
    
-   async def signal_ready(self, on_msg: PrintMessage):
-      session = BaseSession(None)
-      session.out = on_msg
-      session.err = on_msg
+   async def signal_ready(self, io: IOAdapter):           
+      session = BaseSession(None)      
+      # Bind the given IOAdapter to this session for output and error handling.
+      session.bind_io(io)
       await self._registry.system.on_ready(session)
                                  
-   async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError, depth=0):   
+   async def send(self, session_id: str, input_str: str, io: IOAdapter, depth=0):   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
       if depth > Settings.max_dispatch_depth:
-        return await on_err("Command recursion limit reached.")
+        return await io.err("Command recursion limit reached.")
 
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
       session, _ = await self._registry.sessions.get_or_create(session_id)
+
+      # Bind the given IOAdapter to this session for output and error handling.
+      session.bind_io(io)
+
       # Bind the current controller context to the session.
       # This allows commands to access controller-specific state (e.g. name, domain, config).
       session.bind_context(Context(self)) 
-      # Assign the output callback used for sending standard messages to the client.
-      session.out = on_msg
-      # Assign the error callback used for sending error or warning messages to the client.
-      session.err = on_err
 
       await asyncio.create_task(self._run_processing(session, inputs))
 
@@ -98,7 +99,7 @@ class Engine():
 
       request = Request(input_str)
       if not request.cmd:
-         return await session.err("Kein Befehl erkannt.")
+         return await session.fail("Kein Befehl erkannt.")
 
       try:
          if session.domain:
@@ -108,7 +109,7 @@ class Engine():
          # resolve the commands
          result = self._registry.resolve(request.cmd, session)
          if not result:
-            return await session.err(f"Befehl '{request.cmd}' nicht gefunden.")
+            return await session.fail(f"Befehl '{request.cmd}' nicht gefunden.")
 
          controller, command = result
          session.ctx.bind_controller(controller) 
@@ -126,13 +127,13 @@ class Engine():
 
       except PermissionError as exc:
          LogService.permission(session, "command", command.key)
-         await session.err(str(exc))
+         await session.fail(str(exc))
 
       except ValueError as exc:
-         await session.err(str(exc))
+         await session.fail(str(exc))
 
       except Exception as exc:
-         await session.err("Ein interner Fehler ist aufgetreten.")
+         await session.fail("Ein interner Fehler ist aufgetreten.")
          LogService.error(exc)
 
       finally:        

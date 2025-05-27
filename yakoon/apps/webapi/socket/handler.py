@@ -4,6 +4,7 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from yakoon.engine.core.dialog.manager import DialogManager
+from yakoon.engine.core.io import IOAdapter
 from yakoon.engine.runtime import Engine
 from yakoon.platform.render.render_mode import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
@@ -26,19 +27,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
     print(f"[WebSocket] Connected: {session_id}")
 
-    async def out(msg: str):
-        await websocket.send_text(msg)
-
-    async def err(msg: str):
-        await websocket.send_text(f"⚠️ {msg}")
+    out = err = websocket.send_text
+    io = IOAdapter(out, err)
 
     try:
-        await engine.signal_ready(out)
+        await engine.signal_ready(io)
         while True:               
             await asyncio.sleep(0.1)
-            data = await websocket.receive_text()              
+            command = await websocket.receive_text()              
 
-            await engine.send(session_id, data, out, err)
+            await engine.send(session_id, command, io)
 
     except WebSocketDisconnect:
         print(f"[WebSocket] Disconnected: {session_id}")

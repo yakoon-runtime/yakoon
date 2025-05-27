@@ -10,7 +10,7 @@ class CmdWelcome(Command):
     requires = ["system"]
 
     async def run(self, session: PlatformSession, request: Request):
-        await session.out("Yakoon sagt: 'Willkommen'.")
+        await session.emit("Yakoon sagt: 'Willkommen'.")
 
         #result = await ask_AI("Sag Hallo.")
-        #await session.out(result)
+        #await session.emit(result)

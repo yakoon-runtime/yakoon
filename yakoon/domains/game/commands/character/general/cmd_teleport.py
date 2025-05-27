@@ -13,4 +13,4 @@ class CmdTeleport(Command):
 
     async def run(self, session: SolutionSession, request: Request):
 
-        await session.out("teleport done!")
+        await session.emit("teleport done!")

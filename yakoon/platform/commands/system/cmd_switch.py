@@ -19,10 +19,10 @@ class CmdSwitch(Command):
         registry: DomainRegistry = getattr(session.ctx, "_registry")
         controller = registry.get_controller_by_name(name)
         if not controller:
-            return await session.send_error(f"Unbekannte Domain: {name}")
+            return await session.fail(f"Unbekannte Domain: {name}")
 
         session.domain = controller
-        await session.send_status(f"Du bist jetzt in {controller.name.upper()}.")
+        await session.notify(f"Du bist jetzt in {controller.name.upper()}.")
 
         # Domain can decide to login to domain
         await controller.on_enter(session)

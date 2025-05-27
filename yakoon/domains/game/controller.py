@@ -90,8 +90,8 @@ class GameController(BaseController):
         Used to show welcome messages, check account requirements, or guide login flow.
         Override this in each domain to define entry behavior.
         """
-        await session.send_msg("Willkommen im MUD.")
-        await session.send_status("Melde dich mit `ic <charakter>` an.")        
+        await session.emit("Willkommen im MUD.")
+        await session.notify("Melde dich mit `ic <charakter>` an.")        
 
     async def on_cleanup(self, session: SolutionSession):
         """

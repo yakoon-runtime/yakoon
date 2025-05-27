@@ -16,6 +16,6 @@ class CmdLook(Command):
         char = runtime_data.character
         room = RoomStore.get_by_id(char.location) if char else None
         if not room:
-            return await session.err("Du bist nirgendwo.")
+            return await session.fail("Du bist nirgendwo.")
 
-        await session.send_msg(await room.render(session))
+        await session.emit(await room.render(session))

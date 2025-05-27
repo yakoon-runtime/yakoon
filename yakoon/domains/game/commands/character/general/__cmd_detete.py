@@ -13,15 +13,15 @@ class __CmdDelete(Command):
     async def run(self, session: SolutionSession, request: Request):
         obj_id = request.args[0] if request.args else None
         if not obj_id:
-            return await session.err("Bitte gib eine Objekt-ID an.")
+            return await session.fail("Bitte gib eine Objekt-ID an.")
 
         obj = ObjectStore.get(obj_id)
         if not obj:
-            return await session.out(f"Objekt {obj_id} nicht gefunden.")
+            return await session.emit(f"Objekt {obj_id} nicht gefunden.")
         if not obj.has_perm(session, "delete"):
             raise PermissionError("Keine Berechtigung zum Löschen.")
 
         if await confirm(session, f"Wirklich löschen? (y/n) → {obj_id}"):
-            await session.out(f"Objekt '{obj_id}' gelöscht.")
+            await session.emit(f"Objekt '{obj_id}' gelöscht.")
         else:
-            await session.out("Abgebrochen.")
+            await session.emit("Abgebrochen.")

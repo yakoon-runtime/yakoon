@@ -17,5 +17,5 @@ class CmdClock(Command):
         season = get_season(clock)
         phase = get_day_phase(clock)
         
-        await session.out(
+        await session.emit(
             f"Aktuelle Spielzeit: {season.name}: {text} - Phase: {phase.name}")

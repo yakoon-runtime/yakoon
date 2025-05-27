@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 
+from yakoon.engine.core.io import IOAdapter
 from yakoon.engine.system.data import RuntimeSessionData, StorageSessionData
 
 if TYPE_CHECKING:
@@ -38,12 +39,7 @@ class BaseSession(object):
         self._cmd_groups_dynamic = []
         self._context:Context = None
         self._domain:BaseController = None
-
-        #: Output callback for normal messages (must be assigned before use)
-        self.out: Optional[PrintMessage] = None
-
-        #: Output callback for error messages (must be assigned before use)
-        self.err: Optional[PrintError] = None
+        self._io: IOAdapter = None
 
         # Persistent session state (e.g., account_id, domain flags)
         #: Session-wide persistent data storage (domain-aware dictionary).
@@ -81,17 +77,41 @@ class BaseSession(object):
     def bind_context(self, context: Context):
         self._context = context
 
-    async def send_msg(self, text: str):
-        assert self.out is not None, "Output function not set"
-        await self.out(text)
+    def bind_io(self, io: IOAdapter):
+        self._io = io
 
-    async def send_status(self, text: str):
-        assert self.out is not None, "Output function not set"
-        await self.out(f"✅ {text}")
+    async def emit(self, text: str):
+        """
+        Outputs a plain text message via the session's output channel.
 
-    async def send_error(self, text: str):
-        assert self.out is not None, "Output function not set"
-        await self.err(f"❌ {text}")
+        Args:
+            text (str): The message to emit.
+        """
+        await self._io.out(text)
 
-    async def send_cmd(self, input_str: str):
-        await self.ctx.send_cmd(self, input_str, self.out, self.err)
+    async def notify(self, text: str):
+        """
+        Emits a status message (e.g. success, ready) with a visual marker.
+
+        Args:
+            text (str): The status message to display.
+        """
+        await self._io.out(f"✅ {text}")
+
+    async def fail(self, text: str):
+        """
+        Emits an error or failure message with an error marker.
+
+        Args:
+            text (str): The error message to display.
+        """
+        await self._io.err(f"❌ {text}")
+
+    async def dispatch(self, input_str: str):
+        """
+        Sends a command for execution using the current session context.
+
+        Args:
+            input_str (str): The command string to dispatch.
+        """
+        await self.ctx.dispatch(self, input_str, self._io)

@@ -15,4 +15,4 @@ class SolutionMainController(PlatformController):
     """
 
     async def on_ready(self, session: SolutionSession):
-        await session.send_msg(f"> [A.M.E.E. online] ✅ Command interface ready.")
+        await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

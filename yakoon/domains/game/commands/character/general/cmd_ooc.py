@@ -12,8 +12,8 @@ class CmdOOC(Command):
     async def run(self, session: SolutionSession, request: Request):
         runtime_data: RuntimeGameData = session.data_runtime
         if not runtime_data.character:
-            return await session.err("Du bist bereits OOC.")
+            return await session.fail("Du bist bereits OOC.")
         
         name = runtime_data.character.name
         session.data_storage.rem(session.ctx.controller.name, "char_id")
-        await session.send_msg(f"Du bist nun OOC. Charakter '{name}' wurde verlassen.")
+        await session.emit(f"Du bist nun OOC. Charakter '{name}' wurde verlassen.")
