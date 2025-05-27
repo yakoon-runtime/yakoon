@@ -35,13 +35,13 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
        #await engine.send(session_id, "batch: login guest; look", out, err)
 
-        while True:
-            data = await websocket.receive_text()
+        while True:               
 
-            #if DialogManager.resolve_prompt(session_id, data):
-            #    continue
-
-            asyncio.create_task(engine.send(session_id, data, out, err))
+            await asyncio.sleep(0.1)
+            if not engine.is_processing:                     
+                data = await websocket.receive_text()
+              
+                await engine.send(session_id, data, out, err)
 
     except WebSocketDisconnect:
         print(f"[WebSocket] Disconnected: {session_id}")

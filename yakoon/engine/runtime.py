@@ -1,7 +1,10 @@
 
+import asyncio
+from collections import deque
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
+from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log_service import LogService
 from yakoon.engine.system.context import Context
@@ -11,16 +14,20 @@ from yakoon.engine.system.session import BaseSession, PrintError, PrintMessage
 class Engine():
      
    def __init__(self, registry: DomainRegistry):
-      """
+      """      
       Creates a new instance of the class engine.
       """
       self._registry = registry
+      self._is_processing = False
+
+   @property
+   def is_processing(self) -> bool:
+        return self._is_processing
 
    @property
    def registry(self) -> DomainRegistry:
         return self._registry
-
-
+                                 
    async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError, depth=0):   
       """
       Entry point for any user input.
@@ -40,12 +47,59 @@ class Engine():
       # Assign the error callback used for sending error or warning messages to the client.
       session.err = on_err
 
-      for raw in inputs:
+      try:
+         self._is_processing = True
+         await asyncio.create_task(self._run_processing(session, inputs))
+      finally:
+         self._is_processing = False
+
+   async def _run_processing(self, session: BaseSession, inputs: list[str]):
+      """
+      Executes a batch of commands sequentially, including prompt handling.
+
+      - Each command runs in an isolated task to allow blocking prompts via `ask()`.
+      - If a prompt is triggered during execution, the next item in the queue is automatically
+         used to resolve it (via `DialogManager.resolve_prompt()`).
+      - If no further input is available when a prompt is active, execution stops.
+      - The final input in the batch can be interpreted as a prompt response if needed.
+
+      Args:
+         session (BaseSession): The session context in which the batch runs.
+         inputs (list[str]): A list of commands and/or prompt responses.
+      """
+      queue = deque(inputs)
+
+      async def run_one(raw: str):
          await self._registry.system.on_before_send(session)
-         await self._send_one(session, raw.strip())
+         await self._send_one(session, raw)
          await self._registry.system.on_after_send(session)
-         
+
+      while queue:
+         await asyncio.sleep(0.01)  # yield control briefly
+         raw = queue.popleft()
+
+         # If this is the final input and a prompt is active → treat it as the response
+         if raw and not queue:
+            if DialogManager.is_waiting(session.id):
+               DialogManager.resolve_prompt(session.id, raw)
+               return
+
+         task = asyncio.create_task(run_one(raw))
+
+         while not task.done():
+            await asyncio.sleep(0.01)
+
+            if DialogManager.is_waiting(session.id):
+               if queue:
+                  next_raw = queue.popleft()
+                  DialogManager.resolve_prompt(session.id, next_raw)
+                  break  # prompt resolved, allow task to continue
+               else:                   
+                  return # Prompt expected, but no further input in batch 
+
    async def _send_one(self, session: BaseSession, input_str: str):   
+      #if DialogManager.resolve_prompt(session.id, input_str):
+      #   return
 
       request = Request(input_str)
       if not request.cmd:
