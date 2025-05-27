@@ -17,6 +17,9 @@ class PlatformController(BaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
      
+    async def on_ready(self, session: PlatformSession):
+        pass
+
     async def on_before_send(self, session: PlatformSession):
         groups = set()
         registry = session.ctx._registry  # access intern by design

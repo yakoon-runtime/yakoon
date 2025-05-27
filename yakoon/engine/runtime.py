@@ -18,15 +18,16 @@ class Engine():
       Creates a new instance of the class engine.
       """
       self._registry = registry
-      self._is_processing = False
-
-   @property
-   def is_processing(self) -> bool:
-        return self._is_processing
 
    @property
    def registry(self) -> DomainRegistry:
         return self._registry
+   
+   async def signal_ready(self, on_msg: PrintMessage):
+      session = BaseSession(None)
+      session.out = on_msg
+      session.err = on_msg
+      await self._registry.system.on_ready(session)
                                  
    async def send(self, session_id: str, input_str: str, on_msg: PrintMessage, on_err: PrintError, depth=0):   
       """
@@ -47,11 +48,7 @@ class Engine():
       # Assign the error callback used for sending error or warning messages to the client.
       session.err = on_err
 
-      try:
-         self._is_processing = True
-         await asyncio.create_task(self._run_processing(session, inputs))
-      finally:
-         self._is_processing = False
+      await asyncio.create_task(self._run_processing(session, inputs))
 
    async def _run_processing(self, session: BaseSession, inputs: list[str]):
       """
@@ -98,8 +95,6 @@ class Engine():
                   return # Prompt expected, but no further input in batch 
 
    async def _send_one(self, session: BaseSession, input_str: str):   
-      #if DialogManager.resolve_prompt(session.id, input_str):
-      #   return
 
       request = Request(input_str)
       if not request.cmd:

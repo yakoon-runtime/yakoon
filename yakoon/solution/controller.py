@@ -1,4 +1,5 @@
 from yakoon.platform.controller import PlatformController
+from yakoon.solution.platform.runtime.session import SolutionSession
 
 
 class SolutionMainController(PlatformController):
@@ -13,7 +14,5 @@ class SolutionMainController(PlatformController):
     This replaces the default PlatformController for all solution-specific routing and setup logic.
     """
 
-    # Example: override default_command_groups = ["your:group"]
-    # def commandsets = [MyCommandSet]
-    # def on_before_send(self, session, msg): ...
-    pass
+    async def on_ready(self, session: SolutionSession):
+        await session.send_msg(f"> [A.M.E.E. online] ✅ Command interface ready.")

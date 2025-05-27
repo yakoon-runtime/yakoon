@@ -2,12 +2,11 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
-## [2025-05-26]
-**Prompt-Handlung**
-Entscheidung: Prompt-Handling (resolve_prompt) wurde aus der Engine entfernt.
-Grund: Trennung von Command-Logik und Interaktionssteuerung (Single Responsibility).
-Folge: Clients (Web, Console) sind selbst verantwortlich für Prompt-Flow.
-Zusatz: OutputBufferManager wird für alle Clients zentral verwendet.
+## [2025-05-27]
+**Prompt-aware Batch Execution**
+Introduce prompt-aware batch execution with internal input resolution.
+Reason: Avoid blocking the engine on ask() during batch processing while preserving 
+execution order and prompt flow.
 
 ## [2025-05-26]
 **Dynamische Commands per Domain-Hooks**

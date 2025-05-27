@@ -33,15 +33,12 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_text(f"⚠️ {msg}")
 
     try:
-       #await engine.send(session_id, "batch: login guest; look", out, err)
-
+        await engine.signal_ready(out)
         while True:               
-
             await asyncio.sleep(0.1)
-            if not engine.is_processing:                     
-                data = await websocket.receive_text()
-              
-                await engine.send(session_id, data, out, err)
+            data = await websocket.receive_text()              
+
+            await engine.send(session_id, data, out, err)
 
     except WebSocketDisconnect:
         print(f"[WebSocket] Disconnected: {session_id}")

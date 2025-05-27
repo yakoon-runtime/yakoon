@@ -23,17 +23,18 @@ async def run_console():
    
     session_id = "cli"
     engine = Engine(SolutionRegistry())
+    await engine.signal_ready(msg)
 
     #command_inits = ["switch"]
     command_inits = ["batch: login stefan; switch; mud; ic stefan; version; switch;"]
 
     while True:               
-        
         await asyncio.sleep(0.1)
-        if not engine.is_processing:                        
-            command = command_inits.pop(0) if command_inits else await ainput("|:> ")
 
-            await engine.send(session_id, command, msg, err)
+        command = (command_inits.pop(0).strip() 
+           if command_inits else await ainput("|:> "))
+        
+        await engine.send(session_id, command, msg, err)
         
 if __name__ == "__main__":
     asyncio.run(run_console())
