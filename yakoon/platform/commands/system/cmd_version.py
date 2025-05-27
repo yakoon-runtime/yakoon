@@ -15,13 +15,16 @@ class CmdVersion(Command):
     key = "version"
 
     async def run(self, session: PlatformSession, request: Request):
-        output = render_template_for(Settings.cmd_platform_templates + "system/cmd_version", {
-            "version": get_platform_version(),
-            "python": platform.python_version(),
-            "hostname": platform.node(),
-            "uptime": get_uptime(),
-            "time": datetime.now(timezone.utc).isoformat()
-        })
+        output = render_template_for(
+            Settings.cmd_platform_templates + "system/cmd_version", {
+                "version": get_platform_version(),
+                "python": platform.python_version(),
+                "hostname": platform.node(),
+                "uptime": get_uptime(),
+                "time": datetime.now(timezone.utc).isoformat()
+            }
+        )
+        
         await session.emit(output)
 
 

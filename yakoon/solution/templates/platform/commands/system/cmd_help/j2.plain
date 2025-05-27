@@ -1,0 +1,12 @@
+Verfügbare Domains:
+{% for controller in controllers %}
+ └─ {{ controller.name|ljust(10) }} → switch {{ controller.name }}
+{% endfor %}
+
+Globale Befehle:
+{% for category, commands in grouped.items() %}
+- {{category|title}}
+{% for cmd in commands %}
+   └─ {{ cmd.key }}
+{% endfor %}
+{% endfor %}

@@ -8,7 +8,7 @@ import { initYakoonSocket, sendToYakoon } from "./api/yakoon-socket";
 
 export default function App() {
   const [output, setOutput] = useState<string[]>([
-    "> [A.M.E.E. online] Command interface ready."
+    /*"> [A.M.E.E. online] Command interface ready."*/
   ]);
 
   const containerRef = useRef<HTMLDivElement>(null);

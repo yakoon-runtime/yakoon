@@ -1,6 +1,7 @@
 from enum import Enum
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
+from yakoon.platform.render.filters import register_filters
 from yakoon.platform.render.render_mode import RenderMode
 from yakoon.platform.settings import Settings
 
@@ -17,6 +18,8 @@ env = Environment(
     trim_blocks=True,
     lstrip_blocks=True
 )
+
+register_filters(env)
 
 
 def render_template_for(template_key: str, context: dict, mode: RenderMode | None = None) -> str:
@@ -36,4 +39,4 @@ def render_template_for(template_key: str, context: dict, mode: RenderMode | Non
         except TemplateNotFound:
             continue
 
-    return f"Template missing: {template_key} ({mode.value})"
+    raise LookupError(f"Template missing: {template_key} ({mode.value})")

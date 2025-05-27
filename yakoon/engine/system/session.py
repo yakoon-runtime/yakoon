@@ -96,7 +96,7 @@ class BaseSession(object):
         Args:
             text (str): The status message to display.
         """
-        await self._io.out(f"✅ {text}")
+        await self._io.out(f"> i: {text}")
 
     async def fail(self, text: str):
         """
@@ -105,7 +105,7 @@ class BaseSession(object):
         Args:
             text (str): The error message to display.
         """
-        await self._io.err(f"❌ {text}")
+        await self._io.err(f"> e: {text}")
 
     async def dispatch(self, input_str: str):
         """

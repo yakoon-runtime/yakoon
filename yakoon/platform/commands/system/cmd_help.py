@@ -2,7 +2,9 @@
 from collections import defaultdict
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
+from yakoon.platform.render.resolver import render_template_for
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.settings import Settings
 
 
 class CmdHelpSystem(Command):
@@ -10,21 +12,17 @@ class CmdHelpSystem(Command):
     key = "help"
 
     async def run(self, session: PlatformSession, request: Request):
-
         registry = getattr(session.ctx, "_registry")
-
-        await session.emit("Verfügbare Domains:")
-        for controller in registry.controllers:
-            await session.emit(f"- {controller.name:10}  →  @switch {controller.name}")
-
         grouped = get_grouped_commands(session.ctx.controller)
-
-        await session.emit(f"\nGlobale Befehle:")
-        for category in sorted(grouped):
-            await session.emit(f"Kategorie: {category}")
-            for cmd in grouped[category]:
-                await session.emit(f"- {cmd.key}")
-
+        output = render_template_for(
+            Settings.cmd_platform_templates + "system/cmd_help",
+            {
+                "controllers": [registry.system] + registry.controllers,
+                "grouped": grouped,
+            }
+        )
+        await session.emit(output)
+        
 
 class CmdHelpDomain(Command):
 
@@ -34,12 +32,15 @@ class CmdHelpDomain(Command):
 
         controller = session.ctx.controller
         if not request.args:
-            await session.emit(f"Hilfe für Domain: {controller.name}")
             grouped = get_grouped_commands(controller)
-            for category in sorted(grouped):
-                await session.emit(f"Kategorie: {category}")
-                for cmd in grouped[category]:
-                    await session.emit(f"- {cmd.key}")
+            output = render_template_for(
+                Settings.cmd_platform_templates + "system/cmd_help_domain",
+                {
+                    "controller": controller,
+                    "grouped": grouped
+                }
+            )
+            await session.emit(output)
             return
 
         key = request.args[0]
@@ -48,7 +49,7 @@ class CmdHelpDomain(Command):
             await session.emit(f"Hilfe zu: {cmd.key}")
             await session.emit(cmd.__doc__ or "Keine Beschreibung verfügbar.")
         else:
-            await session.fail(f"Befehl '{key}' nicht gefunden.")
+            await session.send_error(f"Befehl '{key}' nicht gefunden.")
     
 
 def get_grouped_commands(controller) -> dict[str, list[Command]]:

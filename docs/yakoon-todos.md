@@ -1,10 +1,10 @@
 
 # Core 
-- WebApi? -> OutBufferManager? 
 
-
+# Platform
 - Hilfesystem anbinden
   - Templates für die Hilfe
+- Switch list -> Zeigt alle domains. 
 - Templates für Switch
 - Templates für Login
 
@@ -12,6 +12,8 @@
 - Erstelle neues Projekt ....
 - Konzept: Engabe -> Verarbeitung - > Ausgabe
   - Antwort was getan wird; Antwort was getan wurde? 
+
+# A.M.E.E 
 - Alles Dokumentieren im Code auf Englisch (Docstrings)
 - Unittests (oder besseres - Yukoon-Style)
 

@@ -13,6 +13,7 @@ SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 command_inits = []
 #command_inits += ["batch: login stefan; switch; mud; ic stefan; version; switch;"]
+command_inits += ["batch: login stefan; switch mud; ic stefan;"]
 
 async def run_console():
    
@@ -24,7 +25,7 @@ async def run_console():
         await asyncio.sleep(0.1)
 
         command = (command_inits.pop(0).strip() 
-           if command_inits else await ainput("|:> "))
+           if command_inits else await ainput("Command:> "))
         
         await engine.send("cli", command, io)
         

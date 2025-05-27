@@ -3,6 +3,12 @@
 > Dokumentiert wird: Was? Und Warum?
 
 ## [2025-05-27]
+**Einführung IOAdpater**
+Einführung eines `IOAdapter`, um Ausgaben (`out`, `err`) in einer gemeinsamen Struktur zu kapseln.
+Die Übergabe einzelner Callback-Funktionen wurde durch ein objektbasiertes Modell ersetzt, das klarer, testbarer und flexibler ist – insbesondere für Console, WebSocket und zukünftige Frontends.
+Der IO-Kontext wird nun konsistent per `IOAdapter` an Engine- und Session-Methoden übergeben.
+
+## [2025-05-27]
 **Prompt-aware Batch Execution**
 Introduce prompt-aware batch execution with internal input resolution.
 Reason: Avoid blocking the engine on ask() during batch processing while preserving 
