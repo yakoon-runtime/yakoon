@@ -1,0 +1,5 @@
+{% if returning %}
+Willkommen zurück.
+{%- else %}
+Du bist angemeldet als {{ account.name }}.
+{%- endif %}

@@ -1,5 +1,7 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
+from yakoon.platform.render.resolver import render_template_for
+from yakoon.platform.settings import Settings
 from yakoon.platform.stores.account_store import AccountStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
@@ -23,6 +25,8 @@ class CmdLogin(Command):
             raise ValueError("Session cannot be None")
 
         await session.ctx.platform.on_account_login(session, account)
-        if not created:
-            return await session.emit("Willkommen zurück.")
-        await session.emit(f"Du bist angemeldet als {account.name}.")
+        output = render_template_for(
+                Settings.cmd_platform_templates + "account/cmd_login",
+                {"account": account, "returning": not created}
+            )
+        await session.emit(output)
