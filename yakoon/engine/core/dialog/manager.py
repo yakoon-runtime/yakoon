@@ -1,4 +1,5 @@
 import asyncio
+from typing import Awaitable, Callable
 
 
 class DialogManager:
@@ -11,53 +12,71 @@ class DialogManager:
     (e.g. from console or websocket) and automated resolution within batch flows.
     """
 
-    _waiting: dict[str, asyncio.Future] = {}
+    DEFAULT_TIMEOUT = 30
 
+    _waiting: dict[str, asyncio.Future] = {}
+    _timeouts: dict[str, asyncio.Task] = {}
+    
     @classmethod
-    def set_prompt(cls, session):
+    def set_prompt(cls, session, timeout: float | None = None, on_timeout: Callable[[], Awaitable[None]] | None = None):
         """
-        Create and register a new prompt Future for a given session.
+        Registers a new prompt Future for the given session.
 
         Args:
-            session (BaseSession): The session initiating the prompt.
+            session: The session requesting input.
+            timeout (float | None): Optional timeout in seconds. If reached, the prompt is cancelled.
+            on_timeout (Callable | None): Optional coroutine to execute if the timeout is reached.
 
         Returns:
-            asyncio.Future: The Future to be awaited by the prompt initiator.
-        """         
+            asyncio.Future: The Future to be awaited by the caller.
+        """
+        timeout = timeout if timeout is not None else cls.DEFAULT_TIMEOUT
+
+        session_id = session.id
         fut = asyncio.get_running_loop().create_future()
-        cls._waiting[session.id] = fut
+        cls._waiting[session_id] = fut
+
+        # optional timeout auto-cancel
+        if timeout:
+            async def auto_expire():
+                await asyncio.sleep(timeout)
+                if not fut.done():
+                    fut.cancel()
+                if on_timeout:
+                    await on_timeout()
+                else:
+                    await session.fail("Prompt timed out.")
+
+            task = asyncio.create_task(auto_expire())
+            cls._timeouts[session_id] = task
+
         return fut
 
     @classmethod
     def is_waiting(cls, session_id: str) -> bool:
-        """
-        Check whether the given session is currently waiting for input.
-
-        Args:
-            session_id (str): The ID of the session.
-
-        Returns:
-            bool: True if a prompt is active for the session.
-        """
         return session_id in cls._waiting
 
     @classmethod
     def resolve_prompt(cls, session_id: str, value: str) -> bool:
-        """
-        Resolve the currently active prompt for the session with a given value.
-
-        Args:
-            session_id (str): The ID of the session.
-            value (str): The user input to fulfill the prompt.
-
-        Returns:
-            bool: True if a prompt was resolved; False otherwise.
-        """
         fut = cls._waiting.pop(session_id, None)
         if fut and not fut.done():
+            # clean up timeout task
+            timeout_task = cls._timeouts.pop(session_id, None)
+            if timeout_task:
+                timeout_task.cancel()
             fut.set_result(value)
             return True
         return False
 
+    @classmethod
+    def cancel_prompt(cls, session_id: str):
+        """
+        Cancels a prompt manually (e.g. on disconnect).
+        """
+        fut = cls._waiting.pop(session_id, None)
+        if fut and not fut.done():
+            fut.cancel()
 
-
+        task = cls._timeouts.pop(session_id, None)
+        if task:
+            task.cancel()

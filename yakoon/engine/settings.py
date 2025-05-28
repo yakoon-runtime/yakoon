@@ -18,6 +18,9 @@ class Settings:
     """Maximum allowed depth for nested command dispatches (e.g. via session.dispatch()).
     Prevents infinite recursion when commands internally trigger other commands."""
 
+    prompt_timed_out = 30
+    """Timeout in seconds. If reached, the prompt is cancelled."""
+
     log_commands: bool = True
     """Logs every command issued by a session."""
 

@@ -1,11 +1,12 @@
 
 
 from yakoon.engine.core.dialog.manager import DialogManager
+from yakoon.engine.settings import Settings
 
 
 async def ask(session, prompt_text: str) -> str:
     await session.emit(prompt_text)
-    return await DialogManager.set_prompt(session)
+    return await DialogManager.set_prompt(session, Settings.prompt_timed_out)
 
 
 async def confirm(session, prompt_text: str) -> bool:

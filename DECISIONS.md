@@ -2,11 +2,21 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-28]
+**Thema: Timeout - offene Future**
+Wenn der Aufrufer keinen Timeout setzt, wird automatisch ein Standardwert verwendet 
+(z. B. 30 Sekunden). So wird jede Prompt-Blockade vermieden, auch wenn man’s vergiss
+
 ## [2025-05-27]
 **Einführung IOAdpater**
 Einführung eines `IOAdapter`, um Ausgaben (`out`, `err`) in einer gemeinsamen Struktur zu kapseln.
 Die Übergabe einzelner Callback-Funktionen wurde durch ein objektbasiertes Modell ersetzt, das klarer, testbarer und flexibler ist – insbesondere für Console, WebSocket und zukünftige Frontends.
 Der IO-Kontext wird nun konsistent per `IOAdapter` an Engine- und Session-Methoden übergeben.
+
+## [2025-05-27]
+**Prompt & Batch**
+Clients, die kontinuierlich Requests verarbeiten (z. B. Console, Telnet, WebSocket), unterstützen interaktive Prompts (Benutzereingaben) während der Command-Ausführung. Diese Clients besitzen einen stabilen, zustandsbehafteten Kanal, über den Prompts korrekt empfangen und beantwortet werden können. Bei stateless Clients (z. B. REST-Services) kann hingegen nicht garantiert werden, dass ein gestarteter Prompt-Future überhaupt aufgelöst wird. Stateless-Clients dürfen keine interaktiven Prompts verwenden. Stattdessen müssen sie vollständige Abläufe als batch:-Kommandos ausführen, bei denen alle Eingaben im Voraus definiert sind.
+Daher: REST macht nur vollständige Abläufe und ist per Design zustandslos (auch wenn technisch machbar).
 
 ## [2025-05-27]
 **Prompt-aware Batch Execution**

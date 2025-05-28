@@ -1,12 +1,29 @@
 
-# Core 
+==================
+# ✅ NEXT STEPS #
+==================
 
-# Platform
-- Hilfesystem anbinden
-  - Templates für die Hilfe
-- Switch list -> Zeigt alle domains. 
-- Templates für Switch
+# Mdojo
 - Templates für Login
+- Klärung domain game (mud / minddojo / mdojo)
+- Mehrsprachigkeit Konzept: Klärung alles in Templates?
+  - Einfache Sätze (Translater vs. Template)
+    return await session.fail("Du bist bereits OOC.")
+- Templates DE/ENG (subfolder)?
+
+- Gamesettings: wirklich von Setings ableiten? eher nicht
+- game.models.room -> template + field attachment.
+- game.commands.general - IC, OOC
+- game.commands.character - * 
+- Konzept Storage (Domain)
+  - Eine DB / Jede Domain eigenständig  => Vielfalt?
+  - Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
+    - Dann könnten wir solche Dateien einfach per Drag&Drop ins System ziehen!
+- Konzept Namespaces 
+  - User_1, User_2 -> NS1
+  - User_2 -> NS2
+- Ersten Commands aus Evennia abziehen 
+  - Account, Session 
 
 # Platform
 - Erstelle neues Projekt ....
@@ -26,17 +43,16 @@
 - Daten können hier dann verarbeitet werden. 
 - Request kann auch BINDATA / Chunks?
 
-
 # Docker
 - Alles muss in einem Docker laufen
 
 # MUD
 - Templates für die Räume (Jinja2)
-- Persistieren aller Objekte
-- Und jede Menge Commands (die habe ich schon für Evennia entwickelt. Sind aber
-  alle noch anzupassen.
 - Konzept: Namespaces 
   - Modelle sind verwenden Namensberreiche
+- Und jede Menge Commands (die habe ich schon für Evennia entwickelt. Sind aber
+  alle noch anzupassen.
+- Persistieren aller Objekte
 - Commands:
   - CmdInventory
   - CmdGet, CmdPut -> Legen in Boxen / Inventar....
