@@ -1,7 +1,9 @@
 # yakoon/engine/settings.py
 
+import os
 from dataclasses import dataclass
 
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
 
 @dataclass
 class Settings:
@@ -18,7 +20,7 @@ class Settings:
     """Maximum allowed depth for nested command dispatches (e.g. via session.dispatch()).
     Prevents infinite recursion when commands internally trigger other commands."""
 
-    prompt_timed_out = 30
+    prompt_timed_out = 60 * 3
     """Timeout in seconds. If reached, the prompt is cancelled."""
 
     log_commands: bool = True

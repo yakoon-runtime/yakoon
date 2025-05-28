@@ -8,25 +8,25 @@ from yakoon.solution.settings import SolutionSettings
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 SolutionSettings.runtime.render_mode = RenderMode.ANSI
-_engine = Engine(SolutionRegistry())
+engine = Engine(SolutionRegistry())
 
 
 async def handle_client(reader, writer):
-
-    addr = writer.get_extra_info("peername")
-    session_id = f"{addr[0]}:{addr[1]}"
-    print(f"[Telnet] Verbindung von {session_id}")
 
     async def out(msg: str):
         msg_str = format_codes_to_ansi(str(msg))  
         writer.write((msg_str + "\r\n").encode("utf-8"))  
         await writer.drain()
 
-    io = IOAdapter(out, out)
+    addr = writer.get_extra_info("peername")
+    session_id = f"{addr[0]}:{addr[1]}"
+    print(f"[Telnet] Verbindung von {session_id}")
+    
+    await engine.signal_ready(IOAdapter(out, out))
 
     while True:
         command = await reader.readline()
         if not command:
             continue            
         command = command.decode("utf-8").strip()
-        await _engine.send(session_id, command, io)
+        await engine.send(session_id, command, IOAdapter(out, out))

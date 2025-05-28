@@ -1,6 +1,9 @@
 import asyncio
 from typing import Awaitable, Callable
 
+from yakoon.engine.core.dialog.zombie import detector
+from yakoon.engine.settings import DEV_MODE
+
 
 class DialogManager:
     """
@@ -34,6 +37,10 @@ class DialogManager:
 
         session_id = session.id
         fut = asyncio.get_running_loop().create_future()
+
+        if DEV_MODE:
+            detector.track(session.id, fut)
+
         cls._waiting[session_id] = fut
 
         # optional timeout auto-cancel
@@ -65,6 +72,8 @@ class DialogManager:
             if timeout_task:
                 timeout_task.cancel()
             fut.set_result(value)
+            if DEV_MODE:
+                detector.untrack(session_id)
             return True
         return False
 
@@ -80,3 +89,5 @@ class DialogManager:
         task = cls._timeouts.pop(session_id, None)
         if task:
             task.cancel()
+        if DEV_MODE:
+            detector.untrack(session_id)
