@@ -71,7 +71,7 @@ Jedes logische Template besteht aus drei eigenständigen Dateien: .md, .plain, .
 ## [2025-05-25]
 **Template-Rendering mit Markdown**
 Alle Ausgaben erfolgen über Jinja2-Templates mit Markdown-Syntax.
-> Grund: maximale Flexibilität, anpassbares Layout (auch für Kundenlösungen), markdown-kompatibel (z. B. Webclient, Chat-Ausgabe); Struktur: gemeinsamer `templates/`-Ordner, unterteilt nach Domain (`templates/mud/`, `templates/system/`, etc.)
+> Grund: maximale Flexibilität, anpassbares Layout (auch für Kundenlösungen), markdown-kompatibel (z. B. Webclient, Chat-Ausgabe); Struktur: gemeinsamer `templates/`-Ordner, unterteilt nach Domain (`templates/realm/`, `templates/system/`, etc.)
 > Endung: .j2.md -> jinja2 + markdown -> (Syntax-Highlighting)
 > Zeilenumbrüche: zwei Leerzeichen am Ende / dreifaches Backtick
 

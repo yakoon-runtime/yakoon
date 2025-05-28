@@ -28,7 +28,7 @@ class AccountStore:
         cls._accounts[account.id] = account
 
 default_groups = {
-   "group 1": ["mud:system","mud:account", "mud:character"]
+   "group 1": ["realm:system","realm:account", "realm:character"]
 }
 
 

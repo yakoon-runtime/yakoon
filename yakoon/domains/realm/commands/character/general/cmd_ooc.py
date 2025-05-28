@@ -1,0 +1,19 @@
+from yakoon.domains.realm.runtime.data import RuntimeRealmData
+from yakoon.engine.core.command import Command
+from yakoon.engine.core.parser import Request
+from yakoon.solution.platform.runtime.session import SolutionSession
+
+
+class CmdOOC(Command):
+
+    key = "ooc"
+    requires_character = True
+
+    async def run(self, session: SolutionSession, request: Request):
+        runtime_data: RuntimeRealmData = session.data_runtime
+        if not runtime_data.character:
+            return await session.fail("Du bist bereits OOC.")
+        
+        name = runtime_data.character.name
+        session.data_storage.rem(session.ctx.controller.name, "char_id")
+        await session.emit(f"Du bist nun OOC. Charakter '{name}' wurde verlassen.")

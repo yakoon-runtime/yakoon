@@ -20,7 +20,7 @@ class BaseController(ABC):
     """
 
     name: str = "unnamed"
-    """Unique identifier used for command prefix resolution (e.g. mud:look, system:help)."""
+    """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = []     
 

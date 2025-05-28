@@ -4,17 +4,15 @@
 ==================
 
 # Mdojo
-- Templates für Login
-- Klärung domain game (mud / minddojo / mdojo)
 - Mehrsprachigkeit Konzept: Klärung alles in Templates?
   - Einfache Sätze (Translater vs. Template)
     return await session.fail("Du bist bereits OOC.")
 - Templates DE/ENG (subfolder)?
 
-- Gamesettings: wirklich von Setings ableiten? eher nicht
-- game.models.room -> template + field attachment.
-- game.commands.general - IC, OOC
-- game.commands.character - * 
+- Realmsettings: wirklich von Setings ableiten? eher nicht
+- realm.models.room -> template + field attachment.
+- realm.commands.general - IC, OOC
+- realm.commands.character - * 
 - Konzept Storage (Domain)
   - Eine DB / Jede Domain eigenständig  => Vielfalt?
   - Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
@@ -85,7 +83,7 @@ Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konz
 # Application Plan
 yakoon/               ← die Engine (pip install yakoon)
 minddojo/             ← ein Spielprojekt, erzeugt mit `yakoon --init`
-├── game/             ← Lokale Basisschicht (wenn überschrieben)
+├── realm/             ← Lokale Basisschicht (wenn überschrieben)
 ├── worlds/
 │   └── dojo1/
 │       ├── rooms/
@@ -101,7 +99,7 @@ minddojo/             ← ein Spielprojekt, erzeugt mit `yakoon --init`
 **Beispiele:**
 - feat(cli): add project init command
 - fix(auth): reject empty passwords
-- refactor(game): move phase logic to store
+- refactor(realm): move phase logic to store
 - test: add coverage for CmdLook
 - docs(readme): update getting started
 

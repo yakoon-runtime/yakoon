@@ -1,6 +1,6 @@
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.solution.controller import SolutionMainController
-from yakoon.solution.domains.game.controller import SolutionGameController
+from yakoon.solution.domains.realm.controller import SolutionRealmController
 from yakoon.solution.services.session_service import SolutionSessionService
 
 
@@ -23,7 +23,7 @@ class SolutionRegistry(DomainRegistry):
     def __init__(self):        
         super().__init__(
             controllers=[
-                SolutionGameController(),
+                SolutionRealmController(),
             ],
             system=SolutionMainController(),
             sessions=SolutionSessionService(),

@@ -15,8 +15,8 @@ from yakoon.solution.settings import SolutionSettings
 SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 command_inits = []
-#command_inits += ["batch: login stefan; switch; mud; ic stefan; version; switch;"]
-command_inits += ["batch: login stefan; switch mud; ic stefan;"]
+#command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
+command_inits += ["batch: login stefan; switch realm; ic stefan;"]
 
 
 async def run_console():

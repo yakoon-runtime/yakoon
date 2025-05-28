@@ -38,7 +38,7 @@ Gesprochene Anweisungen werden per Whisper-API in Text umgewandelt und in Comman
 > Bedienung der gesamten Plattform per Sprache – z. B.:
 >
 > „Starte Projekt MindDojo“
-> → wird zu `create project domain=game name=MindDojo`
+> → wird zu `create project domain=realm name=MindDojo`
 
 **Technologie:**
 * OpenAI `whisper-1` für Speech-to-Text

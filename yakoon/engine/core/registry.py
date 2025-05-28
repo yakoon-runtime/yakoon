@@ -43,7 +43,7 @@ class DomainRegistry:
         # This allows commands (e.g. exits or context actions) to be registered
         cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
         
-        # 1. Prefix (e.g. mud:look, system:help)
+        # 1. Prefix (e.g. realm:look, system:help)
         if ":" in input_str:
             prefix, rest = input_str.split(":", 1)
             for controller in [self.system] + self.controllers:

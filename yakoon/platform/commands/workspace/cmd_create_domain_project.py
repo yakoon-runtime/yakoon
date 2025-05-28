@@ -17,7 +17,7 @@ from yakoon.platform.runtime.session import PlatformSession
 
 class CmdCreateDomainProject(Command):
     """
-    create project domain=game name=minddojo
+    create project domain=realm name=minddojo
     """
 
     key = "create"
