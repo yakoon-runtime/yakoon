@@ -3,7 +3,14 @@
 > Dokumentiert wird: Was? Und Warum?
 
 ## [2025-05-28]
-**Thema: Timeout - offene Future**
+**Memory Manager**
+MemoryManager zur zyklischen Überwachung von Speicherveränderungen.
+Anzeige von Objekt-Trends mit Pfeilen und Delta-Werten.
+safe_input() ersetzt ainput() zur Vermeidung wachsender Closures.
+Keine Anzeichen für Memory-Leaks mehr bei Commands und Prompts.
+
+## [2025-05-28]
+**Timeout - offene Future**
 Wenn der Aufrufer keinen Timeout setzt, wird automatisch ein Standardwert verwendet 
 (z. B. 30 Sekunden). So wird jede Prompt-Blockade vermieden, auch wenn man’s vergiss
 

@@ -18,7 +18,7 @@ class ZombieDetector:
     def untrack(self, session_id: str):
         self._registry.pop(session_id, None)
 
-    async def start(self):
+    def start(self):
         async def _loop():
             while True:
                 now = asyncio.get_event_loop().time()
@@ -32,7 +32,7 @@ class ZombieDetector:
                 await asyncio.sleep(self.check_interval)
 
         if not self._task:
-            self._task = asyncio.create_task(_loop())
+            self._task = asyncio.create_task(_loop())            
 
     def stop(self):
         if self._task:

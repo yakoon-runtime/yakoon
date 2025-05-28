@@ -22,8 +22,8 @@ command_inits += ["batch: login stefan; switch mud; ic stefan;"]
 async def run_console():
    
     if DEV_MODE:
+        detector.start()
         mem_monitor.start()
-        asyncio.create_task(detector.start())
 
     io = IOAdapter(print, print)
 
