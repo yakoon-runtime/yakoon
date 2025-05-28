@@ -1,5 +1,5 @@
 from yakoon.engine.core.domain.controller import BaseController
-from yakoon.engine.core.io import IOAdapter
+from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.services.session_service import BaseSessionService
 

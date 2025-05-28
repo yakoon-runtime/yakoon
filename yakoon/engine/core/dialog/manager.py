@@ -1,7 +1,7 @@
 import asyncio
 from typing import Awaitable, Callable
 
-from yakoon.engine.core.dialog.zombie import detector
+from yakoon.engine.debug.zombie import detector
 from yakoon.engine.settings import DEV_MODE
 
 

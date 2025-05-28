@@ -3,8 +3,7 @@ import asyncio
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from yakoon.engine.core.dialog.manager import DialogManager
-from yakoon.engine.core.io import IOAdapter
+from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.runtime import Engine
 from yakoon.platform.render.render_mode import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry

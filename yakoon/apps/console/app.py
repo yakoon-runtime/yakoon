@@ -1,8 +1,9 @@
 
 import asyncio
-from aioconsole import ainput
-from yakoon.engine.core.io import IOAdapter
-from yakoon.engine.core.dialog.zombie import detector
+from yakoon.engine.core.io.adapter import IOAdapter
+from yakoon.engine.core.io.input import safe_input
+from yakoon.engine.debug.memory import mem_monitor
+from yakoon.engine.debug.zombie import detector
 from yakoon.engine.runtime import Engine
 from yakoon.engine.settings import DEV_MODE
 from yakoon.platform.render.resolver import RenderMode
@@ -21,16 +22,18 @@ command_inits += ["batch: login stefan; switch mud; ic stefan;"]
 async def run_console():
    
     if DEV_MODE:
+        mem_monitor.start()
         asyncio.create_task(detector.start())
-    
+
+    io = IOAdapter(print, print)
+
     engine = Engine(SolutionRegistry())
-    await engine.signal_ready(IOAdapter(print, print))
+    await engine.signal_ready(io)
 
     while True:               
-        io = IOAdapter(print, print)
         
         command = (command_inits.pop(0).strip() 
-           if command_inits else await ainput("Command:> "))
+           if command_inits else await safe_input())
                 
         await engine.send("cli", command, io)
 

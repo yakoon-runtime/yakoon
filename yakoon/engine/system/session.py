@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 
-from yakoon.engine.core.io import IOAdapter
+from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.system.data import RuntimeSessionData, StorageSessionData
 
 if TYPE_CHECKING:

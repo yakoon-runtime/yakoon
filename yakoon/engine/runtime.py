@@ -1,7 +1,7 @@
 
 import asyncio
 from collections import deque
-from yakoon.engine.core.io import IOAdapter
+from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
