@@ -26,9 +26,7 @@ class Presenter:
         """
         self._prompts = None
         self._session = session
-        self._ctx = RenderContext(       
-            key=f"{session.ctx.controller.name}/{template_key}",
-            lang=session.lang)
+        self._ctx = RenderContext(key=template_key, lang=session.lang)
 
     @property
     def prompts(self) -> Prompts:

@@ -2,22 +2,20 @@ import platform
 import subprocess
 import time
 from datetime import datetime, timezone
-from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.render.context import Presenter
-from yakoon.platform.render.engine.runtime import render_template_for
+from yakoon.platform.commands.base import PlatformCommand
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.settings import Settings
-from yakoon.engine.core.command import Command
 
 
-class CmdVersion(Command):
+class CmdVersion(PlatformCommand):
 
     key = "version"
+    template_key = "system/cmd_version"
 
     async def run(self, session: PlatformSession, request: Request):
 
-        presenter = Presenter("commands/system/cmd_version", session)
+        presenter = self.get_presenter(session)
         await presenter.emit("show", 
                 version=get_platform_version(),
                 python=platform.python_version(),

@@ -1,16 +1,16 @@
-from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
 from yakoon.engine.core.registry import DomainRegistry
-from yakoon.platform.render.context import Presenter
+from yakoon.platform.commands.base import PlatformCommand
 from yakoon.platform.runtime.session import PlatformSession
 
 
-class CmdSwitch(Command):
+class CmdSwitch(PlatformCommand):
     
     key = "switch"
+    template_key = "system/cmd_switch"
 
     async def run(self, session: PlatformSession, request: Request):
-        presenter = Presenter("commands/system/cmd_switch", session)
+        presenter = self.get_presenter(session)
 
         name = request.get_arg(0)
         if not name:

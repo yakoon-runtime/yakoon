@@ -2,34 +2,37 @@
 from collections import defaultdict
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
+from yakoon.platform.commands.base import PlatformCommand
 from yakoon.platform.render.context import Presenter
 from yakoon.platform.runtime.session import PlatformSession
 
 
-class CmdHelpSystem(Command):
+class CmdHelpSystem(PlatformCommand):
 
     key = "help"
+    template_key = "system/cmd_help"
 
     async def run(self, session: PlatformSession, request: Request):
         registry = getattr(session.ctx, "_registry")
         grouped = get_grouped_commands(session.ctx.controller)
 
-        presenter = Presenter("commands/system/cmd_help", session)
+        presenter = self.get_presenter(session)
         await presenter.emit(
             "show", controllers=[registry.system] + registry.controllers, 
             grouped=grouped)
         
 
-class CmdHelpDomain(Command):
+class CmdHelpDomain(PlatformCommand):
 
     key = "help"
+    template_key = "system/cmd_help_domain"
 
     async def run(self, session: PlatformSession, request: Request):
 
         controller = session.ctx.controller
         if not request.args:
             grouped = get_grouped_commands(controller)
-            presenter = Presenter("system/cmd_help_domain",session)
+            presenter = self.get_presenter(session)
             return await presenter.emit("show", controller=controller, grouped=grouped)
 
         # TODO: Hilfe für unsere Commands

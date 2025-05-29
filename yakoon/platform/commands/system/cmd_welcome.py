@@ -1,16 +1,15 @@
-from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.render.context import Presenter
+from yakoon.platform.commands.base import PlatformCommand
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.plugins.ai.agent import ask_AI
 
 
-class CmdWelcome(Command):
+class CmdWelcome(PlatformCommand):
 
     key = "welcome"    
+    template_key = "system/cmd_welcome"
+
     requires = ["system"]
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: PlatformSession, _: Request):
 
-        presenter = Presenter("commands/system/cmd_welcome", session)
-        await presenter.emit("show")
+        await self.get_presenter(session).emit("show")
