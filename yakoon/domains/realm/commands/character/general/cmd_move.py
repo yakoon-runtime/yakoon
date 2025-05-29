@@ -1,8 +1,8 @@
 
 from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
+from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.parser import Request
-from yakoon.domains.realm.stores.room_store import RoomStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 
@@ -21,7 +21,7 @@ class CmdMove(RealmCommand):
             return await presenter.fail("missing_arg")
 
         char = session.data_runtime.character
-        room = RoomStore.get_by_id(char.location) if char else None
+        room = RoomService.get_by_id(char.location) if char else None
         if not room:
             return await presenter.fail("no_location")
 
@@ -29,7 +29,7 @@ class CmdMove(RealmCommand):
         if not dest_id:
             return await presenter.fail("invalid_exit", target=target)
 
-        dest_room = RoomStore.get_by_id(dest_id)
+        dest_room = RoomService.get_by_id(dest_id)
         if not dest_room:
             return await presenter.fail("not_found", dest=dest_id)
 

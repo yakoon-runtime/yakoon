@@ -2,9 +2,8 @@ from typing import Callable
 
 from yakoon.domains.realm.models.character import Character
 from yakoon.domains.realm.models.room import Room
-from yakoon.domains.realm.stores.character_store import CharacterStore
-from yakoon.domains.realm.stores.room_store import RoomStore
-
+from yakoon.domains.realm.services.character import CharacterService
+from yakoon.domains.realm.services.room import RoomService
 
 class CharacterBehavior:
     """
@@ -18,5 +17,5 @@ class CharacterBehavior:
         Injects store-dependent behavior into the given Character instance.
         This avoids circular imports and keeps the model clean.
         """
-        character.on_store_character: Callable[[Character], None] = CharacterStore.persist # type: ignore
-        character.on_load_room: Callable[[str], Room] = RoomStore.get_by_id # type: ignore
+        character.on_store_character: Callable[[Character], None] = CharacterService.persist # type: ignore
+        character.on_load_room: Callable[[str], Room] = RoomService.get_by_id # type: ignore

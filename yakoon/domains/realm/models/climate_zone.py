@@ -7,3 +7,6 @@ class ClimateZone:
     temperature: str    # e.g. "hot", "cold", "mild"
     humidity: str       # e.g. "dry", "humid"
     description: str = ""
+
+    def validate(self):
+        pass

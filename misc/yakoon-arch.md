@@ -1,0 +1,13 @@
+
+Unsere Stuktur
+
+Apps -> Console-, Telnet-, WebApi (WS), Webclient (Reakt + Websockets)
+Engine 
+ - Platform
+   - commands ...
+ - Domains
+   - Realm
+     - commands ...
+   - Office 
+     - commands ...
+   - ....

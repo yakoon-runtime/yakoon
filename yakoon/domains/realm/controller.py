@@ -1,13 +1,14 @@
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
-from yakoon.domains.realm.stores.character_store import CharacterStore
-from yakoon.domains.realm.stores.room_store import RoomStore
+from yakoon.domains.realm.services.character import CharacterService
+from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.shared.cmdset import PlatformSharedCommands
 from yakoon.solution.platform.runtime.session import SolutionSession
 from .commands.account.general.cmdset import GeneralAccountCommands
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
+
 
 class RealmController(BaseController):
 
@@ -44,10 +45,10 @@ class RealmController(BaseController):
         char_id = session.data_storage.get(self.name, "char_id")
         if not char_id:
             return
-        character = CharacterStore.get_by_id(char_id)
+        character = CharacterService.get_by_id(char_id)
         if not character:
             return
-        room = RoomStore.get_by_id(character.location)
+        room = RoomService.get_by_id(character.location)
         if not room:
             return
 
@@ -71,7 +72,7 @@ class RealmController(BaseController):
         if not char_id:
             return
 
-        character = CharacterStore.get_by_id(char_id)
+        character = CharacterService.get_by_id(char_id)
         session.data_runtime = RuntimeRealmData(character)  
 
     async def on_before_run_command(self, session: SolutionSession, request, command):

@@ -1,7 +1,6 @@
 from yakoon.engine.core.parser import Request
 from yakoon.platform.commands.base import PlatformCommand
-from yakoon.platform.render.context import Presenter 
-from yakoon.platform.stores.account_store import AccountStore
+from yakoon.platform.services.account import AccountService
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 
@@ -18,7 +17,7 @@ class CmdLogin(PlatformCommand):
             return await presenter.emit("missing_arg")
 
         name = request.args[0]
-        account = AccountStore.get_by_name(name)
+        account = AccountService.get_by_name(name)
         if not account:
             return await presenter.emit("not_found", name=name)
 

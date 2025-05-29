@@ -1,6 +1,6 @@
 from yakoon.domains.realm.commands.base import RealmCommand
-from yakoon.domains.realm.services.season_service import get_season
-from yakoon.domains.realm.services.time_service import get_day_phase
+from yakoon.domains.realm.services.day_phase import DayPhaseService
+from yakoon.domains.realm.services.season import SeasonService
 from yakoon.engine.core.parser import Request
 from yakoon.solution.platform.runtime.session import SolutionSession
 
@@ -18,6 +18,6 @@ class CmdClock(RealmCommand):
 
         await presenter.emit("show",
             time=clock.get_formatted_time(),
-            season=get_season(clock),
-            phase=get_day_phase(clock)
+            season=SeasonService.get_season_by_clock(clock),
+            phase=DayPhaseService.get_day_phase_by_clock(clock)
         )

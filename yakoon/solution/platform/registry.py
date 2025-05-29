@@ -1,7 +1,7 @@
 from yakoon.engine.core.registry import DomainRegistry
 from yakoon.solution.controller import SolutionMainController
 from yakoon.solution.domains.realm.controller import SolutionRealmController
-from yakoon.solution.services.session_service import SolutionSessionService
+from yakoon.solution.services.session import SolutionSessionService
 
 
 class SolutionRegistry(DomainRegistry):

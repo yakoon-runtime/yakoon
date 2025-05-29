@@ -1,7 +1,7 @@
 
-from yakoon.engine.services.session_service import BaseSessionService
-from yakoon.platform.services.session_service import SessionService
-from yakoon.platform.stores.memory_session_store import InMemorySessionStore
+from yakoon.engine.services.session import BaseSessionService
+from yakoon.platform.services.session import SessionService
+from yakoon.platform.stores.memory.session import InMemorySessionStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 

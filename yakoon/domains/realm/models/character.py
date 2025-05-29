@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from yakoon.domains.realm.models.room import Room
 from yakoon.solution.platform.runtime.session import SolutionSession      
 
 
-@dataclass
+@dataclass #(frozen=True, kw_only=True, slots=True)
 class Character:
     id: str = ""
     name: str = ""
@@ -14,6 +13,13 @@ class Character:
     # THis two field were set by attach().
     on_load_room: Optional[Callable[[str], "Room"]] = None
     on_store_character: Optional[Callable[["Character"], None]] = None
+
+    def validate(self):
+        if len(self.name) > 50:
+            pass
+            #raise DomainValidationError("Room name too long.")
+
+    #__post_init__ 
 
     async def move_to(self, session: SolutionSession, new_location_id):  
         """

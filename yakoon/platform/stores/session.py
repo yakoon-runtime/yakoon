@@ -5,7 +5,7 @@ from typing import Optional
 from yakoon.platform.runtime.session import PlatformSession
 
 
-class SessionStore(ABC):
+class BaseSessionStore(ABC):
 
     @abstractmethod
     async def get_by_id(self, session_id: str) -> Optional[PlatformSession]:

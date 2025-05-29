@@ -1,12 +1,12 @@
-from yakoon.platform.stores.account_store import AccountStore
-from yakoon.platform.stores.session_store import SessionStore
-from yakoon.engine.services.session_service import BaseSessionService
+from yakoon.platform.services.account import AccountService
+from yakoon.platform.stores.session import BaseSessionStore
+from yakoon.engine.services.session import BaseSessionService
 from yakoon.platform.runtime.session import PlatformSession
 
 
 class SessionService(BaseSessionService):
     
-    def __init__(self, store: SessionStore):
+    def __init__(self, store: BaseSessionStore):
         self.store = store
 
     async def get_by_id(self, session_id: str) -> PlatformSession:
@@ -27,7 +27,7 @@ class SessionService(BaseSessionService):
     async def restore_account(self, session: PlatformSession, **kwargs):
         account_id = kwargs.get("account_id", session.account_id)
         if account_id and session.is_anonymous:
-            account = AccountStore.get_by_id(account_id)
+            account = AccountService.get_by_id(account_id)
             session.account_id = account_id
             session.account = account
         #if session.account:

@@ -1,10 +1,10 @@
 from typing import Optional
 from yakoon.engine.system.data import RuntimeSessionData
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.stores.session_store import SessionStore
+from yakoon.platform.stores.session import BaseSessionStore
 
 
-class InMemorySessionStore(SessionStore):
+class InMemorySessionStore(BaseSessionStore):
 
     def __init__(self, session_cls):
         self._sessions: dict[str, PlatformSession] = {}

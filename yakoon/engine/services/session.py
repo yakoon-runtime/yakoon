@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
-
 from yakoon.engine.system.session import BaseSession
+
 
 class BaseSessionService(ABC):
 

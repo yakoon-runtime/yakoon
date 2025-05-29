@@ -10,3 +10,5 @@ class DayPhase:
     end_hour: int          # exklusiv
     description: str = ""  # optional
 
+    def validate(self):
+        pass

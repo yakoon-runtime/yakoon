@@ -1,22 +1,20 @@
-# yakoon/engine/services/log_service.py
-
 from yakoon.engine.settings import Settings
 
 
 class LogService:
     
-    @staticmethod
-    def audit(msg: str):
+    @classmethod
+    def audit(cls, msg: str):
         if Settings.log_commands:
             print(f"[AUDIT] {msg}")
 
-    @staticmethod
-    def error(exc: Exception):
+    @classmethod
+    def error(cls, exc: Exception):
         if Settings.log_errors:
             import traceback
             print("[ERROR]", "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
 
-    @staticmethod
-    def permission(session, obj, action):
+    @classmethod
+    def permission(cls, session, obj, action):
         if Settings.log_permission_denied:
             print(f"[SEC] Denied: {session.id} → {obj} ({action})")

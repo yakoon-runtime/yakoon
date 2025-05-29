@@ -1,7 +1,7 @@
 
 from yakoon.domains.realm.commands.base import RealmCommand
+from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.parser import Request
-from yakoon.domains.realm.stores.room_store import RoomStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 
@@ -17,7 +17,7 @@ class CmdLook(RealmCommand):
         presenter = self.get_presenter(session)
 
         char = session.data_runtime.character
-        room = RoomStore.get_by_id(char.location) if char else None
+        room = RoomService.get_by_id(char.location) if char else None
         if not room:
             return await presenter.fail("not_found")
 

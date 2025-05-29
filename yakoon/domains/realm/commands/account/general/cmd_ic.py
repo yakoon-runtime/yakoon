@@ -1,7 +1,7 @@
 from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
-from yakoon.domains.realm.stores.character_store import CharacterStore
+from yakoon.domains.realm.services.character import CharacterService
 from yakoon.engine.core.parser import Request
 from yakoon.solution.platform.runtime.session import SolutionSession
 
@@ -18,7 +18,7 @@ class CmdIC(RealmCommand):
             return await presenter.fail("no_name_in_args")
 
         char_name = request.args[0]
-        char = CharacterStore.get_by_name(char_name)
+        char = CharacterService.get_by_name(char_name)
 
         if not char:
             return await presenter.fail("not_found", name=char_name)

@@ -13,5 +13,8 @@ class Object(Secured):
     contains: list[str] = field(default_factory=list)
     movable: bool = True
 
+    def validate(self):
+        pass
+
     async def render(self, session: SolutionSession) -> str:
         return f"|c{self.name}|n\n{self.desc}"

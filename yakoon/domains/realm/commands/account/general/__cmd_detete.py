@@ -1,8 +1,8 @@
 
+from yakoon.domains.realm.services.object import ObjectService
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.dialog.prompts import confirm
 from yakoon.engine.core.parser import Request
-from yakoon.domains.mdojo.stores.object_store import ObjectStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 
@@ -15,7 +15,7 @@ class __CmdDelete(Command):
         if not obj_id:
             return await session.fail("Bitte gib eine Objekt-ID an.")
 
-        obj = ObjectStore.get(obj_id)
+        obj = ObjectService.get_by_id(obj_id)
         if not obj:
             return await session.emit(f"Objekt {obj_id} nicht gefunden.")
         if not obj.has_perm(session, "delete"):
