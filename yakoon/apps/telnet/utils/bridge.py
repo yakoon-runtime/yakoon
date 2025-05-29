@@ -1,6 +1,6 @@
 from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.runtime import Engine
-from yakoon.platform.render.render_mode import RenderMode
+from yakoon.platform.render.engine.mode import RenderMode
 from yakoon.platform.utils.ansi import format_codes_to_ansi
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings

@@ -1,0 +1,9 @@
+{%- if section.key == "show" %}
+|g|uSystem Status|n
+└─ Platform Version  : {{ section.data.version }}
+└─ Python            : {{ section.data.python }}
+└─ Hostname          : {{ section.data.hostname }}
+└─ Uptime            : {{ section.data.uptime }}
+└─ Time (UTC)        : {{ section.data.time }}
+
+{%- endif %}

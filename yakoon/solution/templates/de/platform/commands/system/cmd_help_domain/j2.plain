@@ -1,0 +1,9 @@
+{%- if section.key == "show" %}
+Hilfe für Domain: {{ section.data.controller.name }}
+{% for category, commands in section.data.grouped.items() %}
+
+| Kategorie: {{ category|title }}
+>> {% for cmd in commands %}{{ cmd.key }}  {% endfor %}
+
+{% endfor %}
+{%- endif %}

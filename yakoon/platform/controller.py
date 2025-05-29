@@ -6,7 +6,7 @@ from yakoon.platform.runtime.session import PlatformSession
 
 class PlatformController(BaseController):
 
-    name: str = "system"
+    name: str = "platform"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = ["system", "account"]     

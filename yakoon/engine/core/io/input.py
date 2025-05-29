@@ -2,6 +2,7 @@
 
 import asyncio
 
+
 async def safe_input(prompt: str = "|:> ") -> str:
     """
     Asynchronously reads user input from stdin without creating extra closures or tasks.

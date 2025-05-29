@@ -1,0 +1,18 @@
+{%- if section.key == "show" %}
+Verfügbare Domains:
+{% for controller in section.data.controllers %}
+└─ {{ controller.name|ljust(10) }} → switch {{ controller.name }}
+{% endfor %}
+
+Globale Befehle:
+{% for category, commands in section.data.grouped.items() %}
+- {{category|title}}
+{% for cmd in commands %}
+   └─ {{ cmd.key }}
+{% endfor %}
+{% endfor %}
+{%- else %}
+Unbekannter Schlüssel: {{ section.key }}
+
+{%- endif %}
+

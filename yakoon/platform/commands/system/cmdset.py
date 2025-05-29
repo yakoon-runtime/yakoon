@@ -4,6 +4,7 @@ from yakoon.engine.core.commandset import CommandSet
 from yakoon.platform.commands.system.cmd_switch import CmdSwitch
 from yakoon.platform.commands.system.cmd_help import CmdHelpSystem
 from yakoon.platform.commands.system.cmd_version import CmdVersion
+from yakoon.platform.commands.system.cmd_welcome import CmdWelcome
 from yakoon.platform.settings import Settings
 
 
@@ -17,4 +18,5 @@ class PlatformSystemCommands(CommandSet):
             CmdVersion,
             CmdHelpSystem,
             CmdSwitch,
+            CmdWelcome,
         ]

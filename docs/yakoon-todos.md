@@ -3,16 +3,7 @@
 # ✅ NEXT STEPS #
 ==================
 
-# Mdojo
-- Mehrsprachigkeit Konzept: Klärung alles in Templates?
-  - Einfache Sätze (Translater vs. Template)
-    return await session.fail("Du bist bereits OOC.")
-- Templates DE/ENG (subfolder)?
-
-- Realmsettings: wirklich von Setings ableiten? eher nicht
-- realm.models.room -> template + field attachment.
-- realm.commands.general - IC, OOC
-- realm.commands.character - * 
+# Realm
 - Konzept Storage (Domain)
   - Eine DB / Jede Domain eigenständig  => Vielfalt?
   - Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
@@ -20,6 +11,11 @@
 - Konzept Namespaces 
   - User_1, User_2 -> NS1
   - User_2 -> NS2
+- Realmsettings: wirklich von Setings ableiten? eher nicht
+- realm.models.room -> template + field attachment.
+- realm.commands.general - IC, OOC
+- realm.commands.character - * 
+
 - Ersten Commands aus Evennia abziehen 
   - Account, Session 
 

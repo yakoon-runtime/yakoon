@@ -2,6 +2,18 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-29]
+**Presenter**
+Ein Presenter wurde eingeführt, um die gesamte Template-Struktur zu kapseln.
+Dieser Presenter arbeitet mit der Session ist so somit in der Lage direkt
+Templates an Clients zu versenden. Grund: Die Verwendung von Templates reduziert
+sich auf eine Erstellung des Presenters + pres.emit("key", **data). Zudem wurden
+die Prompts angebunden. pres.prompts.emit("key")
+
+## [2025-05-28]
+**Templates vs. Translater**
+Entscheidung: Alle Benutzerausgaben werden über Jinja2-Templates pro Command und Sprache geregelt. Dies ermöglicht konsistente, übersetzbare Ausgaben mit klarer Struktur, einfacher Sprachumschaltung und vollständiger Trennung von Logik und Darstellung – ohne redundante Translator-Systeme.
+
 ## [2025-05-28]
 **Memory Manager**
 MemoryManager zur zyklischen Überwachung von Speicherveränderungen.

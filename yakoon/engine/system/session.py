@@ -22,19 +22,13 @@ class BaseSession(object):
     Handles persistent key-value data and domain-specific runtime context.
     """
 
-    #: Output callback function used for normal messages.
-    #: Typically sends text to the user interface (e.g., console, webclient, telnet).
-    out: PrintMessage
-
-    #: Output callback function used for error messages.
-    #: Used to signal problems, warnings, or command feedback.
-    err: PrintError
-
     def __init__(self, id: str):
         """
         Constructs a new session.
         """
         self.id = id or str(uuid4())
+        self.lang: str = "de"
+
         self._cmd_groups = []
         self._cmd_groups_dynamic = []
         self._context:Context = None

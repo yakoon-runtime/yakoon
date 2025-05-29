@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from yakoon.engine.settings import Settings as BaseSettings
-from yakoon.platform.render.render_mode import RenderMode
+from yakoon.platform.render.engine.mode import RenderMode
 
 
 @dataclass
@@ -34,5 +34,3 @@ class Settings(BaseSettings):
 
     cmd_category_debug: str = "debug"
     """Development-only commands used for testing, diagnostics, or inspection."""
-
-    cmd_platform_templates = "platform/commands/"

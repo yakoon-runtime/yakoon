@@ -1,7 +1,0 @@
-Hilfe für Domain: {{ controller.name }}
-{% for category, commands in grouped.items() %}
-
-| Kategorie: {{ category|title }}
->> {% for cmd in commands %}{{ cmd.key }}  {% endfor %}
-
-{% endfor %}

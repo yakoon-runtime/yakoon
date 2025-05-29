@@ -2,7 +2,7 @@
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.dialog.prompts import confirm
 from yakoon.engine.core.parser import Request
-from yakoon.domains.realm.stores.object_store import ObjectStore
+from yakoon.domains.mdojo.stores.object_store import ObjectStore
 from yakoon.solution.platform.runtime.session import SolutionSession
 
 

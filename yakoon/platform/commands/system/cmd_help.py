@@ -2,9 +2,8 @@
 from collections import defaultdict
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.render.resolver import render_template_for
+from yakoon.platform.render.context import Presenter
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.settings import Settings
 
 
 class CmdHelpSystem(Command):
@@ -14,14 +13,11 @@ class CmdHelpSystem(Command):
     async def run(self, session: PlatformSession, request: Request):
         registry = getattr(session.ctx, "_registry")
         grouped = get_grouped_commands(session.ctx.controller)
-        output = render_template_for(
-            Settings.cmd_platform_templates + "system/cmd_help",
-            {
-                "controllers": [registry.system] + registry.controllers,
-                "grouped": grouped,
-            }
-        )
-        await session.emit(output)
+
+        presenter = Presenter("commands/system/cmd_help", session)
+        await presenter.emit(
+            "show", controllers=[registry.system] + registry.controllers, 
+            grouped=grouped)
         
 
 class CmdHelpDomain(Command):
@@ -33,16 +29,10 @@ class CmdHelpDomain(Command):
         controller = session.ctx.controller
         if not request.args:
             grouped = get_grouped_commands(controller)
-            output = render_template_for(
-                Settings.cmd_platform_templates + "system/cmd_help_domain",
-                {
-                    "controller": controller,
-                    "grouped": grouped
-                }
-            )
-            await session.emit(output)
-            return
+            presenter = Presenter("system/cmd_help_domain",session)
+            return await presenter.emit("show", controller=controller, grouped=grouped)
 
+        # TODO: Hilfe für unsere Commands
         key = request.args[0]
         cmd = controller.router.find_by_key_or_alias(key, session.cmd_groups)
         if cmd:

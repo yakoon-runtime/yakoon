@@ -4,7 +4,8 @@ import time
 from datetime import datetime, timezone
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.parser import Request
-from yakoon.platform.render.resolver import render_template_for
+from yakoon.platform.render.context import Presenter
+from yakoon.platform.render.engine.runtime import render_template_for
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.settings import Settings
 from yakoon.engine.core.command import Command
@@ -15,18 +16,15 @@ class CmdVersion(Command):
     key = "version"
 
     async def run(self, session: PlatformSession, request: Request):
-        output = render_template_for(
-            Settings.cmd_platform_templates + "system/cmd_version", {
-                "version": get_platform_version(),
-                "python": platform.python_version(),
-                "hostname": platform.node(),
-                "uptime": get_uptime(),
-                "time": datetime.now(timezone.utc).isoformat()
-            }
-        )
-        
-        await session.emit(output)
 
+        presenter = Presenter("commands/system/cmd_version", session)
+        await presenter.emit("show", 
+                version=get_platform_version(),
+                python=platform.python_version(),
+                hostname=platform.node(),
+                uptime=get_uptime(),
+                time=datetime.now(timezone.utc).isoformat())
+        
 
 _start_time = time.time()
 

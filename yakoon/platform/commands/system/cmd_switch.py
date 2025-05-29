@@ -1,35 +1,29 @@
 from yakoon.engine.core.command import Command
-from yakoon.engine.core.dialog import ask
 from yakoon.engine.core.parser import Request
 from yakoon.engine.core.registry import DomainRegistry
-from yakoon.platform.render.resolver import render_template_for
+from yakoon.platform.render.context import Presenter
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.settings import Settings
 
 
 class CmdSwitch(Command):
-
+    
     key = "switch"
 
     async def run(self, session: PlatformSession, request: Request):
-        
+        presenter = Presenter("commands/system/cmd_switch", session)
+
         name = request.get_arg(0)
         if not name:
-            name = await ask(session, "Welche Domain?")
-        
+            name = await presenter.prompts.ask("ask_domain")
+
         name = name.lower()
         registry: DomainRegistry = getattr(session.ctx, "_registry")
         controller = registry.get_controller_by_name(name)
+
         if not controller:
-            return await session.fail(f"Unbekannte Domain: {name}")
+            return await presenter.fail("not_found", name=name)
 
-        # sets the current controller.
         session.domain = controller
-        session.data_storage.set(
-            registry.system.name, "domain", name)
+        session.data_storage.set(registry.system.name, "domain", name)
 
-        output = render_template_for(
-            Settings.cmd_platform_templates + "system/cmd_switch",
-            {"name": controller.name}
-        )
-        await session.notify(output)
+        await presenter.notify("success", name=controller.name)

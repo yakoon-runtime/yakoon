@@ -5,7 +5,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from yakoon.engine.core.io.adapter import IOAdapter
 from yakoon.engine.runtime import Engine
-from yakoon.platform.render.render_mode import RenderMode
+from yakoon.platform.render.engine.mode import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 
