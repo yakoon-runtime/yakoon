@@ -26,5 +26,6 @@ class CmdSwitch(PlatformCommand):
         
         session.domain_id = name
         await SessionService.save(session)
+        await controller.on_enter(session)
 
         await presenter.notify("success", name=controller.name)

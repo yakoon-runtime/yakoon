@@ -71,10 +71,17 @@ class Engine():
       """
       queue = deque(inputs)
 
-      async def run_one(raw: str):
-         await self._registry.system.on_before_send(session)
-         await self._send_one(session, raw)
-         await self._registry.system.on_after_send(session)
+      async def _run_internal_task(raw):
+         # Platform-level pre-processing hook before input parsing.
+         # Used to validate or prepare the session (e.g., locale, account, command set).
+         await self._registry.system.on_platform_validate(session)
+
+         try:
+            await self._send_one(session, raw)
+         finally:
+            # Final platform-level hook after command execution.
+            # Used for post-processing, logging, or global session update
+            await self._registry.system.on_platform_finalize(session)
 
       while queue:
          await asyncio.sleep(0.01)  # yield control briefly
@@ -86,7 +93,7 @@ class Engine():
                DialogManager.resolve_prompt(session.id, raw)
                return
 
-         task = asyncio.create_task(run_one(raw))
+         task = asyncio.create_task(_run_internal_task(raw))
 
          while not task.done():
             await asyncio.sleep(0.01)
@@ -107,7 +114,8 @@ class Engine():
 
       try:
          if session.domain:
-            # Hook called before command resolution.
+            # Domain-level hook before resolving the input into a command.
+            # Allows dynamic command registration or early input rewriting.
             await session.domain.on_before_resolve(session)
 
          # resolve the commands
@@ -118,16 +126,14 @@ class Engine():
          controller, command = result
          session.ctx.bind_controller(controller) 
 
-         # Pre-execution hook: prepare session state (e.g., load character, context)
-         await controller.on_before_send(session)
          # Pre-command hook: modify or validate request before execution
          await controller.on_before_run_command(session, request, command)
+         
          # Main command execution
          await command.run(session, request)
+         
          # Post-command hook: cleanup, logging, side effects
          await controller.on_after_run_command(session, request, command)
-         # Final hook: format output, update session if needed
-         await controller.on_after_send(session)
 
       except PermissionError as exc:
          LogService.permission(session, "command", command.key)
@@ -142,4 +148,6 @@ class Engine():
 
       finally:        
          if session.domain:
+            # Hook called when a domain session is about to end.
+            # Used for cleanup of runtime data, disconnection, or persistence.   
             await session.domain.on_cleanup(session)

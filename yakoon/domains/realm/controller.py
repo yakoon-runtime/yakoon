@@ -57,25 +57,13 @@ class RealmController(BaseController):
 
         self.router.unregister(dynamic)
         self.router.register(dynamic, get_exit_direction_commandset(room))
-
-    async def on_before_send(self, session: PlatformSession):
-        """
-        Prepares the session's runtime state before any command is executed within this domain.
-
-        Typically used to:
-        - Load domain-specific objects (e.g., Character) into session.data_runtime
-        - Ensure the session is ready for domain-specific command execution
-
-        This method is called once per command dispatch cycle.
-        """        
-        char_id = session.data_storage.get(self.name, "char_id")
-        if not char_id:
-            return
-
-        character = CharacterService.get_by_id(char_id)
-        session.data_runtime = RuntimeRealmData(character)  
-
+  
     async def on_before_run_command(self, session: PlatformSession, request, command):
+        char_id = session.data_storage.get(self.name, "char_id")
+        if char_id:           
+            character = CharacterService.get_by_id(char_id)
+            session.data_runtime = RuntimeRealmData(character)  
+
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")

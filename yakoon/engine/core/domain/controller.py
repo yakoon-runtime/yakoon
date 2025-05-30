@@ -54,6 +54,15 @@ class BaseController(ABC):
         """
         pass
 
+    async def on_platform_validate(self, session: BaseSession):
+        """
+        Platform-level pre-send hook, called before request parsing.
+
+        Used to prepare session context (e.g., account, locale, dynamic commands).
+        Only invoked if this controller is the registered `system` controller.
+        """
+        pass
+
     async def on_before_resolve(self, session: BaseSession):
         """
         Hook called before command resolution.
@@ -61,12 +70,6 @@ class BaseController(ABC):
         Use this to register dynamic commands for the current session,
         e.g. exits, room-specific actions or context-sensitive shortcuts.
         Executed regardless of whether a valid command is found.
-        """
-
-    async def on_before_send(self, session: BaseSession):
-        """
-        Hook called before any input is processed by the engine.
-        Useful for logging, session validation, or input preprocessing.
         """
 
     async def on_before_run_command(self, session: BaseSession, request: Request, command: Command):
@@ -90,25 +93,19 @@ class BaseController(ABC):
         """
         pass
 
-    async def on_account_logout(self, session: BaseSession, account: Any):
-        """
-        Hook called before a user is logged out.
-        Allows the domain to persist state, release resources, or perform cleanup.
-        """
-        pass
-
-    async def on_after_send(self, session: BaseSession):
-        """
-        Hook called after input has been processed and all commands executed.
-        Can be used for cleanup, analytics, or session state updates.
-        """
-
     async def on_enter(self, session: BaseSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.
         Override this in each domain to define entry behavior.
         """
+
+    async def on_account_logout(self, session: BaseSession, account: Any):
+        """
+        Hook called before a user is logged out.
+        Allows the domain to persist state, release resources, or perform cleanup.
+        """
+        pass
 
     async def on_cleanup(self, session: BaseSession):
         """
@@ -117,3 +114,12 @@ class BaseController(ABC):
         Use this to remove dynamic command groups, reset state,
         or undo temporary session changes.
         """
+
+    async def on_platform_finalize(self, session: BaseSession):
+        """
+        Platform-level post-send hook, called after command runing.
+
+        Used to cleanup session context (e.g., account, locale, dynamic commands).
+        Only invoked if this controller is the registered `system` controller.
+        """
+        pass
