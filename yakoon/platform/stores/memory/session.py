@@ -1,7 +1,6 @@
 from typing import Optional
-from yakoon.engine.system.data import RuntimeSessionData
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.stores.session import BaseSessionStore
+from yakoon.platform.stores.base.session import BaseSessionStore
 
 
 class InMemorySessionStore(BaseSessionStore):
@@ -16,11 +15,9 @@ class InMemorySessionStore(BaseSessionStore):
     async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         if session_id not in self._sessions:
             session = PlatformSession(session_id)
-            session.account_id = kwargs.get("account_id")
             self._sessions[session.id] = session
             return self._sessions[session.id], True
         session = self._sessions[session_id]
-        session.data_runtime = RuntimeSessionData() # to avoid runtime state leaks
         return session, False
 
     async def delete(self, session_id: str) -> None:

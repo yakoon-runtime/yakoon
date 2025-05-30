@@ -1,7 +1,8 @@
+from yakoon.engine.system.data import RuntimeSessionData
 from yakoon.platform.services.account import AccountService
-from yakoon.platform.stores.session import BaseSessionStore
 from yakoon.engine.services.session import BaseSessionService
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.stores.base.session import BaseSessionStore
 
 
 class SessionService(BaseSessionService):
@@ -20,7 +21,10 @@ class SessionService(BaseSessionService):
     async def get_or_create(cls, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         session, created = await cls.store.get_or_create(session_id, **kwargs)
         if session:
+            session.account_id = kwargs.get("account_id")
+        if not created:
             await cls.restore_account(session, **kwargs)
+        session.data_runtime = RuntimeSessionData() # to avoid runtime state leaks
         return session, created
 
     @classmethod
