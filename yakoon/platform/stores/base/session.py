@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from yakoon.engine.system.session import BaseSession
+from yakoon.engine.models.session import BaseSession
 
 
 class BaseSessionStore(ABC):

@@ -6,7 +6,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 
 from yakoon.engine.core.io.adapter import IOAdapter
-from yakoon.engine.system.data import RuntimeSessionData, StorageSessionData
+from yakoon.engine.models.data import RuntimeSessionData, StorageSessionData
 
 if TYPE_CHECKING:
     from yakoon.engine.core.domain.controller import BaseController
@@ -22,8 +22,7 @@ class BaseSession:
     # ───── persistent fields (stored in DB/json) ─────
 
     id: str = field(default_factory=lambda: str(uuid4()))
-    cmd_groups: list[str] = field(default_factory=list) #, repr=False, compare=False)
-    
+    domain_id: str = ""
     lang: str = "de"
 
     # Persistent session state (e.g., account_id, domain flags)
@@ -33,7 +32,7 @@ class BaseSession:
     data_storage: StorageSessionData = field(default_factory=lambda: StorageSessionData()) #, repr=False, compare=False)
 
     # ───── transient runtime-only attributes ─────
-
+    _cmd_groups: list[str] = field(default_factory=list, init=False, repr=False)
     _cmd_groups_dynamic: list[str] = field(default_factory=list, init=False, repr=False)
     _context: Context = field(default=None, init=False, repr=False)
     _domain: BaseController = field(default=None, init=False, repr=False)
@@ -54,6 +53,13 @@ class BaseSession:
     @domain.setter
     def domain(self, value):
         self._domain = value
+
+    @property
+    def cmd_groups(self) -> list[Type[str]]:
+        return self._cmd_groups
+    @cmd_groups.setter
+    def cmd_groups(self, value):
+        self._cmd_groups = value
 
     @property
     def cmd_groups_dynamic(self) -> list[Type[str]]:

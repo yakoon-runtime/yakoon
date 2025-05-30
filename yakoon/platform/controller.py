@@ -3,7 +3,6 @@ from yakoon.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.services.session import SessionService
-from yakoon.platform.stores.bindings import bind_active_storage
 
 
 class PlatformController(BaseController):
@@ -18,30 +17,20 @@ class PlatformController(BaseController):
         PlatformSystemCommands, 
         PlatformAccountCommands]
     """ The collection of all commands. """
-     
-    def __init__(self):
-        super().__init__()
-        # TODO: Wir brauchens später ein connect oder ähnl. als Hook.
-        # Denn wir wollen nur dann eine Verbindung, wenn die Domain auch
-        # verwendet wird.
     
-        #. bind_active_storage(os.getenv("YAKOON_STORAGE", "memory"))
-        #bind_active_storage("memory")
-        bind_active_storage("sqlite")
-
-    async def on_ready(self, session: PlatformSession):
-        pass
-
     async def on_before_send(self, session: PlatformSession):
-        groups = set()
         registry = session.ctx._registry  # access intern by design
-
-        for controller in registry.controllers + [registry.system]:
+        # load the last controller
+        controller = registry.get_controller_by_name(session.domain_id)
+        session.domain = controller
+        # builds the commandset for this session
+        groups = set()
+        for controller in registry.get_controllers():
             groups.update(controller.get_default_command_groups_with_prefix())
         session.cmd_groups = list(groups)
-
         def merge(lista: list[str], listb: list[str]) -> list[str]:
             return list(dict.fromkeys(lista + listb))
+        # append the account commandset to this session
         if session.account:
             session.cmd_groups = merge(session.cmd_groups, session.account.cmd_groups)
         session.cmd_groups = sorted(session.cmd_groups)
@@ -49,7 +38,7 @@ class PlatformController(BaseController):
     async def on_before_run_command(self, session: PlatformSession, request, command):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
-                raise PermissionError(f"Auftrag abgelegt. Erforderliche Rollen: {', '.join(required)}")
+                raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
     async def on_after_send(self, session: PlatformSession):
         await super().on_after_send(session)

@@ -24,17 +24,16 @@ class SQLAccountStore:
     async def get_by_id(self, id_: str) -> Account | None:
         stmt = select(AccountORM).where(AccountORM.id == id_)
         result = self.db.execute(stmt).scalar_one_or_none()
-        return from_row(result.__dict__) if result else None
+        return _to_entity(result) if result else None
 
     async def get_by_name(self, name: str) -> Account | None:
         stmt = select(AccountORM).where(AccountORM.name == name)
         result = self.db.execute(stmt).scalar_one_or_none()
-        return from_row(result.__dict__) if result else None
+        return _to_entity(result) if result else None
 
     async def save(self, account: Account):
-        row = to_row(account)
-        orm = AccountORM(**row)
-        self.db.merge(orm)
+        orm = _to_orm(account)
+        self.db.merge(orm)  # insert or update
         self.db.commit()
 
     async def delete_by_id(self, id_: str):
@@ -45,8 +44,17 @@ class SQLAccountStore:
 
   # ─────────── Mapping ───────────
 
-def to_row(account: Account) -> dict:
-    return asdict(account)
+def _to_orm(account: Account) -> dict:
+    return AccountORM(
+        id=account.id,
+        name=account.name,
+        cmd_groups=account.cmd_groups,
+    )
 
-def from_row(row: dict) -> Account:
-    return Account(**row)
+def _to_entity(row: AccountORM) -> Account:
+    return Account(
+        id=row.id,
+        name=row.name,
+        cmd_groups=row.cmd_groups or [],
+    )
+

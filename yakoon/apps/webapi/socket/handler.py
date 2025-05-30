@@ -30,7 +30,7 @@ async def websocket_endpoint(websocket: WebSocket):
     io = IOAdapter(out, err)
 
     try:
-        await engine.signal_ready(io)
+        await engine.initialize(io)
         while True:               
             await asyncio.sleep(0.1)
             command = await websocket.receive_text()              

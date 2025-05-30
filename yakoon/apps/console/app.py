@@ -16,7 +16,7 @@ SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
-command_inits += ["batch: login stefan; switch realm"]
+command_inits += ["batch: login admin; switch realm"]
 
 
 async def run_console():
@@ -28,7 +28,7 @@ async def run_console():
     io = IOAdapter(print, print)
 
     engine = Engine(SolutionRegistry())
-    await engine.signal_ready(io)
+    await engine.initialize(io)
 
     while True:               
         

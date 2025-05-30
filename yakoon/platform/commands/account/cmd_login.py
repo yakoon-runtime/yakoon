@@ -22,14 +22,14 @@ class CmdLogin(PlatformCommand):
         if not account:
             return await presenter.emit("not_found", name=name)
 
-        pers_session, created = await SessionService.get_or_create(session.id)
-        if not pers_session:
+        if not await SessionService.get_by_id(session.id):
             raise ValueError("Session cannot be None")
 
-        pers_session.account_id = account.id
-        SessionService.save(pers_session)
+        session.account_id = account.id
+        await SessionService.save(session)
 
-        await session.ctx.platform.on_account_login(session, account)
+        for controller in session.ctx._registry.get_controllers():
+            if hasattr(controller, "on_account_login"):
+                await controller.on_account_login(session, account)
 
-        key = "login_success" if created else "returning"
-        await presenter.emit(key, account=account)
+        await presenter.emit("login_success", account=account)

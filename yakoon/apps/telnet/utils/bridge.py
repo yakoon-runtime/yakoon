@@ -22,7 +22,7 @@ async def handle_client(reader, writer):
     session_id = f"{addr[0]}:{addr[1]}"
     print(f"[Telnet] Verbindung von {session_id}")
     
-    await engine.signal_ready(IOAdapter(out, out))
+    await engine.initialize(IOAdapter(out, out))
 
     while True:
         command = await reader.readline()

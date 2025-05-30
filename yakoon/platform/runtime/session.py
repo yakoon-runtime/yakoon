@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
-from yakoon.engine.system.session import BaseSession
+from yakoon.engine.models.session import BaseSession
 from yakoon.platform.models.account import Account
 
 
@@ -23,7 +23,7 @@ class PlatformSession(BaseSession):
         
     @property
     def is_anonymous(self) -> bool:
-        return self.account is None
+        return self.account_id is None
 
     @property
     def account(self) -> Account | None:

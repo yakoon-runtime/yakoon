@@ -1,5 +1,5 @@
 
-from yakoon.engine.system.session import BaseSession
+from yakoon.engine.models.session import BaseSession
 from yakoon.platform.render.engine.context import RenderContext
 from yakoon.platform.render.engine.render import render_section
 from yakoon.platform.render.dialog.prompts import Prompts

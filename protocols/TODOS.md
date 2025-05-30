@@ -4,10 +4,11 @@
 ==================
 
 # Realm
-- Konzept Storage (Domain)
-  - Eine DB / Jede Domain eigenständig  => Vielfalt?
-  - Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
+- Accounts
+
+- Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
     - Dann könnten wir solche Dateien einfach per Drag&Drop ins System ziehen!
+
 - Konzept Namespaces 
   - User_1, User_2 -> NS1
   - User_2 -> NS2

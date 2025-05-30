@@ -9,7 +9,7 @@ from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.tools.command_tool import split_batch_input
 from yakoon.engine.services.log import LogService
 from yakoon.engine.system.context import Context
-from yakoon.engine.system.session import BaseSession
+from yakoon.engine.models.session import BaseSession
 
 
 class Engine():
@@ -24,11 +24,15 @@ class Engine():
    def registry(self) -> DomainRegistry:
         return self._registry
    
-   async def signal_ready(self, io: IOAdapter):           
+   async def initialize(self, io: IOAdapter):           
       session = BaseSession(None)      
+      
       # Bind the given IOAdapter to this session for output and error handling.
       session.bind_io(io)
-      await self._registry.system.on_ready(session)
+
+      for controller in self._registry.get_controllers():
+         if hasattr(controller, "on_initialize"):
+            await controller.on_initialize(session)
                                  
    async def send(self, session_id: str, input_str: str, io: IOAdapter, depth=0):   
       """

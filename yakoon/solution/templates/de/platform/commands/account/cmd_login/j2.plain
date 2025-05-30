@@ -1,14 +1,11 @@
 {%- if section.key == "missing_arg" %}
-Wen willst du anmelden?
+Sie benötigen einen Namen.
 
 {%- elif section.key == "not_found" %}
 Account '{{ section.data.name }}' nicht gefunden.
 
-{%- elif section.key == "returning" %}
-Willkommen zurück.
-
 {%- elif section.key == "login_success" %}
-Du bist angemeldet als {{ account.name }}.
+Sie sind angemeldet als {{ section.data.account.name }}.
 
 {%- else %}
 Unbekannter Schlüssel: {{ section.key }}

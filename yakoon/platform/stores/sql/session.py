@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from sqlalchemy import JSON, Column, DateTime, String, Boolean
 from sqlalchemy.future import select
-from yakoon.engine.system.data import StorageSessionData
+from yakoon.engine.models.data import StorageSessionData
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.stores.sql._base import Base
 
@@ -12,8 +12,8 @@ class SessionORM(Base):
     __tablename__ = "sessions"
 
     id = Column(String, primary_key=True)
+    domain_id = Column(String)
     lang = Column(String)
-    cmd_groups = Column(JSON)
     data_storage = Column(JSON)
     
     account_id = Column(String)
@@ -56,7 +56,7 @@ class SQLSessionStore:
           return SessionORM(
             id=session.id,
             lang=session.lang,
-            cmd_groups=session.cmd_groups,
+            domain_id=session.domain_id,
             data_storage=session.data_storage.to_dict(),
             account_id=session.account_id,
             permissions=session.permissions,
@@ -67,7 +67,7 @@ class SQLSessionStore:
         return PlatformSession(
             id=orm.id,
             lang=orm.lang,
-            cmd_groups=orm.cmd_groups or [],
+            domain_id=orm.domain_id,
             data_storage=StorageSessionData.from_dict(orm.data_storage or {}),
             account_id=orm.account_id,
             permissions=orm.permissions,

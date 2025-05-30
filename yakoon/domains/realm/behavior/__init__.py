@@ -17,5 +17,5 @@ class CharacterBehavior:
         Injects store-dependent behavior into the given Character instance.
         This avoids circular imports and keeps the model clean.
         """
-        character.on_store_character: Callable[[Character], None] = CharacterService.persist # type: ignore
+        character.on_store_character: Callable[[Character], None] = CharacterService.save # type: ignore
         character.on_load_room: Callable[[str], Room] = RoomService.get_by_id # type: ignore

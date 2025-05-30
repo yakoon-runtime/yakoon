@@ -8,23 +8,20 @@ class InMemoryAccountStore:
         self._accounts: dict[str, Account] = {}
         load_defaults(self)
 
-    def get_by_name(self, name: str) -> Optional[Account]:
+    async def get_by_name(self, name: str) -> Optional[Account]:
         for account in self._accounts.values():
             if account.name.lower() == name.lower():
                 return account
         return None
 
-    def get_by_id(self, account_id: str) -> Optional[Account]:
+    async def get_by_id(self, account_id: str) -> Optional[Account]:
         return self._accounts.get(account_id)
-
-    def all(self) -> list[Account]:
-        return list(self._accounts.values())
 
     async def delete_by_id(self, account_id: str) -> None:
         self._accounts.pop(account_id, None)
-
-    def exists(self, name: str) -> bool:
-        return self.get_by_name(name) is not None
+     
+    async def save(self, account: Account) -> None:
+        pass
 
     def add(self, account: Account):
         self._accounts[account.id] = account

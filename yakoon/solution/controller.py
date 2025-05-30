@@ -1,5 +1,8 @@
+import os
 from yakoon.platform.controller import PlatformController
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.solution.setup.bindings import bind_active_storage
+from yakoon.solution.setup.init_platform_data import ensure_admin_account
 
 
 class SolutionMainController(PlatformController):
@@ -14,5 +17,10 @@ class SolutionMainController(PlatformController):
     This replaces the default PlatformController for all solution-specific routing and setup logic.
     """
 
-    async def on_ready(self, session: PlatformSession):
+    def __init__(self):
+        super().__init__()    
+        bind_active_storage(os.getenv("PLATFORM_STORAGE", "sqlite")) # sqlite
+
+    async def on_initialize(self, session: PlatformSession):
+        await ensure_admin_account()
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

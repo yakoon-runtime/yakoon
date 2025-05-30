@@ -9,7 +9,7 @@ from yakoon.engine.core.router import CommandRouter
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from yakoon.engine.system.session import BaseSession
+    from yakoon.engine.models.session import BaseSession
     from yakoon.engine.core.command import Command
 
 
@@ -42,6 +42,17 @@ class BaseController(ABC):
     @property
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
+     
+    async def on_initialize(self, session: BaseSession):
+        """
+        Called after the controller has been fully constructed but before any commands are processed.
+
+        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
+        or validating infrastructure state (e.g., ensuring the admin account exists).
+
+        This method is guaranteed to run once before the first engine tick or command dispatch.
+        """
+        pass
 
     async def on_before_resolve(self, session: BaseSession):
         """

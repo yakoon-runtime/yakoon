@@ -4,7 +4,7 @@ from typing import Optional
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.engine.services.base.session import BaseSessionService
-from yakoon.engine.system.session import BaseSession
+from yakoon.engine.models.session import BaseSession
 
 
 class DomainRegistry:
@@ -21,15 +21,17 @@ class DomainRegistry:
         self.sessions = sessions
 
         # Check for duplicate controller names
-        all_controllers = [self.system] + self.controllers
-        names = [c.name for c in all_controllers]
+        names = [c.name for c in self.get_controllers()]
         if len(set(names)) != len(names):
             raise ValueError(f"Duplicate controller names detected: {names}")
         
     def get_controller_by_name(self, name:str) -> BaseController:
-        for controller in [self.system] + self.controllers:
+        for controller in self.get_controllers():
             if controller.name == name:
                 return controller
+
+    def get_controllers(self):
+        return [self.system] + self.controllers
 
     def resolve(self, input_str: str, session: BaseSession) -> Optional[tuple[BaseController, Command]]:
         """
@@ -46,7 +48,7 @@ class DomainRegistry:
         # 1. Prefix (e.g. realm:look, system:help)
         if ":" in input_str:
             prefix, rest = input_str.split(":", 1)
-            for controller in [self.system] + self.controllers:
+            for controller in self.get_controllers():
                 if controller.name == prefix:
                     cmd = controller.router.resolve(rest, cmd_groups)
                     if cmd:
