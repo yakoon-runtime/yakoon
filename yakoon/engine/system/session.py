@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass, field
 from typing import Optional, Type
 from uuid import uuid4
 
@@ -11,33 +12,37 @@ if TYPE_CHECKING:
     from yakoon.engine.core.domain.controller import BaseController
     from yakoon.engine.system.context import Context
 
-
-class BaseSession(object):
+@dataclass
+class BaseSession:
     """
     Represents a generic platform session.
     Handles persistent key-value data and domain-specific runtime context.
     """
 
-    def __init__(self, id: str):
-        """
-        Constructs a new session.
-        """
-        self.id = id or str(uuid4())
-        self.lang: str = "de"
+    # ───── persistent fields (stored in DB/json) ─────
 
-        self._cmd_groups = []
-        self._cmd_groups_dynamic = []
-        self._context:Context = None
-        self._domain:BaseController = None
-        self._io: IOAdapter = None
+    id: str = field(default_factory=lambda: str(uuid4()))
+    cmd_groups: list[str] = field(default_factory=list) #, repr=False, compare=False)
+    
+    lang: str = "de"
 
-        # Persistent session state (e.g., account_id, domain flags)
-        #: Session-wide persistent data storage (domain-aware dictionary).
-        #: This is always reset before each command send to avoid runtime state leaks
-        #: when using stateless memory-based sessions (e.g., for testing or batch processing).
-        self.data_storage: StorageSessionData = StorageSessionData()
-        # Domain-specific runtime data (e.g., Character, Document, etc.)
-        self.data_runtime: Optional[RuntimeSessionData] = None
+    # Persistent session state (e.g., account_id, domain flags)
+    #: Session-wide persistent data storage (domain-aware dictionary).
+    #: This is always reset before each command send to avoid runtime state leaks
+    #: when using stateless memory-based sessions (e.g., for testing or batch processing).
+    data_storage: StorageSessionData = field(default_factory=lambda: StorageSessionData()) #, repr=False, compare=False)
+
+    # ───── transient runtime-only attributes ─────
+
+    _cmd_groups_dynamic: list[str] = field(default_factory=list, init=False, repr=False)
+    _context: Context = field(default=None, init=False, repr=False)
+    _domain: BaseController = field(default=None, init=False, repr=False)
+    _io: IOAdapter = field(default=None, init=False, repr=False)
+    _data_runtime: Optional[RuntimeSessionData] = field(default=None, init=False, repr=False)
+
+    def validate(self):
+        if not self.id:
+            raise ValueError("Id cannot be None or empty")
 
     @property
     def ctx(self) -> Context:
@@ -51,18 +56,18 @@ class BaseSession(object):
         self._domain = value
 
     @property
-    def cmd_groups(self) -> list[Type[str]]:
-        return self._cmd_groups
-    @cmd_groups.setter
-    def cmd_groups(self, value):
-        self._cmd_groups = value
-
-    @property
     def cmd_groups_dynamic(self) -> list[Type[str]]:
         return self._cmd_groups_dynamic
     @cmd_groups_dynamic.setter
     def cmd_groups_dynamic(self, value):
         self._cmd_groups_dynamic = value
+
+    @property
+    def data_runtime(self) -> RuntimeSessionData:
+        return self._data_runtime
+    @data_runtime.setter
+    def data_runtime(self, value):
+        self._data_runtime = value
 
     def bind_context(self, context: Context):
         self._context = context

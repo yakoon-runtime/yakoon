@@ -26,7 +26,8 @@ class PlatformController(BaseController):
         # verwendet wird.
     
         #. bind_active_storage(os.getenv("YAKOON_STORAGE", "memory"))
-        bind_active_storage("memory")
+        #bind_active_storage("memory")
+        bind_active_storage("sqlite")
 
     async def on_ready(self, session: PlatformSession):
         pass
@@ -53,4 +54,4 @@ class PlatformController(BaseController):
     async def on_after_send(self, session: PlatformSession):
         await super().on_after_send(session)
         if session.is_anonymous:
-            await SessionService.delete(session.id)
+            await SessionService.delete_by_id(session.id)

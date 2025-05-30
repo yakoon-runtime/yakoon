@@ -20,8 +20,8 @@ class InMemorySessionStore(BaseSessionStore):
         session = self._sessions[session_id]
         return session, False
 
-    async def delete(self, session_id: str) -> None:
+    async def delete_by_id(self, session_id: str) -> None:
         self._sessions.pop(session_id, None)
 
-    async def persist(self, session: PlatformSession) -> None:
+    async def save(self, session: PlatformSession) -> None:
         pass

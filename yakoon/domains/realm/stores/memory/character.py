@@ -26,7 +26,7 @@ class InMemoryCharacterStore:
     def exists(self, char_id: str) -> bool:
         return char_id in self._chars
 
-    def persist(self, obj: Character):
+    def save(self, obj: Character):
         pass  # optional später
 
 

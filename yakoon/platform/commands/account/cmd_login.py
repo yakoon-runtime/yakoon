@@ -18,14 +18,16 @@ class CmdLogin(PlatformCommand):
             return await presenter.emit("missing_arg")
 
         name = request.args[0]
-        account = AccountService.get_by_name(name)
+        account = await AccountService.get_by_name(name)
         if not account:
             return await presenter.emit("not_found", name=name)
 
-        pers_session, created = await SessionService.get_or_create(
-            session.id, account_id=account.id)
+        pers_session, created = await SessionService.get_or_create(session.id)
         if not pers_session:
             raise ValueError("Session cannot be None")
+
+        pers_session.account_id = account.id
+        SessionService.save(pers_session)
 
         await session.ctx.platform.on_account_login(session, account)
 

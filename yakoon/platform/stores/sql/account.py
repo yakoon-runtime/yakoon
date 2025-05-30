@@ -12,7 +12,7 @@ class AccountORM(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String(30), nullable=False)
-    cmd_groups = Column(JSON, default=[])  # SQLite unterstützt JSON nativ
+    cmd_groups = Column(JSON, default=[]) 
 
 # ─────────────────────────────────────────────────────────────
 
@@ -21,21 +21,27 @@ class SQLAccountStore:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def get_by_id(self, id_: str) -> Account | None:
+    async def get_by_id(self, id_: str) -> Account | None:
         stmt = select(AccountORM).where(AccountORM.id == id_)
         result = self.db.execute(stmt).scalar_one_or_none()
         return from_row(result.__dict__) if result else None
 
-    def get_by_name(self, name: str) -> Account | None:
+    async def get_by_name(self, name: str) -> Account | None:
         stmt = select(AccountORM).where(AccountORM.name == name)
         result = self.db.execute(stmt).scalar_one_or_none()
         return from_row(result.__dict__) if result else None
 
-    def save(self, account: Account):
+    async def save(self, account: Account):
         row = to_row(account)
         orm = AccountORM(**row)
         self.db.merge(orm)
         self.db.commit()
+
+    async def delete_by_id(self, id_: str):
+        orm = self.db.get(AccountORM, id_)
+        if orm:
+            self.db.delete(orm)
+            self.db.commit()
 
   # ─────────── Mapping ───────────
 

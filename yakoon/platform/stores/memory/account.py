@@ -20,6 +20,9 @@ class InMemoryAccountStore:
     def all(self) -> list[Account]:
         return list(self._accounts.values())
 
+    async def delete_by_id(self, account_id: str) -> None:
+        self._accounts.pop(account_id, None)
+
     def exists(self, name: str) -> bool:
         return self.get_by_name(name) is not None
 

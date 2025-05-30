@@ -1,18 +1,11 @@
 from yakoon.engine.system.data import RuntimeSessionData
 from yakoon.platform.services.account import AccountService
-from yakoon.engine.services.session import BaseSessionService
+from yakoon.engine.services.base.session import BaseSessionService
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.stores.base.session import BaseSessionStore
 
 
 class SessionService(BaseSessionService):
     
-    store: BaseSessionStore = None
-
-    @classmethod
-    def bind_storage(cls, store):
-        cls.store = store
-
     @classmethod
     async def get_by_id(cls, session_id: str) -> PlatformSession:
         return await cls.store.get_by_id(session_id)
@@ -20,27 +13,27 @@ class SessionService(BaseSessionService):
     @classmethod
     async def get_or_create(cls, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         session, created = await cls.store.get_or_create(session_id, **kwargs)
-        if session:
-            session.account_id = kwargs.get("account_id")
         if not created:
             await cls.restore_account(session, **kwargs)
         session.data_runtime = RuntimeSessionData() # to avoid runtime state leaks
         return session, created
 
     @classmethod
-    async def persist(cls, session: PlatformSession):
-        await cls.store.persist(session)
+    async def save(cls, session: PlatformSession):
+        await cls.store.save(session)
 
     @classmethod
-    async def delete(cls, session_id: str):
-        await cls.store.delete(session_id)
+    async def delete_by_id(cls, session_id: str):
+        await cls.store.delete_by_id(session_id)
 
     @classmethod
     async def restore_account(cls, session: PlatformSession, **kwargs):
         account_id = kwargs.get("account_id", session.account_id)
+        has_to_store = not session.account_id 
         if account_id and session.is_anonymous:
-            account = AccountService.get_by_id(account_id)
+            account = await AccountService.get_by_id(account_id)
             session.account_id = account_id
             session.account = account
-        #if session.account:
-            #session.cmd_groups = account.groups
+        if has_to_store:
+            await cls.store.save(session)
+        

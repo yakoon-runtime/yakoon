@@ -3,10 +3,13 @@ from sqlalchemy.orm import sessionmaker
 
 from yakoon.platform.stores.sql._base import Base
 
-# Engine-Setup + SessionFactory
 engine = create_engine("sqlite:///yakoon.db", echo=False)
-SessionLocal = sessionmaker(bind=engine)
+LocalSqlSession = sessionmaker(bind=engine)
 
-# Tabellen erzeugen (einmalig beim Start)
-def init_db():
+
+def create_missing_tables():
+    """
+    Creates all ORM-defined tables that do not already exist in the database.
+    Does not alter or remove any existing structures.
+    """
     Base.metadata.create_all(bind=engine)

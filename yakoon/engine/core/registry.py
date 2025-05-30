@@ -3,7 +3,7 @@
 from typing import Optional
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.domain.controller import BaseController
-from yakoon.engine.services.session import BaseSessionService
+from yakoon.engine.services.base.session import BaseSessionService
 from yakoon.engine.system.session import BaseSession
 
 

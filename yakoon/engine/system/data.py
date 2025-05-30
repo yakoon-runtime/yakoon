@@ -1,19 +1,31 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
+
 
 @dataclass
 class RuntimeSessionData:
     pass
 
 
+@dataclass
 class StorageSessionData:
     """
     A grouped key-value store that behaves like a nested dict.
     Allows get/set access via (group, key) without raising errors.
     """
 
-    def __init__(self):
-        self._store: dict[str, dict[str, Any]] = {}
+    # ───── persistent fields (stored in DB/json) ─────
+
+    _store: dict[str, dict[str, Any]] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        return self._store
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        obj = cls()
+        obj._store = data
+        return obj
 
     def get(self, group: str, key: str, default: Any = None) -> Any:
         """

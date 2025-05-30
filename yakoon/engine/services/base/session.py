@@ -1,9 +1,16 @@
 
 from abc import ABC, abstractmethod
 from yakoon.engine.system.session import BaseSession
+from yakoon.platform.stores.base.session import BaseSessionStore
 
 
 class BaseSessionService(ABC):
+
+    store: BaseSessionStore = None
+
+    @classmethod
+    def bind_storage(cls, store):
+        cls.store = store
 
     @abstractmethod
     async def get_by_id(self, session_id: str) -> BaseSession:
@@ -14,11 +21,11 @@ class BaseSessionService(ABC):
         ...
 
     @abstractmethod
-    async def delete(self, session_id: str) -> None:
+    async def delete_by_id(self, session_id: str) -> None:
         ...
 
     @abstractmethod
-    async def persist(self, session: BaseSession) -> None:
+    async def save(self, session: BaseSession) -> None:
         ...
 
     @abstractmethod

@@ -25,5 +25,5 @@ class CharacterService:
         return cls.store.exists(char_id)
     
     @classmethod
-    def persist(cls, char: Character):
-        cls.store.persist(char)
+    def save(cls, char: Character):
+        cls.store.save(char)

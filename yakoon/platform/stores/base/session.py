@@ -15,9 +15,9 @@ class BaseSessionStore(ABC):
         ...
 
     @abstractmethod
-    async def delete(self, session_id: str) -> None:
+    async def delete_by_id(self, session_id: str) -> None:
         ...
 
     @abstractmethod
-    async def persist(self, session: BaseSession) -> None:
+    async def save(self, session: BaseSession) -> None:
         ...

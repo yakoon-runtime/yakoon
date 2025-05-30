@@ -29,7 +29,7 @@ class CmdIC(RealmCommand):
             return await presenter.emit("already", name=char.name)
 
         session.data_storage.set(session.ctx.controller.name, "char_id", char.id)
-        await SessionService.persist(session)
+        await SessionService.save(session)
 
         CharacterBehavior.attach(char)
 
