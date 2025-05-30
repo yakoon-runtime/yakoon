@@ -2,7 +2,7 @@ from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.day_phase import DayPhaseService
 from yakoon.domains.realm.services.season import SeasonService
 from yakoon.engine.core.parser import Request
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 
 
 class CmdClock(RealmCommand):
@@ -10,7 +10,7 @@ class CmdClock(RealmCommand):
     key = "clock"
     template_key = "character/general/cmd_clock"
     
-    async def run(self, session: SolutionSession, request: Request):
+    async def run(self, session: PlatformSession, request: Request):
         presenter = self.get_presenter(session)
 
         controller = session.ctx.controller

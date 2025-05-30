@@ -1,7 +1,8 @@
 from yakoon.engine.core.parser import Request
 from yakoon.platform.commands.base import PlatformCommand
+from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.services.account import AccountService
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.services.session import SessionService
 
 
 class CmdLogin(PlatformCommand):
@@ -9,7 +10,7 @@ class CmdLogin(PlatformCommand):
     key = "login"
     template_key = "account/cmd_login"
 
-    async def run(self, session: SolutionSession, request: Request):
+    async def run(self, session: PlatformSession, request: Request):
 
         presenter = self.get_presenter(session)
 
@@ -21,8 +22,7 @@ class CmdLogin(PlatformCommand):
         if not account:
             return await presenter.emit("not_found", name=name)
 
-        session_service = session.ctx.sessions
-        pers_session, created = await session_service.get_or_create(
+        pers_session, created = await SessionService.get_or_create(
             session.id, account_id=account.id)
         if not pers_session:
             raise ValueError("Session cannot be None")

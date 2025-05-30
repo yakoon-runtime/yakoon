@@ -6,9 +6,8 @@ from yakoon.platform.stores.session import BaseSessionStore
 
 class InMemorySessionStore(BaseSessionStore):
 
-    def __init__(self, session_cls):
+    def __init__(self):
         self._sessions: dict[str, PlatformSession] = {}
-        self._session_cls = session_cls
 
     async def get_by_id(self, session_id: str) -> Optional[PlatformSession]:
         if session_id in self._sessions:
@@ -16,7 +15,7 @@ class InMemorySessionStore(BaseSessionStore):
 
     async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
         if session_id not in self._sessions:
-            session: PlatformSession = self._session_cls(session_id)
+            session = PlatformSession(session_id)
             session.account_id = kwargs.get("account_id")
             self._sessions[session.id] = session
             return self._sessions[session.id], True

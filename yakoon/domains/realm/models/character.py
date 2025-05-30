@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from yakoon.solution.platform.runtime.session import SolutionSession      
+from yakoon.platform.runtime.session import PlatformSession
+
 
 
 @dataclass #(frozen=True, kw_only=True, slots=True)
@@ -21,7 +22,7 @@ class Character:
 
     #__post_init__ 
 
-    async def move_to(self, session: SolutionSession, new_location_id):  
+    async def move_to(self, session: PlatformSession, new_location_id):  
         """
         Moves the character to a new room by ID.
 

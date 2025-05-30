@@ -1,12 +1,10 @@
 
 from typing import Optional
 from yakoon.platform.models.account import Account
-from yakoon.platform.stores.memory.account import InMemoryAccountStore
-
 
 class AccountService:
 
-    store = InMemoryAccountStore()
+    store = None
 
     @classmethod
     def bind_storage(cls, store):

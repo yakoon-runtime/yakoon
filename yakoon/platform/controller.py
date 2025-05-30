@@ -2,8 +2,8 @@ from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.stores.memory._bindings import bind_memory_storages
-from yakoon.platform.stores.sql._bindings import bind_sql_storages
+from yakoon.platform.services.session import SessionService
+from yakoon.platform.stores.bindings import bind_active_storage
 
 
 class PlatformController(BaseController):
@@ -24,9 +24,9 @@ class PlatformController(BaseController):
         # TODO: Wir brauchens später ein connect oder ähnl. als Hook.
         # Denn wir wollen nur dann eine Verbindung, wenn die Domain auch
         # verwendet wird.
-
-        #bind_memory_storages()
-        #bind_sql_storages()
+    
+        #. bind_active_storage(os.getenv("YAKOON_STORAGE", "memory"))
+        bind_active_storage("memory")
 
     async def on_ready(self, session: PlatformSession):
         pass
@@ -53,4 +53,4 @@ class PlatformController(BaseController):
     async def on_after_send(self, session: PlatformSession):
         await super().on_after_send(session)
         if session.is_anonymous:
-            await session.ctx.sessions.delete(session.id)
+            await SessionService.delete(session.id)

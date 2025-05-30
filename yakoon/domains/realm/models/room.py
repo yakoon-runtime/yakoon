@@ -2,7 +2,7 @@ from typing import List
 from dataclasses import dataclass, field
 from yakoon.domains.realm.models.secured import Secured
 from yakoon.domains.realm.services.object import ObjectService
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 
 
 @dataclass
@@ -16,7 +16,7 @@ class Room(Secured):
         if len(self.name) > 30:
             raise ValueError("Room name too long.")
 
-    async def render(self, session: SolutionSession) -> str:
+    async def render(self, session: PlatformSession) -> str:
         parts = [f"|w{self.name}|n", self.desc]        
         objects = ObjectService.contents_of(self.id)
         if objects:

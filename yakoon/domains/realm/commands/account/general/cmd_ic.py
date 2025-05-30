@@ -3,7 +3,8 @@ from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.services.character import CharacterService
 from yakoon.engine.core.parser import Request
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.services.session import SessionService
 
 
 class CmdIC(RealmCommand):
@@ -11,7 +12,7 @@ class CmdIC(RealmCommand):
     key = "ic"
     template_key = "account/general/cmd_ic"
 
-    async def run(self, session: SolutionSession, request: Request):
+    async def run(self, session: PlatformSession, request: Request):
         presenter = self.get_presenter(session)
 
         if not request.args:
@@ -28,7 +29,7 @@ class CmdIC(RealmCommand):
             return await presenter.emit("already", name=char.name)
 
         session.data_storage.set(session.ctx.controller.name, "char_id", char.id)
-        await session.ctx.sessions.persist(session)
+        await SessionService.persist(session)
 
         CharacterBehavior.attach(char)
 

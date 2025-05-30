@@ -2,7 +2,7 @@
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.parser import Request
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 
 
 class CmdLook(RealmCommand):
@@ -13,7 +13,7 @@ class CmdLook(RealmCommand):
 
     template_key = "character/general/cmd_look"
 
-    async def run(self, session: SolutionSession, request: Request):
+    async def run(self, session: PlatformSession, request: Request):
         presenter = self.get_presenter(session)
 
         char = session.data_runtime.character

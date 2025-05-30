@@ -16,10 +16,6 @@ class Context:
         return self._controller 
     
     @property
-    def sessions(self) -> BaseSessionService:
-        return self._registry.sessions
-    
-    @property
     def platform(self) -> BaseController:
         return self._registry.system
     

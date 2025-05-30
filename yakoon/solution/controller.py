@@ -1,5 +1,5 @@
 from yakoon.platform.controller import PlatformController
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 
 
 class SolutionMainController(PlatformController):
@@ -14,5 +14,5 @@ class SolutionMainController(PlatformController):
     This replaces the default PlatformController for all solution-specific routing and setup logic.
     """
 
-    async def on_ready(self, session: SolutionSession):
+    async def on_ready(self, session: PlatformSession):
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

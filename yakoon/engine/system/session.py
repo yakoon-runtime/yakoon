@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Coroutine, Callable, Optional, Type, TypeVar
+from typing import Optional, Type
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
@@ -10,10 +10,6 @@ from yakoon.engine.system.data import RuntimeSessionData, StorageSessionData
 if TYPE_CHECKING:
     from yakoon.engine.core.domain.controller import BaseController
     from yakoon.engine.system.context import Context
-
-Text = TypeVar('Text', str, bytes)
-PrintMessage = Callable[[Text], Coroutine]
-PrintError = Callable[[Exception], Coroutine]
 
 
 class BaseSession(object):

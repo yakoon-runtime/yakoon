@@ -4,7 +4,7 @@ from yakoon.domains.realm.services.character import CharacterService
 from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.shared.cmdset import PlatformSharedCommands
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 from .commands.account.general.cmdset import GeneralAccountCommands
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
@@ -27,13 +27,13 @@ class RealmController(BaseController):
         GeneralCharacterCommands]
     """ The collection of all commands. """
      
-    def dynamic_prefix(self, session: SolutionSession) -> str:
+    def dynamic_prefix(self, session: PlatformSession) -> str:
         """
         Returns the command group prefix for dynamic, session-local commands.
         """
         return f"{self.name}:dynamic:{session.id}"
 
-    async def on_before_resolve(self, session: SolutionSession):
+    async def on_before_resolve(self, session: PlatformSession):
         """
         Hook called before command resolution.
 
@@ -58,7 +58,7 @@ class RealmController(BaseController):
         self.router.unregister(dynamic)
         self.router.register(dynamic, get_exit_direction_commandset(room))
 
-    async def on_before_send(self, session: SolutionSession):
+    async def on_before_send(self, session: PlatformSession):
         """
         Prepares the session's runtime state before any command is executed within this domain.
 
@@ -75,7 +75,7 @@ class RealmController(BaseController):
         character = CharacterService.get_by_id(char_id)
         session.data_runtime = RuntimeRealmData(character)  
 
-    async def on_before_run_command(self, session: SolutionSession, request, command):
+    async def on_before_run_command(self, session: PlatformSession, request, command):
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
@@ -85,7 +85,7 @@ class RealmController(BaseController):
             if not session.data_runtime or not session.data_runtime.character:
                 raise PermissionError("Du brauchst dazu einen Spieler: Verwende 'ic <character>'.")
 
-    async def on_enter(self, session: SolutionSession):
+    async def on_enter(self, session: PlatformSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.
@@ -94,7 +94,7 @@ class RealmController(BaseController):
         await session.emit("Willkommen im MUD.")
         await session.notify("Melde dich mit `ic <charakter>` an.")        
 
-    async def on_cleanup(self, session: SolutionSession):
+    async def on_cleanup(self, session: PlatformSession):
         """
         Always called after a command cycle, even if exceptions occurred.
 

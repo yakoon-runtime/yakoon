@@ -3,7 +3,7 @@ from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.engine.core.command import Command
 from yakoon.engine.core.commandset import CommandSet
 from yakoon.engine.core.parser import Request
-from yakoon.solution.platform.runtime.session import SolutionSession
+from yakoon.platform.runtime.session import PlatformSession
 
 
 class DirectionCommand(Command):
@@ -19,7 +19,7 @@ class DirectionCommand(Command):
     def get_template_path(self):
         return super().get_template_path()
 
-    async def run(self, session: SolutionSession, request: Request):
+    async def run(self, session: PlatformSession, request: Request):
         runtime_data: RuntimeRealmData = session.data_runtime
         character = runtime_data.character
 
