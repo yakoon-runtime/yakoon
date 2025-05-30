@@ -2,6 +2,8 @@ from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.stores.memory._bindings import bind_memory_storages
+from yakoon.platform.stores.sql._bindings import bind_sql_storages
 
 
 class PlatformController(BaseController):
@@ -17,6 +19,15 @@ class PlatformController(BaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
      
+    def __init__(self):
+        super().__init__()
+        # TODO: Wir brauchens später ein connect oder ähnl. als Hook.
+        # Denn wir wollen nur dann eine Verbindung, wenn die Domain auch
+        # verwendet wird.
+
+        #bind_memory_storages()
+        #bind_sql_storages()
+
     async def on_ready(self, session: PlatformSession):
         pass
 

@@ -3,7 +3,6 @@
 # ✅ NEXT STEPS #
 ==================
 
-
 # Realm
 - Konzept Storage (Domain)
   - Eine DB / Jede Domain eigenständig  => Vielfalt?
