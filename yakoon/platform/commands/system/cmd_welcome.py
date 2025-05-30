@@ -12,4 +12,5 @@ class CmdWelcome(PlatformCommand):
 
     async def run(self, session: PlatformSession, _: Request):
 
-        await self.get_presenter(session).emit("show")
+        presenter = await self.get_presenter(session)
+        await presenter.emit("show")

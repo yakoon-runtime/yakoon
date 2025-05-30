@@ -1,7 +1,7 @@
 
 from typing import Optional
 
-from yakoon.domains.realm.models import Object
+from yakoon.domains.realm.models.object import Object
 from yakoon.domains.realm.stores.memory.object import InMemoryObjectStore
 
 

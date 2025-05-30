@@ -14,5 +14,5 @@ class Command(ABC):
         pass
 
     @abstractmethod
-    def get_template_path(self) -> str:
+    async def get_template_path(self) -> str:
         pass

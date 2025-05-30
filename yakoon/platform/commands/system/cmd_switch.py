@@ -11,7 +11,7 @@ class CmdSwitch(PlatformCommand):
     template_key = "system/cmd_switch"
 
     async def run(self, session: PlatformSession, request: Request):
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
 
         name = request.get_arg(0)
         if not name:

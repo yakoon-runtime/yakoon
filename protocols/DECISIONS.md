@@ -2,6 +2,15 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+
+## [2025-05-30]
+**Markdown bleibt als Importformat denkbar**
+Markdown bleibt als Importformat denkbar – z. B. per Drag&Drop mit automatischer DB-Befüllung.
+
+## [2025-05-30]
+**Kein Markdown als Speicherformat**
+Wir verwerfen Markdown als Speicherformat für Räume zugunsten einer SQL-basierten Lösung. Gründe: fehlende Zustandsfähigkeit, kein Multiuser-Support, keine Queries. Ziel ist eine skalierbare, persistente Welt mit dynamischer Erweiterbarkeit.
+
 ## [2025-05-29]
 **Commands & Presenter**
 Alle Commands verwenden das Presenter-System mit klarer template_key-Definition pro Command. Die Darstellung erfolgt vollständig über sprachfähige Jinja2-Templates, getrennt vom Code. Die Struktur verbessert Lesbarkeit, Mehrsprachigkeit und Konsistenz. Ausgabe-Logik ist vollständig kapselbar, testbar und flexibel. Der Presenter ersetzt direkte Ausgaben (session.emit, session.fail) durch eine semantische Schicht. Pfadangaben erfolgen explizit über get_template_path() – kein Hidden-Routing.

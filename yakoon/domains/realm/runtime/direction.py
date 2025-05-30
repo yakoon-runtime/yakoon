@@ -16,8 +16,8 @@ class DirectionCommand(Command):
         self.aliases = []
         self._target = target
 
-    def get_template_path(self):
-        return super().get_template_path()
+    async def get_template_path(self):
+        return await super().get_template_path()
 
     async def run(self, session: PlatformSession, request: Request):
         runtime_data: RuntimeRealmData = session.data_runtime

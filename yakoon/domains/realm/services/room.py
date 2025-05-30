@@ -1,19 +1,20 @@
+from yakoon.domains.realm.models.key import Namespace
 from yakoon.domains.realm.models.room import Room
 from yakoon.domains.realm.stores.memory.room import InMemoryRoomStore
 
 
 class RoomService:
 
-    store = InMemoryRoomStore()
+    store = InMemoryRoomStore() 
 
     @classmethod
-    def create(cls, room: Room):
-        cls.store.add(room)
+    async def create(cls, ns: Namespace, room: Room):
+        await cls.store.add(ns, room)
 
     @classmethod
-    def get_by_id(cls, id_: str) -> Room | None:
-        return cls.store.get_by_id(id_)
+    async def get_by_id(cls, ns: Namespace, id_: str) -> Room | None:
+        return await cls.store.get_by_id(ns, id_)
 
     @classmethod
-    def find_by_name(cls, name: str) -> list[Room]:
-        return cls.store.find_by_name(name)
+    async def find_by_name(cls, ns: Namespace, name: str) -> list[Room]:
+        return await cls.store.find_by_name(ns, name)

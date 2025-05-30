@@ -11,7 +11,7 @@ class CmdClock(RealmCommand):
     template_key = "character/general/cmd_clock"
     
     async def run(self, session: PlatformSession, request: Request):
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
 
         controller = session.ctx.controller
         clock = controller.clock

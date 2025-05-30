@@ -2,16 +2,8 @@
 ==================
 # ✅ NEXT STEPS #
 ==================
-# Bekannte Bugss
-- Beim Send werden die system-hook teilweise doppelt aufgerufen. 
-  - Rufen wir alle System-Hook immer auf?
-  - Rufen wir Systemhooks überhaupt nicht auf, dann können wir die Sessions nicht steuern.
 
 # Realm
-
-
-- Texte speichern wir wo? Markdown-Files wäre irgendwie auch cool
-    - Dann könnten wir solche Dateien einfach per Drag&Drop ins System ziehen!
 
 - Konzept Namespaces 
   - User_1, User_2 -> NS1

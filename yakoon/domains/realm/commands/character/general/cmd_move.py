@@ -14,14 +14,15 @@ class CmdMove(RealmCommand):
     template_key = "character/general/cmd_move"
 
     async def run(self, session: PlatformSession, request: Request):
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
+        ns = await self.get_namespace(session)
 
         target = request.args[0] if request.args else None
         if not target:
             return await presenter.fail("missing_arg")
 
         char = session.data_runtime.character
-        room = RoomService.get_by_id(char.location) if char else None
+        room = await RoomService.get_by_id(ns, char.location) if char else None
         if not room:
             return await presenter.fail("no_location")
 
@@ -29,7 +30,7 @@ class CmdMove(RealmCommand):
         if not dest_id:
             return await presenter.fail("invalid_exit", target=target)
 
-        dest_room = RoomService.get_by_id(dest_id)
+        dest_room = await RoomService.get_by_id(ns, dest_id)
         if not dest_room:
             return await presenter.fail("not_found", dest=dest_id)
 

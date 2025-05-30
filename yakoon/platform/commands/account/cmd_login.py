@@ -12,7 +12,7 @@ class CmdLogin(PlatformCommand):
 
     async def run(self, session: PlatformSession, request: Request):
 
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
 
         if not request.args:
             return await presenter.emit("missing_arg")

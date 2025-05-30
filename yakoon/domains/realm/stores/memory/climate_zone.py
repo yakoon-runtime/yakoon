@@ -1,4 +1,4 @@
-from yakoon.domains.realm.models import ClimateZone
+from yakoon.domains.realm.models.climate_zone import ClimateZone
 
 
 class InMemoryClimateZoneStore:

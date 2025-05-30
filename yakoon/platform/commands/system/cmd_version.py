@@ -15,7 +15,7 @@ class CmdVersion(PlatformCommand):
 
     async def run(self, session: PlatformSession, request: Request):
 
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
         await presenter.emit("show", 
                 version=get_platform_version(),
                 python=platform.python_version(),

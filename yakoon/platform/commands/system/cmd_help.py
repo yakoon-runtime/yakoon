@@ -16,7 +16,7 @@ class CmdHelpSystem(PlatformCommand):
         registry = getattr(session.ctx, "_registry")
         grouped = get_grouped_commands(session.ctx.controller)
 
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
         await presenter.emit(
             "show", controllers=[registry.system] + registry.controllers, 
             grouped=grouped)
@@ -32,7 +32,7 @@ class CmdHelpDomain(PlatformCommand):
         controller = session.ctx.controller
         if not request.args:
             grouped = get_grouped_commands(controller)
-            presenter = self.get_presenter(session)
+            presenter = await self.get_presenter(session)
             return await presenter.emit("show", controller=controller, grouped=grouped)
 
         # TODO: Hilfe für unsere Commands

@@ -1,4 +1,4 @@
-from yakoon.domains.realm.models import Season
+from yakoon.domains.realm.models.season import Season
 
 
 class InMemorySeasonStore:

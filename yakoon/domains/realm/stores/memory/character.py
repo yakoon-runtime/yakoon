@@ -1,6 +1,6 @@
 
 from typing import Optional
-from yakoon.domains.realm.models import Character
+from yakoon.domains.realm.models.character import Character
 
 
 class InMemoryCharacterStore:
@@ -32,6 +32,6 @@ class InMemoryCharacterStore:
 
 def load_defaults(store: InMemoryCharacterStore):
     store.add(
-        Character(id="char-stefan", name="Stefan", location="id:forest"))
+        Character(id="char-stefan", name="Stefan", location="forest"))
     store.add(
-        Character(id="char-lara", name="Lara", location="id:hall"))
+        Character(id="char-lara", name="Lara", location="hall"))

@@ -1,5 +1,6 @@
 
-from yakoon.domains.realm.models import Room
+from yakoon.domains.realm.models.room import Room
+from yakoon.domains.realm.models.key.namespace import Namespace
 
 
 class InMemoryRoomStore:
@@ -7,22 +8,38 @@ class InMemoryRoomStore:
     def __init__(self):
         self._rooms: dict[str, Room] = {}
         load_defaults(self)
-        
-    def get_by_id(self, id_: str) -> Room | None:
-        return self._rooms.get(id_)
 
-    def add(self, room: Room):
+    def _make_key(self, ns: Namespace, id_: str) -> str:
+        return f"{ns.world}:{ns.owner}:{id_}"
+
+    async def get_by_id(self, ns: Namespace, id_: str) -> Room | None:
+        return self._rooms.get(self._make_key(ns, id_))
+
+    def add(self, ns: Namespace, room: Room):
         room.validate()
-        self._rooms[room.id] = room
+        self._rooms[self._make_key(ns, room.id)] = room
 
-    def find_by_name(self, name: str) -> list[Room]:
-        return [r for r in self._rooms.values() if r.name == name]
+    async def find_by_name(self, ns: Namespace, name: str) -> list[Room]:
+        return [r for k, r in self._rooms.items()
+                if k.startswith(f"{ns.world}:{ns.owner}:") and r.name == name]
 
 
 def load_defaults(store: InMemoryRoomStore):
-    store.add(
-        Room(id="id:forest", name="Waldlichtung", desc="Zwischen alten Bäumen.",
-        exits={"n": "id:hall", "tür": "id:hall", "norden": "id:hall"}))
-    store.add(
-        Room(id="id:hall", name="Große Halle", desc="Ein weiter Raum.",
-        exits={"s": "id:forest", "süden": "id:forest"}))
+
+    ns = Namespace(world="realm", owner="system")
+
+    store.add(ns, Room(
+        id="forest",
+        name="Waldlichtung",
+        desc="Zwischen alten Bäumen.",
+        exits={"n": "hall", "tür": "hall", "norden": "hall"},
+        namespace=ns
+    ))
+
+    store.add(ns, Room(
+        id="hall",
+        name="Große Halle",
+        desc="Ein weiter Raum.",
+        exits={"s": "forest", "süden": "forest"},
+        namespace=ns
+    ))

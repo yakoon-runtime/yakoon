@@ -11,7 +11,7 @@ class CmdOOC(RealmCommand):
     requires_character = True
 
     async def run(self, session: PlatformSession, request: Request):
-        presenter = self.get_presenter(session)
+        presenter = await self.get_presenter(session)
        
         runtime_data: RuntimeRealmData = session.data_runtime
         if not runtime_data.character:

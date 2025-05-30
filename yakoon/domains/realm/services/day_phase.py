@@ -1,6 +1,6 @@
 
 from yakoon.domains.realm.runtime.clock import Clock
-from yakoon.domains.realm.models import DayPhase
+from yakoon.domains.realm.models.day_phase import DayPhase
 from yakoon.domains.realm.stores.memory.day_phase import InMemoryDayPhaseStore
 
 

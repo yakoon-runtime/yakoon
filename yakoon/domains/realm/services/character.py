@@ -1,6 +1,6 @@
 
 from typing import Optional
-from yakoon.domains.realm.models import Character
+from yakoon.domains.realm.models.character import Character
 from yakoon.domains.realm.stores.memory.character import InMemoryCharacterStore
 
 

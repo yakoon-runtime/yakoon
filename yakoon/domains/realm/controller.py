@@ -1,6 +1,7 @@
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
 from yakoon.domains.realm.services.character import CharacterService
+from yakoon.domains.realm.services.namespace import NamespaceService
 from yakoon.domains.realm.services.room import RoomService
 from yakoon.engine.core.domain.controller import BaseController
 from yakoon.platform.commands.shared.cmdset import PlatformSharedCommands
@@ -45,10 +46,11 @@ class RealmController(BaseController):
         char_id = session.data_storage.get(self.name, "char_id")
         if not char_id:
             return
+        ns = await NamespaceService.from_session(session)
         character = CharacterService.get_by_id(char_id)
         if not character:
             return
-        room = RoomService.get_by_id(character.location)
+        room = await RoomService.get_by_id(ns, character.location)
         if not room:
             return
 
