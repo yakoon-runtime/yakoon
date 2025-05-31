@@ -28,7 +28,7 @@ class PlatformController(BaseController):
         registry = session.ctx._registry  # access intern by design
 
         # load the last controller
-        controller = registry.get_controller_by_name(session.domain_id)
+        controller = registry.get_controller_by_id(session.domain_id)
         session.domain = controller
 
         # builds the commandset for this session

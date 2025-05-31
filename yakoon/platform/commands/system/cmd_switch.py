@@ -19,7 +19,7 @@ class CmdSwitch(PlatformCommand):
 
         name = name.lower()
         registry: DomainRegistry = getattr(session.ctx, "_registry")
-        controller = registry.get_controller_by_name(name)
+        controller = registry.get_controller_by_id(name)
 
         if not controller:
             return await presenter.fail("not_found", name=name)
