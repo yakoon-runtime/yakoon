@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
-from yakoon.engine.models.session import BaseSession
+from yakoon.runtime.models.session import BaseSession
 from yakoon.platform.models.account import Account
 
 

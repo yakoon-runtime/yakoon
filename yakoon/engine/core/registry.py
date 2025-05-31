@@ -2,9 +2,9 @@
 
 from typing import Optional
 from yakoon.engine.core.command import Command
-from yakoon.engine.core.domain.controller import BaseController
-from yakoon.engine.services.base.session import BaseSessionService
-from yakoon.engine.models.session import BaseSession
+from yakoon.engine.domain.controller import BaseController
+from yakoon.runtime.models.session import BaseSession
+from yakoon.services.base.session import BaseSessionService
 
 
 class DomainRegistry:
@@ -25,7 +25,7 @@ class DomainRegistry:
         if len(set(names)) != len(names):
             raise ValueError(f"Duplicate controller names detected: {names}")
         
-    def get_controller_by_name(self, id:str) -> BaseController:
+    def get_controller_by_id(self, id:str) -> BaseController:
         for controller in self.get_controllers():
             if controller.id == id:
                 return controller

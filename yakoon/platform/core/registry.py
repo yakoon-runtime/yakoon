@@ -1,0 +1,4 @@
+
+
+class BaseServiceRegistry:
+    pass

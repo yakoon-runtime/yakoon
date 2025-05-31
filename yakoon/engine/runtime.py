@@ -7,9 +7,9 @@ from yakoon.engine.settings import Settings
 from yakoon.engine.core.parser import Request
 from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.core.tools.command_tool import split_batch_input
-from yakoon.engine.services.log import LogService
 from yakoon.engine.system.context import Context
-from yakoon.engine.models.session import BaseSession
+from yakoon.services.log import LogService
+from yakoon.runtime.models.session import BaseSession
 
 
 class Engine():

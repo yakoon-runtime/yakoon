@@ -3,7 +3,7 @@ from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
 from yakoon.domains.realm.services.character import CharacterService
 from yakoon.domains.realm.services.namespace import NamespaceService
 from yakoon.domains.realm.services.room import RoomService
-from yakoon.engine.core.domain.controller import BaseController
+from yakoon.engine.domain.controller import BaseController
 from yakoon.platform.commands.shared.cmdset import PlatformSharedCommands
 from yakoon.platform.runtime.session import PlatformSession
 from .commands.account.general.cmdset import GeneralAccountCommands

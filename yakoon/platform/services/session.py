@@ -1,7 +1,7 @@
-from yakoon.engine.models.data import RuntimeSessionData
+from yakoon.runtime.models.data import RuntimeSessionData
 from yakoon.platform.services.account import AccountService
-from yakoon.engine.services.base.session import BaseSessionService
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.services.base.session import BaseSessionService
 
 
 class SessionService(BaseSessionService):

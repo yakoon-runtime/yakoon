@@ -2,7 +2,7 @@
 
 from yakoon.engine.core.dialog.manager import DialogManager
 from yakoon.engine.settings import Settings
-from yakoon.engine.models.session import BaseSession
+from yakoon.runtime.models.session import BaseSession
 
 
 async def ask(session: BaseSession, prompt_text: str) -> str:

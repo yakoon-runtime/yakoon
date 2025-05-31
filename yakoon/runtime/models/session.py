@@ -6,10 +6,10 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 
 from yakoon.engine.core.io.adapter import IOAdapter
-from yakoon.engine.models.data import RuntimeSessionData, StorageSessionData
+from yakoon.runtime.models.data import RuntimeSessionData, StorageSessionData
 
 if TYPE_CHECKING:
-    from yakoon.engine.core.domain.controller import BaseController
+    from yakoon.engine.domain.controller import BaseController
     from yakoon.engine.system.context import Context
 
 @dataclass

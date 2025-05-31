@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from yakoon.engine.models.data import RuntimeSessionData
+from yakoon.runtime.models.data import RuntimeSessionData
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

@@ -9,7 +9,7 @@ from yakoon.engine.core.router import CommandRouter
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from yakoon.engine.models.session import BaseSession
+    from yakoon.runtime.models.session import BaseSession
     from yakoon.engine.core.command import Command
 
 
@@ -23,6 +23,8 @@ class BaseController(ABC):
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = []     
+
+    services = None
 
     def __init__(self):
         self.router = CommandRouter()

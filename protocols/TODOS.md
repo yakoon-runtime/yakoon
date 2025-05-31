@@ -3,6 +3,9 @@
 # ✅ NEXT STEPS #
 ==================
 
+MemoryService wieder alte Version 
+- Ich möchte die aktuellen Allokationen sehen und nicht nur den Unterschied.
+
 # Realm
 
 - Konzept Namespaces 

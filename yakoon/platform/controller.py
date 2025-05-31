@@ -1,7 +1,9 @@
-from yakoon.engine.core.domain.controller import BaseController
+from yakoon.engine.domain.controller import BaseController
 from yakoon.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.commands.system.cmdset import PlatformSystemCommands
+from yakoon.platform.core.router import ServiceRouter
 from yakoon.platform.runtime.session import PlatformSession
+from yakoon.platform.services.registry import PlatformServices
 from yakoon.platform.services.session import SessionService
 
 
@@ -17,7 +19,20 @@ class PlatformController(BaseController):
         PlatformSystemCommands, 
         PlatformAccountCommands]
     """ The collection of all commands. """
+
+    services = PlatformServices()
     
+    async def on_initialize(self):
+        """
+        Called after the controller has been fully constructed but before any commands are processed.
+
+        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
+        or validating infrastructure state (e.g., ensuring the admin account exists).
+
+        This method is guaranteed to run once before the first engine tick or command dispatch.
+        """
+        await self.services.register()
+
     async def on_platform_validate(self, session: PlatformSession):
         """
         Platform-level pre-send hook, called before request parsing.

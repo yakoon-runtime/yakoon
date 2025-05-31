@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from sqlalchemy import JSON, Column, DateTime, String, Boolean
 from sqlalchemy.future import select
-from yakoon.engine.models.data import StorageSessionData
+from yakoon.runtime.models.data import StorageSessionData
 from yakoon.platform.runtime.session import PlatformSession
 from yakoon.platform.stores.sql._base import Base
 
