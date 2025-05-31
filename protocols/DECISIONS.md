@@ -2,6 +2,12 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-05-31]
+**Kontextbasierte Architektur eingeführt**
+Jede Domain besitzt ihre eigene ServiceRegistry, die alle Services kapselt (z. B. room, session, account).
+Über einen ServiceRouter erfolgt die Auflösung pro Bucket.
+Die Plattform kann so flexible, testbare und parallele Umgebungen betreiben.
+Das System ist damit voll modular, multi-bucket-fähig und vorbereitet auf Persistenz, Testumgebungen und Paketinstallationen.
 
 ## [2025-05-30]
 **Markdown bleibt als Importformat denkbar**
