@@ -8,10 +8,6 @@ class BaseSessionService(ABC):
 
     store: BaseSessionStore = None
 
-    @classmethod
-    def bind_storage(cls, store):
-        cls.store = store
-
     @abstractmethod
     async def get_by_id(self, session_id: str) -> BaseSession:
         ...

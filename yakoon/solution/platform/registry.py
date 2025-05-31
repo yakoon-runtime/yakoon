@@ -1,5 +1,4 @@
 from yakoon.engine.registry import DomainRegistry
-from yakoon.domains.platform.services.session import SessionService
 from yakoon.solution.controller import SolutionMainController
 from yakoon.solution.domains.realm.controller import SolutionRealmController
 
@@ -26,5 +25,4 @@ class SolutionRegistry(DomainRegistry):
                 SolutionRealmController(),
             ],
             system=SolutionMainController(),
-            sessions=SessionService,
         )

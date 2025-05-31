@@ -1,10 +1,7 @@
 from yakoon.core.domain.controller import BaseController
 from yakoon.domains.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.platform.commands.system.cmdset import PlatformSystemCommands
-from yakoon.domains.platform.core.router import ServiceRouter
 from yakoon.domains.platform.runtime.session import PlatformSession
-from yakoon.domains.platform.services.registry import PlatformServices
-from yakoon.domains.platform.services.session import SessionService
 
 
 class PlatformController(BaseController):
@@ -13,26 +10,14 @@ class PlatformController(BaseController):
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = ["system", "account"]     
-    """ Defines the default command group. """
+    """Names of command groups that are automatically active for every session, 
+    without requiring explicit permissions."""
 
     commandsets = [
         PlatformSystemCommands, 
         PlatformAccountCommands]
     """ The collection of all commands. """
-
-    services = PlatformServices()
     
-    async def on_initialize(self):
-        """
-        Called after the controller has been fully constructed but before any commands are processed.
-
-        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
-        or validating infrastructure state (e.g., ensuring the admin account exists).
-
-        This method is guaranteed to run once before the first engine tick or command dispatch.
-        """
-        await self.services.register()
-
     async def on_platform_validate(self, session: PlatformSession):
         """
         Platform-level pre-send hook, called before request parsing.
@@ -77,4 +62,5 @@ class PlatformController(BaseController):
         """
         await super().on_platform_finalize(session)
         if session.is_anonymous:
-            await SessionService.delete_by_id(session.id)
+            services = self.services.get_registry("system")
+            await services.sessions.delete_by_id(session.id)

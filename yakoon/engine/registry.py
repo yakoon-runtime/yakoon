@@ -1,10 +1,7 @@
-# engine/core/registry.py
-
 from typing import Optional
 from yakoon.core.command import Command
 from yakoon.core.domain.controller import BaseController
 from yakoon.runtime.models.session import BaseSession
-from yakoon.services.base.session import BaseSessionService
 
 
 class DomainRegistry:
@@ -14,11 +11,9 @@ class DomainRegistry:
     """
 
     def __init__(self, controllers: list[BaseController], 
-                 system: BaseController, 
-                 sessions: BaseSessionService):
+                 system: BaseController):
         self.system = system
         self.controllers = controllers
-        self.sessions = sessions
 
         # Check for duplicate controller names
         names = [c.id for c in self.get_controllers()]

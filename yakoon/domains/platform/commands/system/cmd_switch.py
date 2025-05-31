@@ -2,7 +2,6 @@ from yakoon.core.parser import Request
 from yakoon.engine.registry import DomainRegistry
 from yakoon.domains.platform.commands.base import PlatformCommand
 from yakoon.domains.platform.runtime.session import PlatformSession
-from yakoon.domains.platform.services.session import SessionService
 
 
 class CmdSwitch(PlatformCommand):
@@ -12,6 +11,7 @@ class CmdSwitch(PlatformCommand):
 
     async def run(self, session: PlatformSession, request: Request):
         presenter = await self.get_presenter(session)
+        services = await self.get_services(session)
 
         name = request.get_arg(0)
         if not name:
@@ -25,7 +25,7 @@ class CmdSwitch(PlatformCommand):
             return await presenter.fail("not_found", name=name)
         
         session.domain_id = name
-        await SessionService.save(session)
+        await services.sessions.save(session)
         await controller.on_enter(session)
 
         await presenter.notify("success", name=controller.id)

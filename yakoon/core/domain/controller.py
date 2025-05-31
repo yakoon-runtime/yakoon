@@ -1,12 +1,12 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Sequence, Type
+from typing import TYPE_CHECKING
 
 from yakoon.core.commandset import CommandSet
 from yakoon.core.parser import Request
 from yakoon.engine.router import CommandRouter
-
-from typing import TYPE_CHECKING
+from yakoon.services.router import ServiceRouter
 
 if TYPE_CHECKING:
     from yakoon.runtime.models.session import BaseSession
@@ -22,9 +22,13 @@ class BaseController(ABC):
     id: str = "unnamed"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
-    default_command_groups = []     
-
-    services = None
+    default_command_groups = []    
+    """Names of command groups that are automatically active for every session, 
+    without requiring explicit permissions."""
+ 
+    services: ServiceRouter | None = None
+    """Provides bucket-based access to domain services (e.g. room, account, session). 
+    Injected at runtime by the platform."""
 
     def __init__(self):
         self.router = CommandRouter()
@@ -40,6 +44,9 @@ class BaseController(ABC):
     
     def get_default_command_groups_with_prefix(self) -> list[str]:
         return [self._get_value_with_prefix(group) for group in self.default_command_groups]
+
+    def bind_service_router(self, router: ServiceRouter):
+        self.router = router
 
     @property
     @abstractmethod

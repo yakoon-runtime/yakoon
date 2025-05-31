@@ -10,6 +10,7 @@ from yakoon.engine.context import Context
 from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.manager import DialogManager
 from yakoon.services.log import LogService
+from yakoon.services.registry import SessionServiceRegistry
 
 
 class Engine():
@@ -29,11 +30,20 @@ class Engine():
       
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)
+      session.bind_context(Context(self))
 
       for controller in self._registry.get_controllers():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
-                                 
+
+   async def _require_registry_with_session(self, bucket: str) -> SessionServiceRegistry:
+      registry = self._registry.system.services.get_registry(bucket)
+      if not isinstance(registry, SessionServiceRegistry):
+         raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
+      if not registry:
+         raise RuntimeError(f"No ServiceRegistry found for bucket: {bucket}")
+      return registry                                
+
    async def send(self, session_id: str, input_str: str, io: Output, depth=0):   
       """
       Entry point for any user input.
@@ -44,7 +54,8 @@ class Engine():
 
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
-      session, _ = await self._registry.sessions.get_or_create(session_id)
+      services = await self._require_registry_with_session("system")      
+      session, _ = await services.sessions.get_or_create(session_id)
 
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)

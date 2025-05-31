@@ -1,8 +1,9 @@
 import os
 from yakoon.domains.platform.controller import PlatformController
 from yakoon.domains.platform.runtime.session import PlatformSession
-from yakoon.solution.setup.bindings import bind_active_storage
-from yakoon.solution.setup.init_platform_data import ensure_admin_account
+from yakoon.domains.platform.services.registry.memory import bind_memory_services
+from yakoon.services.router import ServiceRouter
+from yakoon.solution.setup.admin import ensure_admin_account
 
 
 class SolutionMainController(PlatformController):
@@ -17,9 +18,12 @@ class SolutionMainController(PlatformController):
     This replaces the default PlatformController for all solution-specific routing and setup logic.
     """
 
+    services = bind_memory_services()
+
     def __init__(self):
         super().__init__()    
-        bind_active_storage(os.getenv("PLATFORM_STORAGE", "sqlite")) # sqlite
+        self.services = ServiceRouter()
+        self.services.register("system", bind_memory_services())
 
     async def on_initialize(self, session: PlatformSession):
         """
@@ -30,5 +34,5 @@ class SolutionMainController(PlatformController):
 
         This method is guaranteed to run once before the first engine tick or command dispatch.
         """
-        await ensure_admin_account()
+        await ensure_admin_account(session)
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

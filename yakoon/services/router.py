@@ -1,20 +1,20 @@
 
 from typing import Dict
-from yakoon.domains.platform.core.registry import BaseServiceRegistry
+from yakoon.services.registry import ServiceRegistry
 
 
 class ServiceRouter:
     
     def __init__(self):
-        self._registries: Dict[str, BaseServiceRegistry] = {}
+        self._registries: Dict[str, ServiceRegistry] = {}
 
-    def register(self, bucket: str, registry: BaseServiceRegistry):
+    def register(self, bucket: str, registry: ServiceRegistry):
         """
         Registers a ServiceRegistry instance for a given bucket (e.g., 'minddojo', 'realm').
         """
         self._registries[bucket] = registry
 
-    def get_registry(self, bucket: str) -> BaseServiceRegistry:
+    def get_registry(self, bucket: str) -> ServiceRegistry:
         """
         Returns the ServiceRegistry for the given bucket. Raises KeyError if not found.
         """

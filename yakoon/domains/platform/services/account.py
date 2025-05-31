@@ -6,27 +6,21 @@ class AccountService:
 
     store = None
 
-    @classmethod
-    def bind_storage(cls, store):
-        cls.store = store
+    def __init__(self, store):
+        self.store = store
 
-    @classmethod
-    async def get_by_id(cls, id_: str) -> Optional[Account]:
-        return await cls.store.get_by_id(id_)
+    async def get_by_id(self, id_: str) -> Optional[Account]:
+        return await self.store.get_by_id(id_)
 
-    @classmethod
-    async def get_by_name(cls, name: str) -> Optional[Account]:
-        return await cls.store.get_by_name(name)
+    async def get_by_name(self, name: str) -> Optional[Account]:
+        return await self.store.get_by_name(name)
 
-    @classmethod
-    async def all(cls) -> list[Account]:
-        return await cls.store.all()
+    async def all(self) -> list[Account]:
+        return await self.store.all()
 
-    @classmethod
-    async def exists(cls, name: str) -> bool:
-        return await cls.store.exists(name)
+    async def exists(self, name: str) -> bool:
+        return await self.store.exists(name)
 
-    @classmethod
-    async def save(cls, account: Account):
+    async def save(self, account: Account):
         account.validate()
-        await cls.store.save(account)
+        await self.store.save(account)

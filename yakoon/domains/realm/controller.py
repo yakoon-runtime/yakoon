@@ -20,13 +20,14 @@ class RealmController(BaseController):
     """ Defines the realm clock. """
 
     default_command_groups = []     
-    """ Defines the default command group. """
+    """Names of command groups that are automatically active for every session, 
+    without requiring explicit permissions."""
 
     commandsets = [
         PlatformSharedCommands,
         GeneralAccountCommands, 
         GeneralCharacterCommands]
-    """ The collection of all commands. """
+    """The collection of all commands."""
      
     def dynamic_prefix(self, session: PlatformSession) -> str:
         """
