@@ -1,7 +1,7 @@
 import os
 from yakoon.domains.platform.controller import PlatformController
 from yakoon.domains.platform.runtime.session import PlatformSession
-from yakoon.domains.platform.services.registry.memory import bind_memory_services
+from yakoon.domains.platform.services.bindings.memory import bind_memory_services
 from yakoon.services.router import ServiceRouter
 from yakoon.solution.setup.admin import ensure_admin_account
 
@@ -17,8 +17,6 @@ class SolutionMainController(PlatformController):
 
     This replaces the default PlatformController for all solution-specific routing and setup logic.
     """
-
-    services = bind_memory_services()
 
     def __init__(self):
         super().__init__()    

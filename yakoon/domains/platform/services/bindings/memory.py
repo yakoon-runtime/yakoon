@@ -1,6 +1,6 @@
-from yakoon.services.registry import PlatformServiceRegistry
+from yakoon.services.core.session import SessionService
+from yakoon.domains.platform.services.registry import PlatformServiceRegistry
 from yakoon.domains.platform.services.account import AccountService
-from yakoon.domains.platform.services.session import SessionService
 from yakoon.domains.platform.stores.memory.account import InMemoryAccountStore
 from yakoon.domains.platform.stores.memory.session import InMemorySessionStore
 

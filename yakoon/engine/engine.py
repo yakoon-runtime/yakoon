@@ -9,7 +9,7 @@ from yakoon.engine.batch import split_batch_input
 from yakoon.engine.context import Context
 from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.manager import DialogManager
-from yakoon.services.log import LogService
+from yakoon.services.core.log import LogService
 from yakoon.services.registry import SessionServiceRegistry
 
 

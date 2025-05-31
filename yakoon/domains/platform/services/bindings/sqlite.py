@@ -1,8 +1,8 @@
 from yakoon.domains.platform.stores._db.sqlite import\
       LocalSqlSession, create_missing_tables 
 from yakoon.services.registry import PlatformServiceRegistry
+from yakoon.services.core.session import SessionService
 from yakoon.domains.platform.services.account import AccountService
-from yakoon.domains.platform.services.session import SessionService
 from yakoon.domains.platform.stores.sql.account import SQLAccountStore
 from yakoon.domains.platform.stores.sql.session import SQLSessionStore
 

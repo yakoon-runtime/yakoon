@@ -2,7 +2,7 @@
 from yakoon.core.command import Command
 from yakoon.domains.platform.render.context import Presenter
 from yakoon.domains.platform.runtime.session import PlatformSession
-from yakoon.services.registry import PlatformServiceRegistry
+from yakoon.domains.platform.services.registry import PlatformServiceRegistry
 
 
 class PlatformCommand(Command):
