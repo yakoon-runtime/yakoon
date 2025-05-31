@@ -9,7 +9,7 @@ class ObjectKey:
     id: str         # local ID within type
 
     def as_str(self) -> str:
-        return f"{self.namespace.world}:{self.namespace.owner}:{self.type}:{self.id}"
+        return f"{self.namespace.bucket}:{self.namespace.owner}:{self.type}:{self.id}"
 
     def short(self) -> str:
         return f"{self.type}:{self.id}"

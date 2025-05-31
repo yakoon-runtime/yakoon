@@ -7,6 +7,6 @@ class NamespaceService:
     @staticmethod
     async def from_session(session: PlatformSession) -> Namespace:
         return Namespace(
-            world=session.data_storage.get("realm", "world", "realm"), 
+            bucket=session.data_storage.get("realm", "bucket", "realm"), 
             owner="system"  #session.account_id
         )

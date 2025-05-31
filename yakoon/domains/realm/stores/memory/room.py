@@ -10,7 +10,7 @@ class InMemoryRoomStore:
         load_defaults(self)
 
     def _make_key(self, ns: Namespace, id_: str) -> str:
-        return f"{ns.world}:{ns.owner}:{id_}"
+        return f"{ns.bucket}:{ns.owner}:{id_}"
 
     async def get_by_id(self, ns: Namespace, id_: str) -> Room | None:
         return self._rooms.get(self._make_key(ns, id_))
@@ -21,12 +21,12 @@ class InMemoryRoomStore:
 
     async def find_by_name(self, ns: Namespace, name: str) -> list[Room]:
         return [r for k, r in self._rooms.items()
-                if k.startswith(f"{ns.world}:{ns.owner}:") and r.name == name]
+                if k.startswith(f"{ns.bucket}:{ns.owner}:") and r.name == name]
 
 
 def load_defaults(store: InMemoryRoomStore):
 
-    ns = Namespace(world="realm", owner="system")
+    ns = Namespace(bucket="realm", owner="system")
 
     store.add(ns, Room(
         id="forest",
