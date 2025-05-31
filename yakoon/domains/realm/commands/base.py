@@ -1,8 +1,8 @@
 
 from yakoon.domains.realm.models.key.namespace import Namespace
 from yakoon.domains.realm.services.namespace import NamespaceService
-from yakoon.engine.core.command import Command
-from yakoon.platform.render.context import Presenter
+from yakoon.core.command import Command
+from yakoon.domains.platform.render.context import Presenter
 
 
 class RealmCommand(Command):

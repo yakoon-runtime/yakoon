@@ -48,7 +48,7 @@ Wenn der Aufrufer keinen Timeout setzt, wird automatisch ein Standardwert verwen
 
 ## [2025-05-27]
 **Einführung IOAdpater**
-Einführung eines `IOAdapter`, um Ausgaben (`out`, `err`) in einer gemeinsamen Struktur zu kapseln. Die Übergabe einzelner Callback-Funktionen wurde durch ein objektbasiertes Modell ersetzt, das klarer, testbarer und flexibler ist – insbesondere für Console, WebSocket und zukünftige Frontends. Der IO-Kontext wird nun konsistent per `IOAdapter` an Engine- und Session-Methoden übergeben.
+Einführung eines `Output`, um Ausgaben (`out`, `err`) in einer gemeinsamen Struktur zu kapseln. Die Übergabe einzelner Callback-Funktionen wurde durch ein objektbasiertes Modell ersetzt, das klarer, testbarer und flexibler ist – insbesondere für Console, WebSocket und zukünftige Frontends. Der IO-Kontext wird nun konsistent per `Output` an Engine- und Session-Methoden übergeben.
 
 ## [2025-05-27]
 **Prompt & Batch**

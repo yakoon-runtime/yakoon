@@ -1,8 +1,8 @@
 
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.room import RoomService
-from yakoon.engine.core.parser import Request
-from yakoon.platform.runtime.session import PlatformSession
+from yakoon.core.parser import Request
+from yakoon.domains.platform.runtime.session import PlatformSession
 
 
 class CmdLook(RealmCommand):

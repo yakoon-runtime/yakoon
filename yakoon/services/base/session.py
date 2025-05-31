@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 from yakoon.runtime.models.session import BaseSession
-from yakoon.platform.stores.base.session import BaseSessionStore
+from yakoon.domains.platform.stores.base.session import BaseSessionStore
 
 
 class BaseSessionService(ABC):

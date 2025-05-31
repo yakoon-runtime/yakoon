@@ -2,9 +2,9 @@ from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.services.character import CharacterService
-from yakoon.engine.core.parser import Request
-from yakoon.platform.runtime.session import PlatformSession
-from yakoon.platform.services.session import SessionService
+from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.domains.platform.services.session import SessionService
+from yakoon.core.parser import Request
 
 
 class CmdIC(RealmCommand):

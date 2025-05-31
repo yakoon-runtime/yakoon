@@ -1,7 +1,7 @@
 
-from yakoon.engine.core.command import Command
-from yakoon.engine.core.parser import Request
-from yakoon.platform.runtime.session import PlatformSession
+from yakoon.core.command import Command
+from yakoon.core.parser import Request
+from yakoon.domains.platform.runtime.session import PlatformSession
 
 
 class CmdTeleport(Command):

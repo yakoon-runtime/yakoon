@@ -1,9 +1,9 @@
 from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
-from yakoon.engine.core.command import Command
-from yakoon.engine.core.commandset import CommandSet
-from yakoon.engine.core.parser import Request
-from yakoon.platform.runtime.session import PlatformSession
+from yakoon.core.command import Command
+from yakoon.core.commandset import CommandSet
+from yakoon.core.parser import Request
+from yakoon.domains.platform.runtime.session import PlatformSession
 
 
 class DirectionCommand(Command):

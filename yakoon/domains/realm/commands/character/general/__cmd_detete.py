@@ -1,9 +1,9 @@
 
 from yakoon.domains.realm.services.object import ObjectService
-from yakoon.engine.core.command import Command
-from yakoon.engine.core.dialog.prompts import confirm
-from yakoon.engine.core.parser import Request
-from yakoon.platform.runtime.session import PlatformSession
+from yakoon.core.command import Command
+from yakoon.core.parser import Request
+from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.runtime.dialogs.prompts import confirm
 
 
 class __CmdDelete(Command):

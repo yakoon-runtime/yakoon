@@ -1,6 +1,6 @@
 import os
-from yakoon.platform.controller import PlatformController
-from yakoon.platform.runtime.session import PlatformSession
+from yakoon.domains.platform.controller import PlatformController
+from yakoon.domains.platform.runtime.session import PlatformSession
 from yakoon.solution.setup.bindings import bind_active_storage
 from yakoon.solution.setup.init_platform_data import ensure_admin_account
 

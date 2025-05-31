@@ -1,6 +1,6 @@
 
-from yakoon.platform.models.account import Account
-from yakoon.platform.services.account import AccountService
+from yakoon.domains.platform.models.account import Account
+from yakoon.domains.platform.services.account import AccountService
 
 
 async def ensure_admin_account():

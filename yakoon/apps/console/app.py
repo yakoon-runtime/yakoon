@@ -1,12 +1,10 @@
 
 import asyncio
-from yakoon.engine.core.io.adapter import IOAdapter
-from yakoon.engine.core.io.input import safe_input
-from yakoon.engine.debug.memory import mem_monitor
-from yakoon.engine.debug.zombie import detector
-from yakoon.engine.runtime import Engine
+from yakoon.core.devtools import MemoryTrendMonitor
+from yakoon.core.devtools import UnresolvedPromptMonitor
+from yakoon.engine import Engine, Output, safe_input
 from yakoon.engine.settings import DEV_MODE
-from yakoon.platform.render.engine.runtime import RenderMode
+from yakoon.domains.platform.render.engine.runtime import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 
@@ -22,24 +20,25 @@ command_inits += ["batch: login admin; switch realm"]
 async def run_console():
    
     if DEV_MODE:
-        detector.start()
-        mem_monitor.start()
+        UnresolvedPromptMonitor.start()
+        MemoryTrendMonitor.start(15)
 
-    io = IOAdapter(print, print)
-
+    output = Output(print, print)
+    
     engine = Engine(SolutionRegistry())
-    await engine.initialize(io)
+    await engine.initialize(output)
 
     while True:               
         
         command = (command_inits.pop(0).strip() 
            if command_inits else await safe_input())
                 
-        await engine.send("cli", command, io)
+        await engine.send("cli", command, output)
 
 
 if __name__ == "__main__":    
    asyncio.run(run_console())
 
    if DEV_MODE: 
-        detector.stop() 
+        UnresolvedPromptMonitor.stop() 
+        MemoryTrendMonitor.stop()
