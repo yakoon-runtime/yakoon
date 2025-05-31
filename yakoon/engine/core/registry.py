@@ -21,13 +21,13 @@ class DomainRegistry:
         self.sessions = sessions
 
         # Check for duplicate controller names
-        names = [c.name for c in self.get_controllers()]
+        names = [c.id for c in self.get_controllers()]
         if len(set(names)) != len(names):
             raise ValueError(f"Duplicate controller names detected: {names}")
         
-    def get_controller_by_name(self, name:str) -> BaseController:
+    def get_controller_by_name(self, id:str) -> BaseController:
         for controller in self.get_controllers():
-            if controller.name == name:
+            if controller.id == id:
                 return controller
 
     def get_controllers(self):
@@ -49,7 +49,7 @@ class DomainRegistry:
         if ":" in input_str:
             prefix, rest = input_str.split(":", 1)
             for controller in self.get_controllers():
-                if controller.name == prefix:
+                if controller.id == prefix:
                     cmd = controller.router.resolve(rest, cmd_groups)
                     if cmd:
                         return controller, cmd

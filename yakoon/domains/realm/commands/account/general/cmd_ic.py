@@ -28,7 +28,7 @@ class CmdIC(RealmCommand):
         if runtime_data.character and runtime_data.character.id == char.id:
             return await presenter.emit("already", name=char.name)
 
-        session.data_storage.set(session.ctx.controller.name, "char_id", char.id)
+        session.data_storage.set(session.ctx.controller.id, "char_id", char.id)
         await SessionService.save(session)
 
         CharacterBehavior.attach(char)

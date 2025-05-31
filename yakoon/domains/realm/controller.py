@@ -13,7 +13,7 @@ from .runtime.clock import Clock
 
 class RealmController(BaseController):
 
-    name: str = "realm"
+    id: str = "realm"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     clock = Clock()
@@ -32,7 +32,7 @@ class RealmController(BaseController):
         """
         Returns the command group prefix for dynamic, session-local commands.
         """
-        return f"{self.name}:dynamic:{session.id}"
+        return f"{self.id}:dynamic:{session.id}"
 
     async def on_before_resolve(self, session: PlatformSession):
         """
@@ -43,7 +43,7 @@ class RealmController(BaseController):
         Executed regardless of whether a valid command is found.
         """
         session.data_runtime = RuntimeRealmData(None)
-        char_id = session.data_storage.get(self.name, "char_id")
+        char_id = session.data_storage.get(self.id, "char_id")
         if not char_id:
             return
         ns = await NamespaceService.from_session(session)
@@ -61,7 +61,7 @@ class RealmController(BaseController):
         self.router.register(dynamic, get_exit_direction_commandset(room))
   
     async def on_before_run_command(self, session: PlatformSession, request, command):
-        char_id = session.data_storage.get(self.name, "char_id")
+        char_id = session.data_storage.get(self.id, "char_id")
         if char_id:           
             character = CharacterService.get_by_id(char_id)
             session.data_runtime = RuntimeRealmData(character)  

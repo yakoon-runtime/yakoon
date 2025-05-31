@@ -1,7 +1,7 @@
 {%- if section.key == "show" %}
 Verfügbare Domains:
 {% for controller in section.data.controllers %}
-└─ {{ controller.name|ljust(10) }} → switch {{ controller.name }}
+└─ {{ controller.id|ljust(10) }} → switch {{ controller.id }}
 {% endfor %}
 
 Globale Befehle:

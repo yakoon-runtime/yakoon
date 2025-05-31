@@ -7,7 +7,7 @@ from yakoon.platform.services.session import SessionService
 
 class PlatformController(BaseController):
 
-    name: str = "platform"
+    id: str = "platform"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = ["system", "account"]     

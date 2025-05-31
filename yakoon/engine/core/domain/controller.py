@@ -19,7 +19,7 @@ class BaseController(ABC):
     Provides router and default session/command group config.
     """
 
-    name: str = "unnamed"
+    id: str = "unnamed"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = []     
@@ -34,7 +34,7 @@ class BaseController(ABC):
             self.router.register(self._get_value_with_prefix(category), commands_set)
 
     def _get_value_with_prefix(self, value: str) -> str:
-        return f"{self.name}:{value}"
+        return f"{self.id}:{value}"
     
     def get_default_command_groups_with_prefix(self) -> list[str]:
         return [self._get_value_with_prefix(group) for group in self.default_command_groups]

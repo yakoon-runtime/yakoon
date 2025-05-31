@@ -1,5 +1,5 @@
 {%- if section.key == "show" %}
-Hilfe für Domain: {{ section.data.controller.name }}
+Hilfe für Domain: {{ section.data.controller.id }}
 {% for category, commands in section.data.grouped.items() %}
 
 | Kategorie: {{ category|title }}
