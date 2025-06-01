@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from yakoon.engine.settings import Settings as BaseSettings
-from yakoon.domains.platform.render.engine.mode import RenderMode
+from yakoon.services.renderer import RenderMode
 
 
 @dataclass

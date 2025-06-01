@@ -21,7 +21,7 @@ class SolutionController(PlatformController):
     def __init__(self):
         super().__init__()    
         self.services = ServiceRouter()
-        self.services.register("gateway", bind_memory_services())
+        self.services.register_static("gateway", bind_memory_services())
 
     async def on_initialize(self, session: PlatformSession):
         """

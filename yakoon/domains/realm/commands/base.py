@@ -3,8 +3,8 @@ from yakoon.core.command import Command
 from yakoon.domains.platform.runtime.session import PlatformSession
 from yakoon.domains.realm.models.key.namespace import Namespace
 from yakoon.domains.realm.services.namespace import NamespaceService
-from yakoon.domains.platform.render.context import Presenter
 from yakoon.domains.platform.services.registry import PlatformServiceRegistry
+from yakoon.runtime.views.presenter import Presenter
 
 
 class RealmCommand(Command):
@@ -19,5 +19,5 @@ class RealmCommand(Command):
         return await NamespaceService.from_session(session)
 
     async def get_gateway_services(self, session: PlatformSession) -> PlatformServiceRegistry:
-        return session.ctx.gateway.services.get_registry("gateway")
+        return await session.ctx.gateway.services.get_registry("gateway")
         

@@ -3,8 +3,8 @@
 # ✅ NEXT STEPS #
 ==================
 
-MemoryService wieder alte Version 
-- Ich möchte die aktuellen Allokationen sehen und nicht nur den Unterschied.
+git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; clarified structure and naming to reflect its role as entrypoint domain"
+
 
 # Realm
 

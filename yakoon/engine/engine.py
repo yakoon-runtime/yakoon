@@ -36,8 +36,8 @@ class Engine():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
 
-   async def _require_registry_with_session(self, bucket: str) -> SessionServiceRegistry:
-      registry = self._registry.get_gateway().services.get_registry(bucket)
+   async def _require_registry_with_session(self, bucket: str) -> SessionServiceRegistry :
+      registry = await self._registry.get_gateway().services.get_registry(bucket)
       if not isinstance(registry, SessionServiceRegistry):
          raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
       if not registry:

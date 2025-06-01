@@ -4,7 +4,7 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from yakoon.engine import Engine, Output
-from yakoon.domains.platform.render.engine.mode import RenderMode
+from yakoon.services.renderer import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 

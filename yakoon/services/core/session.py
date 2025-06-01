@@ -25,7 +25,7 @@ class SessionService(BaseSessionService):
         await self.store.delete_by_id(session_id)
 
     async def restore_account(self, session: BaseSession, **kwargs):
-        services = session.ctx.gateway.services.get_registry("gateway")
+        services = await session.ctx.gateway.services.get_registry("gateway")
         account_id = kwargs.get("account_id", session.account_id)
         account_id_was_none = not session.account_id 
         if account_id and not session.account:

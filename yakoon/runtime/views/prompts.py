@@ -1,9 +1,7 @@
-
-
 from yakoon.runtime.dialogs.prompts import ask, choice, choice_index, confirm
 from yakoon.runtime.models.session import BaseSession
-from yakoon.domains.platform.render.engine.context import RenderContext
-from yakoon.domains.platform.render.engine.render import render_section
+from yakoon.services.renderer.base.models import RenderContext
+from yakoon.services.renderer.service import RendererService
 
 
 class Prompts:
@@ -18,6 +16,10 @@ class Prompts:
         self._ctx = ctx
         self._session = session
 
+    async def _get_renderer(self, session) -> RendererService:
+        services = await session.ctx.gateway.services.get_registry("gateway")
+        return services.renderer
+
     async def ask(self, section: str, **data) -> str:
         """     
         Asks the user for free-text input based on a rendered template section.
@@ -29,7 +31,8 @@ class Prompts:
         Returns:
             str: The user's input as a string.
         """
-        question = render_section(self._ctx, section, **data)
+        renderer = await self._get_renderer(self._session)
+        question = await renderer.render(self._ctx, section, **data)
         return await ask(self._session, question)
 
     async def confirm(self, section: str, **data) -> bool:
@@ -43,7 +46,8 @@ class Prompts:
         Returns:
             bool: True if confirmed, False otherwise.
         """
-        question = render_section(self._ctx, section, **data)
+        renderer = await self._get_renderer(self._session)
+        question = await renderer.render(self._ctx, section, **data)
         return await confirm(self._session, question, **data)
 
     async def choice(self, section: str, options: list[str], **data) -> str:
@@ -57,10 +61,10 @@ class Prompts:
 
         Returns:
             str: The chosen value.
-        """
-        question = render_section(self._ctx, section, **data)
-        return await choice(self._session, question)
-
+        """        
+        renderer = await self._get_renderer(self._session)
+        question = await renderer.render(self._ctx, section, **data)
+        return await choice(self._session, question, options)
 
     async def choice_index(self, section: str, options: list[str], **data) -> str:
         """
@@ -74,5 +78,6 @@ class Prompts:
         Returns:
             int: The index of the selected choice (starting at 0).
         """
-        question = render_section(self._ctx, section, **data)
-        return await choice_index(self._session, question)
+        renderer = await self._get_renderer(self._session)
+        question = await renderer.render(self._ctx, section, **data)
+        return await choice_index(self._session, question, options)

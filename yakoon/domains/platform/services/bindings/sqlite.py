@@ -5,6 +5,8 @@ from yakoon.services.core.session import SessionService
 from yakoon.domains.platform.services.account import AccountService
 from yakoon.domains.platform.stores.sql.account import SQLAccountStore
 from yakoon.domains.platform.stores.sql.session import SQLSessionStore
+from yakoon.services.renderer.engines.jinja import JinjaEngine
+from yakoon.services.renderer.service import RendererService
 
 
 def bind_sql_services() -> PlatformServiceRegistry:
@@ -16,6 +18,7 @@ def bind_sql_services() -> PlatformServiceRegistry:
     create_missing_tables()
 
     return PlatformServiceRegistry(
-        session=SessionService(SQLSessionStore(db)),
-        account=AccountService(SQLAccountStore(db))
+        renderer=RendererService(JinjaEngine()),
+        sessions=SessionService(SQLSessionStore(db)),
+        accounts=AccountService(SQLAccountStore(db))
     )

@@ -62,5 +62,5 @@ class PlatformController(BaseController):
         """
         await super().on_gateway_finalize(session)
         if session.is_anonymous:
-            services = self.services.get_registry("gateway")
+            services = await self.services.get_registry("gateway")
             await services.sessions.delete_by_id(session.id)

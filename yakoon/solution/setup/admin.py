@@ -7,7 +7,7 @@ async def ensure_admin_account(session: PlatformSession):
     """
     Creates the initial admin account if it does not exist.
     """
-    services = session.ctx.gateway.services.get_registry("gateway")
+    services = await session.ctx.gateway.services.get_registry("gateway")
     if await services.accounts.get_by_id("admin") is None:
         admin = Account(
             id="admin",

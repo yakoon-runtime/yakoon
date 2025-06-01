@@ -1,27 +1,62 @@
-
-from typing import Dict
+from typing import Callable, Awaitable
 from yakoon.services.registry import ServiceRegistry
 
 
 class ServiceRouter:
-    
-    def __init__(self):
-        self._registries: Dict[str, ServiceRegistry] = {}
+    """
+    Manages access to ServiceRegistries for different buckets (contexts/domains).
 
-    def register(self, bucket: str, registry: ServiceRegistry):
+    Supports both static and lazy registration:
+    - Static: predefined ServiceRegistry instances
+    - Lazy: factory functions returning ServiceRegistry via await
+
+    This enables multi-bucket setups, late binding, and async configuration logic.
+    """
+
+    def __init__(self):
+        self._registries: dict[str, ServiceRegistry] = {}
+        self._factories: dict[str, Callable[[], Awaitable[ServiceRegistry]]] = {}
+
+    def register_static(self, bucket: str, registry: ServiceRegistry):
         """
-        Registers a ServiceRegistry instance for a given bucket (e.g., 'minddojo', 'realm').
+        Registers a ServiceRegistry statically for a given bucket.
+
+        Args:
+            bucket (str): The bucket name (e.g. 'realm', 'minddojo').
+            registry (ServiceRegistry): The ready-to-use service registry.
         """
         self._registries[bucket] = registry
 
-    def get_registry(self, bucket: str) -> ServiceRegistry:
+    def register_lazy(self, bucket: str, factory: Callable[[], Awaitable[ServiceRegistry]]):
         """
-        Returns the ServiceRegistry for the given bucket. Raises KeyError if not found.
-        """
-        return self._registries[bucket]
+        Registers a lazy factory to produce a ServiceRegistry for a given bucket.
 
-    def has_registry(self, bucket: str) -> bool:
+        Args:
+            bucket (str): The bucket name.
+            factory (Callable): An async function returning a ServiceRegistry instance.
         """
-        Returns True if a registry is registered for the given bucket.
+        self._factories[bucket] = factory
+
+    async def get_registry(self, bucket: str) -> ServiceRegistry:
         """
-        return bucket in self._registries
+        Retrieves the ServiceRegistry for a given bucket.
+
+        If a static registry exists, it's returned.
+        If a lazy factory is registered, it is awaited and cached.
+        Otherwise, a LookupError is raised.
+
+        Args:
+            bucket (str): The bucket name.
+
+        Returns:
+            ServiceRegistry: The service bundle for the given context.
+        """
+        if bucket in self._registries:
+            return self._registries[bucket]
+
+        if bucket in self._factories:
+            registry = await self._factories[bucket]()
+            self._registries[bucket] = registry
+            return registry
+
+        raise LookupError(f"No services registered for bucket: {bucket}")

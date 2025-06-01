@@ -1,8 +1,8 @@
 
 from yakoon.core.command import Command
-from yakoon.domains.platform.render.context import Presenter
 from yakoon.domains.platform.runtime.session import PlatformSession
 from yakoon.domains.platform.services.registry import PlatformServiceRegistry
+from yakoon.runtime.views.presenter import Presenter
 
 
 class PlatformCommand(Command):
@@ -14,5 +14,5 @@ class PlatformCommand(Command):
         return Presenter(await self.get_template_path(), session)
     
     async def get_services(self, session: PlatformSession) -> PlatformServiceRegistry:
-        return session.ctx.gateway.services.get_registry("gateway")
+        return await session.ctx.gateway.services.get_registry("gateway")
         

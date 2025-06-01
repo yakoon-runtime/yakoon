@@ -1,8 +1,8 @@
 
 from yakoon.runtime.models.session import BaseSession
-from yakoon.domains.platform.render.engine.context import RenderContext
-from yakoon.domains.platform.render.engine.render import render_section
-from yakoon.domains.platform.render.dialog.prompts import Prompts
+from yakoon.services.renderer.base.models import RenderContext
+from yakoon.runtime.views.prompts import Prompts
+from yakoon.services.renderer.service import RendererService
 
 
 class Presenter:
@@ -34,6 +34,10 @@ class Presenter:
             self._prompts = Prompts(self._ctx, self._session)
         return self._prompts
 
+    async def _get_renderer(self, session) -> RendererService:
+        services = await session.ctx.gateway.services.get_registry("gateway")
+        return services.renderer
+
     async def emit(self, section: str, **data):
         """
         Renders and emits a section of the current template via session.emit().
@@ -44,7 +48,8 @@ class Presenter:
             section (str): Template section key (e.g. "success", "info").
             **data: Optional key-value pairs for template variables.
         """
-        text = render_section(self._ctx, section, **data)
+        renderer = await self._get_renderer(self._session)
+        text = await renderer.render(self._ctx, section, **data)
         await self._session.emit(text)
 
     async def fail(self, section: str, **data):
@@ -57,7 +62,8 @@ class Presenter:
             section (str): Template section key (e.g. "not_found", "denied").
             **data: Optional key-value pairs for template variables.
         """
-        text = render_section(self._ctx, section, **data)
+        renderer = await self._get_renderer(self._session)
+        text = await renderer.render(self._ctx, section, **data)
         await self._session.fail(text)
 
     async def notify(self, section: str, **data):
@@ -70,7 +76,8 @@ class Presenter:
             section (str): Template section key (e.g. "hint", "auto_saved").
             **data: Optional key-value pairs for template variables.
         """
-        text = render_section(self._ctx, section, **data)
+        renderer = await self._get_renderer(self._session)
+        text = await renderer.render(self._ctx, section, **data)
         await self._session.notify(text)
 
 

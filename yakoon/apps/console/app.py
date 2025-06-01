@@ -4,10 +4,9 @@ from yakoon.core.devtools import MemoryTrendMonitor
 from yakoon.core.devtools import UnresolvedPromptMonitor
 from yakoon.engine import Engine, Output, safe_input
 from yakoon.engine.settings import DEV_MODE
-from yakoon.domains.platform.render.engine.runtime import RenderMode
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
-
+from yakoon.services.renderer import RenderMode
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 SolutionSettings.runtime.render_mode = RenderMode.PLAIN

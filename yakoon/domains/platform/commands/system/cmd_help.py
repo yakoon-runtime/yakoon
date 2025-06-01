@@ -3,7 +3,6 @@ from collections import defaultdict
 from yakoon.core.command import Command
 from yakoon.core.parser import Request
 from yakoon.domains.platform.commands.base import PlatformCommand
-from yakoon.domains.platform.render.context import Presenter
 from yakoon.domains.platform.runtime.session import PlatformSession
 
 

@@ -1,5 +1,5 @@
 from yakoon.engine import Engine, Output
-from yakoon.domains.platform.render.engine.mode import RenderMode
+from yakoon.services.renderer import RenderMode
 from yakoon.domains.platform.utils.ansi import format_codes_to_ansi
 from yakoon.solution.platform.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings

@@ -5,7 +5,22 @@
     - Projekte ("Erstelle Neues Projekt X", "Lade Projekt X")
     - Dokumentiere (Zugriff auf Lokale Version.)
     
+---    
+## Text To Speach
+🎧 TTS-Anbieter (später)
+- ElevenLabs – sehr natürlich, API-basiert
+- Google Cloud TTS
+- OpenTTS – lokal, Open Source
+- OpenAI `whisper-1` für Speech-to-Text
+- Eine TTS-Engine wäre der natürliche nächste Schritt für immersive, gesprochene Welten.
+Und durch den RendererService kann ich diese einfach einhängen wie jede andere Engine.
 
+def render(self, ctx: RenderContext, section: RenderSection) -> str:
+    text = super().render(ctx, section)  # z. B. via Jinja
+    play_audio(text)  # wandelt Text in gesprochene Sprache
+    return text  # oder leer, wenn keine Ausgabe nötig ist
+
+---
 ## Scripting
 - Scriptdateien (scripts/goblin.txt)
     @script teleport_test:
@@ -23,7 +38,7 @@ await engine.send(npc_session, "look")
 - Memory-Palast-NPCs als interaktive Wissensagenten
 - KI-Integration (await gpt.decide(...).then(send))
 
-
+---
 ### 🎙️ **Voice Interface (Audio Commands)**
 Yakoon wird in Zukunft Sprache als Eingabemodus unterstützen.
 Gesprochene Anweisungen werden per Whisper-API in Text umgewandelt und in Commands
