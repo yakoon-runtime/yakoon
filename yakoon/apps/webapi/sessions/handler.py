@@ -1,7 +1,7 @@
 # yakoon/app/webapi/session_manager.py
 from yakoon.engine import Engine, Output
 from yakoon.services.renderer import RenderMode
-from yakoon.solution.platform.registry import SolutionRegistry
+from yakoon.solution.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 
 

@@ -4,7 +4,7 @@ from yakoon.core.devtools import MemoryTrendMonitor
 from yakoon.core.devtools import UnresolvedPromptMonitor
 from yakoon.engine import Engine, Output, safe_input
 from yakoon.engine.settings import DEV_MODE
-from yakoon.solution.platform.registry import SolutionRegistry
+from yakoon.solution.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 from yakoon.services.renderer import RenderMode
 

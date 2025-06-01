@@ -5,7 +5,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from yakoon.engine import Engine, Output
 from yakoon.services.renderer import RenderMode
-from yakoon.solution.platform.registry import SolutionRegistry
+from yakoon.solution.registry import SolutionRegistry
 from yakoon.solution.settings import SolutionSettings
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
