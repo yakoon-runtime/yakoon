@@ -3,6 +3,9 @@
 # ✅ NEXT STEPS #
 ==================
 
+ctx.gateway -> auflösen -> das brauchen wir nicht mehr
+In Zukunft läuft das über den Controller.
+
 git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; clarified structure and naming to reflect its role as entrypoint domain"
 
 

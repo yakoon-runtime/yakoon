@@ -18,6 +18,6 @@ class CmdOOC(RealmCommand):
             return await presenter.fail("already")
 
         name = runtime_data.character.name
-        session.data_storage.rem(session.ctx.controller.id, "char_id")
+        session.data_storage.rem(self.controller.id, "char_id")
 
         await presenter.emit("success", name=name)

@@ -6,7 +6,6 @@ from yakoon.engine.io.output import Output
 from yakoon.engine.registry import DomainRegistry
 from yakoon.engine.settings import Settings
 from yakoon.engine.batch import split_batch_input
-from yakoon.engine.context import Context
 from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.manager import DialogManager
 from yakoon.services.core.log import LogService
@@ -30,28 +29,24 @@ class Engine():
       
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)
-      session.bind_context(Context(self))
 
       for controller in self._registry.get_controllers():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
 
    async def _require_registry_with_session(self, bucket: str) -> SessionServiceRegistry :
-      registry = await self._registry.get_gateway().services.get_registry(bucket)
+      registry = await self.registry.get_gateway().service_router.get_registry(bucket)
       if not isinstance(registry, SessionServiceRegistry):
          raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
       if not registry:
          raise RuntimeError(f"No ServiceRegistry found for bucket: {bucket}")
       return registry                                
 
-   async def send(self, session_id: str, input_str: str, io: Output, depth=0):   
+   async def dispatch(self, session_id: str, input_str: str, io: Output):   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
-      if depth > Settings.max_dispatch_depth:
-        return await io.err("Command recursion limit reached.")
-
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
       services = await self._require_registry_with_session("gateway")      
@@ -59,10 +54,6 @@ class Engine():
 
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)
-
-      # Bind the current controller context to the session.
-      # This allows commands to access controller-specific state (e.g. name, domain, config).
-      session.bind_context(Context(self)) 
 
       await asyncio.create_task(self._run_processing(session, inputs))
 
@@ -119,15 +110,17 @@ class Engine():
 
    async def _send_one(self, session: BaseSession, input_str: str):   
 
+      command = None
       request = Request(input_str)
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
 
       try:
-         if session.domain:
+         if session.domain_id:
             # Domain-level hook before resolving the input into a command.
             # Allows dynamic command registration or early input rewriting.
-            await session.domain.on_before_resolve(session)
+            current = self._registry.get_controller_by_id(session.domain_id)
+            await current.on_before_resolve(session)
 
          # resolve the commands
          result = self._registry.resolve(request.cmd, session)
@@ -135,8 +128,8 @@ class Engine():
             return await session.fail(f"Befehl '{request.cmd}' nicht gefunden.")
 
          controller, command = result
-         session.ctx.bind_controller(controller) 
-
+         command.controller = controller
+                  
          # Pre-command hook: modify or validate request before execution
          await controller.on_before_run_command(session, request, command)
          
@@ -157,8 +150,11 @@ class Engine():
          await session.fail("Ein interner Fehler ist aufgetreten.")
          LogService.error(exc)
 
-      finally:        
-         if session.domain:
+      finally:       
+         if command: 
+            command.controller = None
+         if session.domain_id:
             # Hook called when a domain session is about to end.
             # Used for cleanup of runtime data, disconnection, or persistence.   
-            await session.domain.on_cleanup(session)
+            current = self._registry.get_controller_by_id(session.domain_id)
+            await current.on_cleanup(session)

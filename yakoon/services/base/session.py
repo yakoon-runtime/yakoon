@@ -23,7 +23,3 @@ class BaseSessionService(ABC):
     @abstractmethod
     async def save(self, session: BaseSession) -> None:
         ...
-
-    @abstractmethod
-    async def restore_account(session: BaseSession) -> None:
-        ...

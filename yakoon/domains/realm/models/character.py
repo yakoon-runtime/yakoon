@@ -29,6 +29,8 @@ class Character:
         Updates internal location, persists the character state,
         and sends appropriate output to the session (description, feedback).
         """
+        print("TODO: move_to")
+        return
         room = self.on_load_room(new_location_id)        
         if not room:
             await session.fail("Dieser Ort existiert nicht.")

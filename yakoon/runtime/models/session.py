@@ -3,14 +3,9 @@ from dataclasses import dataclass, field
 from typing import Optional, Type
 from uuid import uuid4
 
-from typing import TYPE_CHECKING
-
 from yakoon.engine.io.output import Output
 from yakoon.runtime.models.data import RuntimeSessionData, StorageSessionData
 
-if TYPE_CHECKING:
-    from yakoon.core.domain.controller import BaseController
-    from yakoon.engine.context import Context
 
 @dataclass
 class BaseSession:
@@ -34,25 +29,12 @@ class BaseSession:
     # ───── transient runtime-only attributes ─────
     _cmd_groups: list[str] = field(default_factory=list, init=False, repr=False)
     _cmd_groups_dynamic: list[str] = field(default_factory=list, init=False, repr=False)
-    _context: Context = field(default=None, init=False, repr=False)
-    _domain: BaseController = field(default=None, init=False, repr=False)
     _io: Output = field(default=None, init=False, repr=False)
     _data_runtime: Optional[RuntimeSessionData] = field(default=None, init=False, repr=False)
 
     def validate(self):
         if not self.id:
             raise ValueError("Id cannot be None or empty")
-
-    @property
-    def ctx(self) -> Context:
-        return self._context
-
-    @property
-    def domain(self) -> BaseController:
-        return self._domain
-    @domain.setter
-    def domain(self, value):
-        self._domain = value
 
     @property
     def cmd_groups(self) -> list[Type[str]]:
@@ -74,9 +56,6 @@ class BaseSession:
     @data_runtime.setter
     def data_runtime(self, value):
         self._data_runtime = value
-
-    def bind_context(self, context: Context):
-        self._context = context
 
     def bind_io(self, io: Output):
         self._io = io
@@ -107,12 +86,3 @@ class BaseSession:
             text (str): The error message to display.
         """
         await self._io.err(f"> e: {text}")
-
-    async def dispatch(self, input_str: str):
-        """
-        Sends a command for execution using the current session context.
-
-        Args:
-            input_str (str): The command string to dispatch.
-        """
-        await self.ctx.dispatch(self, input_str, self._io)

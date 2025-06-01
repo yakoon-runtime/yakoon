@@ -34,7 +34,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(0.1)
             command = await websocket.receive_text()              
 
-            await engine.send(session_id, command, output)
+            await engine.dispatch(session_id, command, output)
 
     except WebSocketDisconnect:
         print(f"[WebSocket] Disconnected: {session_id}")

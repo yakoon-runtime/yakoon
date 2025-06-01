@@ -19,7 +19,6 @@ class PlatformSession(BaseSession):
     # ───── transient runtime-only attributes ─────
 
     _account: Optional[Account] = field(default=None, init=False, repr=False)
-
         
     @property
     def is_anonymous(self) -> bool:

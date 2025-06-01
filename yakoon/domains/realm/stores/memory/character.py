@@ -9,24 +9,24 @@ class InMemoryCharacterStore:
         self._chars: dict[str, Character] = {}
         load_defaults(self)
 
-    def get_by_name(self, name: str) -> Optional[Character]:
+    async def get_by_name(self, name: str) -> Optional[Character]:
         for char in self._chars.values():
             if char.name.lower() == name.lower():
                 return char
 
-    def get_by_id(self, char_id: str) -> Optional[Character]:
+    async def get_by_id(self, char_id: str) -> Optional[Character]:
         return self._chars.get(char_id)
 
     def add(self, obj: Character):
         self._chars[obj.id] = obj
 
-    def all(self) -> list[Character]:
+    async def all(self) -> list[Character]:
         return list(self._chars.values())
 
-    def exists(self, char_id: str) -> bool:
+    async def exists(self, char_id: str) -> bool:
         return char_id in self._chars
 
-    def save(self, obj: Character):
+    async def save(self, obj: Character):
         pass  # optional später
 
 

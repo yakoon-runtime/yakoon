@@ -1,10 +1,10 @@
-from yakoon.core.domain.controller import BaseController
+from yakoon.core.domain.controller import GatewayController
 from yakoon.domains.platform.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.platform.commands.system.cmdset import PlatformSystemCommands
 from yakoon.domains.platform.runtime.session import PlatformSession
 
 
-class PlatformController(BaseController):
+class PlatformController(GatewayController):
 
     id: str = "gateway"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
@@ -25,24 +25,23 @@ class PlatformController(BaseController):
         Used to prepare session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `system` controller.
         """
-        registry = session.ctx._registry  # access intern by design
-
-        # load the last controller
-        controller = registry.get_controller_by_id(session.domain_id)
-        session.domain = controller
+        services = await self.get_gateway_services()
 
         # builds the commandset for this session
         groups = set()
+        registry = await self.get_controller_registry()
         for controller in registry.get_controllers():
             groups.update(controller.get_default_command_groups_with_prefix())
         session.cmd_groups = list(groups)
-        def merge(lista: list[str], listb: list[str]) -> list[str]:
-            return list(dict.fromkeys(lista + listb))
 
-        # append the account commandset to this session
-        if session.account:
-            session.cmd_groups = merge(session.cmd_groups, session.account.cmd_groups)
-        session.cmd_groups = sorted(session.cmd_groups)
+        def merge(lista: list[str], listb: list[str]) -> list[str]:
+            return sorted(list(dict.fromkeys(lista + listb)))
+        
+        # Middleware-Hook: Session was loaded, Account is missing?
+        if session.account_id:
+            account = await services.accounts.get_by_id(session.account_id)
+            session.account = account
+            session.cmd_groups = merge(session.cmd_groups, account.cmd_groups)
             
     async def on_before_run_command(self, session: PlatformSession, request, command):
         """
@@ -62,5 +61,5 @@ class PlatformController(BaseController):
         """
         await super().on_gateway_finalize(session)
         if session.is_anonymous:
-            services = await self.services.get_registry("gateway")
+            services = await self.service_router.get_registry(self.id)
             await services.sessions.delete_by_id(session.id)

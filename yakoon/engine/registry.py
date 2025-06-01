@@ -1,24 +1,31 @@
 from typing import Optional
 from yakoon.core.command import Command
 from yakoon.core.domain.controller import BaseController
+from yakoon.core.domain.controller.gateway import GatewayController
+from yakoon.core.domain.registry import BaseDomainRegistry
 from yakoon.runtime.models.session import BaseSession
 
 
-class DomainRegistry:
+class DomainRegistry(BaseDomainRegistry):
     """
     Registry interface for routing commands to platform definitions.
     Used by the Engine to remain agnostic of domain structure.
     """
 
     def __init__(self, controllers: list[BaseController], 
-                 gateway: BaseController):
+                 gateway: GatewayController):
         self._gateway = gateway
         self._controllers = controllers
+        self._gateway.controller_registry = self
 
         # Check for duplicate controller names
         names = [c.id for c in self.get_controllers()]
         if len(set(names)) != len(names):
             raise ValueError(f"Duplicate controller names detected: {names}")
+        
+        # set the gatways to the controllers.
+        for controller in controllers:
+            controller.gateway = gateway
 
     def get_gateway(self):
         return self._gateway
@@ -53,10 +60,11 @@ class DomainRegistry:
                         return controller, cmd
 
         # 2. Active domain (switch mode)
-        if session.domain:
-            cmd = session.domain.router.resolve(input_str, cmd_groups)
+        if session.domain_id:
+            current = self.get_controller_by_id(session.domain_id)
+            cmd = current.router.resolve(input_str, cmd_groups)
             if cmd:
-                return session.domain, cmd
+                return current, cmd
 
         # 3. gateway controller (OOC mode only)
         cmd = self._gateway.router.resolve(input_str, cmd_groups)

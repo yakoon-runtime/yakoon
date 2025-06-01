@@ -1,11 +1,13 @@
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
+from yakoon.domains.realm.services.bindings.memory import bind_memory_services
 from yakoon.domains.realm.services.character import CharacterService
-from yakoon.domains.realm.services.namespace import NamespaceService
+from yakoon.domains.realm.services.registry import RealmServiceRegistry
 from yakoon.domains.realm.services.room import RoomService
 from yakoon.core.domain.controller import BaseController
 from yakoon.domains.platform.commands.shared.cmdset import PlatformSharedCommands
 from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.services.router import ServiceRouter
 from .commands.account.general.cmdset import GeneralAccountCommands
 from .commands.character.general.cmdset import GeneralCharacterCommands
 from .runtime.clock import Clock
@@ -24,11 +26,17 @@ class RealmController(BaseController):
     without requiring explicit permissions."""
 
     commandsets = [
-        PlatformSharedCommands,
+        #. TODO: braucht es das? fallen commands nicht ohnehin durch?
+        PlatformSharedCommands, 
         GeneralAccountCommands, 
         GeneralCharacterCommands]
     """The collection of all commands."""
      
+    def __init__(self):
+        super().__init__()    
+        self.service_router = ServiceRouter()
+        self.service_router.register_static(self.id, bind_memory_services())
+
     def dynamic_prefix(self, session: PlatformSession) -> str:
         """
         Returns the command group prefix for dynamic, session-local commands.
@@ -47,11 +55,15 @@ class RealmController(BaseController):
         char_id = session.data_storage.get(self.id, "char_id")
         if not char_id:
             return
-        ns = await NamespaceService.from_session(session)
-        character = CharacterService.get_by_id(char_id)
+        
+        services = await self.get_domain_services()
+        ns = await services.spaces.from_session(session)
+
+        character = await services.chars.get_by_id(char_id)
         if not character:
             return
-        room = await RoomService.get_by_id(ns, character.location)
+        
+        room = await services.rooms.get_by_id(ns, character.location)
         if not room:
             return
 
@@ -63,8 +75,11 @@ class RealmController(BaseController):
   
     async def on_before_run_command(self, session: PlatformSession, request, command):
         char_id = session.data_storage.get(self.id, "char_id")
+        services = await self.get_domain_services()
+        ns = await services.spaces.from_session(session)
+
         if char_id:           
-            character = CharacterService.get_by_id(char_id)
+            character = await services.chars.get_by_id(char_id)
             session.data_runtime = RuntimeRealmData(character)  
 
         if required := getattr(command, "requires", []):

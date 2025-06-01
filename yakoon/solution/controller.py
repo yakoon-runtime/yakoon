@@ -20,8 +20,8 @@ class SolutionController(PlatformController):
 
     def __init__(self):
         super().__init__()    
-        self.services = ServiceRouter()
-        self.services.register_static("gateway", bind_memory_services())
+        self.service_router = ServiceRouter()
+        self.service_router.register_static(self.id, bind_memory_services())
 
     async def on_initialize(self, session: PlatformSession):
         """
@@ -32,5 +32,6 @@ class SolutionController(PlatformController):
 
         This method is guaranteed to run once before the first engine tick or command dispatch.
         """
-        await ensure_admin_account(session)
+        services = await self.get_gateway_services()
+        await ensure_admin_account(services.accounts)
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

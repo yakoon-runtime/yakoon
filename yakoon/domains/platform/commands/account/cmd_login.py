@@ -11,7 +11,7 @@ class CmdLogin(PlatformCommand):
     async def run(self, session: PlatformSession, request: Request):
 
         presenter = await self.get_presenter(session)
-        services = await self.get_services(session)
+        services = await self.get_gateway_services()
 
         if not request.args:
             return await presenter.emit("missing_arg")
@@ -27,7 +27,8 @@ class CmdLogin(PlatformCommand):
         session.account_id = account.id
         await services.sessions.save(session)
 
-        for controller in session.ctx._registry.get_controllers():
+        registry = await self.get_controller_registry()
+        for controller in registry.get_controllers():
             if hasattr(controller, "on_account_login"):
                 await controller.on_account_login(session, account)
 

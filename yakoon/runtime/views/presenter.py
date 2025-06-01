@@ -13,30 +13,28 @@ class Presenter:
     messages, failures, and notifications using predefined sections in the template.
     """
     
-    def __init__(self, template_key: str, session: BaseSession) -> RenderContext:
+    def __init__(self, template_key: str, session: BaseSession, renderer: RendererService) -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
 
         Args:
             template_key (str): Relative template path (e.g. 'account/cmd_login').
             session: Session object with language information.
+            renderer: Renderservice to render the template. 
 
         Returns:
             RenderContext: Template context with full key and language.
         """
         self._prompts = None
         self._session = session
+        self._renderer = renderer
         self._ctx = RenderContext(key=template_key, lang=session.lang)
 
     @property
     def prompts(self) -> Prompts:
         if not self._prompts:
-            self._prompts = Prompts(self._ctx, self._session)
+            self._prompts = Prompts(self._ctx, self._session, self._renderer)
         return self._prompts
-
-    async def _get_renderer(self, session) -> RendererService:
-        services = await session.ctx.gateway.services.get_registry("gateway")
-        return services.renderer
 
     async def emit(self, section: str, **data):
         """
@@ -48,8 +46,7 @@ class Presenter:
             section (str): Template section key (e.g. "success", "info").
             **data: Optional key-value pairs for template variables.
         """
-        renderer = await self._get_renderer(self._session)
-        text = await renderer.render(self._ctx, section, **data)
+        text = await self._renderer.render(self._ctx, section, **data)
         await self._session.emit(text)
 
     async def fail(self, section: str, **data):
@@ -62,8 +59,7 @@ class Presenter:
             section (str): Template section key (e.g. "not_found", "denied").
             **data: Optional key-value pairs for template variables.
         """
-        renderer = await self._get_renderer(self._session)
-        text = await renderer.render(self._ctx, section, **data)
+        text = await self._renderer.render(self._ctx, section, **data)
         await self._session.fail(text)
 
     async def notify(self, section: str, **data):
@@ -76,8 +72,7 @@ class Presenter:
             section (str): Template section key (e.g. "hint", "auto_saved").
             **data: Optional key-value pairs for template variables.
         """
-        renderer = await self._get_renderer(self._session)
-        text = await renderer.render(self._ctx, section, **data)
+        text = await self._renderer.render(self._ctx, section, **data)
         await self._session.notify(text)
 
 

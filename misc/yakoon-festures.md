@@ -30,9 +30,9 @@ def render(self, ctx: RenderContext, section: RenderSection) -> str:
     look
     get box
 
-await engine.send(npc_session, "say Wer wagt es, mein Lager zu betreten?")
-await engine.send(npc_session, "attack stefan")
-await engine.send(npc_session, "look")
+await engine.dispatch(npc_session, "say Wer wagt es, mein Lager zu betreten?")
+await engine.dispatch(npc_session, "attack stefan")
+await engine.dispatch(npc_session, "look")
 
 - Reaktive Trigger (→ bei player enters, führe batch: aus)
 - Memory-Palast-NPCs als interaktive Wissensagenten

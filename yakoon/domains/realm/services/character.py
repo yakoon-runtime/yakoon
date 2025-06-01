@@ -1,29 +1,23 @@
-
 from typing import Optional
 from yakoon.domains.realm.models.character import Character
-from yakoon.domains.realm.stores.memory.character import InMemoryCharacterStore
 
 
 class CharacterService:
     
-    store = InMemoryCharacterStore()
+    def __init__(self, store):
+        self.store = store
 
-    @classmethod
-    def get_by_id(cls, char_id: str) -> Optional[Character]:
-        return cls.store.get_by_id(char_id)
+    async def get_by_id(self, char_id: str) -> Optional[Character]:
+        return await self.store.get_by_id(char_id)
 
-    @classmethod
-    def get_by_name(cls, name: str) -> Optional[Character]:
-        return cls.store.get_by_name(name)
+    async def get_by_name(self, name: str) -> Optional[Character]:
+        return await self.store.get_by_name(name)
 
-    @classmethod
-    def all(cls) -> list[Character]:
-        return cls.store.all()
+    async def all(self) -> list[Character]:
+        return await self.store.all()
 
-    @classmethod
-    def exists(cls, char_id: str) -> bool:
-        return cls.store.exists(char_id)
+    async def exists(self, char_id: str) -> bool:
+        return await self.store.exists(char_id)
     
-    @classmethod
-    def save(cls, char: Character):
-        cls.store.save(char)
+    async def save(self, char: Character):
+        await self.store.save(char)

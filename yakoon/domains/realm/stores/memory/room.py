@@ -15,13 +15,17 @@ class InMemoryRoomStore:
     async def get_by_id(self, ns: Namespace, id_: str) -> Room | None:
         return self._rooms.get(self._make_key(ns, id_))
 
-    def add(self, ns: Namespace, room: Room):
+    async def create(self, ns: Namespace, room: Room):
         room.validate()
         self._rooms[self._make_key(ns, room.id)] = room
 
     async def find_by_name(self, ns: Namespace, name: str) -> list[Room]:
         return [r for k, r in self._rooms.items()
                 if k.startswith(f"{ns.bucket}:{ns.owner}:") and r.name == name]
+
+    def add(self, ns: Namespace, room: Room):
+        room.validate()
+        self._rooms[self._make_key(ns, room.id)] = room
 
 
 def load_defaults(store: InMemoryRoomStore):

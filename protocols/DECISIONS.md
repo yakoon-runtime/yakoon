@@ -28,7 +28,7 @@ Entscheidung: Die KI fungiert ausschließlich als Berater zur Bedeutungserschlie
 intent = ai_chat_prompt("Bring mich ins Ritterschloss")
 if intent.is_valid():
     if session.auto_confirm and intent.command.safe:
-        engine.send(intent.to_command_string())  # z. B. "teleport #343"
+        engine.dispatch(intent.to_command_string())  # z. B. "teleport #343"
     else:
         await ask(session, f"Willst du ausführen: {intent.command.key} {intent.command.args}?")
 

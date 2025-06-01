@@ -15,10 +15,11 @@ class CmdLook(RealmCommand):
 
     async def run(self, session: PlatformSession, request: Request):
         presenter = await self.get_presenter(session)
-        ns = await self.get_namespace(session)
-
+        services = await self.get_domain_services()
         char = session.data_runtime.character
-        room = await RoomService.get_by_id(ns, char.location) if char else None
+
+        ns = await services.spaces.from_session(session)
+        room = await services.rooms.get_by_id(ns, char.location) if char else None
         if not room:
             return await presenter.fail("not_found")
 

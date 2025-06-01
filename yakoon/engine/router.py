@@ -1,8 +1,8 @@
 from __future__ import annotations
-from yakoon.core.command import Command
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from yakoon.core.command import Command
     from yakoon.core.commandset import CommandSet
 
 

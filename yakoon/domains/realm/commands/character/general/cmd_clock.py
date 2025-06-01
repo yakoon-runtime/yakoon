@@ -13,8 +13,7 @@ class CmdClock(RealmCommand):
     async def run(self, session: PlatformSession, request: Request):
         presenter = await self.get_presenter(session)
 
-        controller = session.ctx.controller
-        clock = controller.clock
+        clock = self.controller.clock
 
         await presenter.emit("show",
             time=clock.get_formatted_time(),

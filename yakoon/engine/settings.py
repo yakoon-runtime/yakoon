@@ -16,10 +16,6 @@ class Settings:
     debug: bool = True
     """If True, enables verbose output and developer diagnostics."""
 
-    max_dispatch_depth: int = 10
-    """Maximum allowed depth for nested command dispatches (e.g. via session.dispatch()).
-    Prevents infinite recursion when commands internally trigger other commands."""
-
     prompt_timed_out = 60 * 3
     """Timeout in seconds. If reached, the prompt is cancelled."""
 

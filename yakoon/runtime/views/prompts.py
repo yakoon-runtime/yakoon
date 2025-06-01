@@ -12,13 +12,10 @@ class Prompts:
     confirmations, and choices. 
     """
 
-    def __init__(self, ctx: RenderContext, session: BaseSession):
+    def __init__(self, ctx: RenderContext, session: BaseSession, renderer: RendererService):
         self._ctx = ctx
         self._session = session
-
-    async def _get_renderer(self, session) -> RendererService:
-        services = await session.ctx.gateway.services.get_registry("gateway")
-        return services.renderer
+        self._renderer = renderer
 
     async def ask(self, section: str, **data) -> str:
         """     
@@ -31,8 +28,7 @@ class Prompts:
         Returns:
             str: The user's input as a string.
         """
-        renderer = await self._get_renderer(self._session)
-        question = await renderer.render(self._ctx, section, **data)
+        question = await self._renderer.render(self._ctx, section, **data)
         return await ask(self._session, question)
 
     async def confirm(self, section: str, **data) -> bool:
@@ -46,8 +42,7 @@ class Prompts:
         Returns:
             bool: True if confirmed, False otherwise.
         """
-        renderer = await self._get_renderer(self._session)
-        question = await renderer.render(self._ctx, section, **data)
+        question = await self._renderer.render(self._ctx, section, **data)
         return await confirm(self._session, question, **data)
 
     async def choice(self, section: str, options: list[str], **data) -> str:
@@ -62,8 +57,7 @@ class Prompts:
         Returns:
             str: The chosen value.
         """        
-        renderer = await self._get_renderer(self._session)
-        question = await renderer.render(self._ctx, section, **data)
+        question = await self._renderer.render(self._ctx, section, **data)
         return await choice(self._session, question, options)
 
     async def choice_index(self, section: str, options: list[str], **data) -> str:
@@ -78,6 +72,5 @@ class Prompts:
         Returns:
             int: The index of the selected choice (starting at 0).
         """
-        renderer = await self._get_renderer(self._session)
-        question = await renderer.render(self._ctx, section, **data)
+        question = await self._renderer.render(self._ctx, section, **data)
         return await choice_index(self._session, question, options)

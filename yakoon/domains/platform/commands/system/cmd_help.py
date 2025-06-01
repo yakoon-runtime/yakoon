@@ -12,10 +12,10 @@ class CmdHelpSystem(PlatformCommand):
     template_key = "system/cmd_help"
 
     async def run(self, session: PlatformSession, request: Request):
-        registry = getattr(session.ctx, "_registry")
-        grouped = get_grouped_commands(session.ctx.controller)
-
         presenter = await self.get_presenter(session)
+        grouped = get_grouped_commands(self.controller)
+
+        registry = await self.get_controller_registry() 
         await presenter.emit(
             "show", controllers=registry.get_controllers(), 
             grouped=grouped)
@@ -28,15 +28,14 @@ class CmdHelpDomain(PlatformCommand):
 
     async def run(self, session: PlatformSession, request: Request):
 
-        controller = session.ctx.controller
         if not request.args:
-            grouped = get_grouped_commands(controller)
+            grouped = get_grouped_commands(self.controller)
             presenter = await self.get_presenter(session)
-            return await presenter.emit("show", controller=controller, grouped=grouped)
+            return await presenter.emit("show", controller=self.controller, grouped=grouped)
 
         # TODO: Hilfe für unsere Commands
         key = request.args[0]
-        cmd = controller.router.find_by_key_or_alias(key, session.cmd_groups)
+        cmd = self.controller.router.find_by_key_or_alias(key, session.cmd_groups)
         if cmd:
             await session.emit(f"Hilfe zu: {cmd.key}")
             await session.emit(cmd.__doc__ or "Keine Beschreibung verfügbar.")

@@ -28,4 +28,4 @@ async def handle_client(reader, writer):
         if not command:
             continue            
         command = command.decode("utf-8").strip()
-        await engine.send(session_id, command, Output(out, out))
+        await engine.dispatch(session_id, command, Output(out, out))

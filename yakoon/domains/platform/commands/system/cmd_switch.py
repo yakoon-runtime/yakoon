@@ -11,16 +11,15 @@ class CmdSwitch(PlatformCommand):
 
     async def run(self, session: PlatformSession, request: Request):
         presenter = await self.get_presenter(session)
-        services = await self.get_services(session)
+        services = await self.get_gateway_services()
+        registry = await self.get_controller_registry()
 
         name = request.get_arg(0)
         if not name:
             name = await presenter.prompts.ask("ask_domain")
 
         name = name.lower()
-        registry: DomainRegistry = getattr(session.ctx, "_registry")
         controller = registry.get_controller_by_id(name)
-
         if not controller:
             return await presenter.fail("not_found", name=name)
         

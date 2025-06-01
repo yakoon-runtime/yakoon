@@ -12,6 +12,7 @@ def bind_memory_services() -> PlatformServiceRegistry:
     Returns a ServiceRegistry with in-memory store bindings.
     Used for dev, testing, or temporary platforms.
     """
+    SessionService(InMemorySessionStore()),
     return PlatformServiceRegistry(
         renderer=RendererService(JinjaEngine()),
         sessions=SessionService(InMemorySessionStore()),

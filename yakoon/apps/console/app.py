@@ -13,14 +13,14 @@ SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
-command_inits += ["batch: login admin; switch realm"]
+command_inits += ["batch: login stefan; switch realm"]
 
 
 async def run_console():
    
     if DEV_MODE:
         UnresolvedPromptMonitor.start()
-        MemoryTrendMonitor.start(15)
+        MemoryTrendMonitor.start(60)
 
     output = Output(print, print)
     
@@ -32,7 +32,7 @@ async def run_console():
         command = (command_inits.pop(0).strip() 
            if command_inits else await safe_input())
                 
-        await engine.send("cli", command, output)
+        await engine.dispatch("cli", command, output)
 
 
 if __name__ == "__main__":    

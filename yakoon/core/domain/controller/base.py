@@ -6,10 +6,12 @@ from typing import TYPE_CHECKING
 from yakoon.core.commandset import CommandSet
 from yakoon.core.parser import Request
 from yakoon.engine.router import CommandRouter
+from yakoon.services.registry import ServiceRegistry
 from yakoon.services.router import ServiceRouter
 
 if TYPE_CHECKING:
     from yakoon.runtime.models.session import BaseSession
+    from yakoon.core.domain.registry import BaseDomainRegistry
     from yakoon.core.command import Command
 
 
@@ -26,9 +28,11 @@ class BaseController(ABC):
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
  
-    services: ServiceRouter | None = None
+    service_router: ServiceRouter | None = None
     """Provides bucket-based access to domain services (e.g. room, account, session). 
     Injected at runtime by the platform."""
+
+    gateway: BaseController | None = None
 
     def __init__(self):
         self.router = CommandRouter()
@@ -51,7 +55,21 @@ class BaseController(ABC):
     @property
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
-     
+
+    async def get_domain_services(self) -> ServiceRegistry:
+        return await self.service_router.get_registry(self.id)
+
+    async def get_gateway_services(self) -> ServiceRegistry:
+        if self.gateway is None or self.gateway.id == self.id:
+            return await self.service_router.get_registry(self.id)
+        return await self.gateway.service_router.get_registry(self.gateway.id)
+
+    async def get_controller_registry(self) -> BaseDomainRegistry:
+        gateway = self.gateway if self.gateway else self 
+        if hasattr(gateway, "controller_registry"):
+            return gateway.controller_registry
+        return None
+
     async def on_initialize(self, session: BaseSession):
         """
         Called after the controller has been fully constructed but before any commands are processed.
@@ -132,3 +150,5 @@ class BaseController(ABC):
         Only invoked if this controller is the registered `system` controller.
         """
         pass
+
+
