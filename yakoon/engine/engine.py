@@ -37,7 +37,7 @@ class Engine():
             await controller.on_initialize(session)
 
    async def _require_registry_with_session(self, bucket: str) -> SessionServiceRegistry:
-      registry = self._registry.system.services.get_registry(bucket)
+      registry = self._registry.get_gateway().services.get_registry(bucket)
       if not isinstance(registry, SessionServiceRegistry):
          raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
       if not registry:
@@ -54,7 +54,7 @@ class Engine():
 
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
-      services = await self._require_registry_with_session("system")      
+      services = await self._require_registry_with_session("gateway")      
       session, _ = await services.sessions.get_or_create(session_id)
 
       # Bind the given Output to this session for output and error handling.
@@ -85,14 +85,14 @@ class Engine():
       async def _run_internal_task(raw):
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
-         await self._registry.system.on_platform_validate(session)
+         await self._registry.get_gateway().on_gateway_validate(session)
 
          try:
             await self._send_one(session, raw)
          finally:
             # Final platform-level hook after command execution.
             # Used for post-processing, logging, or global session update
-            await self._registry.system.on_platform_finalize(session)
+            await self._registry.get_gateway().on_gateway_finalize(session)
 
       while queue:
          await asyncio.sleep(0.01)  # yield control briefly

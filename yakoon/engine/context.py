@@ -8,16 +8,16 @@ class Context:
     def __init__(self, engine):
         self.depth = 0
         self._engine = engine
+        self._controller: BaseController = None
         self._registry: DomainRegistry = engine.registry
-        self._controller = None
 
     @property
     def controller(self) -> BaseController:
         return self._controller 
     
     @property
-    def platform(self) -> BaseController:
-        return self._registry.system
+    def gateway(self) -> BaseController:
+        return self._registry._gateway
     
     def bind_controller(self, controller: BaseController):
         self._controller = controller

@@ -1,5 +1,5 @@
 from yakoon.engine.registry import DomainRegistry
-from yakoon.solution.controller import SolutionMainController
+from yakoon.solution.controller import SolutionController
 from yakoon.solution.domains.realm.controller import SolutionRealmController
 
 
@@ -24,5 +24,5 @@ class SolutionRegistry(DomainRegistry):
             controllers=[
                 SolutionRealmController(),
             ],
-            system=SolutionMainController(),
+            gateway=SolutionController(),
         )

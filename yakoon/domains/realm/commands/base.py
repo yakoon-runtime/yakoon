@@ -18,6 +18,6 @@ class RealmCommand(Command):
     async def get_namespace(self, session: PlatformSession) -> Namespace:
         return await NamespaceService.from_session(session)
 
-    async def get_platform_services(self, session: PlatformSession) -> PlatformServiceRegistry:
-        return session.ctx.platform.services.get_registry("system")
+    async def get_gateway_services(self, session: PlatformSession) -> PlatformServiceRegistry:
+        return session.ctx.gateway.services.get_registry("gateway")
         

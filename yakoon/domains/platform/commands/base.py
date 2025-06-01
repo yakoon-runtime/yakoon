@@ -14,5 +14,5 @@ class PlatformCommand(Command):
         return Presenter(await self.get_template_path(), session)
     
     async def get_services(self, session: PlatformSession) -> PlatformServiceRegistry:
-        return session.ctx.platform.services.get_registry("system")
+        return session.ctx.gateway.services.get_registry("gateway")
         

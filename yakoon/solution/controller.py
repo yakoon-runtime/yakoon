@@ -6,7 +6,7 @@ from yakoon.services.router import ServiceRouter
 from yakoon.solution.setup.admin import ensure_admin_account
 
 
-class SolutionMainController(PlatformController):
+class SolutionController(PlatformController):
     """
     Core entry point for the solution.
 
@@ -21,7 +21,7 @@ class SolutionMainController(PlatformController):
     def __init__(self):
         super().__init__()    
         self.services = ServiceRouter()
-        self.services.register("system", bind_memory_services())
+        self.services.register("gateway", bind_memory_services())
 
     async def on_initialize(self, session: PlatformSession):
         """

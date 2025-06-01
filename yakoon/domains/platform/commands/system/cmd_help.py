@@ -18,7 +18,7 @@ class CmdHelpSystem(PlatformCommand):
 
         presenter = await self.get_presenter(session)
         await presenter.emit(
-            "show", controllers=[registry.system] + registry.controllers, 
+            "show", controllers=registry.get_controllers(), 
             grouped=grouped)
         
 

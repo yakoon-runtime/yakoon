@@ -6,7 +6,7 @@ from yakoon.domains.platform.runtime.session import PlatformSession
 
 class PlatformController(BaseController):
 
-    id: str = "platform"
+    id: str = "gateway"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     default_command_groups = ["system", "account"]     
@@ -18,7 +18,7 @@ class PlatformController(BaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
     
-    async def on_platform_validate(self, session: PlatformSession):
+    async def on_gateway_validate(self, session: PlatformSession):
         """
         Platform-level pre-send hook, called before request parsing.
 
@@ -53,14 +53,14 @@ class PlatformController(BaseController):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_platform_finalize(self, session: PlatformSession):
+    async def on_gateway_finalize(self, session: PlatformSession):
         """
         Platform-level post-send hook, called after command runing.
 
         Used to cleanup session context (e.g., account, locale, dynamic commands).
-        Only invoked if this controller is the registered `system` controller.
+        Only invoked if this controller is the registered `gateway` controller.
         """
-        await super().on_platform_finalize(session)
+        await super().on_gateway_finalize(session)
         if session.is_anonymous:
-            services = self.services.get_registry("system")
+            services = self.services.get_registry("gateway")
             await services.sessions.delete_by_id(session.id)

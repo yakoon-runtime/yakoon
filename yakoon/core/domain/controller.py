@@ -63,7 +63,7 @@ class BaseController(ABC):
         """
         pass
 
-    async def on_platform_validate(self, session: BaseSession):
+    async def on_gateway_validate(self, session: BaseSession):
         """
         Platform-level pre-send hook, called before request parsing.
 
@@ -124,7 +124,7 @@ class BaseController(ABC):
         or undo temporary session changes.
         """
 
-    async def on_platform_finalize(self, session: BaseSession):
+    async def on_gateway_finalize(self, session: BaseSession):
         """
         Platform-level post-send hook, called after command runing.
 

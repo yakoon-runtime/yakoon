@@ -13,7 +13,7 @@ class CmdIC(RealmCommand):
 
     async def run(self, session: PlatformSession, request: Request):
         presenter = await self.get_presenter(session)
-        services = await self.get_platform_services(session)
+        services = await self.get_gateway_services(session)
         
         if not request.args:
             return await presenter.fail("no_name_in_args")
