@@ -1,5 +1,5 @@
 
-from yakoon.core.command import Command
+from yakoon.commands.command import Command
 from yakoon.domains.realm.services.registry import RealmServiceRegistry
 
 

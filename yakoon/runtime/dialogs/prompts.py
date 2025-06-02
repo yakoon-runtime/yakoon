@@ -1,4 +1,4 @@
-from yakoon.engine.settings import Settings
+from yakoon.engines.command.settings import Settings
 from yakoon.runtime.dialogs.manager import DialogManager
 from yakoon.runtime.models.session import BaseSession
 

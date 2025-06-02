@@ -1,8 +1,8 @@
 
+from yakoon.engines.render.models.context import RenderContext
 from yakoon.runtime.models.session import BaseSession
-from yakoon.services.renderer.base.models import RenderContext
 from yakoon.runtime.views.prompts import Prompts
-from yakoon.services.renderer.service import RendererService
+from yakoon.services.render import RendererService
 
 
 class Presenter:

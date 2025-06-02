@@ -1,7 +1,7 @@
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
-from yakoon.core.parser import Request
-from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.commands.parser import Request
+from yakoon.domains.gateway.runtime.session import PlatformSession
 
 
 class CmdOOC(RealmCommand):

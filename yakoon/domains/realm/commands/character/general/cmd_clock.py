@@ -1,8 +1,8 @@
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.day_phase import DayPhaseService
 from yakoon.domains.realm.services.season import SeasonService
-from yakoon.core.parser import Request
-from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.commands.parser import Request
+from yakoon.domains.gateway.runtime.session import PlatformSession
 
 
 class CmdClock(RealmCommand):

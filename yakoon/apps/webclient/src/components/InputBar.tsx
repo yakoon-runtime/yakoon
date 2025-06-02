@@ -18,7 +18,7 @@ export function InputBar({ onSubmit, disabled = false }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 p-2 border-t border-zinc-700 bg-zinc-900">
+    <form onSubmit={handleSubmit} className="flex gap-2 p-2 border-zinc-700 bg-zinc-900">
       <input
         type="text"
         value={input}

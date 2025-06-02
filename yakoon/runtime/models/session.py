@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Optional, Type
 from uuid import uuid4
 
-from yakoon.engine.io.output import Output
+from yakoon.engines.command.io.output import Output
 from yakoon.runtime.models.data import RuntimeSessionData, StorageSessionData
 
 

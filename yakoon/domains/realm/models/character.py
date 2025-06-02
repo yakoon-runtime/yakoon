@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import PlatformSession
 
 
 

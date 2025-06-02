@@ -1,5 +1,5 @@
 
-from typing import Optional
+from yakoon.models.namespace import Namespace
 from yakoon.domains.realm.models.character import Character
 
 
@@ -9,29 +9,28 @@ class InMemoryCharacterStore:
         self._chars: dict[str, Character] = {}
         load_defaults(self)
 
-    async def get_by_name(self, name: str) -> Optional[Character]:
-        for char in self._chars.values():
-            if char.name.lower() == name.lower():
-                return char
+    async def create(self, ns: Namespace, char: Character):
+        char.validate()
+        self._chars[ns.get_key(char.id)] = char
 
-    async def get_by_id(self, char_id: str) -> Optional[Character]:
-        return self._chars.get(char_id)
+    async def get_by_id(self, ns: Namespace, id_: str) -> Character | None:
+        return self._chars.get(ns.get_key(id_))
 
-    def add(self, obj: Character):
-        self._chars[obj.id] = obj
+    async def get_by_name(self, ns: Namespace, name: str) -> list[Character]:
+        for k, v, in self._chars.items():
+            if name and name.lower() == v.name.lower():
+                return v
 
-    async def all(self) -> list[Character]:
-        return list(self._chars.values())
-
-    async def exists(self, char_id: str) -> bool:
-        return char_id in self._chars
-
-    async def save(self, obj: Character):
-        pass  # optional später
+    def add(self, ns: Namespace, char: Character):
+        char.validate()
+        self._chars[ns.get_key(char.id)] = char
 
 
 def load_defaults(store: InMemoryCharacterStore):
-    store.add(
+
+    ns = Namespace(domain="realm", bucket="bucket", scope="develop")
+
+    store.add(ns,
         Character(id="char-stefan", name="Stefan", location="forest"))
-    store.add(
+    store.add(ns,
         Character(id="char-lara", name="Lara", location="hall"))

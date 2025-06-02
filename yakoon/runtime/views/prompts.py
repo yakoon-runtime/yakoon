@@ -1,7 +1,7 @@
+from yakoon.engines.render.models.context import RenderContext
 from yakoon.runtime.dialogs.prompts import ask, choice, choice_index, confirm
 from yakoon.runtime.models.session import BaseSession
-from yakoon.services.renderer.base.models import RenderContext
-from yakoon.services.renderer.service import RendererService
+from yakoon.services.render import RendererService
 
 
 class Prompts:

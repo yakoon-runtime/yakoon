@@ -3,23 +3,16 @@
 # ✅ NEXT STEPS #
 ==================
 
-ctx.gateway -> auflösen -> das brauchen wir nicht mehr
-In Zukunft läuft das über den Controller.
-
-git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; clarified structure and naming to reflect its role as entrypoint domain"
-
+REchnung
 
 # Realm
+- Umstellung Services + Stores
 
 - Konzept Namespaces 
   - User_1, User_2 -> NS1
   - User_2 -> NS2
-- Realmsettings: wirklich von Setings ableiten? eher nicht
-- realm.models.room -> template + field attachment.
-- realm.commands.general - IC, OOC
-- realm.commands.character - * 
 
-- Ersten Commands aus Evennia abziehen 
+- Ersten Commands aus Evennia übernehmen 
   - Account, Session 
 
 # Platform
@@ -28,8 +21,8 @@ git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; cla
   - Antwort was getan wird; Antwort was getan wurde? 
 
 # A.M.E.E 
-- Alles Dokumentieren im Code auf Englisch (Docstrings)
-- Unittests (oder besseres - Yukoon-Style)
+- Code dokumentieren (Docstrings)
+- Unittests (oder pytest - Yukoon-Style)
 
 # Open AI
 - Yakoon-06 (AI-key) -> comment_all_public_methods
@@ -44,12 +37,6 @@ git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; cla
 - Alles muss in einem Docker laufen
 
 # MUD
-- Templates für die Räume (Jinja2)
-- Konzept: Namespaces 
-  - Modelle sind verwenden Namensberreiche
-- Und jede Menge Commands (die habe ich schon für Evennia entwickelt. Sind aber
-  alle noch anzupassen.
-- Persistieren aller Objekte
 - Commands:
   - CmdInventory
   - CmdGet, CmdPut -> Legen in Boxen / Inventar....
@@ -58,26 +45,6 @@ git commit -m "refactor(domains): moved 'platform' domain to 'core.gateway'; cla
 get_weather(): Er genügt, das erstmal auf Abruf zu tun.
 1. Die Wetter-Phasen 
 2. Die Wetter-Events (Ereignisse pro Zone)
-
-
----
-# GIT Konvention:
-git commit -m "feat(cli): add project init command"
-
-
-# Start RestService
-- uvicorn yakoon.app.webapi.app:app --reload
-
-# Install Yakon as component
-- Im ProjektRoot: pip install -e .
-- C:\Bibliothek\yakoon>  python -m yakoon --init smurf
-
-# Zusammenfassung -> Chatgpt
-Mach uns mal eine Zusammenfassung, was wir alles geschafft haben, damit wir konzentriert unsere Zusammenarbeit fortsezen können.
-
-# Später
-- Alles Dockern
-
 
 # Application Plan
 yakoon/               ← die Engine (pip install yakoon)

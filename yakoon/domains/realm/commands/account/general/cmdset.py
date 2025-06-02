@@ -1,8 +1,8 @@
 from typing import Sequence, Type
-from yakoon.core.command import Command
-from yakoon.core.commandset import CommandSet
+from yakoon.commands.command import Command
+from yakoon.commands.commandset import CommandSet
 from yakoon.domains.realm.commands.account.general.cmd_ic import CmdIC
-from yakoon.domains.platform.settings import Settings
+from yakoon.domains.gateway.settings import Settings
 
 
 class GeneralAccountCommands(CommandSet):

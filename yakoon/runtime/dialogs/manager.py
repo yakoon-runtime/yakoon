@@ -1,8 +1,8 @@
 import asyncio
 from typing import Awaitable, Callable
 
-from yakoon.core.devtools.prompt import UnresolvedPromptMonitor
-from yakoon.engine.settings import DEV_MODE
+from yakoon.runtime.devtools.prompt import UnresolvedPromptMonitor
+from yakoon.engines.command.settings import DEV_MODE
 
 
 class DialogManager:

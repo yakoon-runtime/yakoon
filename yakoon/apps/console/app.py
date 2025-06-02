@@ -1,12 +1,13 @@
 
 import asyncio
-from yakoon.core.devtools import MemoryTrendMonitor
-from yakoon.core.devtools import UnresolvedPromptMonitor
-from yakoon.engine import Engine, Output, safe_input
-from yakoon.engine.settings import DEV_MODE
-from yakoon.solution.registry import SolutionRegistry
-from yakoon.solution.settings import SolutionSettings
-from yakoon.services.renderer import RenderMode
+from yakoon.engines.render.models.mode import RenderMode
+from yakoon.runtime.devtools import MemoryTrendMonitor
+from yakoon.runtime.devtools import UnresolvedPromptMonitor
+from yakoon.engines.command import Engine, Output, safe_input
+from yakoon.engines.command.settings import DEV_MODE
+from yakoon.bootstrap.registry import BootstrapRegistry
+from yakoon.bootstrap.settings import SolutionSettings
+
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 SolutionSettings.runtime.render_mode = RenderMode.PLAIN
@@ -20,11 +21,11 @@ async def run_console():
    
     if DEV_MODE:
         UnresolvedPromptMonitor.start()
-        MemoryTrendMonitor.start(60)
+        MemoryTrendMonitor.start(20)
 
     output = Output(print, print)
     
-    engine = Engine(SolutionRegistry())
+    engine = Engine(BootstrapRegistry())
     await engine.initialize(output)
 
     while True:               

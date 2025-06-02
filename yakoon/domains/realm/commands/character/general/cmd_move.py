@@ -2,8 +2,8 @@
 from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.room import RoomService
-from yakoon.core.parser import Request
-from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.commands.parser import Request
+from yakoon.domains.gateway.runtime.session import PlatformSession
 
 
 class CmdMove(RealmCommand):
@@ -17,7 +17,7 @@ class CmdMove(RealmCommand):
         presenter = await self.get_presenter(session)
         services = await self.get_domain_services()
 
-        ns = await services.spaces.from_session(session)
+        ns = await services.namespaces.from_session(session)
 
         target = request.args[0] if request.args else None
         if not target:

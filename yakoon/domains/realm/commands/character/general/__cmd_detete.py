@@ -1,8 +1,8 @@
 
 from yakoon.domains.realm.services.object import ObjectService
-from yakoon.core.command import Command
-from yakoon.core.parser import Request
-from yakoon.domains.platform.runtime.session import PlatformSession
+from yakoon.commands.command import Command
+from yakoon.commands.parser import Request
+from yakoon.domains.gateway.runtime.session import PlatformSession
 from yakoon.runtime.dialogs.prompts import confirm
 
 
