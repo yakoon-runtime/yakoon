@@ -1,6 +1,6 @@
 
 
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class Secured:
@@ -8,7 +8,7 @@ class Secured:
     deletable_by: list[str] = []  # z. B. ["builder"]
     viewable_by: list[str] = []  # z. B. ["player", "admin"]
 
-    def has_perm(self, session: PlatformSession, action: str) -> bool:
+    def has_perm(self, session: GatewaySession, action: str) -> bool:
         perms = {
             "edit": self.editable_by,
             "delete": self.deletable_by,

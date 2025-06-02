@@ -1,7 +1,7 @@
 from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 from yakoon.commands.parser import Request
 
 
@@ -10,7 +10,7 @@ class CmdIC(RealmCommand):
     key = "ic"
     template_key = "account/general/cmd_ic"
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
         services = await self.get_domain_services()
         

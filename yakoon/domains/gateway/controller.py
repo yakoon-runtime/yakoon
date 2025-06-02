@@ -1,7 +1,7 @@
 from yakoon.controllers.base import GatewayBaseController
 from yakoon.domains.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.gateway.commands.system.cmdset import PlatformSystemCommands
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class GatewayController(GatewayBaseController):
@@ -18,7 +18,7 @@ class GatewayController(GatewayBaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
     
-    async def on_gateway_validate(self, session: PlatformSession):
+    async def on_gateway_validate(self, session: GatewaySession):
         """
         Platform-level pre-send hook, called before request parsing.
 
@@ -43,7 +43,7 @@ class GatewayController(GatewayBaseController):
             session.account = account
             session.cmd_groups = merge(session.cmd_groups, account.cmd_groups)
             
-    async def on_before_run_command(self, session: PlatformSession, request, command):
+    async def on_before_run_command(self, session: GatewaySession, request, command):
         """
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
@@ -52,7 +52,7 @@ class GatewayController(GatewayBaseController):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_gateway_finalize(self, session: PlatformSession):
+    async def on_gateway_finalize(self, session: GatewaySession):
         """
         Platform-level post-send hook, called after command runing.
 

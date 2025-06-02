@@ -6,7 +6,7 @@ from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
 from yakoon.domains.realm.services.bindings.memory import bind_memory_services
 from yakoon.controllers.base.gateway import BaseController
 from yakoon.domains.gateway.commands.shared.cmdset import PlatformSharedCommands
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 from yakoon.runtime.system.router import ServiceRouter
 
 
@@ -34,13 +34,13 @@ class RealmController(BaseController):
         self.service_router = ServiceRouter()
         self.service_router.register_static(self.id, bind_memory_services())
 
-    def dynamic_prefix(self, session: PlatformSession) -> str:
+    def dynamic_prefix(self, session: GatewaySession) -> str:
         """
         Returns the command group prefix for dynamic, session-local commands.
         """
         return f"{self.id}:dynamic:{session.id}"
 
-    async def on_before_resolve(self, session: PlatformSession):
+    async def on_before_resolve(self, session: GatewaySession):
         """
         Hook called before command resolution.
 
@@ -70,7 +70,7 @@ class RealmController(BaseController):
         self.router.unregister(dynamic)
         self.router.register(dynamic, get_exit_direction_commandset(room))
   
-    async def on_before_run_command(self, session: PlatformSession, request, command):
+    async def on_before_run_command(self, session: GatewaySession, request, command):
         char_id = session.data_storage.get(self.id, "char_id")
         services = await self.get_domain_services()
         ns = await services.namespaces.from_session(session)
@@ -88,7 +88,7 @@ class RealmController(BaseController):
             if not session.data_runtime or not session.data_runtime.character:
                 raise PermissionError("Du brauchst dazu einen Spieler: Verwende 'ic <character>'.")
 
-    async def on_enter(self, session: PlatformSession):
+    async def on_enter(self, session: GatewaySession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.
@@ -97,7 +97,7 @@ class RealmController(BaseController):
         await session.emit("Willkommen im MUD.")
         await session.notify("Melde dich mit `ic <charakter>` an.")        
 
-    async def on_cleanup(self, session: PlatformSession):
+    async def on_cleanup(self, session: GatewaySession):
         """
         Always called after a command cycle, even if exceptions occurred.
 

@@ -1,6 +1,6 @@
 from yakoon.commands.parser import Request
 from yakoon.domains.gateway.commands.base import PlatformCommand
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class CmdLogin(PlatformCommand):
@@ -8,7 +8,7 @@ class CmdLogin(PlatformCommand):
     key = "login"
     template_key = "account/cmd_login"
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
 
         presenter = await self.get_presenter(session)
         services = await self.get_gateway_services()

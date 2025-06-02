@@ -2,7 +2,7 @@ import importlib
 from pathlib import Path
 from yakoon.commands.command import Command
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 """
  subcommands -> Der parser kann das....
@@ -22,7 +22,7 @@ class CmdCreateDomainProject(Command):
 
     key = "create"
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
         
         domain = request.kwargs.get("domain")
         name = request.kwargs.get("name")

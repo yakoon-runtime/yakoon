@@ -3,7 +3,7 @@ from yakoon.domains.realm.behavior import CharacterBehavior
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.services.room import RoomService
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class CmdMove(RealmCommand):
@@ -13,7 +13,7 @@ class CmdMove(RealmCommand):
     requires_character = True
     template_key = "character/general/cmd_move"
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
         services = await self.get_domain_services()
 

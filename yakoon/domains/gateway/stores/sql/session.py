@@ -3,7 +3,7 @@ from dataclasses import asdict
 from sqlalchemy import JSON, Column, DateTime, String, Boolean
 from sqlalchemy.future import select
 from yakoon.runtime.models.data import StorageSessionData
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 from yakoon.domains.gateway.stores.sql._base import Base
 
 
@@ -26,20 +26,20 @@ class SQLSessionStore:
     def __init__(self, db):
         self.db = db
 
-    async def get_by_id(self, id_: str) -> PlatformSession | None:
+    async def get_by_id(self, id_: str) -> GatewaySession | None:
         stmt = select(SessionORM).where(SessionORM.id == id_)
         result = self.db.execute(stmt).scalar_one_or_none()
         return self._to_entity(result) if result else None
 
-    async def get_or_create(self, session_id: str, **kwargs) -> tuple[PlatformSession, bool]:
+    async def get_or_create(self, session_id: str, **kwargs) -> tuple[GatewaySession, bool]:
         existing = await self.get_by_id(session_id)
         if existing:
             return existing, False
-        new = PlatformSession(id=session_id, **kwargs)
+        new = GatewaySession(id=session_id, **kwargs)
         await self.save(new)
         return new, True
 
-    async def save(self, session: PlatformSession):
+    async def save(self, session: GatewaySession):
         orm = self._to_orm(session)
         self.db.merge(orm)  # insert or update
         self.db.commit()
@@ -52,7 +52,7 @@ class SQLSessionStore:
 
     # ─────────── Mapping ───────────
 
-    def _to_orm(self, session: PlatformSession) -> SessionORM:
+    def _to_orm(self, session: GatewaySession) -> SessionORM:
           return SessionORM(
             id=session.id,
             lang=session.lang,
@@ -63,8 +63,8 @@ class SQLSessionStore:
             timestamp=session.timestamp,
         )
     
-    def _to_entity(self, orm: SessionORM) -> PlatformSession:
-        return PlatformSession(
+    def _to_entity(self, orm: SessionORM) -> GatewaySession:
+        return GatewaySession(
             id=orm.id,
             lang=orm.lang,
             domain_id=orm.domain_id,

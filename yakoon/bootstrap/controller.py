@@ -1,6 +1,6 @@
 import os
 from yakoon.domains.gateway.controller import GatewayController
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 from yakoon.domains.gateway.services.bindings.memory import bind_memory_services
 from yakoon.runtime.system.router import ServiceRouter
 from yakoon.bootstrap.setup.admin import ensure_admin_account
@@ -23,7 +23,7 @@ class BootstrapController(GatewayController):
         self.service_router = ServiceRouter()
         self.service_router.register_static(self.id, bind_memory_services())
 
-    async def on_initialize(self, session: PlatformSession):
+    async def on_initialize(self, session: GatewaySession):
         """
         Called after the controller has been fully constructed but before any commands are processed.
 

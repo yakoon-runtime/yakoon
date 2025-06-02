@@ -4,7 +4,7 @@ import time
 from datetime import datetime, timezone
 from yakoon.commands.parser import Request
 from yakoon.domains.gateway.commands.base import PlatformCommand
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 from yakoon.domains.gateway.settings import Settings
 
 
@@ -13,7 +13,7 @@ class CmdVersion(PlatformCommand):
     key = "version"
     template_key = "system/cmd_version"
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
 
         presenter = await self.get_presenter(session)
         await presenter.emit("show", 

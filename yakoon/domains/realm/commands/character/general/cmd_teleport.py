@@ -1,7 +1,7 @@
 
 from yakoon.commands.command import Command
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class CmdTeleport(Command):
@@ -11,6 +11,6 @@ class CmdTeleport(Command):
     requires = ["admin"]
     requires_character = True
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
 
         await session.emit("teleport done!")

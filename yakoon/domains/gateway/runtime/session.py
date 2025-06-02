@@ -8,7 +8,7 @@ from yakoon.domains.gateway.models.account import Account
 
 
 @dataclass
-class PlatformSession(BaseSession):
+class GatewaySession(BaseSession):
 
     # ───── persistent fields (stored in DB/json) ─────
 

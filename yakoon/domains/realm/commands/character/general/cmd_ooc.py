@@ -1,7 +1,7 @@
 from yakoon.domains.realm.commands.base import RealmCommand
 from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import PlatformSession
+from yakoon.domains.gateway.runtime.session import GatewaySession
 
 
 class CmdOOC(RealmCommand):
@@ -10,7 +10,7 @@ class CmdOOC(RealmCommand):
     template_key = "character/general/cmd_ooc"
     requires_character = True
 
-    async def run(self, session: PlatformSession, request: Request):
+    async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
        
         runtime_data: RuntimeRealmData = session.data_runtime
