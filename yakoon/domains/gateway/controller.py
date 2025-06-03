@@ -2,6 +2,7 @@ from yakoon.controllers.base import GatewayBaseController
 from yakoon.domains.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.gateway.commands.system.cmdset import PlatformSystemCommands
 from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.domains.gateway.setup import setup_gateway
 
 
 class GatewayController(GatewayBaseController):
@@ -18,6 +19,10 @@ class GatewayController(GatewayBaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
     
+    def __init__(self):
+        super().__init__()    
+        setup_gateway(self.service_router, self.id)
+
     async def on_gateway_validate(self, session: GatewaySession):
         """
         Platform-level pre-send hook, called before request parsing.
@@ -61,5 +66,5 @@ class GatewayController(GatewayBaseController):
         """
         await super().on_gateway_finalize(session)
         if session.is_anonymous:
-            services = await self.service_router.get_registry(self.id)
+            services = await self.service_router.get_registry("system")
             await services.sessions.delete_by_id(session.id)

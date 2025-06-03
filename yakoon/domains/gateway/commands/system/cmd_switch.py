@@ -11,7 +11,7 @@ class CmdSwitch(PlatformCommand):
 
     async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
-        services = await self.get_gateway_services()
+        services = await self.get_system_services()
         registry = await self.get_controller_registry()
 
         name = request.get_arg(0)

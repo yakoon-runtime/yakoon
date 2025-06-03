@@ -2,6 +2,27 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-06-03]
+**Setup-Funktionen & Registry-Struktur**
+Jede Domain besitzt ein eigenes `setup.py`, das eine ServiceRegistry erzeugt.  
+Die Stores werden über `create_store_registry()` zentral verwaltet und beim Setup übergeben.  
+Alle Registry-Klassen sind explizit typisiert, enthalten aber keine Logik.  
+Service- und Store-Registries sind getrennt, werden aber über `from_store_registry()` verbunden.
+
+## [2025-06-02]
+**003 – Kein ORM / Kein SQL-Mapper**
+Wir verzichten bewusst auf ORMs wie SQLAlchemy oder Tortoise.  
+Sie erzeugen versteckte Abhängigkeiten, Magie im Speicherzugriff und hohes Memory-Footprint.  
+Stattdessen verwenden wir `asyncpg` + `PyPika` + explizite `StoreBase`-Klassen.  
+Alle Datenzugriffe bleiben sichtbar, testbar und frei von Metaprogrammierung.
+
+## [2025-06-01]
+**StoreRegistry & ServiceRegistry**
+Wir trennen Infrastruktur (StoreRegistry) von Anwendungslogik (ServiceRegistry).  
+Jede Domain kapselt ihre eigene ServiceRegistry und bindet nur die Stores, die sie benötigt.  
+Bootstrap entscheidet, welche Domains aktiv sind – nicht, wie sie intern aufgebaut sind.  
+Das System bleibt testbar, erweiterbar und backend-agnostisch
+
 ## [2025-05-31]
 **Kontextbasierte Architektur eingeführt**
 Jede Domain besitzt ihre eigene ServiceRegistry, die alle Services kapselt (z. B. room, session, account).

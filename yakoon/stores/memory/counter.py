@@ -1,10 +1,9 @@
-# yakoon/services/counter/store/memory.py
 
 from collections import defaultdict
-from yakoon.stores.base.counter import BaseCounterStore
 
 
-class InMemoryCounterStore(BaseCounterStore):
+class InMemoryCounterStore:
+
     def __init__(self):
         self._counters = defaultdict(int)
 

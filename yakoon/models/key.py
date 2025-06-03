@@ -18,6 +18,9 @@ class Key:
             raise ValueError(f"Invalid key format: {raw}")
         domain, bucket, scope, id_ = parts
         return Key(Namespace(domain, bucket, scope), id_)
+    
+    def to_str(self):
+        return str(self)
 
     def __str__(self):
         return f"{self.namespace.get_prefix()}:{self.id}"

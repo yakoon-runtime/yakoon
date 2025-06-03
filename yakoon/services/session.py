@@ -1,9 +1,8 @@
 from yakoon.runtime.models.data import RuntimeSessionData
 from yakoon.runtime.models.session import BaseSession
-from yakoon.services.base.session import BaseSessionService
 
 
-class SessionService(BaseSessionService):
+class SessionService:
     
     def __init__(self, store):
         self.store = store
@@ -22,3 +21,4 @@ class SessionService(BaseSessionService):
     async def delete_by_id(self, session_id: str):
         await self.store.delete_by_id(session_id)
     
+

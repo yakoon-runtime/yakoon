@@ -4,7 +4,7 @@ from sqlalchemy import JSON, Column, DateTime, String, Boolean
 from sqlalchemy.future import select
 from yakoon.runtime.models.data import StorageSessionData
 from yakoon.domains.gateway.runtime.session import GatewaySession
-from yakoon.domains.gateway.stores.sql._base import Base
+from yakoon.domains.gateway.stores.___sql._base import Base
 
 
 class SessionORM(Base):

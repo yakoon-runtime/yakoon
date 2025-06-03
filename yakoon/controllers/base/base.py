@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from argparse import Namespace
 from typing import Any, Sequence, Type
 from typing import TYPE_CHECKING
 
@@ -28,7 +29,7 @@ class BaseController(ABC):
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
  
-    service_router: ServiceRouter | None = None
+    service_router: ServiceRouter = None
     """Provides bucket-based access to domain services (e.g. room, account, session). 
     Injected at runtime by the platform."""
 
@@ -36,6 +37,7 @@ class BaseController(ABC):
 
     def __init__(self):
         self.router = CommandRouter()
+        self.service_router = ServiceRouter()
         self._register_all_commands()
 
     def _register_all_commands(self):
@@ -49,12 +51,13 @@ class BaseController(ABC):
     def get_default_command_groups_with_prefix(self) -> list[str]:
         return [self._get_value_with_prefix(group) for group in self.default_command_groups]
 
-    def bind_service_router(self, router: ServiceRouter):
-        self.router = router
-
     @property
     @abstractmethod
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
+
+    async def get_namespace(self, session: BaseSession) -> Namespace:
+        services = await self.get_system_services()
+        return await services.namespaces.from_session(session)
 
     async def get_domain_services(self) -> ServiceRegistry:
         return await self.service_router.get_registry(self.id)
@@ -63,6 +66,11 @@ class BaseController(ABC):
         if self.gateway is None or self.gateway.id == self.id:
             return await self.service_router.get_registry(self.id)
         return await self.gateway.service_router.get_registry(self.gateway.id)
+
+    async def get_system_services(self) -> ServiceRegistry:
+        if self.gateway is None or self.gateway.id == self.id:
+            return await self.service_router.get_registry("system")
+        return await self.gateway.service_router.get_registry("system")
 
     async def get_controller_registry(self) -> BaseDomainRegistry:
         gateway = self.gateway if self.gateway else self 

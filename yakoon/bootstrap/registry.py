@@ -1,6 +1,6 @@
+from yakoon.domains.realm.controller import RealmController
 from yakoon.engines.command.registry import DomainRegistry
 from yakoon.bootstrap.controller import BootstrapController
-from yakoon.bootstrap.domains.realm.controller import SolutionRealmController
 
 
 class BootstrapRegistry(DomainRegistry):
@@ -22,7 +22,7 @@ class BootstrapRegistry(DomainRegistry):
     def __init__(self):        
         super().__init__(
             controllers=[
-                SolutionRealmController(),
+                RealmController(),
             ],
             gateway=BootstrapController(),
         )

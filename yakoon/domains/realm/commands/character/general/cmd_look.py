@@ -16,9 +16,9 @@ class CmdLook(RealmCommand):
     async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
         services = await self.get_domain_services()
-        char = session.data_runtime.character
+        ns = await self.get_namespace(session)
 
-        ns = await services.namespaces.from_session(session)
+        char = session.data_runtime.character
         room = await services.rooms.get_by_id(ns, char.location) if char else None
         if not room:
             return await presenter.fail("not_found")

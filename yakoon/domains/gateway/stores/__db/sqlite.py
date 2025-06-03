@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from yakoon.domains.gateway.stores.sql._base import Base
+from yakoon.domains.gateway.stores.___sql._base import Base
 
 engine = create_engine("sqlite:///yakoon.db", echo=False)
 LocalSqlSession = sessionmaker(bind=engine)

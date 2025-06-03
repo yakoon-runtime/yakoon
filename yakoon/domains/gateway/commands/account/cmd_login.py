@@ -21,11 +21,12 @@ class CmdLogin(PlatformCommand):
         if not account:
             return await presenter.emit("not_found", name=name)
 
-        if not await services.sessions.get_by_id(session.id):
+        sys_services = await self.get_system_services()
+        if not await sys_services.sessions.get_by_id(session.id):
             raise ValueError("Session cannot be None")
 
         session.account_id = account.id
-        await services.sessions.save(session)
+        await sys_services.sessions.save(session)
 
         registry = await self.get_controller_registry()
         for controller in registry.get_controllers():

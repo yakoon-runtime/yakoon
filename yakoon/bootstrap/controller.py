@@ -1,9 +1,6 @@
-import os
+from yakoon.bootstrap.setup import setup_system
 from yakoon.domains.gateway.controller import GatewayController
 from yakoon.domains.gateway.runtime.session import GatewaySession
-from yakoon.domains.gateway.services.bindings.memory import bind_memory_services
-from yakoon.runtime.system.router import ServiceRouter
-from yakoon.bootstrap.setup.admin import ensure_admin_account
 
 
 class BootstrapController(GatewayController):
@@ -20,8 +17,7 @@ class BootstrapController(GatewayController):
 
     def __init__(self):
         super().__init__()    
-        self.service_router = ServiceRouter()
-        self.service_router.register_static(self.id, bind_memory_services())
+        setup_system(self.service_router, "system")
 
     async def on_initialize(self, session: GatewaySession):
         """
@@ -32,6 +28,4 @@ class BootstrapController(GatewayController):
 
         This method is guaranteed to run once before the first engine tick or command dispatch.
         """
-        services = await self.get_gateway_services()
-        await ensure_admin_account(services.accounts)
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

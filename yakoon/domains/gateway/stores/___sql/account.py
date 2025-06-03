@@ -4,7 +4,7 @@ from sqlalchemy import JSON, Column, String
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 from yakoon.domains.gateway.models.account import Account
-from yakoon.domains.gateway.stores.sql._base import Base
+from yakoon.domains.gateway.stores.___sql._base import Base
 
 
 class AccountORM(Base):

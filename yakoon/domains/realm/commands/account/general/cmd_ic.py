@@ -11,17 +11,14 @@ class CmdIC(RealmCommand):
     template_key = "account/general/cmd_ic"
 
     async def run(self, session: GatewaySession, request: Request):
-        presenter = await self.get_presenter(session)
-        services = await self.get_domain_services()
-        
+        presenter = await self.get_presenter(session)        
         if not request.args:
             return await presenter.fail("no_name_in_args")
 
         char_name = request.args[0]
-        
-        ns = await services.namespaces.from_session(session)
+        ns = await self.get_namespace(session)
+        services = await self.get_domain_services()
         char = await services.chars.get_by_name(ns, char_name)
-
         if not char:
             return await presenter.fail("not_found", name=char_name)
 
@@ -30,8 +27,8 @@ class CmdIC(RealmCommand):
             return await presenter.emit("already", name=char.name)
 
         session.data_storage.set(self.controller.id, "char_id", char.id)
-        gateway_services = await self.get_gateway_services()
-        await gateway_services.sessions.save(session)
+        sys_services = await self.get_system_services()
+        await sys_services.sessions.save(session)
 
         CharacterBehavior.attach(char)
 

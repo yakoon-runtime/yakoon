@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from typing import Optional, Type
 from uuid import uuid4
 
@@ -35,6 +35,17 @@ class BaseSession:
     def validate(self):
         if not self.id:
             raise ValueError("Id cannot be None or empty")
+
+    def to_row(self) -> dict:
+          return {
+            f.name: getattr(self, f.name)
+            for f in fields(self)
+            if not f.name.startswith("_")
+        }
+
+    @classmethod
+    def from_row(cls, row: dict):
+        return cls(**row)
 
     @property
     def cmd_groups(self) -> list[Type[str]]:

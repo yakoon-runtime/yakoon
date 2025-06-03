@@ -17,3 +17,7 @@ class Entity:
             "id": self.key.id,
             **{k: v for k, v in asdict(self).items() if k != "key"}
         }
+
+    @classmethod
+    def from_row(cls, row: dict):
+        return cls(**row)

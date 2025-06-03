@@ -15,15 +15,14 @@ class CmdMove(RealmCommand):
 
     async def run(self, session: GatewaySession, request: Request):
         presenter = await self.get_presenter(session)
-        services = await self.get_domain_services()
-
-        ns = await services.namespaces.from_session(session)
-
         target = request.args[0] if request.args else None
         if not target:
             return await presenter.fail("missing_arg")
 
         char = session.data_runtime.character
+
+        services = await self.get_domain_services()
+        ns = await self.get_namespace(session)
         room = await services.rooms.get_by_id(ns, char.location) if char else None
         if not room:
             return await presenter.fail("no_location")

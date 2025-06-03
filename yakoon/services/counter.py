@@ -1,10 +1,10 @@
 from yakoon.models.key import Key
-from yakoon.stores.base.counter import BaseCounterStore
 from yakoon.models.namespace import Namespace
+
 
 class ShardedCounterService:
 
-    def __init__(self, store: BaseCounterStore, shard_count: int = 16):
+    def __init__(self, store, shard_count: int = 16):
         self.store = store
         self.shard_count = shard_count
 

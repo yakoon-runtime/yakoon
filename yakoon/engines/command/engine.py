@@ -1,4 +1,3 @@
-
 import asyncio
 from collections import deque
 from yakoon.commands.parser import Request
@@ -8,7 +7,7 @@ from yakoon.engines.command.settings import Settings
 from yakoon.engines.command.batch import split_batch_input
 from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.manager import DialogManager
-from yakoon.runtime.system.registry import GatewayServiceRegistry
+from yakoon.services._registry import SystemServiceRegistry
 
 
 class Engine():
@@ -33,9 +32,9 @@ class Engine():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
 
-   async def _require_gateway_services(self, bucket: str) -> GatewayServiceRegistry :
+   async def _require_system_services(self, bucket: str= "system") -> SystemServiceRegistry :
       services = await self.registry.get_gateway().service_router.get_registry(bucket)
-      if not isinstance(services, GatewayServiceRegistry):
+      if not isinstance(services, SystemServiceRegistry):
          raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
       if not services:
          raise RuntimeError(f"No ServiceRegistry found for bucket: {bucket}")
@@ -48,7 +47,7 @@ class Engine():
       """
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
-      services = await self._require_gateway_services("gateway")      
+      services = await self._require_system_services()      
       session, _ = await services.sessions.get_or_create(session_id)
 
       # Bind the given Output to this session for output and error handling.
@@ -139,7 +138,7 @@ class Engine():
          await controller.on_after_run_command(session, request, command)
 
       except PermissionError as exc:
-         services = await self._require_gateway_services("gateway")     
+         services = await self._require_system_services()     
          await services.audit.permission(session, "command", command.key)
          await session.fail(str(exc))
 
@@ -147,7 +146,7 @@ class Engine():
          await session.fail(str(exc))
 
       except Exception as exc:
-         services = await self._require_gateway_services("gateway")     
+         services = await self._require_system_services()     
          await services.audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
 
