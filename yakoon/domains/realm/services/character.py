@@ -1,6 +1,9 @@
 from argparse import Namespace
 from typing import Optional
 from yakoon.domains.realm.models.character import Character
+from typing import Optional
+
+from yakoon.models.key import Key
 
 
 class CharacterService:
@@ -8,11 +11,17 @@ class CharacterService:
     def __init__(self, store):
         self.store = store
 
-    async def get_by_id(self, ns: Namespace, char_id: str) -> Optional[Character]:
-        return await self.store.get_by_id(ns, char_id)
+    async def get_by_key(self, key: Key) -> Optional[Character]:
+        row = await self.store.get_by_key(key)
+        return Character.from_row(row) if row else None
 
-    async def get_by_name(self, ns: Namespace, name: str) -> Optional[Character]:
-        return await self.store.get_by_name(ns, name)
+    async def get_by_name(self, namespace: Namespace, name: str) -> Optional[Character]:
+        rows = await self.store.fetch_by_fields(namespace=namespace, name=name, limit=1)        
+        return Character.from_row(rows[0]) if rows else None
     
-    async def save(self, char: Character):
-        await self.store.save(char)
+    async def save(self, character: Character):
+        character.validate()
+        await self.store.save(character.to_row())
+
+    async def delete_by_key(self, key: Key):
+        await self.store.delete_by_key(key)

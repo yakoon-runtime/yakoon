@@ -1,9 +1,8 @@
 from yakoon.domains.realm.behavior import CharacterBehavior
-from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.commands.command import Command
 from yakoon.commands.commandset import CommandSet
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class DirectionCommand(Command):
@@ -19,9 +18,8 @@ class DirectionCommand(Command):
     async def get_template_path(self):
         return await super().get_template_path()
 
-    async def run(self, session: GatewaySession, request: Request):
-        runtime_data: RuntimeRealmData = session.data_runtime
-        character = runtime_data.character
+    async def run(self, session: BaseSession, request: Request):
+        character = session.ctx("realm", "char", persist=False)
 
         CharacterBehavior.attach(character)
         await character.move_to(session, self._target)

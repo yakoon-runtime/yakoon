@@ -1,9 +1,11 @@
 from dataclasses import asdict, dataclass, field, fields
 from uuid import uuid4
 
+from yakoon.models.entity import Entity
+
 
 @dataclass
-class Account:
+class Account(Entity):
 
    # ───── persistent fields (stored in DB/json) ─────
 
@@ -15,15 +17,4 @@ class Account:
         if not self.name.strip():
             raise ValueError("Account name must not be empty.")
         if len(self.name) > 30:
-            raise ValueError("Account name too long.")
-        
-    def to_row(self) -> dict:
-        return {
-            f.name: getattr(self, f.name)
-            for f in fields(self)
-            if not f.name.startswith("_")
-        }
-
-    @classmethod
-    def from_row(cls, row: dict):
-        return cls(**row)
+            raise ValueError("Account name too long.") 

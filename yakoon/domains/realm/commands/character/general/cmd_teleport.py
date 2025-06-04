@@ -1,16 +1,18 @@
 
-from yakoon.commands.command import Command
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.domains.realm.commands.base import RealmCommand
+from yakoon.runtime.models.session import BaseSession
 
 
-class CmdTeleport(Command):
+class CmdTeleport(RealmCommand):
 
     key = "teleport"
     aliases = ["tel", "tp"]
     requires = ["admin"]
+    template_key = "character/general/cmd_teleport"
+
     requires_character = True
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
 
         await session.emit("teleport done!")

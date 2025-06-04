@@ -2,7 +2,7 @@
 from yakoon.domains.realm.services.object import ObjectService
 from yakoon.commands.command import Command
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.prompts import confirm
 
 
@@ -11,7 +11,7 @@ class __CmdDelete(Command):
     key = "delete"
     aliases = ["del"]
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
         obj_id = request.args[0] if request.args else None
         if not obj_id:
             return await session.fail("Bitte gib eine Objekt-ID an.")

@@ -1,24 +1,16 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-
 @dataclass
-class RuntimeSessionData:
-    pass
-
-
-@dataclass
-class StorageSessionData:
+class SessionData:
     """
-    A grouped key-value store that behaves like a nested dict.
-    Allows get/set access via (group, key) without raising errors.
+    A grouped key-value store that supports nested access via key paths.
+    Group names are explicit (e.g., "system", "realm").
     """
-
-    # ───── persistent fields (stored in DB/json) ─────
 
     _store: dict[str, dict[str, Any]] = field(default_factory=dict)
 
-    def to_dict(self) -> dict:
+    def to_row(self) -> dict:
         return self._store
 
     @classmethod
@@ -27,44 +19,49 @@ class StorageSessionData:
         obj._store = data
         return obj
 
-    def get(self, group: str, key: str, default: Any = None) -> Any:
+    def get(self, group: str, path: str, default: Any = None) -> Any:
         """
-        Retrieves the value for a key within a specific group.
-
-        Args:
-            group (str): The name of the group.
-            key (str): The key to look up within the group.
-            default (Any): A fallback value if the key or group is not found.
-
-        Returns:
-            Any: The stored value, or the default if not found.
+        Retrieves a value from a nested key path within a group.
+        Example: get("realm", "char.id") → returns realm["char"]["id"]
         """
+        data = self._store.get(group, {})
+        parts = path.split(".")
 
-        return self._store.get(group, {}).get(key, default)
+        for part in parts:
+            if not isinstance(data, dict):
+                return default
+            data = data.get(part, default)
+        return data
 
-    def set(self, group: str, key: str, value: Any) -> None:
+    def set(self, group: str, path: str, value: Any) -> None:
         """
-        Stores a value under the specified key within the given group.
-
-        Args:
-            group (str): The name of the group.
-            key (str): The key under which the value will be stored.
-            value (Any): The value to store.
+        Sets a value within a nested key path inside a group.
+        Example: set("realm", "char.id", "abc") → realm["char"]["id"] = "abc"
         """
+        root = self._store.setdefault(group, {})
+        node = root
+        parts = path.split(".")
 
-        self._store.setdefault(group, {})[key] = value
+        for part in parts[:-1]:
+            node = node.setdefault(part, {})
+        node[parts[-1]] = value
+        self._store[group] = root  # ensure update
 
-    def rem(self, group: str, key: str) -> None:
+    def rem(self, group: str, path: str) -> None:
         """
-        Removes a key from the given group if it exists.
-        If the group or key does not exist, nothing happens.
+        Removes a key from a nested path inside a group.
+        If any level is missing, does nothing.
         """
-        
-        group_data = self._store.get(group)
-        if group_data and key in group_data:
-            del group_data[key]
-            if not group_data:
-                del self._store[group]  # optional: clean up empty groups
+        node = self._store.get(group)
+        parts = path.split(".")
+
+        for part in parts[:-1]:
+            if not isinstance(node, dict) or part not in node:
+                return
+            node = node[part]
+
+        if isinstance(node, dict):
+            node.pop(parts[-1], None)
 
     def group(self, group: str) -> dict[str, Any]:
         return self._store.setdefault(group, {})
@@ -73,4 +70,4 @@ class StorageSessionData:
         return self._store[group]
 
     def __repr__(self) -> str:
-        return f"<StorageSessionData {self._store}>"
+        return f"<SessionData {self._store}>"

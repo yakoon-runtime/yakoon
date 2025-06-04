@@ -2,6 +2,13 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-06-04]
+**Services bauen Objekte, Stores liefern dicts**
+Wir haben festgelegt, dass alle Stores ausschließlich mit dict arbeiten und keine Domainobjekte instanziieren.
+Das Erzeugen, Validieren und Interpretieren von Objekten erfolgt ausschließlich im Service-Layer.
+So bleibt der Speicher generisch, leicht austauschbar und testbar. Domainlogik gehört nicht in die Infrastruktur.
+Das verhindert unnötige Duplikation und hält die Trennung klar.
+
 ## [2025-06-03]
 **Setup-Funktionen & Registry-Struktur**
 Jede Domain besitzt ein eigenes `setup.py`, das eine ServiceRegistry erzeugt.  

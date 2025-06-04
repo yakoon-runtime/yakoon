@@ -14,7 +14,7 @@ SolutionSettings.runtime.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
-command_inits += ["batch: login stefan; switch realm"]
+command_inits += ["batch: login Stefan; switch realm; ic Stefan"]
 
 
 async def run_console():

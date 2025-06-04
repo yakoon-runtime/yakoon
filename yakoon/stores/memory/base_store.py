@@ -4,6 +4,7 @@ from typing import Any, Optional
 import copy
 
 from yakoon.stores.base.base_store import BaseStore
+from yakoon.models.namespace import Key, Namespace
 
 
 class MemoryStore(BaseStore, ABC):
@@ -13,26 +14,37 @@ class MemoryStore(BaseStore, ABC):
     """
 
     def __init__(self):
-        self._data: dict[str, dict] = {}
-
-    async def get_by_id(self, id: str) -> Optional[dict]:
-        obj = self._data.get(id)
-        return copy.deepcopy(obj) if obj else None
+        self._rows: dict[str, dict] = {}  # key = str(Key)
 
     async def get_by_key(self, key: Key) -> Optional[dict]:
-        return await self.get_by_id(key.to_str())
+        return copy.deepcopy(self._rows.get(str(key)))
 
-    async def fetch_by_namespace(self, namespace: str, *, limit: int = 100) -> list[dict]:
-        return [copy.deepcopy(obj) for obj in self._data.values() if obj.get("namespace") == namespace][0:limit]
-
-    async def fetch_by_fields(self, *, limit: int = 100, **fields: Any) -> list[dict]:
+    async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
         return [
-            obj for obj in self._data.values()
-            if all(obj.get(k) == v for k, v in fields.items())
-        ][0:limit]
+            copy.deepcopy(obj)
+            for obj in self._rows.values()
+            if (
+                obj.get("_domain") == namespace.domain and
+                obj.get("_bucket") == namespace.bucket and
+                obj.get("_scope") == namespace.scope
+            )
+        ][:limit]
+
+    async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
+        return [
+            copy.deepcopy(obj)
+            for obj in self._rows.values()
+            if (
+                obj.get("_domain") == namespace.domain and
+                obj.get("_bucket") == namespace.bucket and
+                obj.get("_scope") == namespace.scope and
+                all(obj.get(k) == v for k, v in fields.items())
+            )
+        ][:limit]
 
     async def save(self, obj: dict) -> None:
-        self._data[obj["id"]] = copy.deepcopy(obj)
+        key = Key.from_parts(obj["_domain"], obj["_bucket"], obj["_scope"], obj["_id"])
+        self._rows[str(key)] = copy.deepcopy(obj)
 
-    async def delete(self, id: str) -> None:
-        self._data.pop(id, None)
+    async def delete_by_key(self, key: Key) -> None:
+        self._rows.pop(str(key), None)

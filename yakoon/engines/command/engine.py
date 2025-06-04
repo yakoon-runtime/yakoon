@@ -48,7 +48,8 @@ class Engine():
       inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
       
       services = await self._require_system_services()      
-      session, _ = await services.sessions.get_or_create(session_id)
+      ns = await services.namespaces.get_by_bucket("bucket")
+      session, _ = await services.sessions.get_or_create(ns.get_key(session_id))
 
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)
@@ -89,8 +90,8 @@ class Engine():
 
          # If this is the final input and a prompt is active → treat it as the response
          if raw and not queue:
-            if DialogManager.is_waiting(session.id):
-               DialogManager.resolve_prompt(session.id, raw)
+            if DialogManager.is_waiting(session.key):
+               DialogManager.resolve_prompt(session.key, raw)
                return
 
          task = asyncio.create_task(_run_internal_task(raw))
@@ -98,10 +99,10 @@ class Engine():
          while not task.done():
             await asyncio.sleep(0.01)
 
-            if DialogManager.is_waiting(session.id):
+            if DialogManager.is_waiting(session.key):
                if queue:
                   next_raw = queue.popleft()
-                  DialogManager.resolve_prompt(session.id, next_raw)
+                  DialogManager.resolve_prompt(session.key, next_raw)
                   break  # prompt resolved, allow task to continue
                else:                   
                   return # Prompt expected, but no further input in batch 

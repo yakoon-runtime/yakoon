@@ -1,7 +1,6 @@
 from yakoon.domains.realm.commands.base import RealmCommand
-from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class CmdOOC(RealmCommand):
@@ -10,14 +9,15 @@ class CmdOOC(RealmCommand):
     template_key = "character/general/cmd_ooc"
     requires_character = True
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
         presenter = await self.get_presenter(session)
+        sys_services = await self.get_system_services()
        
-        runtime_data: RuntimeRealmData = session.data_runtime
-        if not runtime_data.character:
+        char = session.ctx("realm", "char", persist=False)
+        if not char:
             return await presenter.fail("already")
 
-        name = runtime_data.character.name
-        session.data_storage.rem(self.controller.id, "char_id")
+        session.rem_ctx("realm", "char_key", persist=False)
+        await sys_services.sessions.save(session)
 
-        await presenter.emit("success", name=name)
+        await presenter.emit("success", name=char.name)

@@ -1,8 +1,7 @@
 
 from yakoon.domains.realm.commands.base import RealmCommand
-from yakoon.domains.realm.services.room import RoomService
 from yakoon.commands.parser import Request
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class CmdLook(RealmCommand):
@@ -13,12 +12,12 @@ class CmdLook(RealmCommand):
 
     template_key = "character/general/cmd_look"
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
         presenter = await self.get_presenter(session)
         services = await self.get_domain_services()
         ns = await self.get_namespace(session)
 
-        char = session.data_runtime.character
+        char = session.ctx("realm", "char", persist=False)
         room = await services.rooms.get_by_id(ns, char.location) if char else None
         if not room:
             return await presenter.fail("not_found")

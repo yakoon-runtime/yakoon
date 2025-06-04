@@ -5,20 +5,27 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from yakoon.models.namespace import Namespace
 
+
 class Key:
 
-    def __init__(self, namespace: Namespace, id_: str):
+    def __init__(self, namespace: Namespace, id: str):
         self.namespace = namespace
-        self.id = id_
+        self.id = id
 
     @staticmethod
     def from_string(raw: str) -> Key:
         parts = raw.split(":")
         if len(parts) != 4:
             raise ValueError(f"Invalid key format: {raw}")
-        domain, bucket, scope, id_ = parts
-        return Key(Namespace(domain, bucket, scope), id_)
+        domain, bucket, scope, id = parts
+        from yakoon.models.namespace import Namespace
+        return Key(Namespace(domain, bucket, scope), id)
     
+    @classmethod
+    def from_parts(cls, domain: str, bucket: str, scope: str, id: str) -> "Key":
+        from yakoon.models.namespace import Namespace
+        return cls(namespace=Namespace(domain, bucket, scope), id=id)
+
     def to_str(self):
         return str(self)
 

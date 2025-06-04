@@ -35,13 +35,13 @@ class DialogManager:
         """
         timeout = timeout if timeout is not None else cls.DEFAULT_TIMEOUT
 
-        session_id = session.id
+        session_key = str(session.key)
         fut = asyncio.get_running_loop().create_future()
 
         if DEV_MODE:
-            UnresolvedPromptMonitor.track(session.id, fut)
+            UnresolvedPromptMonitor.track(session_key, fut)
 
-        cls._waiting[session_id] = fut
+        cls._waiting[session_key] = fut
 
         # optional timeout auto-cancel
         if timeout:
@@ -55,39 +55,42 @@ class DialogManager:
                     await session.fail("Prompt timed out.")
 
             task = asyncio.create_task(auto_expire())
-            cls._timeouts[session_id] = task
+            cls._timeouts[session_key] = task
 
         return fut
 
     @classmethod
-    def is_waiting(cls, session_id: str) -> bool:
-        return session_id in cls._waiting
+    def is_waiting(cls, session_key: str) -> bool:
+        session_key = str(session_key)
+        return session_key in cls._waiting
 
     @classmethod
-    def resolve_prompt(cls, session_id: str, value: str) -> bool:
-        fut = cls._waiting.pop(session_id, None)
+    def resolve_prompt(cls, session_key: str, value: str) -> bool:
+        session_key = str(session_key)
+        fut = cls._waiting.pop(session_key, None)
         if fut and not fut.done():
             # clean up timeout task
-            timeout_task = cls._timeouts.pop(session_id, None)
+            timeout_task = cls._timeouts.pop(session_key, None)
             if timeout_task:
                 timeout_task.cancel()
             fut.set_result(value)
             if DEV_MODE:
-                UnresolvedPromptMonitor.untrack(session_id)
+                UnresolvedPromptMonitor.untrack(session_key)
             return True
         return False
 
     @classmethod
-    def cancel_prompt(cls, session_id: str):
+    def cancel_prompt(cls, session_key: str):
         """
         Cancels a prompt manually (e.g. on disconnect).
         """
-        fut = cls._waiting.pop(session_id, None)
+        session_key = str(session_key)
+        fut = cls._waiting.pop(session_key, None)
         if fut and not fut.done():
             fut.cancel()
 
-        task = cls._timeouts.pop(session_id, None)
+        task = cls._timeouts.pop(session_key, None)
         if task:
             task.cancel()
         if DEV_MODE:
-            UnresolvedPromptMonitor.untrack(session_id)
+            UnresolvedPromptMonitor.untrack(session_key)

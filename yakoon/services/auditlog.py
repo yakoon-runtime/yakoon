@@ -14,4 +14,4 @@ class AuditLogService:
 
     async def permission(self, session, obj, action):
         if Settings.log_permission_denied:
-            print(f"[SEC] Denied: {session.id} → {obj} ({action})")
+            print(f"[SEC] Denied: {session.key} → {obj} ({action})")

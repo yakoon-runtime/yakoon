@@ -3,7 +3,7 @@ from collections import defaultdict
 from yakoon.commands.command import Command
 from yakoon.commands.parser import Request
 from yakoon.domains.gateway.commands.base import PlatformCommand
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class CmdHelpSystem(PlatformCommand):
@@ -11,7 +11,7 @@ class CmdHelpSystem(PlatformCommand):
     key = "help"
     template_key = "system/cmd_help"
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
         presenter = await self.get_presenter(session)
         grouped = get_grouped_commands(self.controller)
 
@@ -26,7 +26,7 @@ class CmdHelpDomain(PlatformCommand):
     key = "help"
     template_key = "system/cmd_help_domain"
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
 
         if not request.args:
             grouped = get_grouped_commands(self.controller)

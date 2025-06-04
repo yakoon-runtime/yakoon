@@ -2,7 +2,7 @@ from typing import List
 from dataclasses import dataclass, field
 from yakoon.domains.realm.models.secured import Secured
 from yakoon.domains.realm.services.object import ObjectService
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 @dataclass
@@ -18,7 +18,7 @@ class Room(Secured):
         #if not self.namespace:
         #    raise ValueError("Room must have a namespace.")
 
-    async def render(self, session: GatewaySession) -> str:
+    async def render(self, session: BaseSession) -> str:
         parts = [f"|w{self.name}|n", self.desc]        
 
         #objects = ObjectService.contents_of(self.id)

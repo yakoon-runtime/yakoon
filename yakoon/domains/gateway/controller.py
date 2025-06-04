@@ -1,7 +1,7 @@
 from yakoon.controllers.base import GatewayBaseController
 from yakoon.domains.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.gateway.commands.system.cmdset import PlatformSystemCommands
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 from yakoon.domains.gateway.setup import setup_gateway
 
 
@@ -23,7 +23,7 @@ class GatewayController(GatewayBaseController):
         super().__init__()    
         setup_gateway(self.service_router, self.id)
 
-    async def on_gateway_validate(self, session: GatewaySession):
+    async def on_gateway_validate(self, session: BaseSession):
         """
         Platform-level pre-send hook, called before request parsing.
 
@@ -43,12 +43,13 @@ class GatewayController(GatewayBaseController):
             return sorted(list(dict.fromkeys(lista + listb)))
         
         # Middleware-Hook: Session was loaded, Account is missing?
-        if session.account_id:
-            account = await services.accounts.get_by_id(session.account_id)
-            session.account = account
+        account_key = session.ctx("gateway", "account_key", persist=True)
+        if account_key:
+            account = await services.accounts.get_by_key(account_key)
+            session.set_ctx("gateway", "account", account, persist=False)
             session.cmd_groups = merge(session.cmd_groups, account.cmd_groups)
             
-    async def on_before_run_command(self, session: GatewaySession, request, command):
+    async def on_before_run_command(self, session: BaseSession, request, command):
         """
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
@@ -57,7 +58,7 @@ class GatewayController(GatewayBaseController):
             if not set(required).issubset(set(session.permissions)):
                 raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_gateway_finalize(self, session: GatewaySession):
+    async def on_gateway_finalize(self, session: BaseSession):
         """
         Platform-level post-send hook, called after command runing.
 
@@ -65,6 +66,6 @@ class GatewayController(GatewayBaseController):
         Only invoked if this controller is the registered `gateway` controller.
         """
         await super().on_gateway_finalize(session)
-        if session.is_anonymous:
+        if not session.ctx("gateway", "account_key", persist=True):
             services = await self.service_router.get_registry("system")
-            await services.sessions.delete_by_id(session.id)
+            await services.sessions.delete_by_key(session.key)

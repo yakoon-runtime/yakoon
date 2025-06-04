@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from yakoon.domains.realm.models.secured import Secured
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 @dataclass
@@ -16,5 +16,5 @@ class Object(Secured):
     def validate(self):
         pass
 
-    async def render(self, session: GatewaySession) -> str:
+    async def render(self, session: BaseSession) -> str:
         return f"|c{self.name}|n\n{self.desc}"

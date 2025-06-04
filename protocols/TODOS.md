@@ -3,7 +3,11 @@
 # ✅ NEXT STEPS #
 ==================
 
-REchnung
+- Session (temp) erstellen ->
+  -> Dann brauchen wir keinen store und später wieder einen remove.
+  -> Dann sollten wir aber die Session nicht in der Engine erzeugen, sondern im Gateway-Controller.
+
+
 
 # Realm
 - Umstellung Services + Stores

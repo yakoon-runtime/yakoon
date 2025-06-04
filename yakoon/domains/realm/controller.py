@@ -1,11 +1,10 @@
 from yakoon.domains.realm.commands.account.general.cmdset import GeneralAccountCommands
 from yakoon.domains.realm.commands.character.general.cmdset import GeneralCharacterCommands
 from yakoon.domains.realm.runtime.clock import Clock
-from yakoon.domains.realm.runtime.data import RuntimeRealmData
 from yakoon.domains.realm.runtime.direction import get_exit_direction_commandset
 from yakoon.controllers.base.gateway import BaseController
 from yakoon.domains.gateway.commands.shared.cmdset import PlatformSharedCommands
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 from yakoon.domains.realm.setup import setup_realm
 
 
@@ -32,29 +31,28 @@ class RealmController(BaseController):
         super().__init__()    
         setup_realm(self.service_router, "realm")
 
-    def dynamic_prefix(self, session: GatewaySession) -> str:
+    def dynamic_prefix(self, session: BaseSession) -> str:
         """
         Returns the command group prefix for dynamic, session-local commands.
         """
-        return f"{self.id}:dynamic:{session.id}"
+        return f"{self.id}:dynamic:{session.key}"
 
-    async def on_before_resolve(self, session: GatewaySession):
+    async def on_before_resolve(self, session: BaseSession):
         """
         Hook called before command resolution.
 
         Use this to register dynamic commands for the current session,
         e.g. exits, room-specific actions or context-sensitive shortcuts.
         Executed regardless of whether a valid command is found.
-        """
-        session.data_runtime = RuntimeRealmData(None)
-        char_id = session.data_storage.get(self.id, "char_id")
-        if not char_id:
+        """        
+        char_key = session.ctx("realm", "char_key", persist=True)
+        if not char_key:
             return
         
         services = await self.get_domain_services()
         ns = await self.get_namespace(session)
 
-        character = await services.chars.get_by_id(ns, char_id)
+        character = await services.chars.get_by_key(char_key)
         if not character:
             return
         
@@ -68,14 +66,14 @@ class RealmController(BaseController):
         self.router.unregister(dynamic)
         self.router.register(dynamic, get_exit_direction_commandset(room))
   
-    async def on_before_run_command(self, session: GatewaySession, request, command):
-        char_id = session.data_storage.get(self.id, "char_id")
+    async def on_before_run_command(self, session: BaseSession, request, command):
         services = await self.get_domain_services()
         ns = await self.get_namespace(session)
 
-        if char_id:           
-            character = await services.chars.get_by_id(ns, char_id)
-            session.data_runtime = RuntimeRealmData(character)  
+        char_key = session.ctx("realm", "char_key", persist=True)
+        if char_key:           
+            character = await services.chars.get_by_key(char_key)
+            session.set_ctx("realm", "char", character, persist=False)  
 
         if required := getattr(command, "requires", []):
             if not set(required).issubset(set(session.permissions)):
@@ -83,10 +81,10 @@ class RealmController(BaseController):
 
         # default: character is required
         if getattr(command, "requires_character", False):            
-            if not session.data_runtime or not session.data_runtime.character:
+            if not session.ctx("realm", "char", persist=False):
                 raise PermissionError("Du brauchst dazu einen Spieler: Verwende 'ic <character>'.")
 
-    async def on_enter(self, session: GatewaySession):
+    async def on_enter(self, session: BaseSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.
@@ -95,7 +93,7 @@ class RealmController(BaseController):
         await session.emit("Willkommen im MUD.")
         await session.notify("Melde dich mit `ic <charakter>` an.")        
 
-    async def on_cleanup(self, session: GatewaySession):
+    async def on_cleanup(self, session: BaseSession):
         """
         Always called after a command cycle, even if exceptions occurred.
 

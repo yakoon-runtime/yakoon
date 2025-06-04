@@ -1,51 +1,38 @@
 from __future__ import annotations
-from dataclasses import asdict, dataclass, field, fields
-from typing import Optional, Type
-from uuid import uuid4
+from dataclasses import dataclass, field
+from typing import Any, Optional, Type
+from datetime import datetime, timezone
 
 from yakoon.engines.command.io.output import Output
-from yakoon.runtime.models.data import RuntimeSessionData, StorageSessionData
+from yakoon.models.entity import Entity
+from yakoon.runtime.models.data import SessionData
 
 
 @dataclass
-class BaseSession:
+class BaseSession(Entity):
     """
     Represents a generic platform session.
     Handles persistent key-value data and domain-specific runtime context.
     """
 
-    # ───── persistent fields (stored in DB/json) ─────
-
-    id: str = field(default_factory=lambda: str(uuid4()))
-    domain_id: str = ""
     lang: str = "de"
 
-    # Persistent session state (e.g., account_id, domain flags)
-    #: Session-wide persistent data storage (domain-aware dictionary).
-    #: This is always reset before each command send to avoid runtime state leaks
-    #: when using stateless memory-based sessions (e.g., for testing or batch processing).
-    data_storage: StorageSessionData = field(default_factory=lambda: StorageSessionData()) #, repr=False, compare=False)
+    domain_id: str = ""
+    """Currently active domain for routing – set via cmd_switch."""
 
-    # ───── transient runtime-only attributes ─────
+    permissions: list[str] = field(default_factory=lambda: ["system"])
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+    _io: Output = field(default=None, init=False, repr=False)
     _cmd_groups: list[str] = field(default_factory=list, init=False, repr=False)
     _cmd_groups_dynamic: list[str] = field(default_factory=list, init=False, repr=False)
-    _io: Output = field(default=None, init=False, repr=False)
-    _data_runtime: Optional[RuntimeSessionData] = field(default=None, init=False, repr=False)
+
+    _data_storage: SessionData = field(default_factory=lambda: SessionData()) #, repr=False, compare=False)
+    _data_runtime: Optional[SessionData] = field(default_factory=lambda: SessionData(), init=False, repr=False)
 
     def validate(self):
-        if not self.id:
-            raise ValueError("Id cannot be None or empty")
-
-    def to_row(self) -> dict:
-          return {
-            f.name: getattr(self, f.name)
-            for f in fields(self)
-            if not f.name.startswith("_")
-        }
-
-    @classmethod
-    def from_row(cls, row: dict):
-        return cls(**row)
+        if not self.key:
+            raise ValueError("Key cannot be None or empty")
 
     @property
     def cmd_groups(self) -> list[Type[str]]:
@@ -61,12 +48,33 @@ class BaseSession:
     def cmd_groups_dynamic(self, value):
         self._cmd_groups_dynamic = value
 
-    @property
-    def data_runtime(self) -> RuntimeSessionData:
-        return self._data_runtime
-    @data_runtime.setter
-    def data_runtime(self, value):
-        self._data_runtime = value
+    def ctx(self, group: str, key: str, default=None, *, persist: bool = False):
+        """
+        Unified context accessor.
+        If runtime=True (default), uses volatile context.
+        Otherwise uses persistent session data.
+        """
+        source = self._data_storage if persist else self._data_runtime
+        return source.get(group, key, default)
+
+    def set_ctx(self, group:str, key: str, value: Any, *, persist: bool = False):
+        source = self._data_storage if persist else self._data_runtime
+        source.set(group, key, value)
+
+    def rem_ctx(self, group:str, key: str, *, persist: bool = False):
+        source = self._data_storage if persist else self._data_runtime
+        source.rem(group, key)
+
+    def to_row(self) -> dict:
+        row = super().to_row()
+        row["_data"] = self._data_storage.to_row()
+        return row
+
+    @classmethod
+    def from_row(cls, row: dict):
+        obj = super().from_row(row)
+        obj._data_storage = SessionData.from_dict(row.get("_data", {}))
+        return obj
 
     def bind_io(self, io: Output):
         self._io = io

@@ -22,8 +22,8 @@ class Namespace:
     def get_prefix(self) -> str:
         return f"{self.domain}:{self.bucket}:{self.scope}"
 
-    def get_key(self, id_: str) -> Key:
-        return Key(self, id_)
+    def get_key(self, id: str) -> Key:
+        return Key(self, id)
     
     def __eq__(self, other):
         return (

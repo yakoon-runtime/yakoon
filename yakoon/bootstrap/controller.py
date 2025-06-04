@@ -1,6 +1,6 @@
 from yakoon.bootstrap.setup import setup_system
 from yakoon.domains.gateway.controller import GatewayController
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class BootstrapController(GatewayController):
@@ -19,7 +19,7 @@ class BootstrapController(GatewayController):
         super().__init__()    
         setup_system(self.service_router, "system")
 
-    async def on_initialize(self, session: GatewaySession):
+    async def on_initialize(self, session: BaseSession):
         """
         Called after the controller has been fully constructed but before any commands are processed.
 

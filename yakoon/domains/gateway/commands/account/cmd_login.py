@@ -1,6 +1,6 @@
 from yakoon.commands.parser import Request
 from yakoon.domains.gateway.commands.base import PlatformCommand
-from yakoon.domains.gateway.runtime.session import GatewaySession
+from yakoon.runtime.models.session import BaseSession
 
 
 class CmdLogin(PlatformCommand):
@@ -8,7 +8,7 @@ class CmdLogin(PlatformCommand):
     key = "login"
     template_key = "account/cmd_login"
 
-    async def run(self, session: GatewaySession, request: Request):
+    async def run(self, session: BaseSession, request: Request):
 
         presenter = await self.get_presenter(session)
         services = await self.get_gateway_services()
@@ -17,15 +17,16 @@ class CmdLogin(PlatformCommand):
             return await presenter.emit("missing_arg")
 
         name = request.args[0]
-        account = await services.accounts.get_by_name(name)
+        ns = await self.get_namespace(session)
+        account = await services.accounts.get_by_name(ns, name)
         if not account:
             return await presenter.emit("not_found", name=name)
 
         sys_services = await self.get_system_services()
-        if not await sys_services.sessions.get_by_id(session.id):
+        if not await sys_services.sessions.get_by_key(session.key):
             raise ValueError("Session cannot be None")
 
-        session.account_id = account.id
+        session.set_ctx("gateway", "account_key", account.key, persist=True)
         await sys_services.sessions.save(session)
 
         registry = await self.get_controller_registry()
