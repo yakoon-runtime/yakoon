@@ -3,6 +3,18 @@
 # ✅ NEXT STEPS #
 ==================
 
+- Umstellung auf SQLite
+   - Session
+   - Account
+
+- Sessions
+  - list, delete (deactivate?)
+
+- Accounts
+  - list, create, edit, delete
+  - set_pw, -> Mail Benachrichtigung
+
+
 - Session (temp) erstellen ->
   -> Dann brauchen wir keinen store und später wieder einen remove.
   -> Dann sollten wir aber die Session nicht in der Engine erzeugen, sondern im Gateway-Controller.
@@ -11,10 +23,6 @@
 
 # Realm
 - Umstellung Services + Stores
-
-- Konzept Namespaces 
-  - User_1, User_2 -> NS1
-  - User_2 -> NS2
 
 - Ersten Commands aus Evennia übernehmen 
   - Account, Session 

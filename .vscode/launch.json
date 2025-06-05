@@ -3,6 +3,20 @@
     "configurations": [
 
         {
+            "name": "Yakoon: Run Migration",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "yakoon.apps.yakoon",
+            "console": "integratedTerminal",
+            "args": [
+                "migrate", "--config=yakoon/config/backends.yaml"
+            ],
+            "env": {
+                 "DEV_MODE": "true"
+            },
+        },
+
+        {
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",

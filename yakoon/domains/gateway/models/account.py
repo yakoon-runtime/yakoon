@@ -9,7 +9,6 @@ class Account(Entity):
 
    # ───── persistent fields (stored in DB/json) ─────
 
-    id: str = field(default_factory=lambda: str(uuid4()))
     name: str = field(default="")
     cmd_groups: list[str] = field(default_factory=list) 
 
