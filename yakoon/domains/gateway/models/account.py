@@ -11,6 +11,7 @@ class Account(Entity):
 
     name: str = field(default="")
     cmd_groups: list[str] = field(default_factory=list) 
+    permissions: list[str] = field(default_factory=lambda: ["system"])
 
     def validate(self):
         if not self.name.strip():

@@ -1,9 +1,6 @@
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from yakoon.models.namespace import Namespace
+from yakoon.models.namespace import Namespace
 
 
 class Key:
@@ -12,19 +9,26 @@ class Key:
         self.namespace = namespace
         self.id = id
 
-    @staticmethod
-    def from_string(raw: str) -> Key:
-        parts = raw.split(":")
-        if len(parts) != 4:
-            raise ValueError(f"Invalid key format: {raw}")
-        domain, bucket, scope, id = parts
+    @classmethod
+    def from_str(cls, raw: str) -> Key:
+        try:
+            ns_part, id = raw.rsplit("#", 1)
+            domain, bucket, scope = ns_part.split("/")
+        except ValueError:
+            raise ValueError(f"Invalid key format: {raw}")        
         from yakoon.models.namespace import Namespace
         return Key(Namespace(domain, bucket, scope), id)
-    
+        
     @classmethod
     def from_parts(cls, domain: str, bucket: str, scope: str, id: str) -> "Key":
         from yakoon.models.namespace import Namespace
         return cls(namespace=Namespace(domain, bucket, scope), id=id)
+    
+    @staticmethod
+    def is_key(s: str) -> bool:
+        if not isinstance(s, str):
+            return False
+        return "#" in s and s.count("/") == 2
 
     def is_valid(self) -> bool:
         ns = self.namespace
@@ -33,14 +37,14 @@ class Key:
     def with_id(self, new_id: str) -> "Key":
         return Key(namespace=self.namespace, id=new_id)
 
-    def get_prefix(self) -> str:
-        return self.namespace.get_prefix()
+    def to_prefix(self) -> str:
+        return self.namespace.to_str()
 
     def to_str(self):
         return str(self)
 
     def __str__(self):
-        return f"{self.namespace.get_prefix()}:{self.id}"
+        return f"{self.namespace.to_str()}#{self.id}"
 
     def __repr__(self):
         return f"<Key {self}>"
@@ -49,5 +53,5 @@ class Key:
         return isinstance(other, Key) and self.namespace == other.namespace and self.id == other.id
 
     def __hash__(self):
-        return hash((self.namespace.get_prefix(), self.id))
+        return hash((self.namespace.to_str(), self.id))
     

@@ -27,7 +27,7 @@ class SessionService:
 
     async def save(self, session: BaseSession):
         if not session.key.is_valid():
-            prefix = session.key.get_prefix()             
+            prefix = session.key.to_prefix()             
             next_id = await self._services.counters.next(prefix)
             session.key = session.key.with_id(str(next_id))
         if not session.last_active:

@@ -1,7 +1,7 @@
 import aiosqlite
 from contextlib import asynccontextmanager
 from pypika import Table, Query, Field
-from yakoon.models import Key
+from yakoon.models.key import Key
 from typing import Any, Optional
 import json
 
@@ -21,13 +21,9 @@ class SQLiteStore(BaseStore):
         self.table_name = table_name
 
     async def get_by_key(self, key: Key) -> Optional[dict]:
-        q = Query.from_(self.table).select('*').where(
-            (self.table.domain == key.namespace.domain) &
-            (self.table.bucket == key.namespace.bucket) &
-            (self.table.scope == key.namespace.scope) &
-            (self.table.id == key.id)
-        )
+        q = Query.from_(self.table).select('*').where(self.table.key == str(key))
         sql = str(q)
+
         async with aiosqlite.connect(self.db_path) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(sql) as cursor:
@@ -35,29 +31,23 @@ class SQLiteStore(BaseStore):
                 return dict(row) if row else None
 
     async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
-        q = Query.from_(self.table).select('*').where(
-            (self.table.domain == namespace.domain) &
-            (self.table.bucket == namespace.bucket) &
-            (self.table.scope == namespace.scope)
-        )
-        q = q.limit(limit)
+        scope = namespace.to_str()
+        q = Query.from_(self.table).select('*').where(self.table.scope == scope).limit(limit)
         sql = str(q)
+
         async with aiosqlite.connect(self.db_path) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(sql) as cursor:
                 rows = await cursor.fetchall()
                 return [dict(row) for row in rows]
-            
+
     async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
-        q = Query.from_(self.table).select('*').where(
-            (self.table.domain == namespace.domain) &
-            (self.table.bucket == namespace.bucket) &
-            (self.table.scope == namespace.scope)
-        )
+        q = Query.from_(self.table).select('*').where(self.table.scope == namespace.to_str())
+
         for key, value in fields.items():
             q = q.where(self.table[key] == value)
-        q = q.limit(limit)
 
+        q = q.limit(limit)
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:
@@ -67,28 +57,26 @@ class SQLiteStore(BaseStore):
                 return [dict(row) for row in rows]
 
     async def save(self, obj: dict) -> None:
-        # Upsert via INSERT ... ON CONFLICT (domain, bucket, scope, id)
+        columns = list(obj.keys())
+        placeholders = ", ".join(["?"] * len(columns))
+        col_sql = ", ".join(columns)
+
         q = f"""
-        INSERT INTO {self.table_name} (domain, bucket, scope, id, data)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(domain, bucket, scope, id)
-        DO UPDATE SET data = excluded.data;
+        INSERT INTO {self.table_name} ({col_sql})
+        VALUES ({placeholders})
+        ON CONFLICT(key) DO UPDATE SET data = excluded.data;
         """
+        
+        values = list(obj.values())
         async with aiosqlite.connect(self.db_path) as db:
-            await db.execute(q, (
-                obj["domain"], obj["bucket"], obj["scope"], obj["id"],
-                json.dumps(obj)
-            ))
+            await db.execute(q, values)
             await db.commit()
 
+
     async def delete_by_key(self, key: Key) -> None:
-        q = Query.from_(self.table).delete().where(
-            (self.table.domain == key.namespace.domain) &
-            (self.table.bucket == key.namespace.bucket) &
-            (self.table.scope == key.namespace.scope) &
-            (self.table.id == key.id)
-        )
+        q = Query.from_(self.table).delete().where(self.table.key == str(key))
         sql = str(q)
+
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(sql)
             await db.commit()

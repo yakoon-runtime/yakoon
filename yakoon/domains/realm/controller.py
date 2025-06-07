@@ -76,7 +76,8 @@ class RealmController(BaseController):
             session.set_ctx("realm", "char", character, persist=False)  
 
         if required := getattr(command, "requires", []):
-            if not set(required).issubset(set(session.permissions)):
+            account = session.ctx("gateway", "account", persist=False)
+            if not account or not set(required).issubset(set(account.permissions)):
                 raise PermissionError(f"Du darfst das nicht tun. Erforderlich: {', '.join(required)}")
 
         # default: character is required

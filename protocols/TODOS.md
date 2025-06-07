@@ -5,21 +5,11 @@
 
 # Session
 
-- last_active einführen  -> persistieren
-  - last_active muss bei jedem request aktualisiert werden. Nur so könnnen wir später
-    abgelaufene Sessions löschen. -> last_active oder expired_time?
-  - Im Hintergrund müssen wir alte Sessions von Zeit zu Zeit löschen (sequence is expired_time)
-
 - Umstellung auf SQLite
-
-- Sessions
-  - list, delete (deactivate?)
-
 
 # Accounts
   - list, create, edit, delete
   - set_pw, -> Mail Benachrichtigung
-
 
 - Paging muss möglich sein (like ask)
   - Muss dazu der Timeout des Future aktualisiert werden?

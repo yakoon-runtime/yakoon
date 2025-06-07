@@ -1,5 +1,9 @@
 from dataclasses import dataclass, field
+import json
 from typing import Any
+
+from yakoon.models.key import Key
+
 
 @dataclass
 class SessionData:
@@ -11,12 +15,12 @@ class SessionData:
     _store: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def to_row(self) -> dict:
-        return self._store
+        return json.dumps(self._store)
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_row(cls, row: str):  
         obj = cls()
-        obj._store = data
+        obj._store = json.loads(row)
         return obj
 
     def get(self, group: str, path: str, default: Any = None) -> Any:
@@ -27,10 +31,14 @@ class SessionData:
         data = self._store.get(group, {})
         parts = path.split(".")
 
-        for part in parts:
-            if not isinstance(data, dict):
+        for i, part in enumerate(parts):
+            if not isinstance(data, dict) or part not in data:
                 return default
-            data = data.get(part, default)
+            data = data[part]
+
+        if Key.is_key(data):
+            return Key.from_str(data)
+
         return data
 
     def set(self, group: str, path: str, value: Any) -> None:
@@ -44,6 +52,10 @@ class SessionData:
 
         for part in parts[:-1]:
             node = node.setdefault(part, {})
+
+        if isinstance(value, Key):
+            value = value.to_str()
+
         node[parts[-1]] = value
         self._store[group] = root  # ensure update
 

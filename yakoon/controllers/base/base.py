@@ -1,6 +1,5 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from argparse import Namespace
 from typing import Any, Sequence, Type
 from typing import TYPE_CHECKING
 
@@ -11,10 +10,11 @@ from yakoon.runtime.system.registry import ServiceRegistry
 from yakoon.runtime.system.router import ServiceRouter
 
 if TYPE_CHECKING:
-    from yakoon.runtime.models.session import BaseSession
     from yakoon.controllers.registry import BaseDomainRegistry
     from yakoon.commands.command import Command
-
+    from yakoon.models.namespace import Namespace
+    from yakoon.runtime.models.session import BaseSession
+    
 
 class BaseController(ABC):
     """

@@ -1,7 +1,4 @@
 
-from yakoon.models.key import Key
-
-
 class Namespace:
     """
     Represents a namespaced identifier context for addressing objects.
@@ -19,10 +16,11 @@ class Namespace:
         self.bucket = bucket
         self.scope = scope
 
-    def get_prefix(self) -> str:
-        return f"{self.domain}:{self.bucket}:{self.scope}"
+    def to_str(self) -> str:
+        return f"{self.domain}/{self.bucket}/{self.scope}"
 
-    def get_key(self, id: str) -> Key:
+    def get_key(self, id: str) -> "Key":
+        from yakoon.models.key import Key
         return Key(self, id)
     
     def __eq__(self, other):

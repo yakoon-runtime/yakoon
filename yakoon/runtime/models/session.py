@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+import json
 from typing import Any, Optional, Type
 from datetime import datetime, timezone
 
@@ -16,9 +17,6 @@ class BaseSession(Entity):
     """
 
     lang: str = "de"
-
-    permissions: list[str] = field(default_factory=lambda: ["system"])
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     last_active: str = None  # ISO-String (z. B. bei to_row()/from_row)
 
     _io: Output = field(default=None, init=False, repr=False)
@@ -34,8 +32,8 @@ class BaseSession(Entity):
 
     def touch(self):
         """Updates the timestamp of the last activity."""
-        self.last_active = datetime.utcnow().isoformat()
-
+        self.last_active = str(datetime.utcnow().isoformat())
+   
     @property
     def cmd_groups(self) -> list[Type[str]]:
         return self._cmd_groups
@@ -69,13 +67,14 @@ class BaseSession(Entity):
 
     def to_row(self) -> dict:
         row = super().to_row()
-        row["_data"] = self._data_storage.to_row()
+        row["data"] = self._data_storage.to_row()
         return row
 
     @classmethod
     def from_row(cls, row: dict):
+        data_raw = row.pop("data", {})
         obj = super().from_row(row)
-        obj._data_storage = SessionData.from_dict(row.get("_data", {}))
+        obj._data_storage = SessionData.from_row(data_raw)
         return obj
 
     def bind_io(self, io: Output):

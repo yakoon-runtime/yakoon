@@ -2,11 +2,11 @@
 from yakoon.stores.base.registry import StoreRegistry
 
 
-def create_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
+def create_system_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
 
     if backend == "sqlite":
         from yakoon.stores.sqlite._registry import SQLiteStoreRegistry
-        return SQLiteStoreRegistry(db_path or "yakoon.db")
+        return SQLiteStoreRegistry(db_path)
 
     elif backend == "postgres":
         from yakoon.stores.postgres._registry import PostgresStoreRegistry
