@@ -23,7 +23,7 @@ class CmdSwitch(PlatformCommand):
         if not controller:
             return await presenter.fail("not_found", name=name)
         
-        session.domain_id = name
+        session.set_ctx("gateway", "domain_id", controller.id, persist=True)
         await services.sessions.save(session)
         await controller.on_enter(session)
 

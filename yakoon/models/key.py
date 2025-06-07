@@ -26,6 +26,16 @@ class Key:
         from yakoon.models.namespace import Namespace
         return cls(namespace=Namespace(domain, bucket, scope), id=id)
 
+    def is_valid(self) -> bool:
+        ns = self.namespace
+        return all([ns.domain, ns.bucket, ns.scope, self.id])
+    
+    def with_id(self, new_id: str) -> "Key":
+        return Key(namespace=self.namespace, id=new_id)
+
+    def get_prefix(self) -> str:
+        return self.namespace.get_prefix()
+
     def to_str(self):
         return str(self)
 

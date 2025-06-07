@@ -17,9 +17,6 @@ class BaseSession(Entity):
 
     lang: str = "de"
 
-    domain_id: str = ""
-    """Currently active domain for routing – set via cmd_switch."""
-
     permissions: list[str] = field(default_factory=lambda: ["system"])
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 

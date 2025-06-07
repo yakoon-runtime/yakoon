@@ -5,6 +5,7 @@ from yakoon.engines.command.io.output import Output
 from yakoon.engines.command.registry import DomainRegistry
 from yakoon.engines.command.settings import Settings
 from yakoon.engines.command.batch import split_batch_input
+from yakoon.models.key import Key
 from yakoon.runtime.models.session import BaseSession
 from yakoon.runtime.dialogs.manager import DialogManager
 from yakoon.services._registry import SystemServiceRegistry
@@ -40,20 +41,16 @@ class Engine():
          raise RuntimeError(f"No ServiceRegistry found for bucket: {bucket}")
       return services                                
 
-   async def dispatch(self, session_id: str, input_str: str, io: Output):   
+   async def dispatch(self, session_key: Key, input_str: str, io: Output):   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
-      inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]
-      
-      services = await self._require_system_services()      
-      ns = await services.namespaces.get_by_bucket("bucket")
-      session, _ = await services.sessions.get_or_create(ns.get_key(session_id))
-
-      # Bind the given Output to this session for output and error handling.
+      gateway = self._registry.get_gateway()
+      session = await gateway.on_resolve_session(session_key)
       session.bind_io(io)
 
+      inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]  
       await asyncio.create_task(self._run_processing(session, inputs))
 
    async def _run_processing(self, session: BaseSession, inputs: list[str]):
@@ -75,14 +72,14 @@ class Engine():
       async def _run_internal_task(raw):
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
-         await self._registry.get_gateway().on_gateway_validate(session)
-
+         gateway = self._registry.get_gateway()
          try:
+            await gateway.on_gateway_validate(session)
             await self._send_one(session, raw)
          finally:
             # Final platform-level hook after command execution.
             # Used for post-processing, logging, or global session update
-            await self._registry.get_gateway().on_gateway_finalize(session)
+            await gateway.on_gateway_finalize(session)
 
       while queue:
          await asyncio.sleep(0.01)  # yield control briefly
@@ -110,15 +107,16 @@ class Engine():
    async def _send_one(self, session: BaseSession, input_str: str):   
 
       command = None
+      domain_id = session.ctx("gateway", "domain_id", persist=True)
       request = Request(input_str)
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
 
       try:
-         if session.domain_id:
+         if domain_id:
             # Domain-level hook before resolving the input into a command.
             # Allows dynamic command registration or early input rewriting.
-            current = self._registry.get_controller_by_id(session.domain_id)
+            current = self._registry.get_controller_by_id(domain_id)
             await current.on_before_resolve(session)
 
          # resolve the commands
@@ -154,8 +152,8 @@ class Engine():
       finally:       
          if command: 
             command.controller = None
-         if session.domain_id:
+         if domain_id:
             # Hook called when a domain session is about to end.
             # Used for cleanup of runtime data, disconnection, or persistence.   
-            current = self._registry.get_controller_by_id(session.domain_id)
+            current = self._registry.get_controller_by_id(domain_id)
             await current.on_cleanup(session)

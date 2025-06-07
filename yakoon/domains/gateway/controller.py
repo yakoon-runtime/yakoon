@@ -1,6 +1,8 @@
 from yakoon.controllers.base import GatewayBaseController
 from yakoon.domains.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.domains.gateway.commands.system.cmdset import PlatformSystemCommands
+from yakoon.models.key import Key
+from yakoon.models.namespace import Namespace
 from yakoon.runtime.models.session import BaseSession
 from yakoon.domains.gateway.setup import setup_gateway
 
@@ -22,6 +24,24 @@ class GatewayController(GatewayBaseController):
     def __init__(self):
         super().__init__()    
         setup_gateway(self.service_router, self.id)
+
+    async def on_resolve_session(self, session_key: Key) -> BaseSession:
+        """
+        Resolves the session object for the given request.
+
+        This method decides whether to load an existing session from storage,
+        create a new transient session, or reject the request entirely.
+
+        It must not persist the session unless a valid context (e.g. login) has been established.
+        The returned session should be usable by the engine but may remain in-memory only.
+
+        Returns:
+            BaseSession: a session instance bound to the request lifecycle
+        """
+        ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
+        session_key = session_key or ns.get_key(None)
+        services = await self.get_system_services()        
+        return await services.sessions.get_or_new(session_key)
 
     async def on_gateway_validate(self, session: BaseSession):
         """
@@ -67,5 +87,5 @@ class GatewayController(GatewayBaseController):
         """
         await super().on_gateway_finalize(session)
         if not session.ctx("gateway", "account_key", persist=True):
-            services = await self.service_router.get_registry("system")
+            services = await self.get_system_services()
             await services.sessions.delete_by_key(session.key)

@@ -2,6 +2,58 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-06-07]
+**Vergabeprozess für numerische IDs über Shards**
+Beim Vergabeprozess für numerische IDs über Shards stellt sich die Frage, wann ein neuer Shard erzeugt werden muss. Ziel ist es, Ressourcen effizient zu nutzen und unnötige Ranges zu vermeiden. Ein neuer Shard wird nur erzeugt, wenn ein bestehender Shard entweder vollständig ausgeschöpft ist oder beim Speichern ein Konflikt (z.B. Parallelzugriff) auftritt.
+Solange ein Shard noch Schreibkapazität hat und gespeichert werden kann, wird er weiterverwendet.
+Vorteil: 
+- minimale Anzahl von Shards
+- saubere ID-Räume
+- effiziente Nutzung der Datenbank
+- keine unnötige Parallelisierung oder Leerlauf-Shards
+Nachtrag: "Redis wurde bewusst vermieden – zugunsten eines nachvollziehbaren, speicherbasierten Shard-Counters.“
+
+## [2025-06-06]
+# Services dürfen andere Services konsumieren
+Innerhalb der Domänenschicht ist es erlaubt, dass Services einander aufrufen und verwenden. Das ermöglicht saubere Kapselung von Logik und Wiederverwendung, ohne Layer-Grenzen zu verletzen. Ein Service darf jedoch keine Controller, IO-Schichten oder externe Systeme direkt verwenden – diese Verantwortung bleibt klar getrennt.
+
+## [2025-06-06]
+**Der SharedCounter liefert nur IDs, keine Keys**
+Die Struktur eines Keys (domain, bucket, scope) ist domänenspezifisch und lebt im aktuellen Kontext – meist in der Session. Der CounterService hat keine Kenntnis darüber und liefert ausschließlich fortlaufende IDs. Services kombinieren diese ID gezielt mit bestehenden Kontextinformationen, z. B.: → `session.key.with_id(...)`
+So bleibt die Verantwortung klar getrennt:
+- Session = Kontext
+- Service = Entscheidung
+- Counter = technische ID-Vergabe
+
+## [2025-06-06]
+**Kein Leaken von Technik**
+Infrastruktur-Komponenten wie der SharedCounterService, Row-Zugriff oder Key-Generierung dürfen ausschließlich im ServiceLayer verwendet werden. Weder Controller noch Engine sehen technische Hilfsmittel oder Detailzustände. Nur die Bedeutung („ein Raum wird erstellt“) darf durchgereicht werden – alles andere bleibt gekapselt.
+
+## [2025-06-06]
+**CounterService gerhört in interne Infrastruktur**
+Der CounterService ist eine interne Infrastruktur – und wird ausschließlich durch die Domain-Services verwendet, niemals direkt durch Fassade, Controller oder Engine. Warum das richtig ist:
+- IDs sind domänenspezifisch - Fassade kennt keine Objektdetails.
+- Sie reicht Intention weiter, keine Strukturverantwortung - Kein Leaken von Technik	
+- Counter bleibt reine Infrastruktur – kein globales Werkzeug - Erzwingt saubere Objekt-Konstruktion	
+- Alles entsteht durch service.create(...), nie „halb von außen“
+
+## [2025-06-06]
+**Services sind für gültige Objekte verantwortlich**
+Nur der jeweilige Service darf Objekte wie Session, Room oder Account in einen validen Zustand überführen. Das bedeutet: `.validate()` muss innerhalb des Services immer erfolgreich durchführbar sein. Weder Controller noch Engine dürfen IDs erzeugen, Felder ergänzen oder Validierung auslösen. Nur der Service kennt Kontext und Regeln – er trägt die alleinige Verantwortung. Somit erfolgt auch die Erzeugung gültiger Schlüssel über den Coutner-Service nur innerhalb der Services.
+
+## [2025-06-06]
+**Session.key darf niemals None sein**
+Wir initialisieren jede Session mit einem vollständigen Key-Rahmen
+(Domain, Bucket, Scope), aber lassen die ID bewusst leer (None).
+Damit bleibt die Session eindeutig typisiert (z. B. "session/anon/live"),
+aber erzeugt keine persistente ID, bis klar ist, dass sie gespeichert werden muss.
+Ein `None`-Key wurde verworfen, weil:
+- spätere Finalisierung unmöglich wäre (kein Kontext vorhanden)
+- der Code zusätzliche Prüfungen auf `None` erfordert hätte
+- Debugging, Logging und Namespacing unnötig erschwert würden
+Stattdessen gilt: 
+→ `session.key` ist **immer gesetzt**, aber `session.key.id` kann `None` sein.
+
 ## [2025-06-04]
 **Services bauen Objekte, Stores liefern dicts**
 Wir haben festgelegt, dass alle Stores ausschließlich mit dict arbeiten und keine Domainobjekte instanziieren.

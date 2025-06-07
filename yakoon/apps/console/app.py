@@ -1,6 +1,8 @@
 
 import asyncio
 from yakoon.engines.render.models.mode import RenderMode
+from yakoon.models.key import Key
+from yakoon.models.namespace import Namespace
 from yakoon.runtime.devtools import MemoryTrendMonitor
 from yakoon.runtime.devtools import UnresolvedPromptMonitor
 from yakoon.engines.command import Engine, Output, safe_input
@@ -16,7 +18,6 @@ command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
 command_inits += ["batch: login Stefan; switch realm; ic Stefan"]
 
-
 async def run_console():
    
     if DEV_MODE:
@@ -24,16 +25,15 @@ async def run_console():
         MemoryTrendMonitor.start(20)
 
     output = Output(print, print)
-    
     engine = Engine(BootstrapRegistry())
-    await engine.initialize(output)
 
-    while True:               
-        
+    await engine.initialize(output)
+    session = Key.from_parts("yakoon", "bucket", "develop", "cli")
+
+    while True:                       
         command = (command_inits.pop(0).strip() 
            if command_inits else await safe_input())
-                
-        await engine.dispatch("cli", command, output)
+        await engine.dispatch(session, command, output)
 
 
 if __name__ == "__main__":    

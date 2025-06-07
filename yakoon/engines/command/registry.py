@@ -60,8 +60,9 @@ class DomainRegistry(BaseDomainRegistry):
                         return controller, cmd
 
         # 2. Active domain (switch mode)
-        if session.domain_id:
-            current = self.get_controller_by_id(session.domain_id)
+        domain_id = session.ctx("gateway", "domain_id", persist=True)
+        if domain_id: 
+            current = self.get_controller_by_id(domain_id)
             cmd = current.router.resolve(input_str, cmd_groups)
             if cmd:
                 return current, cmd

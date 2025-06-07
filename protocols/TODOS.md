@@ -3,21 +3,26 @@
 # ✅ NEXT STEPS #
 ==================
 
+# Session
+
+- last_active einführen  -> persistieren
+  - last_active muss bei jedem request aktualisiert werden. Nur so könnnen wir später
+    abgelaufene Sessions löschen. -> last_active oder expired_time?
+  - Im Hintergrund müssen wir alte Sessions von Zeit zu Zeit löschen (sequence is expired_time)
+
 - Umstellung auf SQLite
-   - Session
-   - Account
 
 - Sessions
   - list, delete (deactivate?)
 
-- Accounts
+
+# Accounts
   - list, create, edit, delete
   - set_pw, -> Mail Benachrichtigung
 
 
-- Session (temp) erstellen ->
-  -> Dann brauchen wir keinen store und später wieder einen remove.
-  -> Dann sollten wir aber die Session nicht in der Engine erzeugen, sondern im Gateway-Controller.
+- Paging muss möglich sein (like ask)
+  - Muss dazu der Timeout des Future aktualisiert werden?
 
 
 
@@ -31,6 +36,14 @@
 - Erstelle neues Projekt ....
 - Konzept: Engabe -> Verarbeitung - > Ausgabe
   - Antwort was getan wird; Antwort was getan wurde? 
+
+# Template verwalten
+- Projekte z.B. müssen Folien zur Verfügung stellen können
+  - Diese Folien möchte ich herunterladen können -> feat(download)
+  - Dazu muss das System Templates verstehen, die hinterlegt werden können
+
+
+
 
 # A.M.E.E 
 - Code dokumentieren (Docstrings)

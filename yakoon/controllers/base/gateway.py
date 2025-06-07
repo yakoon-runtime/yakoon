@@ -1,8 +1,9 @@
 from __future__ import annotations
-
+from typing import TYPE_CHECKING
+from yakoon.models.key import Key
+from yakoon.runtime.models.session import BaseSession
 from yakoon.controllers.base import BaseController
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from yakoon.controllers.registry import BaseDomainRegistry
 
@@ -23,3 +24,18 @@ class GatewayBaseController(BaseController):
     Used by commands like 'switch' and 'help' to resolve domain information at runtime.
     This allows the gateway to act as a global dispatcher and facilitator for domain transitions.
     """
+
+    async def on_resolve_session(self, session_key: Key) -> BaseSession:
+        """
+        Resolves the session object for the given request.
+
+        This method decides whether to load an existing session from storage,
+        create a new transient session, or reject the request entirely.
+
+        It must not persist the session unless a valid context (e.g. login) has been established.
+        The returned session should be usable by the engine but may remain in-memory only.
+
+        Returns:
+            BaseSession: a session instance bound to the request lifecycle
+        """
+        pass
