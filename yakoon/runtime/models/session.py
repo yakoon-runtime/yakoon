@@ -19,6 +19,7 @@ class BaseSession(Entity):
 
     permissions: list[str] = field(default_factory=lambda: ["system"])
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    last_active: str = None  # ISO-String (z. B. bei to_row()/from_row)
 
     _io: Output = field(default=None, init=False, repr=False)
     _cmd_groups: list[str] = field(default_factory=list, init=False, repr=False)
@@ -30,6 +31,10 @@ class BaseSession(Entity):
     def validate(self):
         if not self.key:
             raise ValueError("Key cannot be None or empty")
+
+    def touch(self):
+        """Updates the timestamp of the last activity."""
+        self.last_active = datetime.utcnow().isoformat()
 
     @property
     def cmd_groups(self) -> list[Type[str]]:

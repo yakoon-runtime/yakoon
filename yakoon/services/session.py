@@ -30,6 +30,8 @@ class SessionService:
             prefix = session.key.get_prefix()             
             next_id = await self._services.counters.next(prefix)
             session.key = session.key.with_id(str(next_id))
+        if not session.last_active:
+            session.touch()
         await self._store.save(session.to_row())
 
     async def delete_by_key(self, key: Key):

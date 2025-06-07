@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     _id TEXT NOT NULL,
     lang TEXT,
     data_storage TEXT,
+    last_active TEXT,
     PRIMARY KEY (_domain, _bucket, _scope, _id)
 );
 

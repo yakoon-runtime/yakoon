@@ -41,7 +41,11 @@ class GatewayController(GatewayBaseController):
         ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
         session_key = session_key or ns.get_key(None)
         services = await self.get_system_services()        
-        return await services.sessions.get_or_new(session_key)
+
+        session = await services.sessions.get_or_new(session_key)        
+        session.touch() # Updates the last activity.
+        
+        return session
 
     async def on_gateway_validate(self, session: BaseSession):
         """
