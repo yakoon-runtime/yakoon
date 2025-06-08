@@ -7,3 +7,4 @@ yakoon.egg-info/
 dist/
 build/
 .venv/
+db/*
