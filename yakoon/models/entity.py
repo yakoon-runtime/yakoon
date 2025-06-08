@@ -16,9 +16,9 @@ class Entity:
 
     def to_row(self) -> dict:
         return {
-            "key": str(self.key),
-            "scope": self.scope or self.key.to_prefix(),
-            "created_at": self.created_at,
+            "__key__": str(self.key),
+            "__scope__": self.scope or self.key.to_prefix(),
+            "__created_at__": self.created_at,
             **{
                 f.name: getattr(self, f.name)
                 for f in fields(self)
@@ -28,12 +28,12 @@ class Entity:
 
     @classmethod
     def from_row(cls, row: dict):
-        key = Key.from_str(row["key"])
-        created_at = row.get("created_at")
+        key = Key.from_str(row["__key__"])
+        created_at = row.get("__created_at__")
 
         # alles außer Standardfelder übernehmen
         data = {
             k: v for k, v in row.items()
-            if k not in {"key", "scope", "created_at"}
+            if k not in {"__key__", "__scope__", "__created_at__"}
         }
         return cls(key=key, created_at=created_at, **data)

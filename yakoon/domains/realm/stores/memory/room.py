@@ -27,7 +27,7 @@ class InMemoryRoomStore:
 
 def load_defaults(store: InMemoryRoomStore):
 
-    ns = Namespace(domain="realm", bucket="bucket", scope="develop")
+    ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
 
     store.add(ns, Room(
         id="forest",

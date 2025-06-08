@@ -21,7 +21,7 @@ class SQLiteStore(BaseStore):
         self.table_name = table_name
 
     async def get_by_key(self, key: Key) -> Optional[dict]:
-        q = Query.from_(self.table).select('*').where(self.table.key == str(key))
+        q = Query.from_(self.table).select('*').where(self.table.__key__ == str(key))
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:
@@ -32,7 +32,7 @@ class SQLiteStore(BaseStore):
 
     async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
         scope = namespace.to_str()
-        q = Query.from_(self.table).select('*').where(self.table.scope == scope).limit(limit)
+        q = Query.from_(self.table).select('*').where(self.table.__scope__ == scope).limit(limit)
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:
@@ -42,7 +42,7 @@ class SQLiteStore(BaseStore):
                 return [dict(row) for row in rows]
 
     async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
-        q = Query.from_(self.table).select('*').where(self.table.scope == namespace.to_str())
+        q = Query.from_(self.table).select('*').where(self.table.__scope__ == namespace.to_str())
 
         for key, value in fields.items():
             q = q.where(self.table[key] == value)
@@ -64,7 +64,7 @@ class SQLiteStore(BaseStore):
         q = f"""
         INSERT INTO {self.table_name} ({col_sql})
         VALUES ({placeholders})
-        ON CONFLICT(key) DO UPDATE SET data = excluded.data;
+        ON CONFLICT(__key__) DO UPDATE SET data = excluded.data;
         """
         
         values = list(obj.values())
@@ -74,7 +74,7 @@ class SQLiteStore(BaseStore):
 
 
     async def delete_by_key(self, key: Key) -> None:
-        q = Query.from_(self.table).delete().where(self.table.key == str(key))
+        q = Query.from_(self.table).delete().where(self.table.__key__ == str(key))
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:

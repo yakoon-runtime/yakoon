@@ -1,9 +1,9 @@
 -- Yakoon Session Schema: Initial Structure
 
 CREATE TABLE IF NOT EXISTS sessions (
-    key TEXT PRIMARY KEY,
-    scope TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    __key__ TEXT PRIMARY KEY,
+    __scope__ TEXT,
+    __created_at__ TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     lang TEXT,
     data TEXT,
     last_active TEXT

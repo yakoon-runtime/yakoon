@@ -20,11 +20,11 @@ class MemoryStore(BaseStore):
         return copy.deepcopy(self._rows.get(str(key)))
 
     async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
-        prefix = namespace.to_str()
+        scope = namespace.to_str()
         return [
             copy.deepcopy(obj)
             for key_str, obj in self._rows.items()
-            if obj.get("scope") == prefix
+            if obj.get("__scope__") == scope
         ][:limit]
 
     async def fetch_by_fields(
@@ -34,15 +34,15 @@ class MemoryStore(BaseStore):
         limit: int = 100,
         **fields: Any
     ) -> list[dict]:
-        prefix = namespace.to_str()
+        scope = namespace.to_str()
         return [
             copy.deepcopy(obj)
             for obj in self._rows.values()
-            if obj.get("scope") == prefix and all(obj.get(k) == v for k, v in fields.items())
+            if obj.get("__scope__") == scope and all(obj.get(k) == v for k, v in fields.items())
         ][:limit]
 
     async def save(self, obj: dict) -> None:
-        key_str = obj["key"]
+        key_str = obj["__key__"]
         self._rows[key_str] = copy.deepcopy(obj)
 
     async def delete_by_key(self, key: Key) -> None:
