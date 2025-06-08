@@ -9,6 +9,11 @@ CREATE TABLE IF NOT EXISTS sessions (
     last_active TEXT
 );
 
+CREATE INDEX IF NOT EXISTS idx_sessions_scope ON sessions (__scope__);
+CREATE INDEX IF NOT EXISTS idx_sessions_last_active ON sessions (last_active);
+
+-- Shards
+
 CREATE TABLE IF NOT EXISTS shards (
     prefix TEXT NOT NULL,
     shard_id INTEGER NOT NULL,

@@ -1,17 +1,16 @@
-from dataclasses import asdict, dataclass, field, fields
-from uuid import uuid4
-
+from dataclasses import dataclass, field
+from typing import ClassVar
 from yakoon.models.entity import Entity
 
 
 @dataclass
 class Account(Entity):
 
-   # ───── persistent fields (stored in DB/json) ─────
-
     name: str = field(default="")
     cmd_groups: list[str] = field(default_factory=list) 
     permissions: list[str] = field(default_factory=lambda: ["system"])
+   
+    __json_fields__: ClassVar[list[str]] = ["permissions", "cmd_groups"]
 
     def validate(self):
         if not self.name.strip():

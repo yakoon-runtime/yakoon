@@ -61,17 +61,21 @@ class SQLiteStore(BaseStore):
         placeholders = ", ".join(["?"] * len(columns))
         col_sql = ", ".join(columns)
 
+        update_fields = [
+            col for col in columns
+            if col != "__key__" and col != "__created_at__"]
+        update_clause = ", ".join(f"{col} = excluded.{col}" for col in update_fields)
+
         q = f"""
         INSERT INTO {self.table_name} ({col_sql})
         VALUES ({placeholders})
-        ON CONFLICT(__key__) DO UPDATE SET data = excluded.data;
+        ON CONFLICT(__key__) DO UPDATE SET {update_clause};
         """
         
         values = list(obj.values())
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(q, values)
             await db.commit()
-
 
     async def delete_by_key(self, key: Key) -> None:
         q = Query.from_(self.table).delete().where(self.table.__key__ == str(key))

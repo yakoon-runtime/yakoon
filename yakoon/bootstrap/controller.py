@@ -15,10 +15,6 @@ class BootstrapController(GatewayController):
     This replaces the default GatewayController for all solution-specific routing and setup logic.
     """
 
-    def __init__(self):
-        super().__init__()    
-        setup_system(self.service_router, "system")
-
     async def on_initialize(self, session: BaseSession):
         """
         Called after the controller has been fully constructed but before any commands are processed.
@@ -28,4 +24,6 @@ class BootstrapController(GatewayController):
 
         This method is guaranteed to run once before the first engine tick or command dispatch.
         """
+        await super().on_initialize(session)
+        await setup_system(self.service_router, "system")
         await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")

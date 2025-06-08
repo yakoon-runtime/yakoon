@@ -1,11 +1,12 @@
 
 from yakoon.domains.gateway.services._registry import GatewayServiceRegistry
-from yakoon.domains.gateway.stores.factory import create_stores
+from yakoon.domains.gateway.services.admin import ensure_admin_account
+from yakoon.domains.gateway.stores.factory import create_gateway_stores
 
 
-def setup_gateway(service_router, name:str):
-    stores = create_stores("memory")
+async def setup_gateway(service_router, name:str):
+    stores = create_gateway_stores("sqlite", db_path="db/gateway.sqlite3.db")
     services = GatewayServiceRegistry.from_store_registry(stores)
 
     service_router.register_static(name, services)
-    #await ensure_admin_account(services.accounts)
+    await ensure_admin_account(services.accounts)

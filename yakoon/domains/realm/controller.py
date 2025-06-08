@@ -27,9 +27,16 @@ class RealmController(BaseController):
         GeneralCharacterCommands]
     """The collection of all commands."""
      
-    def __init__(self):
-        super().__init__()    
-        setup_realm(self.service_router, "realm")
+    async def on_initialize(self, session: BaseSession):
+        """
+        Called after the controller has been fully constructed but before any commands are processed.
+
+        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
+        or validating infrastructure state (e.g., ensuring the admin account exists).
+
+        This method is guaranteed to run once before the first engine tick or command dispatch.
+        """
+        await setup_realm(self.service_router, "realm")
 
     def dynamic_prefix(self, session: BaseSession) -> str:
         """

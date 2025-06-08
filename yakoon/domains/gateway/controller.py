@@ -20,10 +20,18 @@ class GatewayController(GatewayBaseController):
         PlatformSystemCommands, 
         PlatformAccountCommands]
     """ The collection of all commands. """
-    
-    def __init__(self):
-        super().__init__()    
-        setup_gateway(self.service_router, self.id)
+        
+    async def on_initialize(self, session: BaseSession):
+        """
+        Called after the controller has been fully constructed but before any commands are processed.
+
+        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
+        or validating infrastructure state (e.g., ensuring the admin account exists).
+
+        This method is guaranteed to run once before the first engine tick or command dispatch.
+        """
+        await super().on_initialize(session)
+        await setup_gateway(self.service_router, self.id)
 
     async def on_resolve_session(self, session_key: Key) -> BaseSession:
         """

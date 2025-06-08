@@ -3,10 +3,11 @@ from yakoon.domains.gateway.stores.memory._registry import MemoryStoreRegistry
 from yakoon.stores.base.registry import StoreRegistry
 
 
-def create_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
+def create_gateway_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
 
     if backend == "sqlite":
-        raise RuntimeError("sqlite not supported")
+        from yakoon.domains.gateway.stores.sqlite._registry import SQLiteStoreRegistry
+        return SQLiteStoreRegistry(db_path)
 
     elif backend == "postgres":
         raise RuntimeError("postgres not supported")
