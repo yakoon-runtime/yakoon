@@ -3,15 +3,15 @@ import asyncio
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from yakoon.engines.command import Engine, Output
-from yakoon.engines.render.models.mode import RenderMode
-from yakoon.bootstrap.registry import BootstrapRegistry
-from yakoon.bootstrap.settings import SolutionSettings
+from yakoon.saas.engines.command import Engine, Output
+from yakoon.saas.engines.render.models.mode import RenderMode
+from yakoon.saas.bootstrap.registry import BootstrapControllerDirectory
+from yakoon.saas.bootstrap.settings import SolutionSettings
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 SolutionSettings.runtime.render_mode = RenderMode.MARKDOWN
 
-engine = Engine(BootstrapRegistry())
+engine = Engine(BootstrapControllerDirectory())
 
 router = APIRouter()
 active_sessions = {}

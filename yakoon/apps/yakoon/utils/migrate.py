@@ -2,7 +2,7 @@
 import yaml
 import sys
     
-from yakoon.stores.boot.base.router import MigratorRouter
+from yakoon.saas.stores.boot.base.router import MigratorRouter
 
 
 async def migrate_from_config(path: str):

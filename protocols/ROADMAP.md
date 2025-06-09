@@ -17,7 +17,7 @@ Yakoon ist eine text- und commandbasierte Plattform zur Steuerung und Automatisi
 
 ### Inhalte
 
-* [ ] Engine mit DomainRegistry, ControllerHooks, Lifecycle klar definiert
+* [ ] Engine mit ControllerDirectory, ControllerHooks, Lifecycle klar definiert
 * [ ] Sessionverwaltung mit persistenter Speicherbindung (PostgreSQL)
 * [ ] MindDojo als private Domain (nicht auslieferbar)
 * [ ] Web-Terminal (Markdown, Prompt, Sessionleiste)

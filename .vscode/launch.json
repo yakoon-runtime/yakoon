@@ -1,6 +1,28 @@
 {
     "version": "0.2.0",
     "configurations": [
+    
+        {
+            "name": "Yakoon: Loop",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "yakoon.loop.client",
+            "console": "integratedTerminal",
+            "env": {
+                 "DEV_MODE": "true"
+            },
+        },
+
+        {
+            "name": "Yakoon: Run Console",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "yakoon.saas.bootstrap.apps.console.run",
+            "console": "integratedTerminal",
+            "env": {
+                 "DEV_MODE": "true"
+            },
+        },
 
         {
             "name": "Yakoon: Run Migration",
@@ -17,21 +39,10 @@
         },
 
         {
-            "name": "Yakoon: Run Console",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "yakoon.bootstrap.apps.console.run",
-            "console": "integratedTerminal",
-            "env": {
-                 "DEV_MODE": "true"
-            },
-        },
-
-        {
             "name": "Yakoon: Run Telnet",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.bootstrap.apps.telnet.run",
+            "module": "yakoon.saas.bootstrap.apps.telnet.run",
             "console": "integratedTerminal",
             "env": {
                  "DEV_MODE": "true"
@@ -42,7 +53,7 @@
             "name": "Yakoon: Run WebAPI",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.bootstrap.apps.webapi.run",
+            "module": "yakoon.saas.bootstrap.apps.webapi.run",
             "console": "integratedTerminal",
             "env": {
                  "DEV_MODE": "true"

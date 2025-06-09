@@ -3,6 +3,8 @@
 # ✅ NEXT STEPS #
 ==================
 
+interne Bezeichnung: e2c
+
 # Session
 
 - Umstellung auf SQLite
