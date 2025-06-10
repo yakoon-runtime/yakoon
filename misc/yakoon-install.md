@@ -6,3 +6,6 @@
 - cd webclient
 - npm install
 
+
+## Lösung: Symbolischer Link
+mklink /J runtime C:\Bibliothek\yakoon\yakoon\mesh

@@ -1,9 +1,9 @@
 
 import yaml
 import sys
-    
-from yakoon.saas.stores.boot.base.router import MigratorRouter
 
+from yakoon.mesh.stores.boot.base.router import MigratorRouter
+    
 
 async def migrate_from_config(path: str):
 
@@ -12,3 +12,5 @@ async def migrate_from_config(path: str):
 
     router = MigratorRouter(config)
     await router.run()
+ 
+    print(f"✅ Migration finished: {path}")
