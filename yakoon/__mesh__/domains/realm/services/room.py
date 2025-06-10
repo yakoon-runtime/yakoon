@@ -1,5 +1,5 @@
 from yakoon.saas.domains.realm.models.room import Room
-from yakoon.saas.models.namespace import Namespace
+from yakoon.mesh.models.namespace import Namespace
 
 
 class RoomService:

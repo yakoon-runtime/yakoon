@@ -1,7 +1,7 @@
 
 from yakoon.saas.domains.realm.stores.memory._registry import MemoryStoreRegistry
 from yakoon.saas.domains.realm.stores.sqlite._registry import SQLiteStoreRegistry
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 def create_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:

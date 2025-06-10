@@ -1,9 +1,9 @@
+from yakoon.mesh.models.key import Key
+from yakoon.mesh.models.namespace import Namespace
 from yakoon.saas.controllers.base import GatewayBaseController
 from yakoon.saas.controllers.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.saas.controllers.gateway.commands.system.cmdset import PlatformSystemCommands
-from yakoon.saas.models.key import Key
-from yakoon.saas.models.namespace import Namespace
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 from yakoon.saas.controllers.gateway.setup import setup_gateway
 
 

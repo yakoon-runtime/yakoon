@@ -2,6 +2,10 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 
+## [2025-06-09]
+**Controller-basierte Modularisierung**
+Wir behandeln jeden Systembestandteil (Mesh, Redis, Queue, Realm etc.) als eigenen Controller. Nur registrierte Controller sind verfügbar – nicht registrierte Features existieren für die Plattform nicht. Ein aktiver Controller kapselt seine Logik vollständig (inkl. Sub-Switch, Help, Dispatch). Das System bleibt damit modular, entkoppelt und dynamisch erweiterbar – ohne zentrale Routinglogik.
+
 ## [2025-06-07]
 **Vergabeprozess für numerische IDs über Shards**
 Beim Vergabeprozess für numerische IDs über Shards stellt sich die Frage, wann ein neuer Shard erzeugt werden muss. Ziel ist es, Ressourcen effizient zu nutzen und unnötige Ranges zu vermeiden. Ein neuer Shard wird nur erzeugt, wenn ein bestehender Shard entweder vollständig ausgeschöpft ist oder beim Speichern ein Konflikt (z.B. Parallelzugriff) auftritt.
@@ -99,7 +103,7 @@ Wir verwerfen Markdown als Speicherformat für Räume zugunsten einer SQL-basier
 
 ## [2025-05-29]
 **Commands & Presenter**
-Alle Commands verwenden das Presenter-System mit klarer template_key-Definition pro Command. Die Darstellung erfolgt vollständig über sprachfähige Jinja2-Templates, getrennt vom Code. Die Struktur verbessert Lesbarkeit, Mehrsprachigkeit und Konsistenz. Ausgabe-Logik ist vollständig kapselbar, testbar und flexibel. Der Presenter ersetzt direkte Ausgaben (session.emit, session.fail) durch eine semantische Schicht. Pfadangaben erfolgen explizit über get_template_path() – kein Hidden-Routing.
+Alle Commands verwenden das Presenter-System mit klarer template_key-Definition pro SaasCommand. Die Darstellung erfolgt vollständig über sprachfähige Jinja2-Templates, getrennt vom Code. Die Struktur verbessert Lesbarkeit, Mehrsprachigkeit und Konsistenz. Ausgabe-Logik ist vollständig kapselbar, testbar und flexibel. Der Presenter ersetzt direkte Ausgaben (session.emit, session.fail) durch eine semantische Schicht. Pfadangaben erfolgen explizit über get_template_path() – kein Hidden-Routing.
 
 ## [2025-05-29]
 **Umgang mit KI (Intent Mapping)**
@@ -114,7 +118,7 @@ if intent.is_valid():
 
 ## [2025-05-29]
 **Umgang mit KI (Intent Mapping)**
-Entscheidung: Die KI wird nicht direkt zur Steuerung der Plattform genutzt, sondern dient ausschließlich der Interpretation von Benutzereingaben. Aus diesen ermittelt sie das passende Command, die zugehörige Domain und mögliche Argumente. Begründung: Die Plattform bleibt ausführende Instanz mit vollständiger Kontrolle. Die KI agiert als Intent-Resolver, nicht als Logikträger – das verhindert Automatisierungsfehler, Halluzinationen und wahrt Systemintegrität.
+Entscheidung: Die KI wird nicht direkt zur Steuerung der Plattform genutzt, sondern dient ausschließlich der Interpretation von Benutzereingaben. Aus diesen ermittelt sie das passende SaasCommand, die zugehörige Domain und mögliche Argumente. Begründung: Die Plattform bleibt ausführende Instanz mit vollständiger Kontrolle. Die KI agiert als Intent-Resolver, nicht als Logikträger – das verhindert Automatisierungsfehler, Halluzinationen und wahrt Systemintegrität.
 
 ## [2025-05-29]
 **Presenter**
@@ -122,7 +126,7 @@ Ein Presenter wurde eingeführt, um die gesamte Template-Struktur zu kapseln. Di
 
 ## [2025-05-28]
 **Templates vs. Translater**
-Entscheidung: Alle Benutzerausgaben werden über Jinja2-Templates pro Command und Sprache geregelt. Dies ermöglicht konsistente, übersetzbare Ausgaben mit klarer Struktur, einfacher Sprachumschaltung und vollständiger Trennung von Logik und Darstellung – ohne redundante Translator-Systeme.
+Entscheidung: Alle Benutzerausgaben werden über Jinja2-Templates pro SaasCommand und Sprache geregelt. Dies ermöglicht konsistente, übersetzbare Ausgaben mit klarer Struktur, einfacher Sprachumschaltung und vollständiger Trennung von Logik und Darstellung – ohne redundante Translator-Systeme.
 
 ## [2025-05-28]
 **Memory Manager**
@@ -138,7 +142,7 @@ Einführung eines `Output`, um Ausgaben (`out`, `err`) in einer gemeinsamen Stru
 
 ## [2025-05-27]
 **Prompt & Batch**
-Clients, die kontinuierlich Requests verarbeiten (z. B. Console, Telnet, WebSocket), unterstützen interaktive Prompts (Benutzereingaben) während der Command-Ausführung. 
+Clients, die kontinuierlich Requests verarbeiten (z. B. Console, Telnet, WebSocket), unterstützen interaktive Prompts (Benutzereingaben) während der SaasCommand-Ausführung. 
 Diese Clients besitzen einen stabilen, zustandsbehafteten Kanal, über den Prompts korrekt empfangen und beantwortet werden können. Bei stateless Clients (z. B. REST-Services) kann hingegen nicht garantiert werden, dass ein gestarteter Prompt-Future überhaupt aufgelöst wird. Stateless-Clients dürfen keine interaktiven Prompts verwenden. Stattdessen müssen sie vollständige Abläufe als batch:-Kommandos ausführen, bei denen alle Eingaben im Voraus definiert sind. Daher: REST macht nur vollständige Abläufe und ist per Design zustandslos (auch wenn technisch machbar).
 
 ## [2025-05-27]
@@ -156,7 +160,7 @@ Dadurch wird dynamisches Routing pro Session möglich, ohne den Resolver oder di
 **Festlegung von Ausführungsbedingungen für Commands**
 Commands können festlegen, ob ein geladener Charakter erforderlich ist: requires_character = False
 > Fehlt das Attribut oder ist es True, prüft der Domain-Hook on_before_run_command(...), ob session.data_runtime.character gesetzt ist – sonst wird die Ausführung blockiert.
-> Damit steuert das Command selbst die Anforderungen an den Session-Zustand.n
+> Damit steuert das SaasCommand selbst die Anforderungen an den Session-Zustand.n
 
 ## [2025-05-26]
 **Klickbare Links**

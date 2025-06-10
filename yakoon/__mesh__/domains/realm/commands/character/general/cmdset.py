@@ -1,6 +1,6 @@
 from typing import Sequence, Type
-from yakoon.saas.commands.command import Command
-from yakoon.saas.commands.commandset import CommandSet
+from yakoon.saas.commands.command import SaasCommand
+from yakoon.mesh.commands.commandset import CommandSet
 from yakoon.saas.domains.realm.commands.character.general.cmd_clock import CmdClock
 from yakoon.saas.domains.realm.commands.character.general.cmd_look import CmdLook
 from yakoon.saas.domains.realm.commands.character.general.cmd_move import CmdMove
@@ -13,7 +13,7 @@ class GeneralCharacterCommands(CommandSet):
     category = "character"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
+    def commands(cls) -> Sequence[Type[SaasCommand]]: 
         return [            
             CmdClock,
             CmdOOC,

@@ -1,6 +1,6 @@
 
+from yakoon.mesh.runtime.system.registry import ServiceRegistry
 from yakoon.saas.controllers.gateway.services.account import AccountService
-from yakoon.saas.runtime.system.registry import ServiceRegistry
 
 
 class GatewayServiceRegistry(ServiceRegistry):

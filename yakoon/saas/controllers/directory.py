@@ -1,7 +1,7 @@
 
 from abc import abstractmethod
 
-from yakoon.saas.controllers.base import BaseController
+from yakoon.mesh.controllers.base import BaseController
 
 
 class BaseControllerDirectory:

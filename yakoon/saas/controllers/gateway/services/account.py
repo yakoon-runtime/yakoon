@@ -1,8 +1,9 @@
 
 from typing import Optional
+from yakoon.mesh.models.key import Key
+from yakoon.mesh.models.namespace import Namespace
 from yakoon.saas.controllers.gateway.models.account import Account
-from yakoon.saas.models.key import Key
-from yakoon.saas.models.namespace import Namespace
+
 
 class AccountService:
 

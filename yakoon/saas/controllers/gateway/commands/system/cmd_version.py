@@ -2,10 +2,10 @@ import platform
 import subprocess
 import time
 from datetime import datetime, timezone
-from yakoon.saas.commands.parser import Request
+from yakoon.mesh.commands.parser import Request
 from yakoon.saas.controllers.gateway.commands.base import PlatformCommand
-from yakoon.saas.runtime.models.session import BaseSession
-from yakoon.saas.controllers.gateway.settings import Settings
+from yakoon.mesh.runtime.session import BaseSession
+from yakoon.saas.settings import settings
 
 
 class CmdVersion(PlatformCommand):
@@ -73,12 +73,10 @@ def get_platform_version() -> str:
     Resolves the platform version in the following order:
     1. Git tag (via 'git describe --tags')
     2. version.txt file
-    3. Settings.platform_version fallback
     Returns a string such as 'v0.7.2' or 'unknown'.
     """
     return (
         get_git_tag()
         or read_version_file()
-        or Settings.platform_version
         or "unknown"
     )

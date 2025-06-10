@@ -1,5 +1,5 @@
 import httpx
-from yakoon.saas.plugins.ai.settings import Settings
+from yakoon.saas.settings import settings
 
 
 async def ask_ollama(prompt: str, context: dict = {}) -> str:
@@ -8,7 +8,7 @@ async def ask_ollama(prompt: str, context: dict = {}) -> str:
         "prompt": prompt,
         "stream": False
     }
-    async with httpx.AsyncClient(timeout=Settings.time_out) as client:
-        response = await client.post(Settings.ollama_url, json=payload)
+    async with httpx.AsyncClient(timeout=settings.ai.ollama.timeout) as client:
+        response = await client.post(settings.ai.ollama.url, json=payload)
         response.raise_for_status()
         return response.json()["response"]

@@ -4,7 +4,7 @@ from yakoon.saas.domains.realm.runtime.clock import Clock
 from yakoon.saas.domains.realm.runtime.direction import get_exit_direction_commandset
 from yakoon.saas.controllers.base.gateway import BaseController
 from yakoon.saas.controllers.gateway.commands.shared.cmdset import PlatformSharedCommands
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 from yakoon.saas.domains.realm.setup import setup_realm
 
 

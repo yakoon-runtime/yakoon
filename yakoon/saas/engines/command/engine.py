@@ -1,17 +1,19 @@
 import asyncio
 from collections import deque
 from typing import Optional, Tuple
-from yakoon.saas.commands.command import CmdNotFound, Command
-from yakoon.saas.commands.parser import Request
-from yakoon.saas.controllers.base.base import BaseController
-from yakoon.saas.engines.command.io.output import Output
+from yakoon.saas.settings import settings
+from yakoon.mesh.commands.parser import Request
+from yakoon.mesh.models.key import Key
+from yakoon.mesh.runtime.dialogs.manager import DialogManager
+from yakoon.mesh.commands.command import CmdNotFound
+from yakoon.mesh.runtime.session.output import Output
+from yakoon.mesh.runtime.session import BaseSession
+
 from yakoon.saas.engines.command.directory import ControllerDirectory
-from yakoon.saas.engines.command.settings import Settings
 from yakoon.saas.engines.command.batch import split_batch_input
-from yakoon.saas.models.key import Key
-from yakoon.saas.runtime.models.session import BaseSession
-from yakoon.saas.runtime.dialogs.manager import DialogManager
 from yakoon.saas.services._registry import SystemServiceRegistry
+from yakoon.saas.commands.command import SaasCommand
+from yakoon.saas.controllers.base.base import SaasBaseController
 
 
 class Engine():
@@ -34,7 +36,7 @@ class Engine():
 
    async def _resolve_for_controller(
          self, controller_id, request: Request, 
-         session: BaseSession) -> Optional[Tuple[BaseController, Command]]:
+         session: BaseSession) -> Optional[Tuple[SaasBaseController, SaasCommand]]:
       
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
@@ -50,7 +52,7 @@ class Engine():
                return controller, command
 
    async def _require_system_services(self, bucket: str= "system") -> SystemServiceRegistry :
-      services = await self._directory.gateway.service_router.get_directory(bucket)
+      services = await self._directory.gateway.service_router.get_registry(bucket)
       if not isinstance(services, SystemServiceRegistry):
          raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
       if not services:
@@ -66,7 +68,7 @@ class Engine():
       session = await gateway.on_resolve_session(session_key)
       session.bind_io(io)
 
-      inputs = split_batch_input(input_str) if Settings.enable_batch else [input_str]  
+      inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
       await asyncio.create_task(self._run_processing(session, inputs))
 
    async def _run_processing(self, session: BaseSession, inputs: list[str]):

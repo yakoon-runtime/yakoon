@@ -1,8 +1,8 @@
 from typing import Optional
 from yakoon.saas.controllers.gateway.models.account import Account
-from yakoon.saas.models.key import Key
-from yakoon.saas.models.namespace import Namespace
-from yakoon.saas.stores.memory.base_store import MemoryStore
+from yakoon.mesh.models.key import Key
+from yakoon.mesh.models.namespace import Namespace
+from yakoon.mesh.stores.memory.base_store import MemoryStore
 
 
 class InMemoryAccountStore(MemoryStore):

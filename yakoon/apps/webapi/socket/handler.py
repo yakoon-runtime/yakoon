@@ -4,7 +4,7 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from yakoon.saas.engines.command import Engine, Output
-from yakoon.saas.engines.render.models.mode import RenderMode
+from yakoon.mesh.runtime.render.models.mode import RenderMode
 from yakoon.saas.bootstrap.registry import BootstrapControllerDirectory
 from yakoon.saas.bootstrap.settings import SolutionSettings
 

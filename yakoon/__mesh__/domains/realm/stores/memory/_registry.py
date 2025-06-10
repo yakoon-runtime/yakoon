@@ -1,6 +1,6 @@
 from yakoon.saas.domains.realm.stores.memory.character import InMemoryCharacterStore
 from yakoon.saas.domains.realm.stores.memory.room import InMemoryRoomStore
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 class MemoryStoreRegistry(StoreRegistry):

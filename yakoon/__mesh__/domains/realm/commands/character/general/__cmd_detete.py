@@ -1,12 +1,12 @@
 
 from yakoon.saas.domains.realm.services.object import ObjectService
-from yakoon.saas.commands.command import Command
-from yakoon.saas.commands.parser import Request
-from yakoon.saas.runtime.models.session import BaseSession
-from yakoon.saas.runtime.dialogs.prompts import confirm
+from yakoon.saas.commands.command import SaasCommand
+from yakoon.mesh.commands.parser import Request
+from yakoon.mesh.runtime.session import BaseSession
+from yakoon.mesh.runtime.dialogs.prompts import confirm
 
 
-class __CmdDelete(Command):
+class __CmdDelete(SaasCommand):
 
     key = "delete"
     aliases = ["del"]

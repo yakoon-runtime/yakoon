@@ -1,5 +1,5 @@
 from yakoon.saas.controllers.gateway.stores.memory.account import InMemoryAccountStore
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 class MemoryStoreRegistry(StoreRegistry):

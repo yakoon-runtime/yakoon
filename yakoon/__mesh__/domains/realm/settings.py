@@ -1,10 +1,6 @@
 
 
-class Settings():
-
-    # Debugging & Logging
-    debug: bool = False
-    """If True, enables verbose output and developer diagnostics."""
+class Settings:
 
     # Time & Realm Loop
     tick_rate: float = 60.0

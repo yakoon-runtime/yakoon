@@ -1,4 +1,4 @@
-from yakoon.saas.controllers.base import BaseController
+from yakoon.mesh.controllers.base import BaseController
 from yakoon.saas.controllers.base.gateway import GatewayBaseController
 from yakoon.saas.controllers.directory import BaseControllerDirectory
 

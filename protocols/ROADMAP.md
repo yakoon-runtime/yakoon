@@ -33,16 +33,16 @@ Yakoon ist eine text- und commandbasierte Plattform zur Steuerung und Automatisi
 
 ---
 
-## 🚀 Version 0.2 – Yakoon als persönliche Command-Zentrale
+## 🚀 Version 0.2 – Yakoon als persönliche SaasCommand-Zentrale
 
 ### Ziel
 
-„Ich möchte alles, was ich in meinem Unternehmen tue, per Command tun können – per Sprache oder Tastatur.“
+„Ich möchte alles, was ich in meinem Unternehmen tue, per SaasCommand tun können – per Sprache oder Tastatur.“
 
 ### Inhalte
 
 * [ ] Aufbau produktiver Domains (`ops`, `finance`, `projects`, `content` ...)
-* [ ] Command-Bindings: REST, Shell, Python
+* [ ] SaasCommand-Bindings: REST, Shell, Python
 * [ ] Logging & Auditing jeder Session
 * [ ] CLI- oder Web-Terminal mit Sprachintegration (Whisper / OpenAI)
 * [ ] API-Zugriff auf Firmen-Ressourcen über Commands
@@ -52,7 +52,7 @@ Yakoon ist eine text- und commandbasierte Plattform zur Steuerung und Automatisi
 ### Erfolgskriterium
 
 * Eigener Arbeitsalltag kann komplett in Yakoon abgebildet werden
-* Wiederverwendbare Command-Domains entstehen aus Bedarf
+* Wiederverwendbare SaasCommand-Domains entstehen aus Bedarf
 * Yakoon wird zur zentralen Oberfläche für Steuerung
 
 ---

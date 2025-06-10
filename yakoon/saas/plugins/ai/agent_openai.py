@@ -1,12 +1,13 @@
 
-from yakoon.saas.plugins.ai.settings import Settings
+from yakoon.saas.settings import settings
 
 
 async def ask_openai(prompt: str, context: dict = {}) -> str:
 
     try:
-        import openai
-        openai.api_key = Settings.openai_api_key
+        import openai # type: ignore
+        raise NotImplementedError()
+        openai.api_key = settings.ai.openai.api_key
     except:
         raise RuntimeError(f"Open AI not installed.")
     

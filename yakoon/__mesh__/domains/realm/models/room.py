@@ -2,7 +2,7 @@ from typing import List
 from dataclasses import dataclass, field
 from yakoon.saas.domains.realm.models.secured import Secured
 from yakoon.saas.domains.realm.services.object import ObjectService
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 
 
 @dataclass

@@ -1,11 +1,11 @@
 from yakoon.saas.domains.realm.behavior import CharacterBehavior
-from yakoon.saas.commands.command import Command
-from yakoon.saas.commands.commandset import CommandSet
-from yakoon.saas.commands.parser import Request
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.saas.commands.command import SaasCommand
+from yakoon.mesh.commands.commandset import CommandSet
+from yakoon.mesh.commands.parser import Request
+from yakoon.mesh.runtime.session import BaseSession
 
 
-class DirectionCommand(Command):
+class DirectionCommand(SaasCommand):
 
     key = "" # key is set by runtime
     aliases = [] # alias is set by runtime
@@ -25,7 +25,7 @@ class DirectionCommand(Command):
         await character.move_to(session, self._target)
 
 
-def get_exit_direction_commandset(room) -> list[Command]:
+def get_exit_direction_commandset(room) -> list[SaasCommand]:
     exits = getattr(room, "exits", {})
     return CommandSet.build_command_set([
         DirectionCommand(key=dir, target=room_id)

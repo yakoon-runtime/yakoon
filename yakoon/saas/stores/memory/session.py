@@ -1,6 +1,6 @@
 from typing import Optional
 
-from yakoon.saas.stores.memory.base_store import MemoryStore
+from yakoon.mesh.stores.memory.base_store import MemoryStore
 
 
 class InMemorySessionStore(MemoryStore):

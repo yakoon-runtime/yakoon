@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import ClassVar
-from yakoon.saas.models.entity import Entity
+from yakoon.mesh.models.entity import Entity
 
 
 @dataclass

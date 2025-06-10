@@ -1,6 +1,6 @@
 
-from yakoon.saas.stores.base.registry import StoreRegistry
-from yakoon.saas.stores.sqlite.shard import SQLiteShardCounterStore
+from yakoon.mesh.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.sqlite.shard import SQLiteShardCounterStore
 from yakoon.saas.stores.sqlite.session import SQLiteSessionStore
 
 

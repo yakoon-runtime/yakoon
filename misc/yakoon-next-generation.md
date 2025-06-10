@@ -36,7 +36,7 @@ Yakoon kombiniert:
 | Komponente              | Funktion                        |
 | ----------------------- | ------------------------------- |
 | 🧠‍ KI-Operator         | interpretiert deine Intention   |
-| 🧱‍ Command-Engine      | ruft autorisierte Aktionen auf  |
+| 🧱‍ SaasCommand-Engine      | ruft autorisierte Aktionen auf  |
 | 💻 Lokale Infrastruktur | wirkt auf Files, Tools, Dienste |
 | 🔐 Sicherheit           | feingranulare Rechtekontrolle   |
 
@@ -77,7 +77,7 @@ Yakoon kombiniert:
 
 ## 🛡 Sicherheit = First-Class Citizen
 
-* Keine Blackbox: Jeder Command = Python, lesbar, testbar
+* Keine Blackbox: Jeder SaasCommand = Python, lesbar, testbar
 * KI arbeitet nur innerhalb erlaubter Commands
 * Logging + Rechtekonzept voll integriert
 
@@ -86,7 +86,7 @@ Yakoon kombiniert:
 ## 🏁 Zusammengefasst
 
 > Yakoon OS ist das Interface, das deine Tools verdient haben.
-> Eine **Command-first, Context-aware, KI-gestützte Steuerungsebene** –
+> Eine **SaasCommand-first, Context-aware, KI-gestützte Steuerungsebene** –
 > gebaut für Menschen, nicht für Klicks.
 
 ---

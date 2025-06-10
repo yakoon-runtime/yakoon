@@ -1,5 +1,5 @@
-from yakoon.saas.runtime.models.session import BaseSession
-from yakoon.saas.models.key import Key
+from yakoon.mesh.runtime.session import BaseSession
+from yakoon.mesh.models.key import Key
 
 
 class SessionService:

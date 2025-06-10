@@ -1,4 +1,4 @@
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 class PostgresStoreRegistry(StoreRegistry):

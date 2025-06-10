@@ -1,5 +1,5 @@
 
-from yakoon.saas.stores.sqlite.base_store import SQLiteStore
+from yakoon.mesh.stores.sqlite.base_store import SQLiteStore
 
 
 class SQLiteAccountStore(SQLiteStore):

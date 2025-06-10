@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from yakoon.saas.engines.render.jinja.engine import JinjaEngine
-from yakoon.saas.runtime.system.registry import ServiceRegistry
-from yakoon.saas.services.auditlog import AuditLogService
-from yakoon.saas.services.shard import ShardAllocator, ShardedCounterService
-from yakoon.saas.services.namespace import NamespaceService
-from yakoon.saas.services.render import RendererService
+from yakoon.mesh.runtime.render.jinja.engine import JinjaEngine
+from yakoon.mesh.runtime.system.registry import ServiceRegistry
+from yakoon.mesh.services.shard import ShardAllocator, ShardedCounterService
+from yakoon.mesh.services.namespace import NamespaceService
+from yakoon.mesh.services.render import RendererService
+from yakoon.mesh.services.auditlog import AuditLogService
+
 from yakoon.saas.services.session import SessionService
 
 

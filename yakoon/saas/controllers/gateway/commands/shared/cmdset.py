@@ -1,17 +1,17 @@
 from typing import Sequence, Type
-from yakoon.saas.commands.command import Command
-from yakoon.saas.commands.commandset import CommandSet
+from yakoon.saas.commands.command import SaasCommand
+from yakoon.mesh.commands.commandset import CommandSet
 from yakoon.saas.controllers.gateway.commands.system.cmd_help import CmdHelpDomain
 from yakoon.saas.controllers.gateway.commands.system.cmd_switch import CmdSwitch
-from yakoon.saas.controllers.gateway.settings import Settings
+from yakoon.saas.settings import settings
 
 
 class PlatformSharedCommands(CommandSet):
     
-    category = Settings.cmd_category_system
+    category = settings.cmdsets.system
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
+    def commands(cls) -> Sequence[Type[SaasCommand]]: 
         return [
             CmdSwitch,
             CmdHelpDomain,

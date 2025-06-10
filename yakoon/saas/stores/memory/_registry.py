@@ -1,5 +1,5 @@
-from yakoon.saas.stores.base.registry import StoreRegistry
-from yakoon.saas.stores.memory.shard import InMemoryShardCounterStore
+from yakoon.mesh.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.memory.shard import InMemoryShardCounterStore
 from yakoon.saas.stores.memory.session import InMemorySessionStore
 
 

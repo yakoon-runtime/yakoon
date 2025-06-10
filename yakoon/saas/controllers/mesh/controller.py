@@ -1,22 +1,22 @@
 import json
 from typing import Optional
 
-from fastapi import WebSocket, WebSocketDisconnect
-from fastapi import APIRouter, WebSocket
-from fastapi import WebSocket, WebSocketDisconnect
-from yakoon.saas.controllers.base.base import BaseController
+#from fastapi import APIRouter, WebSocket
+#from fastapi import WebSocket, WebSocketDisconnect
+from yakoon.mesh.controllers.base.base import BaseController
+from yakoon.saas.controllers.base.base import SaasBaseController
 from yakoon.saas.controllers.mesh.commands.cmdset import MeshCommandSet
-from yakoon.saas.runtime.mesh.tanent import CommandProxy, ControllerProxy, Tanent
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.models.tanent import CommandProxy, ControllerProxy, Tanent
+from yakoon.mesh.runtime.session import BaseSession
 
 
-ws_router = APIRouter()
-@ws_router.websocket("/ws/loop")
-async def loop_ws(websocket: WebSocket):
-    await MeshController.instance().handle_loop_connection(websocket)
+#ws_router = APIRouter()
+#@ws_router.websocket("/ws/loop")
+#async def loop_ws(websocket: WebSocket):
+#    await MeshController.instance().handle_loop_connection(websocket)
 
 
-class MeshController(BaseController):
+class MeshController(SaasBaseController):
 
     id: str = "mesh"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
@@ -56,7 +56,8 @@ class MeshController(BaseController):
             for ctrl_id, proxy in list(tenant.controllers.items()):
                 if proxy.websocket == websocket:
                     del tenant.controllers[ctrl_id]     
-    
+
+    """
     async def handle_loop_connection(self, websocket: WebSocket):
         await websocket.accept()
         try:
@@ -80,7 +81,8 @@ class MeshController(BaseController):
                 #    await websocket.send_text(json.dumps(response.__dict__))
 
                 """
-                case "command":
+    """
+                                    case "command":
                     req = CommandRequest(**msg["payload"])
                     controller = command_mesh.resolve(req.tenant, req.controller)
                     response = await controller.dispatch(req)
@@ -89,9 +91,10 @@ class MeshController(BaseController):
                 case "ping":
                     await websocket.send_text(json.dumps({"pong": True}))
                 """
-
+    """
         except WebSocketDisconnect:
             self.unregister(websocket)
+    """
         
     async def on_initialize(self, session: BaseSession):
         """

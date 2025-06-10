@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from yakoon.saas.models.key import Key
-from yakoon.saas.runtime.models.session import BaseSession
-from yakoon.saas.controllers.base import BaseController
+from yakoon.mesh.models.key import Key
+from yakoon.saas.controllers.base.base import SaasBaseController
+from yakoon.mesh.runtime.session import BaseSession
 
 if TYPE_CHECKING:
     from yakoon.saas.controllers.directory import BaseControllerDirectory
 
 
-class GatewayBaseController(BaseController):
+class GatewayBaseController(SaasBaseController):
     """
     Special controller that acts as the system entrypoint and command router.
 

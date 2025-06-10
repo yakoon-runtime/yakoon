@@ -1,6 +1,6 @@
 
 from yakoon.saas.controllers.gateway.stores.memory._registry import MemoryStoreRegistry
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 def create_gateway_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:

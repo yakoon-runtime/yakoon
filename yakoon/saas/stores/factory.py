@@ -1,5 +1,5 @@
 
-from yakoon.saas.stores.base.registry import StoreRegistry
+from yakoon.mesh.stores.base.registry import StoreRegistry
 
 
 def create_system_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:

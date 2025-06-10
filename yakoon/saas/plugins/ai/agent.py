@@ -1,10 +1,10 @@
 
-from yakoon.saas.plugins.ai.settings import Settings
+from yakoon.saas.settings import settings
 
 
 async def ask_AI(prompt: str, context: dict = {}) -> str:
 
-    backend = Settings.backend 
+    backend = settings.ai.backend
     if backend == "openai":
         from yakoon.saas.plugins.ai.agent_openai import ask_openai
         return await ask_openai(prompt, context)

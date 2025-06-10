@@ -1,20 +1,21 @@
 
-import uvicorn
+#import uvicorn
 import asyncio
-from fastapi import FastAPI
+#from fastapi import FastAPI
 
-from yakoon.saas.engines.render.models.mode import RenderMode
-from yakoon.saas.models.key import Key
-from yakoon.saas.runtime.devtools import MemoryTrendMonitor
-from yakoon.saas.runtime.devtools import UnresolvedPromptMonitor
-from yakoon.saas.engines.command import Engine, Output, safe_input
-from yakoon.saas.engines.command.settings import DEV_MODE
+from yakoon.mesh.runtime.render.models.mode import RenderMode
+from yakoon.mesh.models.key import Key
+from yakoon.mesh.runtime.devtools import MemoryTrendMonitor
+from yakoon.mesh.runtime.devtools import UnresolvedPromptMonitor
+from yakoon.mesh.runtime.session.output import Output
+from yakoon.mesh.utils.input import safe_input
+from yakoon.saas.engines.command.engine import Engine
+from yakoon.mesh.settings import settings
 from yakoon.saas.bootstrap.registry import BootstrapControllerDirectory
-from yakoon.saas.bootstrap.settings import SolutionSettings
 
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
-SolutionSettings.runtime.render_mode = RenderMode.PLAIN
+settings.render.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
@@ -24,14 +25,14 @@ command_inits += ["ping"]
 
 async def run_console():
    
-    if DEV_MODE:
+    if settings.base.dev_mode:
         UnresolvedPromptMonitor.start()
         MemoryTrendMonitor.start(20)
 
     # FastAPI App vorbereiten
-    app = FastAPI()
-    from yakoon.saas.controllers.mesh.controller import ws_router
-    app.include_router(ws_router)
+    #app = FastAPI()
+    #from yakoon.saas.controllers.mesh.controller import ws_router
+    #app.include_router(ws_router)
 
     # Starte FastAPI-Server als Hintergrundtask
     async def start_api():
@@ -40,7 +41,7 @@ async def run_console():
         await server.serve()
 
     # Starte API nebenläufig
-    asyncio.create_task(start_api())
+    #asyncio.create_task(start_api())
 
     output = Output(print, print)
     engine = Engine(BootstrapControllerDirectory())
@@ -57,6 +58,6 @@ async def run_console():
 if __name__ == "__main__":    
    asyncio.run(run_console())
 
-   if DEV_MODE: 
+   if settings.base.dev_mode: 
         UnresolvedPromptMonitor.stop() 
         MemoryTrendMonitor.stop()

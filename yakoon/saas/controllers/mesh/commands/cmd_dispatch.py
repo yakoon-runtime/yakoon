@@ -1,8 +1,8 @@
 import json
-from yakoon.saas.commands.command import CmdNotFound
-from yakoon.saas.commands.parser import Request
+from yakoon.mesh.commands.command import CmdNotFound
+from yakoon.mesh.commands.parser import Request
 from yakoon.saas.controllers.mesh.commands.base import MeshCommand
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 
 
 class CmdDispatch(MeshCommand):

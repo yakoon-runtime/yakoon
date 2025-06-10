@@ -3,6 +3,9 @@
 # ✅ NEXT STEPS #
 ==================
 
+   from yakoon.saas.controllers.directory import BaseControllerDirectory
+
+
 interne Bezeichnung: e2c
 
 # Session

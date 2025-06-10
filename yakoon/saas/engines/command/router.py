@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from yakoon.saas.commands.command import Command
-    from yakoon.saas.commands.commandset import CommandSet
+    from yakoon.saas.commands.command import SaasCommand
+    from yakoon.mesh.commands.commandset import CommandSet
     
 
 class CommandRouter:
 
     def __init__(self):
-        self._groups: dict[str, dict[str, type[Command]]] = {}
+        self._groups: dict[str, dict[str, type[SaasCommand]]] = {}
         self._aliases: dict[str, str] = {}
 
     def register(self, category: str, cmdset: type[CommandSet], *, append: bool = False):
         if category in self._groups and not append:
-            raise ValueError(f"Command group '{category}' already exists. Use append=True to add more commands.")
+            raise ValueError(f"SaasCommand group '{category}' already exists. Use append=True to add more commands.")
 
         group = self._groups.setdefault(category, {})
         for cmd in cmdset.commands():
@@ -26,7 +26,7 @@ class CommandRouter:
     def unregister(self, category: str):
         self._groups.pop(category, None)
 
-    def find_by_key_or_alias(self, name: str, groups: list[str] | None = None) -> Command | None:
+    def find_by_key_or_alias(self, name: str, groups: list[str] | None = None) -> SaasCommand | None:
         if not groups:
             raise ValueError("No command groups provided. Did you forget to set session.cmd_groups?")
 
@@ -46,7 +46,7 @@ class CommandRouter:
 
         return None
 
-    def resolve(self, name: str, groups: list[str] | None = None) -> Command | None:
+    def resolve(self, name: str, groups: list[str] | None = None) -> SaasCommand | None:
         cmd_cls = self.find_by_key_or_alias(name, groups)
         if not cmd_cls:
             return None

@@ -1,6 +1,6 @@
 from yakoon.saas.bootstrap.setup import setup_system
 from yakoon.saas.controllers.gateway.controller import GatewayController
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 
 
 class BootstrapController(GatewayController):
@@ -26,4 +26,4 @@ class BootstrapController(GatewayController):
         """
         await super().on_initialize(session)
         await setup_system(self.service_router, "system")
-        await session.emit(f"> [A.M.E.E. online] ✅ Command interface ready.")
+        await session.emit(f"> [A.M.E.E. online] ✅ SaasCommand interface ready.")

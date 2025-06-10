@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from yakoon.saas.models.entity import Entity
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.models.entity import Entity
+from yakoon.mesh.runtime.session import BaseSession
 
 
 @dataclass #(frozen=True, kw_only=True, slots=True)

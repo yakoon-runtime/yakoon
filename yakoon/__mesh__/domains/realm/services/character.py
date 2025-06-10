@@ -3,7 +3,7 @@ from typing import Optional
 from yakoon.saas.domains.realm.models.character import Character
 from typing import Optional
 
-from yakoon.saas.models.key import Key
+from yakoon.mesh.models.key import Key
 
 
 class CharacterService:

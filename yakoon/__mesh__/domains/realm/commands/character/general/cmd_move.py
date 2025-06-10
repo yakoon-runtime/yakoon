@@ -2,8 +2,8 @@
 from yakoon.saas.domains.realm.behavior import CharacterBehavior
 from yakoon.saas.domains.realm.commands.base import RealmCommand
 from yakoon.saas.domains.realm.services.room import RoomService
-from yakoon.saas.commands.parser import Request
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.commands.parser import Request
+from yakoon.mesh.runtime.session import BaseSession
 
 
 class CmdMove(RealmCommand):

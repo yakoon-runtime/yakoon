@@ -1,6 +1,6 @@
 
 
-from yakoon.saas.runtime.models.session import BaseSession
+from yakoon.mesh.runtime.session import BaseSession
 
 
 class Secured:

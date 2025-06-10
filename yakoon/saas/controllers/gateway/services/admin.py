@@ -1,7 +1,7 @@
 
+from yakoon.mesh.models.key import Key
 from yakoon.saas.controllers.gateway.models.account import Account
 from yakoon.saas.controllers.gateway.services.account import AccountService
-from yakoon.saas.models.key import Key
 
 
 async def ensure_admin_account(accounts: AccountService):

@@ -1,5 +1,5 @@
 
-from yakoon.saas.runtime.system.router import ServiceRouter
+from yakoon.mesh.runtime.system.router import ServiceRouter
 from yakoon.saas.services._registry import SystemServiceRegistry
 from yakoon.saas.stores.factory import create_system_stores
 
