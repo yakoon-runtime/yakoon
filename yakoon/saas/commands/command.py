@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from yakoon.mesh.commands.command import MeshCommand
-from yakoon.saas.controllers.directory import BaseControllerDirectory
+from yakoon.mesh.controllers.base.directory import BaseControllerDirectory
 from yakoon.saas.controllers.gateway.services._registry import GatewayServiceRegistry
 from yakoon.saas.services._registry import SystemServiceRegistry
 

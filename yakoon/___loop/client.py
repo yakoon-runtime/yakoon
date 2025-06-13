@@ -2,10 +2,10 @@ import asyncio
 import json
 import websockets
 
-from yakoon.loop.config import LOOP_CONFIG
-from yakoon.loop.controller import register_controller
-from yakoon.loop.registry import CommandRegistry
-from yakoon.loop.protocol import CommandRequest, CommandResponse
+from yakoon.___loop.config import LOOP_CONFIG
+from yakoon.___loop.controller import register_controller
+from yakoon.___loop.registry import CommandRegistry
+from yakoon.___loop.protocol import CommandRequest, CommandResponse
 
 async def loop_main():
     

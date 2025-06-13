@@ -15,6 +15,14 @@ def copy_mesh_runtime(target_dir: Path):
     print(f"✅ Mesh runtime copied to {target_dir}")
 
 
+def ensure_real_runtime(path: Path):
+    if path.is_symlink():
+        print("🔁 Converting symlink to real runtime copy")
+        target = path.resolve()
+        path.unlink()
+        shutil.copytree(target, path)
+        
+
 def zip_directory(source_dir: Path, zip_path: Path):
     """
     Zip an entire directory recursively into a .zip file.

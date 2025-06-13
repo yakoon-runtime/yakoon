@@ -26,9 +26,4 @@ class CmdLogin(PlatformCommand):
         sys_services = await self.get_system_services()
         await sys_services.sessions.save(session)
 
-        registry = await self.get_controller_directory()
-        for controller in registry.get_controllers():
-            if hasattr(controller, "on_account_login"):
-                await controller.on_account_login(session, account)
-
         await presenter.emit("login_success", account=account)

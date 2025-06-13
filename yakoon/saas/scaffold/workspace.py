@@ -1,6 +1,8 @@
 import shutil
 from pathlib import Path
 
+from yakoon.saas.scaffold.export import ensure_real_runtime
+
 
 TEMPLATE_DIR = Path(__file__).parent / "template" 
 
@@ -13,17 +15,28 @@ def scaffold_workspace(app_name: str, target_dir: Path):
         raise FileExistsError(f"Target directory '{target_dir}' already exists.")
 
     shutil.copytree(TEMPLATE_DIR, target_dir)
-    rewrite_imports(target_dir, original="yakoon.mesh", replacement=f"{app_name}.runtime")
+    ensure_real_runtime(target_dir / "runtime")
+    rewrite_imports(target_dir, app_name) # original="yakoon.saas.scaffold.templates.workspace.runtime", replacement=f"{app_name}.runtime")
     print(f"✅ Scaffold '{app_name}' created at {target_dir}")
 
 
-def rewrite_imports(path: Path, original: str, replacement: str):
+def rewrite_imports(path: Path, app_name: str):
     """
-    Replace all imports in .py files from `original` to `replacement`.
+    Replace yakoon.* imports with app-local equivalents in all .py files under `path`.
     """
+    replacements = [
+        ("from yakoon.mesh", f"from {app_name}.runtime"),
+        ("import yakoon.mesh", f"import {app_name}.runtime"),
+        ("from yakoon", f"from {app_name}"),
+        ("import yakoon", f"import {app_name}"),
+    ]
+
     for file in path.rglob("*.py"):
+        if not file.is_file():
+            continue
         content = file.read_text(encoding="utf-8")
-        new_content = content.replace(f"from {original}", f"from {replacement}")
-        new_content = new_content.replace(f"import {original}", f"import {replacement}")
+        new_content = content
+        for old, new in replacements:
+            new_content = new_content.replace(old, new)
         if new_content != content:
             file.write_text(new_content, encoding="utf-8")

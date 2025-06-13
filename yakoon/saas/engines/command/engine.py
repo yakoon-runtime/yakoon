@@ -9,7 +9,7 @@ from yakoon.mesh.commands.command import CmdNotFound
 from yakoon.mesh.runtime.session.output import Output
 from yakoon.mesh.runtime.session import BaseSession
 
-from yakoon.saas.engines.command.directory import ControllerDirectory
+from yakoon.mesh.controllers.directory import ControllerDirectory
 from yakoon.saas.engines.command.batch import split_batch_input
 from yakoon.saas.services._registry import SystemServiceRegistry
 from yakoon.saas.commands.command import SaasCommand

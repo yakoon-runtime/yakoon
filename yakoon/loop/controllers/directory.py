@@ -1,9 +1,8 @@
-from yakoon.mesh.controllers.directory import ControllerDirectory
-from yakoon.saas.controllers.mesh.controller import MeshController
-from yakoon.saas.bootstrap.controller import BootstrapController
+from yakoon.loop.runtime.controllers.directory import ControllerDirectory
+from yakoon.loop.controllers.gateway.controller import MeshGatewayController
 
 
-class BootstrapControllerDirectory(ControllerDirectory):
+class AppControllerDirectory(ControllerDirectory):
     """
     Full domain registry for the solution.
 
@@ -21,8 +20,7 @@ class BootstrapControllerDirectory(ControllerDirectory):
   
     def __init__(self):        
         super().__init__(
-            controllers=[
-                MeshController()
+            controllers=[                
             ],
-            gateway=BootstrapController(),
+            gateway=MeshGatewayController(),
         )

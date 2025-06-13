@@ -8,3 +8,6 @@ dist/
 build/
 .venv/
 db/*
+
+# ignore the symlink
+yakoon/loop/runtime

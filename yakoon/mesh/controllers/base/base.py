@@ -92,26 +92,12 @@ class BaseController(ABC):
         """
         pass
 
-    async def on_account_login(self, session: BaseSession, account: Any):
-        """
-        Hook called after a user successfully logs in.
-        Allows the domain to perform setup such as loading player state or emitting welcome messages.
-        """
-        pass
-
     async def on_enter(self, session: BaseSession):
         """
         Called after a user switches into this domain (e.g. via @switch).
         Used to show welcome messages, check account requirements, or guide login flow.
         Override this in each domain to define entry behavior.
         """
-
-    async def on_account_logout(self, session: BaseSession, account: Any):
-        """
-        Hook called before a user is logged out.
-        Allows the domain to persist state, release resources, or perform cleanup.
-        """
-        pass
 
     async def on_cleanup(self, session: BaseSession):
         """

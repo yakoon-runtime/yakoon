@@ -6,7 +6,7 @@ from yakoon.mesh.runtime.system.registry import ServiceRegistry
 from yakoon.saas.engines.command.router import CommandRouter
 
 if TYPE_CHECKING:
-    from yakoon.saas.controllers.directory import BaseControllerDirectory
+    from yakoon.mesh.controllers.base.directory import BaseControllerDirectory
     from yakoon.saas.commands.command import SaasCommand
     
 

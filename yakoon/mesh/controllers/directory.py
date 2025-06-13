@@ -1,6 +1,6 @@
 from yakoon.mesh.controllers.base import BaseController
+from yakoon.mesh.controllers.base.directory import BaseControllerDirectory
 from yakoon.saas.controllers.base.gateway import GatewayBaseController
-from yakoon.saas.controllers.directory import BaseControllerDirectory
 
 
 class ControllerDirectory(BaseControllerDirectory):
@@ -10,10 +10,10 @@ class ControllerDirectory(BaseControllerDirectory):
     """
 
     @property
-    def gateway(self) -> GatewayBaseController:
+    def gateway(self) -> BaseController:
         return self._gateway
 
-    def __init__(self, controllers: list[BaseController], gateway: GatewayBaseController):
+    def __init__(self, controllers: list[BaseController], gateway: BaseController):
         self.controllers: dict[str, BaseController] = {}    
         self._gateway = gateway
         self._gateway.controller_directory = self

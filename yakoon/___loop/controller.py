@@ -1,4 +1,4 @@
-from yakoon.loop.registry import CommandRegistry
+from yakoon.___loop.registry import CommandRegistry
 
 def enter_room(args):
     return {"msg": f"You enter {args.get('room', 'an empty space')}"}

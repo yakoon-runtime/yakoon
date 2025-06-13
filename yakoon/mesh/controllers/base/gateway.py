@@ -5,7 +5,7 @@ from yakoon.mesh.runtime.session import BaseSession
 from yakoon.mesh.controllers.base import BaseController
 
 if TYPE_CHECKING:
-    from yakoon.saas.controllers.directory import BaseControllerDirectory
+    from yakoon.mesh.controllers.base.directory import BaseControllerDirectory
 
 
 class GatewayBaseController(BaseController):
