@@ -5,12 +5,14 @@ from yakoon.loop.runtime.runtime.session.session import BaseSession
 
 class CmdWelcome(LoopCommand):
 
-    key = "welcome"    
+    key = "home"    
     template_key = "system/cmd_welcome"
 
     requires = ["system"]
 
     async def run(self, session: BaseSession, _: Request):
 
-        presenter = await self.get_presenter(session)
-        await presenter.emit("show")
+        print("🧩 CmdWelcome: run()")
+        pass
+        #presenter = await self.get_presenter(session)
+        #await presenter.emit("show")

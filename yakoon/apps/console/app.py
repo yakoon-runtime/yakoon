@@ -1,7 +1,7 @@
 
-#import uvicorn
+import uvicorn
 import asyncio
-#from fastapi import FastAPI
+from fastapi import FastAPI
 
 from yakoon.mesh.runtime.render.models.mode import RenderMode
 from yakoon.mesh.models.key import Key
@@ -21,18 +21,18 @@ command_inits = ["welcome"]
 #command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
 #command_inits += ["batch: login Stefan; switch realm; ic Stefan"]
 #command_inits += ["batch: login Stefan; switch mesh"]
-command_inits += ["ping"]
+#command_inits += ["ping"]
 
 async def run_console():
    
-    if settings.base.dev_mode:
-        UnresolvedPromptMonitor.start()
-        MemoryTrendMonitor.start(20)
+    #if settings.base.dev_mode:
+    #    UnresolvedPromptMonitor.start()
+    #    MemoryTrendMonitor.start(20)
 
     # FastAPI App vorbereiten
-    #app = FastAPI()
-    #from yakoon.saas.controllers.mesh.controller import ws_router
-    #app.include_router(ws_router)
+    app = FastAPI()
+    from yakoon.saas.controllers.mesh.controller import ws_router
+    app.include_router(ws_router)
 
     # Starte FastAPI-Server als Hintergrundtask
     async def start_api():
@@ -41,7 +41,7 @@ async def run_console():
         await server.serve()
 
     # Starte API nebenläufig
-    #asyncio.create_task(start_api())
+    asyncio.create_task(start_api())
 
     output = Output(print, print)
     engine = Engine(BootstrapControllerDirectory())

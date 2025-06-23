@@ -1,19 +1,18 @@
 import json
-from typing import Optional
 
-#from fastapi import APIRouter, WebSocket
-#from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
 from yakoon.mesh.controllers.base.base import BaseController
 from yakoon.saas.controllers.base.base import SaasBaseController
 from yakoon.saas.controllers.mesh.commands.cmdset import MeshCommandSet
-from yakoon.mesh.models.tanent import CommandProxy, ControllerProxy, Tanent
+from yakoon.mesh.models.tenent import CommandProxy, ControllerProxy, Tenent
 from yakoon.mesh.runtime.session import BaseSession
 
 
-#ws_router = APIRouter()
-#@ws_router.websocket("/ws/loop")
-#async def loop_ws(websocket: WebSocket):
-#    await MeshController.instance().handle_loop_connection(websocket)
+ws_router = APIRouter()
+@ws_router.websocket("/ws/loop")
+async def loop_ws(websocket: WebSocket):
+    await MeshController.instance().handle_loop_connection(websocket)
 
 
 class MeshController(SaasBaseController):
@@ -36,28 +35,37 @@ class MeshController(SaasBaseController):
 
     def __init__(self):
         super().__init__()
-        self.tanents: dict[str, Tanent] = {}
+        self.tenants: dict[str, Tenent] = {}
         MeshController._instance = self
 
     def get_proxy_controllers(self, tenant_id: str):
-        return self.tanents.setdefault(tenant_id, Tanent(tenant_id))
+        return self.tenants.setdefault(tenant_id, Tenent(tenant_id))
 
     def register(self, tenant_id: str, controller_id: str, commands: list[dict], websocket):
-        tenant = self.tanents.setdefault(tenant_id, Tanent(tenant_id))
+        tenant = self.tenants.setdefault(tenant_id, Tenent(tenant_id))
+
+        command_map = {}
+        for cmd in commands:
+            key = cmd["key"]
+            if key in command_map:
+                raise ValueError(f"Duplicate command key in controller '{controller_id}': {key}")
+            command_map[key] = CommandProxy(cmd["key"], "", "") #TODO: add the other values.
+
         proxy = ControllerProxy(
-            controller_id=controller_id,
-            commands={cmd["name"]: CommandProxy(**cmd) for cmd in commands},
+            id=controller_id,
+            commands=command_map,
             websocket=websocket,
         )
-        tenant.controllers[controller_id] = proxy        
+
+        tenant.controllers[controller_id] = proxy
+    
 
     def unregister(self, websocket):
-        for tenant in self.tanents.values():
+        for tenant in self.tenents.values():
             for ctrl_id, proxy in list(tenant.controllers.items()):
                 if proxy.websocket == websocket:
                     del tenant.controllers[ctrl_id]     
 
-    """
     async def handle_loop_connection(self, websocket: WebSocket):
         await websocket.accept()
         try:
@@ -66,23 +74,24 @@ class MeshController(SaasBaseController):
                 msg = json.loads(raw)
 
                 if msg.get("type") == "register_controller":
-                    self.register(
-                        tenant_id=msg["tenant"],
-                        controller_id=msg["controller_id"],
-                        commands=msg["commands"],
-                        websocket=websocket,
-                    )
-                    data = json.dumps("registered")
+                    controllers = msg["controllers"]
+                    for controller in controllers:
+                        self.register(
+                            tenant_id=msg["tenant"],
+                            controller_id=controller["controller_id"],
+                            commands=controller["commands"],
+                            websocket=websocket,
+                        )
+                    data = json.dumps({"type": "registered"})
                     await websocket.send_text(data)
 
                 #elif msg.get("type") == "command":
                 #    request = CommandRequest(**msg["payload"])
                 #    response = await self.command_mesh.dispatch(request)
                 #    await websocket.send_text(json.dumps(response.__dict__))
-
+ 
                 """
-    """
-                                    case "command":
+                case "command":
                     req = CommandRequest(**msg["payload"])
                     controller = command_mesh.resolve(req.tenant, req.controller)
                     response = await controller.dispatch(req)
@@ -91,10 +100,11 @@ class MeshController(SaasBaseController):
                 case "ping":
                     await websocket.send_text(json.dumps({"pong": True}))
                 """
-    """
-        except WebSocketDisconnect:
+
+        except WebSocketDisconnect as e:
+            print(e)
             self.unregister(websocket)
-    """
+
         
     async def on_initialize(self, session: BaseSession):
         """

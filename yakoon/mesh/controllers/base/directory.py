@@ -17,7 +17,7 @@ class BaseControllerDirectory:
     """
 
     @abstractmethod
-    def get_controllers(self, tanent_id: str) -> list[BaseController]:
+    def get_controllers(self, tenent_id: str) -> list[BaseController]:
         """
         Returns all registered domain controllers.
 
@@ -27,7 +27,7 @@ class BaseControllerDirectory:
         ...
 
     @abstractmethod
-    def get_controller_by_id(self, tanent_id: str, id: str) -> BaseController:
+    def get_controller_by_id(self, tenent_id: str, id: str) -> BaseController:
         """
         Resolves and returns a domain controller by its unique ID.
 

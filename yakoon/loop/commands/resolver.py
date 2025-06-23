@@ -24,13 +24,14 @@ class CommandResolver:
         return result
     
     def collect_commands_data(self, controller, commands: list[MeshCommand]):
-        result = {}
+        keys  = []
+        result = []
         for command in commands:
-            if command.key in result:
+            if command.key in keys:
                 raise ValueError(f"Duplicate command key: {controller.id}.{command.key}")
-            result[command.key] = {
-                "id": "12345",
+            keys.append(command.key)
+            result.append({
                 "key": command.key,
                 "aliases" : command.aliases
-            }
+            })
         return result

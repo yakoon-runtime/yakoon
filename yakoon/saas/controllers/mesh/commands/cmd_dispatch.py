@@ -15,7 +15,11 @@ class CmdDispatch(MeshCommand):
         for controller in proxies.controllers.values():
             command = controller.commands.get(request.cmd)
             if command:
-                return await controller.websocket.send_text(
-                    json.dumps(command.__dict__))
+                msg = {
+                    "type": "dispatch_command", 
+                    "controller_id": controller.id, 
+                    "cmd_key": command.key
+                    }
+                return await controller.websocket.send_text(json.dumps(msg))
         
         raise CmdNotFound(f"{request.cmd}")

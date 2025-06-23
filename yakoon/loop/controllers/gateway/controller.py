@@ -1,4 +1,5 @@
 from yakoon.loop.controllers.gateway.commands.system.cmdset import MeshSystemCommands
+from yakoon.loop.runtime.commands.command import MeshCommand
 from yakoon.loop.runtime.controllers.base.base import BaseController
 from yakoon.loop.runtime.models.key import Key
 from yakoon.loop.runtime.runtime.session.session import BaseSession
@@ -17,7 +18,13 @@ class MeshGatewayController(BaseController):
         MeshSystemCommands,
     ]
     """ The collection of all commands. """
-        
+
+    async def resolve_command(self, key: str) -> MeshCommand | None:
+        for cmd_set in self.commandsets:
+            for cmd in cmd_set.commands():
+                if cmd.key == key:
+                    return cmd()
+          
     async def on_initialize(self, session: BaseSession):
         """
         Called after the controller has been fully constructed but before any commands are processed.
