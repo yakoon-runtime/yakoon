@@ -12,7 +12,8 @@ class CmdWelcome(LoopCommand):
 
     async def run(self, session: BaseSession, _: Request):
 
-        print("🧩 CmdWelcome: run()")
-        pass
+        await session.emit("🧩 CmdWelcome: run()")
+        await session.fail("My error")
+
         #presenter = await self.get_presenter(session)
         #await presenter.emit("show")

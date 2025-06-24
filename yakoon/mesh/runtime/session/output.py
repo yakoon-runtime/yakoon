@@ -26,3 +26,26 @@ class Output:
     def __init__(self, out_fn=print, err_fn=print):
         self.out = ensure_async(out_fn)
         self.err = ensure_async(err_fn)
+
+import json
+import asyncio
+
+class OutputWS:
+    
+    def __init__(self, ws):
+        self.ws = ws
+        self.out = ensure_async(self._make_sender("out"))
+        self.err = ensure_async(self._make_sender("err"))
+
+    def _make_sender(self, stream: str):
+        async def send(text: str):
+            payload = {
+                "type": "loop_msg",
+                "stream": stream,
+                "text": text
+            }
+            try:
+                await self.ws.send(json.dumps(payload))
+            except (ConnectionError, asyncio.CancelledError) as e:
+                print(f"[WS][{stream}] Failed to send: {e}")
+        return send

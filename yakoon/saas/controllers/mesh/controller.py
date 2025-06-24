@@ -71,6 +71,9 @@ class MeshController(SaasBaseController):
         try:
             while True:
                 raw = await websocket.receive_text()
+                if not raw:
+                    continue
+
                 msg = json.loads(raw)
 
                 if msg.get("type") == "register_controller":
@@ -85,22 +88,15 @@ class MeshController(SaasBaseController):
                     data = json.dumps({"type": "registered"})
                     await websocket.send_text(data)
 
-                #elif msg.get("type") == "command":
-                #    request = CommandRequest(**msg["payload"])
-                #    response = await self.command_mesh.dispatch(request)
-                #    await websocket.send_text(json.dumps(response.__dict__))
+                if msg.get("type") == "loop_msg":
+                    print(msg) # TODO: Hier müssen wir unsere Lifecycle wieder aufnehmen....
+                    
+                    #trace_id = msg["trace_id"]
+                    #entry = PendingResponseRegistry.pop(trace_id)
+                    #session = entry.session
+                    #await session.emit(msg["text"])
+                
  
-                """
-                case "command":
-                    req = CommandRequest(**msg["payload"])
-                    controller = command_mesh.resolve(req.tenant, req.controller)
-                    response = await controller.dispatch(req)
-                    await websocket.send_text(json.dumps(response.__dict__))
-
-                case "ping":
-                    await websocket.send_text(json.dumps({"pong": True}))
-                """
-
         except WebSocketDisconnect as e:
             print(e)
             self.unregister(websocket)
