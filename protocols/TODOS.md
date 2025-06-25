@@ -3,9 +3,50 @@
 # ✅ NEXT STEPS #
 ==================
 
-   from yakoon.saas.controllers.directory import BaseControllerDirectory
+
+Klar – hier ist dein strukturierter **TODO-Plan für morgen**, sortiert nach Relevanz und Abhängigkeit:
+
+---
+
+## ✅ TODO: Prompt-Handling & Timeout-Sicherung (Loop ↔ SaaS)
+
+### 🔹 1. Prompt-Zeitlimits & Cleanup
+
+* [ ] `PromptRegistry` mit TTL-Unterstützung (SaaS & Loop)
+* [ ] `cleanup_expired_prompts()`-Routine (periodisch oder beim Zugriff)
+* [ ] Logging abgelaufener Prompts mit trace\_id und session.id
+* [ ] Optional: `session.abort_prompt()` bei Cleanup (z. B. Ausgabe an User: „Timeout“)
+
+---
+
+### 🔹 2. Prompt-IDs & Stack-Handling im Frontend
+
+* [ ] Jeder Prompt bekommt eindeutige `prompt_id`
+* [ ] Frontend muss Prompt-IDs **tracken und zuordnen können**
+* [ ] Antwort-Nachrichten müssen die `prompt_id` zurücksenden
+* [ ] Optional: Prompt-Stack (nur letzte aktiv, vorherige disabled)
+
+---
+
+### 🔹 3. Loop ↔ SaaS Reconnect & Recovery
+
+* [ ] Bei Loop-Crash: nicht gelöste Prompts im SaaS erkennen (z. B. via Logging)
+* [ ] Optional: Reconnect-Protokoll (`loop_rejoin()`), das offene Prompts replayt
+* [ ] Optional: Fallback-Antwort im SaaS bei Verlust („Loop nicht mehr erreichbar.“)
+
+---
+
+### 🔹 4. UX-Verhalten definieren
+
+* [ ] Wie sieht ein Prompt-Timeout im Frontend aus?
+* [ ] Was passiert mit dem Original-Command nach Timeout?
+* [ ] Wollen wir „Prompt wiederholen?“ oder abbrechen?
+
+---
 
 
+
+from yakoon.saas.controllers.directory import BaseControllerDirectory
 interne Bezeichnung: e2c
 
 # Session

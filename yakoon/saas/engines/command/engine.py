@@ -124,6 +124,7 @@ class Engine():
 
    async def _send_one(self, session: BaseSession, input_str: str):   
 
+      command_result = None
       command, request = None, Request(input_str)
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
@@ -153,7 +154,7 @@ class Engine():
          
          # Main command execution
          await command.run(session, request)
-         
+
          # Post-command hook: cleanup, logging, side effects
          await controller.on_after_run_command(session, request, command)
 

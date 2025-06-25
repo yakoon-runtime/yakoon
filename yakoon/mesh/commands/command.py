@@ -24,7 +24,7 @@ class MeshCommand(ABC):
     controller: BaseController = None
    
     @abstractmethod
-    async def run(self, session: Any, request: Any) -> None:
+    async def run(self, session: Any, request: Any) -> None | RemoteDispatchResult:
         pass
 
     @abstractmethod

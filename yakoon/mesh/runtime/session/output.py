@@ -32,8 +32,9 @@ import asyncio
 
 class OutputWS:
     
-    def __init__(self, ws):
+    def __init__(self, ws, trace_id):
         self.ws = ws
+        self.trace_id = trace_id
         self.out = ensure_async(self._make_sender("out"))
         self.err = ensure_async(self._make_sender("err"))
 
@@ -41,6 +42,7 @@ class OutputWS:
         async def send(text: str):
             payload = {
                 "type": "loop_msg",
+                "trace_id": self.trace_id,
                 "stream": stream,
                 "text": text
             }

@@ -59,7 +59,7 @@ async def handle_run_command(ws, msg: dict, directory):
 
         session_data = msg.get("session")
         session = BaseSession.from_row(session_data)
-        session.bind_io(OutputWS(ws))
+        session.bind_io(OutputWS(ws, msg["trace_id"]))
         
         await session.emit("Hello")
 

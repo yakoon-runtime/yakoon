@@ -24,6 +24,8 @@ class MeshController(SaasBaseController):
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
 
+    pending: dict[str, tuple] = {}
+
     commandsets = [
         MeshCommandSet, 
         ]
@@ -89,7 +91,15 @@ class MeshController(SaasBaseController):
                     await websocket.send_text(data)
 
                 if msg.get("type") == "loop_msg":
-                    print(msg) # TODO: Hier müssen wir unsere Lifecycle wieder aufnehmen....
+                    trace_id = msg["trace_id"]
+                    result = self.pending.pop(trace_id, None)
+                    if result:
+                        session, fut = result
+                        if fut:
+                            await session.emit(msg["text"])
+                            fut.set_result(data)
+
+                    #print(msg) # TODO: Hier müssen wir unsere Lifecycle wieder aufnehmen....
                     
                     #trace_id = msg["trace_id"]
                     #entry = PendingResponseRegistry.pop(trace_id)
