@@ -2,27 +2,6 @@
     "version": "0.2.0",
     "configurations": [
     
-        {
-            "name": "Yakoon: Loop",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "yakoon.loop.app",
-            "console": "integratedTerminal",
-            "env": {
-                 "DEV_MODE": "true"
-            },
-        },
-
-        {
-            "name": "MyGame",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "mygame.loop",
-            "console": "integratedTerminal",
-            "env": {
-                 "DEV_MODE": "true"
-            },
-        },
 
         {
             "name": "____Yakoon: Loop____",
@@ -39,23 +18,8 @@
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.saas.bootstrap.apps.console.run",
+            "module": "yakoon.hosts.console.app",
             "console": "integratedTerminal",
-            "env": {
-                 "DEV_MODE": "true"
-            },
-        },
-
-        {
-            "name": "Yakoon: Run Cli",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "yakoon.apps.yakoon",
-            "console": "integratedTerminal",
-            "args": [
-                "scaffold", "mygame"
-                //"migrate", "--config=yakoon/config/backends.yaml"
-            ],
             "env": {
                  "DEV_MODE": "true"
             },

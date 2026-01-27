@@ -1,0 +1,19 @@
+from dataclasses import dataclass, field
+from typing import ClassVar
+from yakoon.base.models.entity import Entity
+
+
+@dataclass
+class Account(Entity):
+
+    name: str = field(default="")
+    cmd_groups: list[str] = field(default_factory=list) 
+    permissions: list[str] = field(default_factory=lambda: ["system"])
+   
+    __json_fields__: ClassVar[list[str]] = ["permissions", "cmd_groups"]
+
+    def validate(self):
+        if not self.name.strip():
+            raise ValueError("Account name must not be empty.")
+        if len(self.name) > 30:
+            raise ValueError("Account name too long.") 
