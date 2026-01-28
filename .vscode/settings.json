@@ -2,5 +2,10 @@
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "python.venvPath": "${workspaceFolder}/venv",
   "python.analysis.autoSearchPaths": true,
-  "python.analysis.useLibraryCodeForTypes": true
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.extraPaths": [
+    "packages/yakoon-base/src",
+    "packages/yakoon-platform/src",
+    "packages/yakoon-hosts/src"
+  ]
 }

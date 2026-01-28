@@ -1,6 +1,5 @@
 # Build artifacts
 *.egg-info/
-yakoon.egg-info/
 
 **/__pycache__/
 *.pyc
