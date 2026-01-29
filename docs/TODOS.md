@@ -45,10 +45,6 @@ Klar – hier ist dein strukturierter **TODO-Plan für morgen**, sortiert nach R
 ---
 
 
-
-from yakoon.saas.controllers.directory import BaseControllerDirectory
-interne Bezeichnung: e2c
-
 # Session
 
 - Umstellung auf SQLite
