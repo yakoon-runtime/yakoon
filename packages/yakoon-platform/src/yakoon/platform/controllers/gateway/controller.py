@@ -4,7 +4,7 @@ from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.views.template import TemplateSource
 from yakoon.platform.controllers.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.controllers.gateway.commands.system.cmdset import PlatformSystemCommands
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 
 
 class GatewayController(BaseController):
@@ -28,7 +28,7 @@ class GatewayController(BaseController):
         PlatformAccountCommands]
     """ The collection of all commands. """
         
-    async def on_initialize(self, session: BaseSession):
+    async def on_initialize(self, session: Session):
         """
         Called after the controller has been fully constructed but before any commands are processed.
 
@@ -39,7 +39,7 @@ class GatewayController(BaseController):
         """
         pass
 
-    async def on_resolve_session(self, session_key: Key) -> BaseSession:
+    async def on_resolve_session(self, session_key: Key) -> Session:
         """
         Resolves the session object for the given request.
 
@@ -61,7 +61,7 @@ class GatewayController(BaseController):
         
         return session
 
-    async def on_gateway_validate(self, session: BaseSession):
+    async def on_gateway_validate(self, session: Session):
         """
         Platform-level pre-send hook, called before request parsing.
 
@@ -89,7 +89,7 @@ class GatewayController(BaseController):
             session.set_ctx("gateway", "account", account, persist=False)
             session.cmd_groups = merge(session.cmd_groups, account.cmd_groups)
             
-    async def on_before_run_command(self, session: BaseSession, request, command):
+    async def on_before_run_command(self, session: Session, request, command):
         """
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
@@ -99,7 +99,7 @@ class GatewayController(BaseController):
             #if not account or not set(required).issubset(set(account.permissions)):
             #    raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_gateway_finalize(self, session: BaseSession):
+    async def on_gateway_finalize(self, session: Session):
         """
         Platform-level post-send hook, called after command runing.
 

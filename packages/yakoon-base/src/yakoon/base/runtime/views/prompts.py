@@ -1,6 +1,6 @@
 from yakoon.base.runtime.views.context import RenderContext
 from yakoon.base.runtime.dialogs.prompts import ask, choice, choice_index, confirm
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 
 
 class Prompts:
@@ -11,7 +11,7 @@ class Prompts:
     confirmations, and choices. 
     """
 
-    def __init__(self, ctx: RenderContext, session: BaseSession, renderer: "RendererService"):
+    def __init__(self, ctx: RenderContext, session: Session, renderer: "RendererService"):
         self._ctx = ctx
         self._session = session
         self._renderer = renderer

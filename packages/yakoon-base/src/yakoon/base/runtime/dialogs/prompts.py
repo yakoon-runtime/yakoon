@@ -1,9 +1,9 @@
 from yakoon.base.settings import settings
 from yakoon.base.runtime.dialogs.manager import DialogManager
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 
 
-async def ask(session: BaseSession, prompt_text: str) -> str:
+async def ask(session: Session, prompt_text: str) -> str:
     """     
     Asks the user for free-text input based on a rendered template section.
 
@@ -20,7 +20,7 @@ async def ask(session: BaseSession, prompt_text: str) -> str:
         session, timeout=settings.network.prompt_timed_out)
 
 
-async def confirm(session: BaseSession, prompt_text: str) -> bool:
+async def confirm(session: Session, prompt_text: str) -> bool:
     """
     Asks the user for a yes/no confirmation using a template-based prompt.
 
@@ -41,7 +41,7 @@ async def confirm(session: BaseSession, prompt_text: str) -> bool:
         await session.emit("Bitte antworte mit 'y' oder 'n'.")
 
 
-async def choice(session: BaseSession, prompt_text: str, options: list[str]) -> str:
+async def choice(session: Session, prompt_text: str, options: list[str]) -> str:
     """
     Presents the user with a list of choices and returns the selected value.
 
@@ -62,7 +62,7 @@ async def choice(session: BaseSession, prompt_text: str, options: list[str]) -> 
         await session.emit(f"Bitte wähle eine der Optionen: {options_str}")
 
 
-async def choice_index(session: BaseSession, prompt_text: str, options: list[str]) -> str:
+async def choice_index(session: Session, prompt_text: str, options: list[str]) -> str:
     """
     Presents the user with a numbered list of choices and returns the selected index.
 

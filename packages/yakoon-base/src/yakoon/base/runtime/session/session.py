@@ -9,9 +9,9 @@ from yakoon.base.runtime.session.output import Output
 
 
 @dataclass
-class BaseSession(Entity):
+class Session(Entity):
     """
-    Represents a generic platform session.
+    Represents a generic session.
     Handles persistent key-value data and domain-specific runtime context.
     """
 

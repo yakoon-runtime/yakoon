@@ -2,7 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+from yakoon.base.commands.request import Request
 from yakoon.base.models.namespace import Namespace
+from yakoon.base.runtime.session.session import Session
 from yakoon.base.runtime.views.presenter import Presenter
 from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.base.controllers.base import BaseController
@@ -37,3 +39,7 @@ class Command(ABC):
         
     async def get_services(self) -> ServiceRegistry:
         return self.controller.services
+
+    async def run(self, session: Session, request: Request):
+        pass
+

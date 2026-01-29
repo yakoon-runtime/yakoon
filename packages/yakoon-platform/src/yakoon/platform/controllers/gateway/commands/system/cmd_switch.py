@@ -1,6 +1,6 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 
 
 class CmdSwitch(Command):
@@ -8,7 +8,7 @@ class CmdSwitch(Command):
     key = "switch"
     template_key = "gateway/system/cmd_switch"
 
-    async def run(self, session: BaseSession, request: Request):
+    async def run(self, session: Session, request: Request):
         presenter = await self.get_presenter(session)
         services = await self.get_system_services()
         registry = await self.get_controller_directory()

@@ -1,6 +1,6 @@
 
 from yakoon.base.runtime.views.context import RenderContext
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 from yakoon.base.runtime.views.prompts import Prompts
 
 
@@ -12,7 +12,7 @@ class Presenter:
     messages, failures, and notifications using predefined sections in the template.
     """
     
-    def __init__(self, template_key: str, session: BaseSession, renderer: "RendererService") -> RenderContext:
+    def __init__(self, template_key: str, session: Session, renderer: "RendererService") -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
 

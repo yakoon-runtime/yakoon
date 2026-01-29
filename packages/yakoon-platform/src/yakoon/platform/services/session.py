@@ -1,4 +1,4 @@
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 from yakoon.base.models.key import Key
 
 
@@ -11,11 +11,11 @@ class SessionService:
     def set_services(self, services):
         self._services = services
 
-    async def get_by_key(self, key: Key) -> BaseSession:
+    async def get_by_key(self, key: Key) -> Session:
         row = await self._store.get_by_key(key)
-        return BaseSession.from_row(row) if row else None
+        return Session.from_row(row) if row else None
 
-    async def get_or_new(self, key: Key, **kwargs) -> tuple[BaseSession, bool]:
+    async def get_or_new(self, key: Key, **kwargs) -> tuple[Session, bool]:
         """
         Returns an existing session if found, otherwise returns a new (unsaved) session.
         Does not persist the session automatically.
@@ -23,9 +23,9 @@ class SessionService:
         session = await self.get_by_key(key)
         if session:
             return session
-        return BaseSession(key=key, **kwargs)
+        return Session(key=key, **kwargs)
 
-    async def save(self, session: BaseSession):
+    async def save(self, session: Session):
         if not session.key.is_valid():
             prefix = session.key.to_prefix()             
             next_id = await self._services.counters.next(prefix)

@@ -1,5 +1,5 @@
 
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 from yakoon.base.models.namespace import Namespace
 
 
@@ -10,7 +10,7 @@ class NamespaceService:
     def __init__(self, domain:str=None):
         self._domain = domain or self._domain
         
-    async def from_session(self, session: BaseSession) -> Namespace:
+    async def from_session(self, session: Session) -> Namespace:
         return Namespace(
             domain=self._domain,    
             bucket="bucket", # session.data_storage.get("realm", "bucket", self._domain), 

@@ -7,7 +7,7 @@ from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.runtime.dialogs.manager import DialogManager
 from yakoon.base.runtime.session.output import Output
-from yakoon.base.runtime.session import BaseSession
+from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 
 from yakoon.base.runtime.system.registry import ServiceRegistry
@@ -31,7 +31,7 @@ class Engine:
       self._commands = commands
    
    async def initialize(self, io: Output):           
-      session = BaseSession(None)      
+      session = Session(None)      
       
       # Bind the given Output to this session for output and error handling.
       session.bind_io(io)
@@ -43,7 +43,7 @@ class Engine:
     
    async def _resolve_for_controller(
          self, controller_id, request: Request, 
-         session: BaseSession) -> Optional[Tuple[BaseController, Command]]:
+         session: Session) -> Optional[Tuple[BaseController, Command]]:
       
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
@@ -67,7 +67,7 @@ class Engine:
       inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
       await asyncio.create_task(self._run_processing(session, inputs))
 
-   async def _run_processing(self, session: BaseSession, inputs: list[str]):
+   async def _run_processing(self, session: Session, inputs: list[str]):
       """
       Executes a batch of commands sequentially, including prompt handling.
 
@@ -118,7 +118,7 @@ class Engine:
                else:                   
                   return # Prompt expected, but no further input in batch 
 
-   async def _send_one(self, session: BaseSession, input_str: str):   
+   async def _send_one(self, session: Session, input_str: str):   
 
       command, request = None, Request(input_str)
       if not request.cmd:
