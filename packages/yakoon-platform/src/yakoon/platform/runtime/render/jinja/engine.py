@@ -4,9 +4,9 @@ from typing import Iterable, Optional
 from yakoon.base.runtime.views.context import RenderContext
 from yakoon.base.runtime.views.template import TemplateSource
 
-from yakoon.platform.runtime.render.models.mode import RenderMode
-from yakoon.platform.runtime.render.models.section import RenderSection
-from yakoon.platform.runtime.render.base.engine import BaseRenderEngine
+from yakoon.platform.runtime.render.mode import RenderMode
+from yakoon.platform.runtime.render.section import RenderSection
+from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.jinja.filters import register_filters
 from yakoon.platform.settings import settings
 

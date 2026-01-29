@@ -7,7 +7,7 @@ from yakoon.base.runtime.session.output import Output
 from yakoon.base.utils.input import safe_input
 
 from yakoon.platform.settings import settings
-from yakoon.platform.runtime.render.models.mode import RenderMode
+from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.controllers.directory import ControllerDirectory
 from yakoon.platform.controllers.gateway.controller import GatewayController
 

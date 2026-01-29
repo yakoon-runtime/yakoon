@@ -3,9 +3,9 @@ from typing import Iterable
 
 from yakoon.base.runtime.views.context import RenderContext
 from yakoon.platform.settings import settings
-from yakoon.platform.runtime.render.models.mode import RenderMode
-from yakoon.platform.runtime.render.models.section import RenderSection
-from yakoon.platform.runtime.render.base.engine import BaseRenderEngine
+from yakoon.platform.runtime.render.mode import RenderMode
+from yakoon.platform.runtime.render.section import RenderSection
+from yakoon.platform.runtime.render.base import BaseRenderEngine
 
 
 class RendererService:

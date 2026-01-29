@@ -2,8 +2,8 @@
 from abc import ABC, abstractmethod
 
 from yakoon.base.runtime.views.context import RenderContext
-from yakoon.platform.runtime.render.models.mode import RenderMode
-from yakoon.platform.runtime.render.models.section import RenderSection
+from yakoon.platform.runtime.render.mode import RenderMode
+from yakoon.platform.runtime.render.section import RenderSection
 
 
 class BaseRenderEngine(ABC):

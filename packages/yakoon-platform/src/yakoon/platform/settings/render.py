@@ -2,7 +2,7 @@
 import os
 from dataclasses import dataclass
 
-from yakoon.platform.runtime.render.models.mode import RenderMode
+from yakoon.platform.runtime.render.mode import RenderMode
 
 
 @dataclass
