@@ -1,11 +1,11 @@
 
 from collections import defaultdict
-from yakoon.base.commands.command import MeshCommand
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdHelpSystem(MeshCommand):
+class CmdHelpSystem(Command):
 
     key = "help"
     template_key = "gateway/system/cmd_help"
@@ -22,7 +22,7 @@ class CmdHelpSystem(MeshCommand):
             grouped=grouped)
         
 
-class CmdHelpDomain(MeshCommand):
+class CmdHelpDomain(Command):
 
     key = "help"
     template_key = "gateway/system/cmd_help_domain"
@@ -44,8 +44,8 @@ class CmdHelpDomain(MeshCommand):
             await session.send_error(f"Befehl '{key}' nicht gefunden.")
     
 
-def get_grouped_commands(controller) -> dict[str, list[MeshCommand]]:
-    grouped: dict[str, list[MeshCommand]] = defaultdict(list)
+def get_grouped_commands(controller) -> dict[str, list[Command]]:
+    grouped: dict[str, list[Command]] = defaultdict(list)
     for cmdset in controller.commandsets:
         for cmd in cmdset.commands():
             grouped[cmdset.category].append(cmd)

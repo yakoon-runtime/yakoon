@@ -1,9 +1,9 @@
-from yakoon.base.commands.command import MeshCommand
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdLogin(MeshCommand):
+class CmdLogin(Command):
 
     key = "login"
     template_key = "gateway/account/cmd_login"

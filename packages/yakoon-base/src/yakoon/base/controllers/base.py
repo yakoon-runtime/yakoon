@@ -9,7 +9,7 @@ from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.base.runtime.views.template import TemplateSource
 
 if TYPE_CHECKING:
-    from yakoon.base.commands.command import MeshCommand
+    from yakoon.base.commands.command import Command
     from yakoon.base.models.namespace import Namespace
     from yakoon.base.runtime.session import BaseSession
     
@@ -68,14 +68,14 @@ class BaseController(ABC):
         Executed regardless of whether a valid command is found.
         """
 
-    async def on_before_run_command(self, session: BaseSession, request: Request, command: MeshCommand):
+    async def on_before_run_command(self, session: BaseSession, request: Request, command: Command):
         """
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
         """
         pass
 
-    async def on_after_run_command(self, session: BaseSession, request: Request, command: MeshCommand):
+    async def on_after_run_command(self, session: BaseSession, request: Request, command: Command):
         """
         Hook called immediately after a single command has been executed.
         Can be used for cleanup, logging, or updating domain state.

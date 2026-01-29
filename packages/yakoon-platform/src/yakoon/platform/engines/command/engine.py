@@ -8,7 +8,7 @@ from yakoon.base.models.key import Key
 from yakoon.base.runtime.dialogs.manager import DialogManager
 from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import BaseSession
-from yakoon.base.commands.command import CmdNotFound, MeshCommand
+from yakoon.base.commands.command import CmdNotFound, Command
 
 from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.platform.engines.command.router import CommandDirectory
@@ -43,13 +43,13 @@ class Engine:
     
    async def _resolve_for_controller(
          self, controller_id, request: Request, 
-         session: BaseSession) -> Optional[Tuple[BaseController, MeshCommand]]:
+         session: BaseSession) -> Optional[Tuple[BaseController, Command]]:
       
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
       
-      result: tuple[str, MeshCommand] = await self._commands.resolve(request.cmd, cmd_groups)
+      result: tuple[str, Command] = await self._commands.resolve(request.cmd, cmd_groups)
       if result:
          controller_id, command = result
          return await self._directory.get(controller_id), command

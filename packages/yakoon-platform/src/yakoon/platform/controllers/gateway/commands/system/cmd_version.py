@@ -3,12 +3,12 @@ import subprocess
 import time
 from datetime import datetime, timezone
 
-from yakoon.base.commands.command import MeshCommand
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdVersion(MeshCommand):
+class CmdVersion(Command):
 
     key = "version"
     template_key = "gateway/system/cmd_version"

@@ -12,7 +12,7 @@ class CmdNotFound(Exception):
     pass
 
 
-class MeshCommand(ABC):
+class Command(ABC):
 
     key: str
     aliases: list[str] = []
