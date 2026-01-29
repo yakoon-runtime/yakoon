@@ -2,14 +2,13 @@
 from collections import defaultdict
 from yakoon.base.commands.command import MeshCommand
 from yakoon.base.commands.request import Request
-from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdHelpSystem(PlatformCommand):
+class CmdHelpSystem(MeshCommand):
 
     key = "help"
-    template_key = "system/cmd_help"
+    template_key = "gateway/system/cmd_help"
 
     async def run(self, session: BaseSession, request: Request):
         presenter = await self.get_presenter(session)
@@ -23,10 +22,10 @@ class CmdHelpSystem(PlatformCommand):
             grouped=grouped)
         
 
-class CmdHelpDomain(PlatformCommand):
+class CmdHelpDomain(MeshCommand):
 
     key = "help"
-    template_key = "system/cmd_help_domain"
+    template_key = "gateway/system/cmd_help_domain"
 
     async def run(self, session: BaseSession, request: Request):
 

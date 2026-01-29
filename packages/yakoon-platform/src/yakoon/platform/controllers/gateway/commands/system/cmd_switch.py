@@ -1,12 +1,12 @@
+from yakoon.base.commands.command import MeshCommand
 from yakoon.base.commands.request import Request
-from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdSwitch(PlatformCommand):
+class CmdSwitch(MeshCommand):
     
     key = "switch"
-    template_key = "system/cmd_switch"
+    template_key = "gateway/system/cmd_switch"
 
     async def run(self, session: BaseSession, request: Request):
         presenter = await self.get_presenter(session)

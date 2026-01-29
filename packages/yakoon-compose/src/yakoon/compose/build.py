@@ -1,5 +1,4 @@
-from yakoon.base.runtime.session.output import Output
-from yakoon.base.runtime.system.registry import NewServiceRegistry
+from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.base.runtime.views.template import TemplateSource
 from yakoon.base.stores.base.registry import StoreRegistry
 
@@ -49,9 +48,9 @@ async def _compose_stores() -> StoreRegistry:
     return stores
 
 
-async def _compose_services(stores: StoreRegistry, template_sources: list[TemplateSource]) -> NewServiceRegistry:
+async def _compose_services(stores: StoreRegistry, template_sources: list[TemplateSource]) -> ServiceRegistry:
     
-    services = NewServiceRegistry()
+    services = ServiceRegistry()
     
     services.register_static("audit", AuditLogService())
     services.register_static("namespaces", NamespaceService())

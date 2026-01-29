@@ -2,7 +2,7 @@
 
 from typing import Awaitable, Callable
 
-class NewServiceRegistry:
+class ServiceRegistry:
 
     def __init__(self):
         self._services: dict[str, object] = {}

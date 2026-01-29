@@ -10,7 +10,7 @@ from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import BaseSession
 from yakoon.base.commands.command import CmdNotFound, MeshCommand
 
-from yakoon.base.runtime.system.registry import NewServiceRegistry
+from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.settings import settings
 from yakoon.platform.controllers.directory import ControllerDirectory
@@ -21,7 +21,7 @@ class Engine:
      
    def __init__(self, 
                 directory: ControllerDirectory, 
-                services: NewServiceRegistry, 
+                services: ServiceRegistry, 
                 commands: CommandDirectory):
       """      
       Creates a new instance of the class engine.

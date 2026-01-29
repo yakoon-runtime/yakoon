@@ -2,15 +2,16 @@ import platform
 import subprocess
 import time
 from datetime import datetime, timezone
+
+from yakoon.base.commands.command import MeshCommand
 from yakoon.base.commands.request import Request
-from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
 
 
-class CmdVersion(PlatformCommand):
+class CmdVersion(MeshCommand):
 
     key = "version"
-    template_key = "system/cmd_version"
+    template_key = "gateway/system/cmd_version"
 
     async def run(self, session: BaseSession, request: Request):
 

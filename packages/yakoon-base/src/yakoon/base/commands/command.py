@@ -4,7 +4,7 @@ from typing import Any
 
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.views.presenter import Presenter
-from yakoon.base.runtime.system.registry import NewServiceRegistry
+from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.base.controllers.base import BaseController
 
 
@@ -20,13 +20,8 @@ class MeshCommand(ABC):
 
     controller: BaseController = None
    
-    @abstractmethod
-    async def run(self, session: Any, request: Any) -> None:
-        pass
-
-    @abstractmethod
     async def get_template_path(self) -> str:
-        pass
+        return self.template_key
 
     async def get_namespace(self, session) -> Namespace:
         services = await self.get_services()
@@ -40,5 +35,5 @@ class MeshCommand(ABC):
 
         return Presenter(await self.get_template_path(), session, renderer=renderer)
         
-    async def get_services(self) -> NewServiceRegistry:
+    async def get_services(self) -> ServiceRegistry:
         return self.controller.services
