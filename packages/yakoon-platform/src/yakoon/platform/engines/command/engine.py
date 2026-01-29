@@ -2,28 +2,33 @@ import asyncio
 from collections import deque
 from typing import Optional, Tuple
 
-from yakoon.base.commands.parser import Request
+from yakoon.base.commands.request import Request
+from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.runtime.dialogs.manager import DialogManager
 from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import BaseSession
-from yakoon.base.commands.command import CmdNotFound
+from yakoon.base.commands.command import CmdNotFound, MeshCommand
 
+from yakoon.base.runtime.system.registry import NewServiceRegistry
+from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.settings import settings
 from yakoon.platform.controllers.directory import ControllerDirectory
 from yakoon.platform.engines.command.batch import split_batch_input
-from yakoon.platform.services._registry import SystemServiceRegistry
-from yakoon.platform.commands.command import SaasCommand
-from yakoon.platform.controllers.base.base import SaasBaseController
 
 
-class Engine():
+class Engine:
      
-   def __init__(self, directory: ControllerDirectory):
+   def __init__(self, 
+                directory: ControllerDirectory, 
+                services: NewServiceRegistry, 
+                commands: CommandDirectory):
       """      
       Creates a new instance of the class engine.
       """
       self._directory = directory
+      self._services = services
+      self._commands = commands
    
    async def initialize(self, io: Output):           
       session = BaseSession(None)      
@@ -32,46 +37,30 @@ class Engine():
       session.bind_io(io)
 
       ## initialize the controllers
-      for controller in  self._directory.get_all_for():
+      for controller in await self._directory.get_all_for():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
-
-      # initialize the services
-      services = await self._require_system_services()
-      await services.initialize(self._directory) 
-
-      
+    
    async def _resolve_for_controller(
          self, controller_id, request: Request, 
-         session: BaseSession) -> Optional[Tuple[SaasBaseController, SaasCommand]]:
+         session: BaseSession) -> Optional[Tuple[BaseController, MeshCommand]]:
       
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
+      
+      result: tuple[str, MeshCommand] = await self._commands.resolve(request.cmd, cmd_groups)
+      if result:
+         controller_id, command = result
+         return await self._directory.get(controller_id), command
 
-      controllers = [
-        self._directory.gateway,
-        self._directory.get(controller_id)]
-
-      for controller in filter(None, controllers):
-         command = controller.resolve(request.cmd, cmd_groups)
-         if command:
-               return controller, command
-
-   async def _require_system_services(self, bucket: str= "system") -> SystemServiceRegistry :
-      services = await self._directory.gateway.service_router.get_registry(bucket)
-      if not isinstance(services, SystemServiceRegistry):
-         raise RuntimeError(f"Registry for bucket '{bucket}' does not provide session services")
-      if not services:
-         raise RuntimeError(f"No ServiceRegistry found for bucket: {bucket}")
-      return services                                
-
+   
    async def dispatch(self, session_key: Key, input_str: str, io: Output):   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
-      gateway = self._directory.gateway
+      gateway = await self._directory.get_gateway()
       session = await gateway.on_resolve_session(session_key)
       session.bind_io(io)
 
@@ -97,7 +86,7 @@ class Engine():
       async def _run_internal_task(raw):
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
-         gateway = self._directory.gateway
+         gateway = await self._directory.get_gateway()
          try:
             await gateway.on_gateway_validate(session)
             await self._send_one(session, raw)
@@ -131,20 +120,18 @@ class Engine():
 
    async def _send_one(self, session: BaseSession, input_str: str):   
 
-      command_result = None
       command, request = None, Request(input_str)
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
 
       domain_id = session.ctx("gateway", "domain_id", persist=True)
-
       domain_id = "mesh"
 
       try:
          if domain_id:
             # Domain-level hook before resolving the input into a command.
             # Allows dynamic command registration or early input rewriting.
-            controller = self._directory.get(domain_id)
+            controller = await self._directory.get(domain_id)
             if controller: # TODO: proxy.on_before_resolve -> dieser löst das intern auf (controller oder websocket)
                await controller.on_before_resolve(session)
 
@@ -169,16 +156,16 @@ class Engine():
          await session.fail(f"Unbekannter Befehl: '{request.cmd}'")
 
       except PermissionError as exc:
-         services = await self._require_system_services()     
-         await services.audit.permission(session, "command", command.key)
+         audit = await self._services.get("audit")
+         await audit.permission(session, "command", command.key)
          await session.fail(str(exc))
 
       except ValueError as exc:
          await session.fail(str(exc))
 
       except Exception as exc:
-         services = await self._require_system_services()     
-         await services.audit.error(exc)
+         audit = await self._services.get("audit")
+         await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
 
       finally:       
@@ -187,7 +174,7 @@ class Engine():
          if domain_id:
             # Hook called when a domain session is about to end.
             # Used for cleanup of runtime data, disconnection, or persistence.   
-            controller = self._directory.get(domain_id)
+            controller = await self._directory.get(domain_id)
             if controller:
                await controller.on_cleanup(session)
 

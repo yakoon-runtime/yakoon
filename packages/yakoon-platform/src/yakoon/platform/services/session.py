@@ -1,10 +1,8 @@
-from yakoon.base.controllers.base.directory import BaseControllerDirectory
-from yakoon.base.controllers.base.service import ControllerService
 from yakoon.base.runtime.session import BaseSession
 from yakoon.base.models.key import Key
 
 
-class SessionService(ControllerService):
+class SessionService:
     
     def __init__(self, store):
         self._store = store

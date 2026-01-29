@@ -3,7 +3,7 @@ from yakoon.platform.controllers.gateway.stores.memory._registry import MemorySt
 from yakoon.base.stores.base.registry import StoreRegistry
 
 
-def create_gateway_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
+async def create_gateway_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
 
     if backend == "sqlite":
         from yakoon.platform.controllers.gateway.stores.sqlite._registry import SQLiteStoreRegistry

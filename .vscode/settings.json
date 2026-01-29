@@ -6,6 +6,7 @@
   "python.analysis.extraPaths": [
     "packages/yakoon-base/src",
     "packages/yakoon-platform/src",
+    "packages/yakoon-compose/src",
     "packages/yakoon-hosts/src"
   ]
 }

@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "yakoon-hosts"
+name = "yakoon-compose"
 version = "0.1.0"
-dependencies = ["yakoon-base", "yakoon-platform", "yakoon-compose"]
+dependencies = ["yakoon-platform", "yakoon-base"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

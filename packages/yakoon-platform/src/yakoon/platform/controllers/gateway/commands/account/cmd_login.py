@@ -1,4 +1,4 @@
-from yakoon.base.commands.parser import Request
+from yakoon.base.commands.request import Request
 from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
 
@@ -11,7 +11,7 @@ class CmdLogin(PlatformCommand):
     async def run(self, session: BaseSession, request: Request):
 
         presenter = await self.get_presenter(session)
-        services = await self.get_gateway_services()
+        services = await self.get_services()
 
         if not request.args:
             return await presenter.emit("missing_arg")

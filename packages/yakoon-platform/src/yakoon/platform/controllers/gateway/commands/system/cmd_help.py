@@ -1,7 +1,7 @@
 
 from collections import defaultdict
-from yakoon.platform.commands.command import SaasCommand
-from yakoon.base.commands.parser import Request
+from yakoon.base.commands.command import MeshCommand
+from yakoon.base.commands.request import Request
 from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
 
@@ -45,8 +45,8 @@ class CmdHelpDomain(PlatformCommand):
             await session.send_error(f"Befehl '{key}' nicht gefunden.")
     
 
-def get_grouped_commands(controller) -> dict[str, list[SaasCommand]]:
-    grouped: dict[str, list[SaasCommand]] = defaultdict(list)
+def get_grouped_commands(controller) -> dict[str, list[MeshCommand]]:
+    grouped: dict[str, list[MeshCommand]] = defaultdict(list)
     for cmdset in controller.commandsets:
         for cmd in cmdset.commands():
             grouped[cmdset.category].append(cmd)

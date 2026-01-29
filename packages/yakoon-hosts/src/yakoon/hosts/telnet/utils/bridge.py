@@ -1,13 +1,12 @@
 from yakoon.platform.engines.command import Engine, Output
 from yakoon.base.runtime.render.models.mode import RenderMode
 from yakoon.platform.controllers.gateway.utils.ansi import format_codes_to_ansi
-from yakoon.platform.bootstrap.registry import BootstrapControllerDirectory
 from yakoon.platform.bootstrap.settings import SolutionSettings
 
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 SolutionSettings.runtime.render_mode = RenderMode.ANSI
-engine = Engine(BootstrapControllerDirectory())
+engine = Engine(None)
 
 
 async def handle_client(reader, writer):

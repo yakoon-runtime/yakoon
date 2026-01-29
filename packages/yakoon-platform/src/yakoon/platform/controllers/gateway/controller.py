@@ -1,20 +1,27 @@
+from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
-from yakoon.platform.controllers.base import GatewayBaseController
+from yakoon.base.runtime.views.template import TemplateSource
 from yakoon.platform.controllers.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.controllers.gateway.commands.system.cmdset import PlatformSystemCommands
 from yakoon.base.runtime.session import BaseSession
-from yakoon.platform.controllers.gateway.setup import setup_gateway
 
 
-class GatewayController(GatewayBaseController):
+class GatewayController(BaseController):
 
     id: str = "gateway"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
+    is_gateway: bool = True
+
     default_command_groups = ["system", "account"]     
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
+
+    template_source: set[TemplateSource] = TemplateSource(
+        name="yakoon.platform",
+        package="yakoon.platform.bootstrap",
+        package_path="templates")
 
     commandsets = [
         PlatformSystemCommands, 
@@ -30,8 +37,7 @@ class GatewayController(GatewayBaseController):
 
         This method is guaranteed to run once before the first engine tick or command dispatch.
         """
-        await super().on_initialize(session)
-        await setup_gateway(self.service_router, self.id)
+        pass
 
     async def on_resolve_session(self, session_key: Key) -> BaseSession:
         """
@@ -48,9 +54,9 @@ class GatewayController(GatewayBaseController):
         """
         ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
         session_key = session_key or ns.get_key(None)
-        services = await self.get_system_services()        
+        sessions = await self.services.get("sessions")
 
-        session = await services.sessions.get_or_new(session_key)        
+        session = await sessions.get_or_new(session_key)        
         session.touch() # Updates the last activity.
         
         return session
@@ -62,8 +68,6 @@ class GatewayController(GatewayBaseController):
         Used to prepare session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `system` controller.
         """
-        services = await self.get_gateway_services()
-
         session.cmd_groups = ["gateway:system", "gateway:account", "mesh:system"]
         print("todo: on_gateway_validate")
         return
@@ -102,7 +106,6 @@ class GatewayController(GatewayBaseController):
         Used to cleanup session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `gateway` controller.
         """
-        await super().on_gateway_finalize(session)
         if not session.ctx("gateway", "account_key", persist=True):
-            services = await self.get_system_services()
-            await services.sessions.delete_by_key(session.key)
+            sessions = await self.services.get("sessions")
+            await sessions.delete_by_key(session.key)

@@ -2,10 +2,9 @@ import platform
 import subprocess
 import time
 from datetime import datetime, timezone
-from yakoon.base.commands.parser import Request
+from yakoon.base.commands.request import Request
 from yakoon.platform.controllers.gateway.commands.base import PlatformCommand
 from yakoon.base.runtime.session import BaseSession
-from yakoon.platform.settings import settings
 
 
 class CmdVersion(PlatformCommand):

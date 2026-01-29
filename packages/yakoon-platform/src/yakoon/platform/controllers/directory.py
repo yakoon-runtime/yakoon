@@ -1,5 +1,5 @@
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.controllers.base.directory import BaseControllerDirectory
+from yakoon.base.controllers.directory import BaseControllerDirectory
 
 
 class ControllerDirectory(BaseControllerDirectory):
@@ -8,26 +8,33 @@ class ControllerDirectory(BaseControllerDirectory):
     Used by the Engine to remain agnostic of domain structure.
     """
 
-    @property
-    def gateway(self) -> BaseController:
-        return self._gateway
+    def __init__(self, controllers: list[BaseController]):
+        self._controllers: dict[str, BaseController] = {}    
 
-    def __init__(self, controllers: list[BaseController], gateway: BaseController):
-        self.controllers: dict[str, BaseController] = {}    
-        self._gateway = gateway
-        self._gateway.controller_directory = self
-
-        for controller in [gateway] + controllers:        
-            controller.gateway = gateway
-            if controller.id in self.controllers:
+        has_gateway, gateway_id = False, None
+        for controller in controllers:        
+            if controller.id in controllers:
                 raise ValueError(f"Duplicate controller names detected: {controller.id}")
-            self.controllers[controller.id] = controller
+            if has_gateway:
+                raise ValueError(f"Duplicate gateway controller: {gateway_id.id} / {controller.id}")
+            if controller.is_gateway:
+                has_gateway = True
+                gateway_id = controller.id
+            self._controllers[controller.id] = controller
 
-    def get(self, controller_id: str) -> BaseController:
-        return self.controllers.get(controller_id)
+        if not has_gateway:
+            raise ValueError(f"No gateway controller found")
+
+    async def get_gateway(self) -> BaseController:
+        for controller in self._controllers.values():        
+            if controller.is_gateway:
+                return controller
+
+    async def get(self, controller_id: str) -> BaseController:
+        return self._controllers.get(controller_id)
     
-    def get_all_for(self) -> list[BaseController]:
-        return self.controllers.values()
+    async def get_all_for(self) -> list[BaseController]:
+        return self._controllers.values()
 
-    def has(self, controller_id: str) -> bool:
-        return controller_id in self.controllers.get(controller_id, {})
+    async def has(self, controller_id: str) -> bool:
+        return bool(self._controllers.get(controller_id, {}))
