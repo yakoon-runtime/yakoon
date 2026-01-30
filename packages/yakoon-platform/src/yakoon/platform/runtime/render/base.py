@@ -1,8 +1,8 @@
 
 from abc import ABC, abstractmethod
 
-from yakoon.base.runtime.views.context import RenderContext
 from yakoon.platform.runtime.render.mode import RenderMode
+from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
 
 

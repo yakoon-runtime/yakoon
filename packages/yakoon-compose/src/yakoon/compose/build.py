@@ -5,6 +5,7 @@ from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
 from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.namespace import NamespaceService
+from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
 
@@ -57,6 +58,7 @@ async def _compose_services(stores: StoreRegistry, template_sources: list[Templa
     services.register_static("renderer", RendererService(JinjaEngine(template_sources)))
     services.register_static("counters", ShardedCounterService(ShardAllocator(stores.counters)))
     services.register_static("sessions", SessionService(stores.sessions)) 
+    services.register_static("presenter", PresenterService())
     return services   
 
 

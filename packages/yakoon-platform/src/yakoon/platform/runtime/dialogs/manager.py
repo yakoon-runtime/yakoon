@@ -2,7 +2,7 @@ import asyncio
 from typing import Awaitable, Callable
 
 from yakoon.base.runtime.devtools.prompt import UnresolvedPromptMonitor
-from yakoon.base.settings import settings
+from yakoon.platform.settings import settings
 
 
 class DialogManager:

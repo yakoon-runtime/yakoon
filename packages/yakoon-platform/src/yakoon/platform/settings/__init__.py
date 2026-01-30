@@ -1,3 +1,4 @@
+from yakoon.platform.settings.base import BaseSettings
 from yakoon.platform.settings.cmdsets import CmdSetCategoriesSetting
 from yakoon.platform.settings.engine import EngineSettings
 from yakoon.platform.settings.logging import LoggingSettings
@@ -8,6 +9,7 @@ from yakoon.platform.settings.render import RenderSettings
 class SaasSettings:
 
     ai = AISettings()
+    base = BaseSettings()
     engine = EngineSettings()
     network = NetSettings()
     logging = LoggingSettings()

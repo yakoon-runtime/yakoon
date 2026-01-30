@@ -1,13 +1,14 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
-from typing import Any
+from abc import ABC
 
 from yakoon.base.commands.request import Request
+from yakoon.base.interaction.presenter import Presenter
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
-from yakoon.base.runtime.views.presenter import Presenter
 from yakoon.base.runtime.system.registry import ServiceRegistry
 from yakoon.base.controllers.base import BaseController
+
+#from yakoon.base.runtime.views.presenter import Presenter
 
 
 class CmdNotFound(Exception):
@@ -34,8 +35,17 @@ class Command(ABC):
     async def get_presenter(self, session) -> Presenter:
         services = await self.get_services()
         renderer = await services.get("renderer")
+        presenter = await services.get("presenter") 
 
-        return Presenter(await self.get_template_path(), session, renderer=renderer)
+        return await presenter.create_presenter(
+                await self.get_template_path(), 
+                session, renderer=renderer)
+        
+    #async def get_presenter(self, session) -> "Presenter":
+    #    services = await self.get_services()
+    #    renderer = await services.get("renderer")
+    #
+    #    return Presenter(await self.get_template_path(), session, renderer=renderer)
         
     async def get_services(self) -> ServiceRegistry:
         return self.controller.services

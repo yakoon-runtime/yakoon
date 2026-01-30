@@ -13,7 +13,6 @@ from yakoon.platform.controllers.gateway.controller import GatewayController
 
 from yakoon.compose.build import compose_engine
 
-
 # Set the global rendering mode to ansi text (no Markdown formatting)
 settings.render.render_mode = RenderMode.PLAIN
 

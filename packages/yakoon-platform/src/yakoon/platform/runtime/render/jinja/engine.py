@@ -1,14 +1,15 @@
 from pathlib import Path
 from typing import Iterable, Optional
 
-from yakoon.base.runtime.views.context import RenderContext
 from yakoon.base.runtime.views.template import TemplateSource
 
+from yakoon.platform.settings import settings
+from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.runtime.render.section import RenderSection
 from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.jinja.filters import register_filters
-from yakoon.platform.settings import settings
+
 
 from jinja2 import (
     Environment,

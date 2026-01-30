@@ -2,17 +2,17 @@ import asyncio
 from collections import deque
 from typing import Optional, Tuple
 
+from yakoon.base.models.key import Key
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.models.key import Key
-from yakoon.base.runtime.dialogs.manager import DialogManager
 from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 
-from yakoon.base.runtime.system.registry import ServiceRegistry
-from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.settings import settings
+from yakoon.base.runtime.system.registry import ServiceRegistry
+from yakoon.platform.runtime.dialogs.manager import DialogManager
+from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.controllers.directory import ControllerDirectory
 from yakoon.platform.engines.command.batch import split_batch_input
 
