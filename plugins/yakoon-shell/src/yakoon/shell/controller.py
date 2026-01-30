@@ -15,6 +15,8 @@ class ShellController(BaseController):
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     is_shell: bool = True
+    is_global_visible: bool = True
+    is_activatable: bool = False
 
     default_command_groups = ["system", "account"]     
     """Names of command groups that are automatically active for every session, 

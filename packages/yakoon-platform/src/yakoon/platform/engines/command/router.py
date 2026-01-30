@@ -10,21 +10,43 @@ if TYPE_CHECKING:
 class CommandDirectory:
 
     def __init__(self):
-        self._routers: dict[str, CommandRouter] = {}        
+        self._routers: list[CommandRouter] = []        
 
     def register(self, router_name, router: CommandRouter):
-        self._routers[router_name] = router
+        router.id = router_name
+        self._routers.append(router)
 
-    def find(self, cmd_name: str, cmd_groups: list[str] | None = None) -> tuple[str, Command] | None:
-        for router_name, router in self._routers.items():
+    def find(self, active_router_id: str, cmd_name: str, cmd_groups: list[str] | None = None) -> tuple[str, Command] | None:
+        
+        eligible_routers = None
+
+        if active_router_id is None: 
+            # Shell mode
+            
+            eligible_routers = [
+                r for r in self._routers
+                if r.is_shell or r.is_global_visible]
+        else:                       
+            # Fokusmodus
+            
+            eligible_routers = [
+                r for r in self._routers 
+                if r.is_shell or (r.is_activatable and r.id == active_router_id)]
+
+        for router in eligible_routers:
             command = router.instantiate(cmd_name, cmd_groups)
             if command:
-                return router_name, command
+                return router.id, command
 
 
 class CommandRouter:
 
-    def __init__(self):
+    def __init__(self, is_shell, is_global_visible, is_activatable):
+        
+        self.is_shell = is_shell
+        self.is_global_visible = is_global_visible
+        self.is_activatable = is_activatable
+
         self._groups: dict[str, dict[str, type[Command]]] = {}
         self._aliases: dict[str, str] = {}
 

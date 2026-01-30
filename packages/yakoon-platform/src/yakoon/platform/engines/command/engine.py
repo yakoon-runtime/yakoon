@@ -43,7 +43,7 @@ class Engine:
             await controller.on_initialize(session)
     
    async def _find_matching_command(
-         self, controller_id, request: Request, 
+         self, active_router_id, request: Request, 
          session: Session) -> Optional[Tuple[BaseController, Command]]:
       
       # Include the session-local command group for dynamic routing.
@@ -51,10 +51,11 @@ class Engine:
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
       cmd_groups += ["office.mailing:system"] # TODO
       
-      result: tuple[str, Command] = self._commands.find(request.cmd, cmd_groups)
+      find = self._commands.find
+      result: tuple[str, Command] = find(active_router_id, request.cmd, cmd_groups)
       if result:
-         controller_id, command = result
-         return self._directory.get(controller_id), command
+         active_router_id, command = result
+         return self._directory.get(active_router_id), command
 
    
    async def dispatch(self, session_key: Key, input_str: str, io: Output):   
@@ -126,19 +127,19 @@ class Engine:
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
 
-      domain_id = session.ctx("gateway", "domain_id", persist=True)
-      domain_id = "mesh"
+      active_router_id = session.ctx("gateway", "domain_id", persist=True)
+      active_router_id = "office.mailing"
 
       try:
-         if domain_id:
+         if active_router_id:
             # Domain-level hook before resolving the input into a command.
             # Allows dynamic command registration or early input rewriting.
-            controller = self._directory.get(domain_id)
+            controller = self._directory.get(active_router_id)
             if controller: # TODO: proxy.on_before_resolve -> dieser löst das intern auf (controller oder websocket)
                await controller.on_before_resolve(session)
 
          # resolve the commands
-         result = await self._find_matching_command(domain_id, request, session)
+         result = await self._find_matching_command(active_router_id, request, session)
          if not result:
             raise CmdNotFound(f"{request.cmd}")
 
@@ -173,10 +174,10 @@ class Engine:
       finally:       
          if command: 
             command.controller = None
-         if domain_id:
+         if active_router_id:
             # Hook called when a domain session is about to end.
             # Used for cleanup of runtime data, disconnection, or persistence.   
-            controller = self._directory.get(domain_id)
+            controller = self._directory.get(active_router_id)
             if controller:
                await controller.on_cleanup(session)
 
