@@ -1,5 +1,6 @@
 import asyncio
 
+
 from yakoon.base.models.key import Key
 from yakoon.base.utils.input import safe_input
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
@@ -12,6 +13,9 @@ from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.controllers.gateway.controller import GatewayController
 
 from yakoon.compose.engine import compose_engine
+
+from yakoon.office.mailing.controller import OfficeMailingController
+
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 settings.render.render_mode = RenderMode.PLAIN
@@ -28,7 +32,7 @@ async def run_console():
 
    engine = await compose_engine(
       controllers=ControllerDirectory(
-         controllers=[GatewayController()]))
+         controllers=[GatewayController(), OfficeMailingController()]))
 
    await engine.initialize(output)
    
