@@ -1,14 +1,12 @@
 from __future__ import annotations
 from abc import ABC
 
+from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 from yakoon.base.commands.request import Request
-from yakoon.base.interaction.presenter import Presenter
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
-from yakoon.base.runtime.system.registry import ServiceRegistry
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.controllers.base import BaseController
-
-#from yakoon.base.runtime.views.presenter import Presenter
 
 
 class CmdNotFound(Exception):
@@ -23,27 +21,24 @@ class Command(ABC):
 
     controller: BaseController = None
    
-    async def get_template_path(self) -> str:
+    @property
+    def services(self) -> ServiceDirectory:
+        return self.controller.services
+
+    def get_template_path(self) -> str:
         return self.template_key
 
     async def get_namespace(self, session) -> Namespace:
-        services = await self.get_services()
-        namespaces = await services.get("namespaces")
-        
+        namespaces = self.services.get(NamespaceService)   
+
         return await namespaces.from_session(session)
 
     async def get_presenter(self, session) -> Presenter:
-        services = await self.get_services()
-        renderer = await services.get("renderer")
-        presenter = await services.get("presenter") 
-
+        presenter = self.services.get(PresenterService) 
+        
         return await presenter.create_presenter(
-                await self.get_template_path(), 
-                session, renderer=renderer)
+                self.get_template_path(), session)
                 
-    async def get_services(self) -> ServiceRegistry:
-        return self.controller.services
-
     async def run(self, session: Session, request: Request):
         pass
 

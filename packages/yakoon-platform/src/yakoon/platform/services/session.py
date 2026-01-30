@@ -11,16 +11,16 @@ class SessionService:
     def set_services(self, services):
         self._services = services
 
-    async def get_by_key(self, key: Key) -> Session:
+    async def load(self, key: Key) -> Session:
         row = await self._store.get_by_key(key)
         return Session.from_row(row) if row else None
 
-    async def get_or_new(self, key: Key, **kwargs) -> tuple[Session, bool]:
+    async def load_or_create(self, key: Key, **kwargs) -> tuple[Session, bool]:
         """
         Returns an existing session if found, otherwise returns a new (unsaved) session.
         Does not persist the session automatically.
         """
-        session = await self.get_by_key(key)
+        session = await self.load(key)
         if session:
             return session
         return Session(key=key, **kwargs)

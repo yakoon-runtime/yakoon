@@ -1,5 +1,37 @@
 from typing import Protocol
 
+from yakoon.base.models.key import Key
+from yakoon.base.models.namespace import Namespace
+from yakoon.base.runtime.session.session import Session
+
+class ShardedCounterService(Protocol):    
+    async def next(self, prefix: str) -> str: ...
+
+
+class SessionService(Protocol):
+    async def save(self, session: Session): ...
+    async def delete_by_key(self, key: Key): ...
+    async def load(self, key: Key) -> Session: ...
+    async def load_or_create(self, key: Key, **kwargs) -> tuple[Session, bool]: ...
+    """
+    Returns an existing session if found, otherwise returns a new (unsaved) session.
+    Does not persist the session automatically.
+    """
+ 
+class RendererService(Protocol):
+    async def render(self, ctx, key: str, **data) -> str: ...
+    
+
+class NamespaceService(Protocol):        
+    async def from_session(self, session: Session) -> Namespace: ...
+    async def get_by_bucket(self, bucket: str="bucket", scope: str="develop") -> Namespace: ...
+    
+
+class AuditLogService(Protocol):
+    async def audit(self, msg: str): ...
+    async def error(self, exc: Exception): ...
+    async def permission(self, session, obj, action): ...
+
 
 class Prompts(Protocol):
 
@@ -52,7 +84,7 @@ class Prompts(Protocol):
     Returns:
         int: The index of the selected choice (starting at 0).
     """
- 
+        
 
 class Presenter(Protocol):
 
@@ -90,3 +122,8 @@ class Presenter(Protocol):
         section (str): Template section key (e.g. "hint", "auto_saved").
         **data: Optional key-value pairs for template variables.
     """
+
+
+class PresenterService(Protocol):
+    async def create_presenter(self, template_key: str, session: Session) -> Presenter: ...
+

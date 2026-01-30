@@ -1,10 +1,12 @@
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
+from yakoon.base.ports import SessionService
 from yakoon.base.runtime.views.template import TemplateSource
+from yakoon.base.runtime.session import Session
+
 from yakoon.platform.controllers.gateway.commands.account.cmdset import PlatformAccountCommands
 from yakoon.platform.controllers.gateway.commands.system.cmdset import PlatformSystemCommands
-from yakoon.base.runtime.session import Session
 
 
 class GatewayController(BaseController):
@@ -54,9 +56,9 @@ class GatewayController(BaseController):
         """
         ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
         session_key = session_key or ns.get_key(None)
-        sessions = await self.services.get("sessions")
+        sessions = self.services.get(SessionService)
 
-        session = await sessions.get_or_new(session_key)        
+        session = await sessions.load_or_create(session_key)        
         session.touch() # Updates the last activity.
         
         return session
@@ -107,5 +109,5 @@ class GatewayController(BaseController):
         Only invoked if this controller is the registered `gateway` controller.
         """
         if not session.ctx("gateway", "account_key", persist=True):
-            sessions = await self.services.get("sessions")
+            sessions = self.services.get(SessionService)
             await sessions.delete_by_key(session.key)

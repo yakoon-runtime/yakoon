@@ -9,11 +9,12 @@ from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 
+from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.settings import settings
-from yakoon.base.runtime.system.registry import ServiceRegistry
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.platform.runtime.dialogs.manager import DialogManager
 from yakoon.platform.engines.command.router import CommandDirectory
-from yakoon.platform.controllers.directory import ControllerDirectory
+from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.batch import split_batch_input
 
 
@@ -21,7 +22,7 @@ class Engine:
      
    def __init__(self, 
                 directory: ControllerDirectory, 
-                services: ServiceRegistry, 
+                services: ServiceDirectory, 
                 commands: CommandDirectory):
       """      
       Creates a new instance of the class engine.
@@ -37,11 +38,11 @@ class Engine:
       session.bind_io(io)
 
       ## initialize the controllers
-      for controller in await self._directory.get_all_for():
+      for controller in self._directory.get_all():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
     
-   async def _resolve_for_controller(
+   async def _find_matching_command(
          self, controller_id, request: Request, 
          session: Session) -> Optional[Tuple[BaseController, Command]]:
       
@@ -49,10 +50,10 @@ class Engine:
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
       
-      result: tuple[str, Command] = await self._commands.resolve(request.cmd, cmd_groups)
+      result: tuple[str, Command] = self._commands.find(request.cmd, cmd_groups)
       if result:
          controller_id, command = result
-         return await self._directory.get(controller_id), command
+         return self._directory.get(controller_id), command
 
    
    async def dispatch(self, session_key: Key, input_str: str, io: Output):   
@@ -60,7 +61,7 @@ class Engine:
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
-      gateway = await self._directory.get_gateway()
+      gateway = self._directory.find_gateway()
       session = await gateway.on_resolve_session(session_key)
       session.bind_io(io)
 
@@ -86,7 +87,7 @@ class Engine:
       async def _run_internal_task(raw):
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
-         gateway = await self._directory.get_gateway()
+         gateway = self._directory.find_gateway()
          try:
             await gateway.on_gateway_validate(session)
             await self._send_one(session, raw)
@@ -131,12 +132,12 @@ class Engine:
          if domain_id:
             # Domain-level hook before resolving the input into a command.
             # Allows dynamic command registration or early input rewriting.
-            controller = await self._directory.get(domain_id)
+            controller = self._directory.get(domain_id)
             if controller: # TODO: proxy.on_before_resolve -> dieser löst das intern auf (controller oder websocket)
                await controller.on_before_resolve(session)
 
          # resolve the commands
-         result = await self._resolve_for_controller(domain_id, request, session)
+         result = await self._find_matching_command(domain_id, request, session)
          if not result:
             raise CmdNotFound(f"{request.cmd}")
 
@@ -156,7 +157,7 @@ class Engine:
          await session.fail(f"Unbekannter Befehl: '{request.cmd}'")
 
       except PermissionError as exc:
-         audit = await self._services.get("audit")
+         audit = self._services.get(AuditLogService)
          await audit.permission(session, "command", command.key)
          await session.fail(str(exc))
 
@@ -164,7 +165,7 @@ class Engine:
          await session.fail(str(exc))
 
       except Exception as exc:
-         audit = await self._services.get("audit")
+         audit = self._services.get(AuditLogService)
          await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
 
@@ -174,7 +175,7 @@ class Engine:
          if domain_id:
             # Hook called when a domain session is about to end.
             # Used for cleanup of runtime data, disconnection, or persistence.   
-            controller = await self._directory.get(domain_id)
+            controller = self._directory.get(domain_id)
             if controller:
                await controller.on_cleanup(session)
 

@@ -14,6 +14,3 @@ class CmdWelcome(Command):
 
         presenter = await self.get_presenter(session)
         await presenter.emit("show")
-
-        #presenter = await self.get_presenter(session)
-        #await presenter.emit("show")

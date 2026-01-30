@@ -35,12 +35,12 @@ class ControllerDirectory:
         if not has_gateway:
             raise ValueError(f"No gateway controller found")
 
-    async def get_gateway(self) -> BaseController:
+    def find_gateway(self) -> BaseController:
         for controller in self._controllers.values():        
             if controller.is_gateway:
                 return controller
 
-    async def get(self, controller_id: str) -> BaseController:
+    def get(self, controller_id: str) -> BaseController:
         """
         Resolves and returns a domain controller by its unique ID.
 
@@ -53,7 +53,7 @@ class ControllerDirectory:
         
         return self._controllers.get(controller_id)
     
-    async def get_all_for(self) -> list[BaseController]:
+    def get_all(self) -> list[BaseController]:
         """
         Returns all registered domain controllers.
 
@@ -63,7 +63,7 @@ class ControllerDirectory:
 
         return self._controllers.values()
 
-    async def has(self, controller_id: str) -> bool:
+    def has(self, controller_id: str) -> bool:
         """
         Returns true if controller has given id.
 

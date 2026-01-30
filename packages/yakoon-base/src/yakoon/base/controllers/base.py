@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.base.commands.request import Request
-from yakoon.base.runtime.system.registry import ServiceRegistry
+from yakoon.base.ports import NamespaceService
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.runtime.views.template import TemplateSource
 
 if TYPE_CHECKING:
@@ -28,7 +29,7 @@ class BaseController(ABC):
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
  
-    services: ServiceRegistry = None
+    services: ServiceDirectory = None
     """Provides bucket-based access to services (e.g. room, account, session). 
     Injected at runtime by the platform."""
 
@@ -39,13 +40,14 @@ class BaseController(ABC):
     def commandsets(self) -> Sequence[Type[CommandSet]]: ...
 
     def __init__(self):
-        self.services = ServiceRegistry()
+        self.services = ServiceDirectory()
 
-    async def connect_services(self, services: ServiceRegistry):
+    def connect_services(self, services: ServiceDirectory):
         self.services = services
     
-    async def get_namespace(self, session: Session) -> Namespace:
-        namespaces = await self.services.get("namespaces")
+    async def create_namespace(self, session: Session) -> Namespace:
+        namespaces = self.services.get(NamespaceService)
+        
         return await namespaces.from_session(session)
     
     async def on_initialize(self, session: Session):

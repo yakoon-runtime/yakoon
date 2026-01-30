@@ -1,17 +1,17 @@
 import asyncio
 
 from yakoon.base.models.key import Key
+from yakoon.base.utils.input import safe_input
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
 from yakoon.base.runtime.session.output import Output
-from yakoon.base.utils.input import safe_input
 
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode
-from yakoon.platform.controllers.directory import ControllerDirectory
+from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.controllers.gateway.controller import GatewayController
 
-from yakoon.compose.build import compose_engine
+from yakoon.compose.engine import compose_engine
 
 # Set the global rendering mode to ansi text (no Markdown formatting)
 settings.render.render_mode = RenderMode.PLAIN

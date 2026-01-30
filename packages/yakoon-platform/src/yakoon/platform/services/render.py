@@ -1,5 +1,4 @@
 
-from typing import Iterable
 
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode

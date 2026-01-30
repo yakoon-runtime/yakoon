@@ -1,6 +1,8 @@
 
+from yakoon.base.ports import RendererService
 from yakoon.base.runtime.session import Session
 
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.dialogs.prompts import ask, choice, choice_index, confirm
 
@@ -150,8 +152,9 @@ class Presenter:
 
 class PresenterService:
 
-    async def create_presenter(self, 
-                               template_key: str, 
-                               session: Session, 
-                               renderer: "RendererService") -> RenderContext:
-        return Presenter(template_key, session, renderer)
+    def __init__(self, services: ServiceDirectory):
+        self._services = services
+
+    async def create_presenter(self, template_key: str, session: Session) -> Presenter:
+        
+        return Presenter(template_key, session, self._services.get(RendererService))
