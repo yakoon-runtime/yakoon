@@ -1,3 +1,4 @@
+
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
@@ -5,29 +6,27 @@ from yakoon.base.ports import SessionService
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.runtime.session import Session
 
-from yakoon.platform.controllers.gateway.commands.account.cmdset import PlatformAccountCommands
-from yakoon.platform.controllers.gateway.commands.system.cmdset import PlatformSystemCommands
+from yakoon.shell.commands.system.cmdset import ShellSystemCommands
 
 
-class GatewayController(BaseController):
+class ShellController(BaseController):
 
-    id: str = "gateway"
+    id: str = "shell"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
-    is_gateway: bool = True
+    is_shell: bool = True
 
     default_command_groups = ["system", "account"]     
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
 
     template_source: set[TemplateSource] = TemplateSource(
-        name="yakoon.platform",
-        package="yakoon.platform.bootstrap",
+        name="yakoon.shell",
+        package="yakoon.shell",
         package_path="templates")
 
     commandsets = [
-        PlatformSystemCommands, 
-        PlatformAccountCommands]
+        ShellSystemCommands]
     """ The collection of all commands. """
         
     async def on_initialize(self, session: Session):
@@ -63,15 +62,15 @@ class GatewayController(BaseController):
         
         return session
 
-    async def on_gateway_validate(self, session: Session):
+    async def on_shell_validate(self, session: Session):
         """
         Platform-level pre-send hook, called before request parsing.
 
         Used to prepare session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `system` controller.
         """
-        session.cmd_groups = ["gateway:system", "gateway:account", "mesh:system"]
-        print("todo: on_gateway_validate")
+        session.cmd_groups = ["shell:system", ]
+        print("todo: on_shell_validate")
         return
 
         # builds the commandset for this session
@@ -101,7 +100,7 @@ class GatewayController(BaseController):
             #if not account or not set(required).issubset(set(account.permissions)):
             #    raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 
-    async def on_gateway_finalize(self, session: Session):
+    async def on_shell_finalize(self, session: Session):
         """
         Platform-level post-send hook, called after command runing.
 

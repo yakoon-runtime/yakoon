@@ -1,2 +1,2 @@
 cd ..
-pip install -e plugins/yakoon-office
+pip install -e plugins/yakoon-shell -e plugins/yakoon-office

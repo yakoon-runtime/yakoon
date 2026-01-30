@@ -6,7 +6,7 @@ from yakoon.base.runtime.session import Session
 class CmdWelcome(Command):
 
     key = "welcome"    
-    template_key = "gateway/system/cmd_welcome"
+    template_key = "shell/system/cmd_welcome"
 
     requires = ["system"]
 

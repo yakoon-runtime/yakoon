@@ -8,7 +8,7 @@ from yakoon.base.runtime.session import Session
 class CmdHelpSystem(Command):
 
     key = "help"
-    template_key = "gateway/system/cmd_help"
+    template_key = "shell/shared/cmd_help"
 
     async def run(self, session: Session, request: Request):
         presenter = await self.get_presenter(session)

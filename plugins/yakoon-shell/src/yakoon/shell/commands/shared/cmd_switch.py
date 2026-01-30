@@ -6,7 +6,7 @@ from yakoon.base.runtime.session import Session
 class CmdSwitch(Command):
     
     key = "switch"
-    template_key = "gateway/system/cmd_switch"
+    template_key = "gateway/shared/cmd_switch"
 
     async def run(self, session: Session, request: Request):
         presenter = await self.get_presenter(session)

@@ -62,8 +62,8 @@ class Engine:
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
-      gateway = self._directory.find_gateway()
-      session = await gateway.on_resolve_session(session_key)
+      shell = self._directory.find_shell()
+      session = await shell.on_resolve_session(session_key)
       session.bind_io(io)
 
       inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
@@ -88,14 +88,14 @@ class Engine:
       async def _run_internal_task(raw):
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
-         gateway = self._directory.find_gateway()
+         shell = self._directory.find_shell()
          try:
-            await gateway.on_gateway_validate(session)
+            await shell.on_shell_validate(session)
             await self._send_one(session, raw)
          finally:
             # Final platform-level hook after command execution.
             # Used for post-processing, logging, or global session update
-            await gateway.on_gateway_finalize(session)
+            await shell.on_shell_finalize(session)
 
       while queue:
          await asyncio.sleep(0.01)  # yield control briefly

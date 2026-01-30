@@ -23,7 +23,7 @@ class BaseController(ABC):
     id: str = "unnamed"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
-    is_gateway = False
+    is_shell = False
 
     default_command_groups = []    
     """Names of command groups that are automatically active for every session, 

@@ -8,7 +8,7 @@
     "packages/yakoon-platform/src",
     "packages/yakoon-compose/src",
     "packages/yakoon-hosts/src",
-
-    "packages/yakoon-office/src"
+    "plugins/yakoon-shell/src",
+    "plugins/yakoon-office/src"
   ]
 }

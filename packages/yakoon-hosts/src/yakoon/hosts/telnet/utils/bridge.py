@@ -1,6 +1,6 @@
 from yakoon.platform.engines.command import Engine, Output
 from yakoon.base.runtime.render.models.mode import RenderMode
-from yakoon.platform.controllers.gateway.utils.ansi import format_codes_to_ansi
+from yakoon.hosts.telnet.utils.ansi import format_codes_to_ansi
 from yakoon.platform.bootstrap.settings import SolutionSettings
 
 

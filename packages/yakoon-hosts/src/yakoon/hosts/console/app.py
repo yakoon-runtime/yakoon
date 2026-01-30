@@ -10,10 +10,9 @@ from yakoon.base.runtime.session.output import Output
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.directories.controller import ControllerDirectory
-from yakoon.platform.controllers.gateway.controller import GatewayController
-
 from yakoon.compose.engine import compose_engine
 
+from yakoon.shell.controller import ShellController
 from yakoon.office.mailing.controller import OfficeMailingController
 
 
@@ -32,7 +31,7 @@ async def run_console():
 
    engine = await compose_engine(
       controllers=ControllerDirectory(
-         controllers=[GatewayController(), OfficeMailingController()]))
+         controllers=[ShellController(), OfficeMailingController()]))
 
    await engine.initialize(output)
    

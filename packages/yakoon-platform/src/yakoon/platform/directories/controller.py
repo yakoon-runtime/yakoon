@@ -12,32 +12,32 @@ class ControllerDirectory:
         Defines the interface for a registry that manages all available domain controllers.
 
         A domain registry is responsible for:
-        - Providing access to all registered controllers (e.g. gateway, realm, minddojo)
+        - Providing access to all registered controllers (e.g. shell, office, minddojo)
         - Resolving controllers by their unique ID (used in routing, command dispatch, etc.)
 
-        This interface is typically implemented by the system gateway or platform entrypoint
+        This interface is typically implemented by the system shell or platform entrypoint
         to coordinate domain activation, switching, and global command handling.
         """
 
         self._controllers: dict[str, BaseController] = {}    
 
-        has_gateway, gateway_id = False, None
+        has_shell, shell_id = False, None
         for controller in controllers:        
             if controller.id in controllers:
                 raise ValueError(f"Duplicate controller names detected: {controller.id}")
-            if controller.is_gateway and has_gateway:
-                raise ValueError(f"Duplicate gateway controller: {gateway_id.id} / {controller.id}")
-            if controller.is_gateway:
-                has_gateway = True
-                gateway_id = controller.id
+            if controller.is_shell and has_shell:
+                raise ValueError(f"Duplicate shell controller: {shell_id.id} / {controller.id}")
+            if controller.is_shell:
+                has_shell = True
+                shell_id = controller.id
             self._controllers[controller.id] = controller
 
-        if not has_gateway:
-            raise ValueError(f"No gateway controller found")
+        if not has_shell:
+            raise ValueError(f"No shell controller found")
 
-    def find_gateway(self) -> BaseController:
+    def find_shell(self) -> BaseController:
         for controller in self._controllers.values():        
-            if controller.is_gateway:
+            if controller.is_shell:
                 return controller
 
     def get(self, controller_id: str) -> BaseController:
@@ -45,7 +45,7 @@ class ControllerDirectory:
         Resolves and returns a domain controller by its unique ID.
 
         Args:
-            id (str): The identifier of the domain controller (e.g. 'realm', 'gateway').
+            id (str): The identifier of the domain controller (e.g. 'shell', 'office').
 
         Returns:
             BaseController: The matching controller instance.
