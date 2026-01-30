@@ -1,3 +1,4 @@
+from yakoon.base.ports import SessionService
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import Session
@@ -11,19 +12,19 @@ class CmdLogin(Command):
     async def run(self, session: Session, request: Request):
 
         presenter = await self.get_presenter(session)
-        services = await self.get_services()
 
         if not request.args:
             return await presenter.emit("missing_arg")
 
         name = request.args[0]
         ns = await self.get_namespace(session)
-        account = await services.accounts.get_by_name(ns, name)
+        accounts = self.services.get(AccountService)
+        account = await accounts.get_by_name(ns, name)
         if not account:
             return await presenter.emit("not_found", name=name)
 
         session.set_ctx("gateway", "account_key", account.key, persist=True)
-        sys_services = await self.get_system_services()
-        await sys_services.sessions.save(session)
+        sessions = self.services.get(SessionService)
+        await sessions.save(session)
 
         await presenter.emit("login_success", account=account)
