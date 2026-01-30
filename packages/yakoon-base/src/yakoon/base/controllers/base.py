@@ -7,7 +7,7 @@ from yakoon.base.commands.commandset import CommandSet
 from yakoon.base.commands.request import Request
 from yakoon.base.ports import NamespaceService
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.runtime.views.template import TemplateSource
+from yakoon.base.descriptors.template import TemplateSource
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command

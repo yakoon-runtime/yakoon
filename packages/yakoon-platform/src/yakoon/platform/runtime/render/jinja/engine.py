@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Iterable, Optional
 
-from yakoon.base.runtime.views.template import TemplateSource
+from yakoon.base.descriptors.template import TemplateSource
 
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.context import RenderContext

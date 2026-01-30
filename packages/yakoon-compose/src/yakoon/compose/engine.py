@@ -1,5 +1,5 @@
 from yakoon.base import ports
-from yakoon.base.descriptors import TemplateSource
+from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.stores.base.registry import StoreRegistry
 
