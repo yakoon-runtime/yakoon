@@ -10,8 +10,8 @@ class RenderContext:
         lang (str): Language code (e.g. 'de', 'en').
     """
    
-    def __init__(self, key, lang):
+    def __init__(self, key, prefix, lang):
         self.key = key
         self.lang = lang
-        self.prefix = "prefix" 
+        self.prefix = prefix
 

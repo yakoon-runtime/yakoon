@@ -125,5 +125,6 @@ class Presenter(Protocol):
 
 
 class PresenterService(Protocol):
-    async def create_presenter(self, template_key: str, session: Session) -> Presenter: ...
+    async def create_presenter(
+            self, template_prefix: str, template_key: str, session: Session) -> Presenter: ...
 

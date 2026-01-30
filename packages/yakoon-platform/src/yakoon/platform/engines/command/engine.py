@@ -2,6 +2,7 @@ import asyncio
 from collections import deque
 from typing import Optional, Tuple
 
+from yakoon.base.ports import AuditLogService
 from yakoon.base.models.key import Key
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
@@ -9,7 +10,6 @@ from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 
-from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.settings import settings
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.platform.runtime.dialogs.manager import DialogManager
@@ -49,6 +49,7 @@ class Engine:
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
+      cmd_groups += ["office.mailing:system"] # TODO
       
       result: tuple[str, Command] = self._commands.find(request.cmd, cmd_groups)
       if result:

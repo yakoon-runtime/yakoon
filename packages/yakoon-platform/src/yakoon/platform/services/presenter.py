@@ -87,11 +87,12 @@ class Presenter:
     messages, failures, and notifications using predefined sections in the template.
     """
     
-    def __init__(self, template_key: str, session: Session, renderer: "RendererService") -> RenderContext:
+    def __init__(self, template_prefix: str, template_key: str, session: Session, renderer: "RendererService") -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
 
         Args:
+            template_prefix (str): the template prefix
             template_key (str): Relative template path (e.g. 'account/cmd_login').
             session: Session object with language information.
             renderer: Renderservice to render the template. 
@@ -102,7 +103,8 @@ class Presenter:
         self._prompts = None
         self._session = session
         self._renderer = renderer
-        self._ctx = RenderContext(key=template_key, lang=session.lang)
+        self._ctx = RenderContext(
+            key=template_key, prefix=template_prefix, lang=session.lang)
 
     @property
     def prompts(self) -> Prompts:
@@ -155,6 +157,6 @@ class PresenterService:
     def __init__(self, services: ServiceDirectory):
         self._services = services
 
-    async def create_presenter(self, template_key: str, session: Session) -> Presenter:
+    async def create_presenter(self, template_prefix:str, template_key: str, session: Session) -> Presenter:
         
-        return Presenter(template_key, session, self._services.get(RendererService))
+        return Presenter(template_prefix, template_key, session, self._services.get(RendererService))

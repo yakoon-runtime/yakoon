@@ -33,7 +33,7 @@ class BaseController(ABC):
     """Provides bucket-based access to services (e.g. room, account, session). 
     Injected at runtime by the platform."""
 
-    template_source: set[TemplateSource] = None
+    template_source: TemplateSource = None
 
     @property
     @abstractmethod

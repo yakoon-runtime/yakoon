@@ -37,6 +37,7 @@ class Command(ABC):
         presenter = self.services.get(PresenterService) 
         
         return await presenter.create_presenter(
+                self.controller.template_source.name,
                 self.get_template_path(), session)
                 
     async def run(self, session: Session, request: Request):

@@ -81,8 +81,6 @@ class JinjaEngine(BaseRenderEngine):
         Fallbacks to js.txt if preferred format not found.
         """
         
-        ctx.prefix = "yakoon.platform"
-
         mode = mode or settings.render.render_mode
         preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.{mode.value}"
         fallback = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.plain"

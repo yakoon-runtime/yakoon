@@ -25,7 +25,7 @@ class ControllerDirectory:
         for controller in controllers:        
             if controller.id in controllers:
                 raise ValueError(f"Duplicate controller names detected: {controller.id}")
-            if has_gateway:
+            if controller.is_gateway and has_gateway:
                 raise ValueError(f"Duplicate gateway controller: {gateway_id.id} / {controller.id}")
             if controller.is_gateway:
                 has_gateway = True
