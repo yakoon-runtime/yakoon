@@ -24,11 +24,16 @@ async def compose_engine(controllers: ControllerDirectory) -> Engine:
     templates = _compose_template_sources(controllers)
     services = _compose_services(stores, templates)
 
-    gateway = controllers.find_gateway()
-    gateway.connect_services(services)
+    _compose_controllers(controllers, services)
 
     engine = Engine(controllers, services, commands)    
     return engine
+
+
+def _compose_controllers(directory: ControllerDirectory, services: ServiceDirectory):
+
+    for controller in directory.get_all():
+        controller.connect_services(services.fork())
 
 
 def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
