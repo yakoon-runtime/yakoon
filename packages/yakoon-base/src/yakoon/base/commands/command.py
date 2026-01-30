@@ -40,13 +40,7 @@ class Command(ABC):
         return await presenter.create_presenter(
                 await self.get_template_path(), 
                 session, renderer=renderer)
-        
-    #async def get_presenter(self, session) -> "Presenter":
-    #    services = await self.get_services()
-    #    renderer = await services.get("renderer")
-    #
-    #    return Presenter(await self.get_template_path(), session, renderer=renderer)
-        
+                
     async def get_services(self) -> ServiceRegistry:
         return self.controller.services
 
