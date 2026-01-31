@@ -2,10 +2,61 @@
 from dataclasses import asdict
 from typing import Iterable, Sequence
 
-from yakoon.base.models.catalog import ControllerInfo
+from yakoon.base.models.catalog import CommandInfo, ControllerInfo
+
+
+class CommandCatalog:
+
+    def __init__(self, commands: Iterable[CommandInfo], shell_builtins: Sequence[str] = ()):
+        self._commmands = commands
+        self._shell_builtins = set(shell_builtins)
+
+    def all(self):
+        return self._commmands
+    
+    def builtins(self):
+        return self._shell_builtins
+
+
+class CommandCatalogService:
+
+    __slots__ = ("_by_controller", "_shell_builtins")
+
+    def __init__(self, catalog: CommandCatalog):
+        by_controller: dict[str, list[CommandInfo]] = {}
+        for c in catalog.all():
+            by_controller.setdefault(c.controller_id, []).append(c)
+
+        # stabile Ordnung
+        for _, items in by_controller.items():
+            items.sort(key=lambda x: x.key)
+
+        self._by_controller = by_controller
+        self._shell_builtins = set(catalog.builtins())
+
+    def for_controller(self, controller_id: str) -> Sequence[CommandInfo]:
+        return tuple(self._by_controller.get(controller_id, ()))
+
+    def keys_for_controller(self, controller_id: str) -> Sequence[str]:
+        return tuple(c.key for c in self.for_controller(controller_id))
+
+    def is_shell_builtin(self, key: str) -> bool:
+        return key in self._shell_builtins
+
+    def shell_builtins(self) -> Sequence[str]:
+        return tuple(sorted(self._shell_builtins))
 
 
 class ControllerCatalog:
+    
+    def __init__(self, controllers: Iterable[ControllerInfo]):
+        self._controllers = controllers
+
+    def all(self):
+        return self._controllers
+
+
+class ControllerCatalogService:
     """
     Read-only snapshot about controller metadata.
     No controller instance, no directory references.
@@ -13,9 +64,9 @@ class ControllerCatalog:
 
     __slots__ = ("_by_id",)
 
-    def __init__(self, controllers: Iterable[ControllerInfo]):
+    def __init__(self, catalog: ControllerCatalog):
         by_id: dict[str, ControllerInfo] = {}
-        for c in controllers:
+        for c in catalog.all():
             if c.id in by_id:
                 raise ValueError(f"Duplicate controller id in catalog: {c.id}")
             by_id[c.id] = c
@@ -56,16 +107,4 @@ class ControllerCatalog:
     def is_global_visible(self, controller_id: str) -> bool:
         c = self.get(controller_id)
         return bool(c and c.is_global_visible)
-
-
-class SystemCatalogService:
-    
-    _controllers: ControllerCatalog
-
-    def __init__(self, controllers: ControllerCatalog):
-       self._controllers = controllers
-
-    def get_controller_catalog(self) -> ControllerCatalog:
-       return self._controllers
         
-    

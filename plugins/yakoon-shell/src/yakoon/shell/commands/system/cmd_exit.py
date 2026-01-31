@@ -1,6 +1,6 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
-from yakoon.base.ports import SessionService, SystemCatalogService
+from yakoon.base.ports import ControllerCatalogService, SessionService
 from yakoon.base.runtime.session import Session
 
 
@@ -13,8 +13,7 @@ class CmdExit(Command):
 
     async def run(self, session: Session, request: Request):
 
-        catalogs = self.services.get(SystemCatalogService)
-        controllers = catalogs.get_controller_catalog()        
+        controllers = self.services.get(ControllerCatalogService)
         presenter = await self.get_presenter(session)
 
         shell = controllers.shell()[0]

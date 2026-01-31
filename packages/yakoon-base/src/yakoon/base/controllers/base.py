@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from yakoon.base.models.namespace import Namespace
     from yakoon.base.runtime.session import Session
     
+    
 class BaseController(ABC):
     """
     Abstract base for all controllers.
@@ -26,6 +27,8 @@ class BaseController(ABC):
     is_shell: bool = False
     is_global_visible: bool = False
     is_activatable: bool = True
+
+    shell_builtins = {}
 
     default_command_groups = []    
     """Names of command groups that are automatically active for every session, 

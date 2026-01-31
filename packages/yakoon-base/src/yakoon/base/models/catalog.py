@@ -1,7 +1,12 @@
 
-
-
 from dataclasses import dataclass
+
+@dataclass(frozen=True, slots=True)
+class CommandInfo:
+    key: str
+    category: str | None = None
+    controller_id: str | None = None
+    permission_groups: tuple[str, ...] = () # später RBAC
 
 
 @dataclass(frozen=True, slots=True)
