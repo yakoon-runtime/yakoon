@@ -58,7 +58,7 @@ class Engine:
          return self._directory.get(active_router_id), command
 
    
-   async def dispatch(self, session_key: Key, input_str: str, io: Output):   
+   async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:   
       """
       Entry point for any user input.
       Handles session lifecycle, context binding, output routing, and optional batch execution.
@@ -69,6 +69,7 @@ class Engine:
 
       inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
       await asyncio.create_task(self._run_processing(session, inputs))
+      return session
 
    async def _run_processing(self, session: Session, inputs: list[str]):
       """

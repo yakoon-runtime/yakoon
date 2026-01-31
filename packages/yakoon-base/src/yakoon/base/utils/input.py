@@ -1,7 +1,7 @@
 import asyncio
 
 
-async def safe_input(prompt: str = "$ ") -> str:
+async def safe_input(prompt: str = "$ ", prefix: str="") -> str:
     """
     Asynchronously reads user input from stdin without creating extra closures or tasks.
 
@@ -14,6 +14,6 @@ async def safe_input(prompt: str = "$ ") -> str:
     Returns:
         str: The entered user input.
     """
-    print(prompt, end="", flush=True)
+    print(prefix + prompt, end="", flush=True)
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, input)

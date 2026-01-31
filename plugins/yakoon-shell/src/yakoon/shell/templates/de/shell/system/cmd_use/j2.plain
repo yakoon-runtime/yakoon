@@ -7,7 +7,6 @@
   {% endfor %}
 
 {%- elif section.key == "activated" %}
-Aktiviert: Controller "{{section.data.controller.id}}"
 
 {%- elif section.key == "already_in_shell" %}
 Controller "{{section.data.controller.id}}" ist bereits aktiv.

@@ -27,7 +27,9 @@ command_inits = ["welcome"]
 
 async def run_console():
    
+   session = None
    output = Output(print, print)
+   session_key = Key.from_parts("yakoon", "bucket", "develop", "cli")
 
    engine = await compose_engine(
       controllers=ControllerDirectory(
@@ -35,11 +37,11 @@ async def run_console():
 
    await engine.initialize(output)
    
-   session = Key.from_parts("yakoon", "bucket", "develop", "cli")
    while True:                       
+      prefix = session.get_active_controller("") if session else ""   
       command = (command_inits.pop(0).strip() 
-         if command_inits else await safe_input())
-      await engine.dispatch(session, command, output)
+         if command_inits else await safe_input(prefix=prefix))
+      session = await engine.dispatch(session_key, command, output)
 
 if __name__ == "__main__":    
    asyncio.run(run_console())

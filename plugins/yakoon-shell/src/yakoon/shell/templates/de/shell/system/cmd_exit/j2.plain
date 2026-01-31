@@ -1,5 +1,4 @@
 {%- if section.key == "shell.exit_app" %}
-Default Controller: "{{section.data.controller.id}}"
 
 {%- elif section.key == "shell.already_in_shell" %}
 Controller "{{section.data.controller.id}}" ist bereits aktiv.
