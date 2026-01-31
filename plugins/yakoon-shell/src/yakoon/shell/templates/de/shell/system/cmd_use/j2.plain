@@ -9,9 +9,9 @@
 {%- elif section.key == "activated" %}
 
 {%- elif section.key == "already_in_shell" %}
-Controller "{{section.data.controller.id}}" ist bereits aktiv.
+Programm "{{section.data.controller.id}}" ist bereits aktiv.
 
 {%- elif section.key == "name_not_found" %}
-Der Kontroller "{{section.data.name}}" wurde nicht gefunden.
+Das Programm "{{section.data.name}}" wurde nicht gefunden.
 
 {%- endif %}

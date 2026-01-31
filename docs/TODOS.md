@@ -3,13 +3,7 @@
 # ✅ NEXT STEPS #
 ==================
 
-1) Prompt ändern:
 
-yakoon>
-
-office.mailing>
-
-exit zeigt vorher/nachher
 
 2) help wird jetzt trivial
 
@@ -21,6 +15,18 @@ Fokusmodus:
 
 nur Gateway + aktiver Controller
 
+
+
+shell$ help
+
+Programs:
+  office.mailing
+  crm.leads
+
+Shell commands:
+  help
+  use
+  exit
 
 
 ==================
