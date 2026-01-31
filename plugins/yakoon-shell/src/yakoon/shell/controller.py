@@ -109,6 +109,7 @@ class ShellController(BaseController):
         Used to cleanup session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `gateway` controller.
         """
-        if not session.ctx("gateway", "account_key", persist=True):
-            sessions = self.services.get(SessionService)
-            await sessions.delete_by_key(session.key)
+        pass
+        #if not session.ctx("gateway", "account_key", persist=True):
+        #    sessions = self.services.get(SessionService)
+        #    await sessions.delete_by_key(session.key)

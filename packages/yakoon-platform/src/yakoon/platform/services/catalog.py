@@ -1,4 +1,5 @@
 
+from dataclasses import asdict
 from typing import Iterable, Sequence
 
 from yakoon.base.models.catalog import ControllerInfo
@@ -23,7 +24,7 @@ class ControllerCatalog:
     def ids(self) -> Sequence[str]:
         return tuple(sorted(self._by_id.keys()))
 
-    def get_all(self) -> Sequence[ControllerInfo]:
+    def all(self) -> Sequence[ControllerInfo]:
         return tuple(self._by_id[cid] for cid in self.ids())
 
     def get(self, controller_id: str) -> ControllerInfo | None:

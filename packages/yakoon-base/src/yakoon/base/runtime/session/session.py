@@ -70,6 +70,11 @@ class Session(Entity):
         row = super().to_row()
         row["data"] = self._data_storage.to_row()
         return row
+    
+    def set_active_controller(self, controller_id:str):
+        self.set_ctx("state", "active_controller_id", controller_id, persist=True)
+    def get_active_controller(self):
+        return self.ctx("state", "active_controller_id", None, persist=True)
 
     @classmethod
     def from_row(cls, row: dict):

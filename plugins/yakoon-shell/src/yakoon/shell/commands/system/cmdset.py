@@ -1,8 +1,8 @@
 from typing import Sequence, Type
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
-from yakoon.shell.commands.shared.cmd_switch import CmdSwitch
-from yakoon.shell.commands.shared.cmd_help import CmdHelpSystem
+from yakoon.shell.commands.system.cmd_exit import CmdExit
+from yakoon.shell.commands.system.cmd_use import CmdUse
 from yakoon.shell.commands.system.cmd_version import CmdVersion
 from yakoon.shell.commands.system.cmd_welcome import CmdWelcome
 
@@ -14,6 +14,8 @@ class ShellSystemCommands(CommandSet):
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 
         return [
-            CmdVersion,
             CmdWelcome,
+            CmdVersion,
+            CmdUse,
+            CmdExit,
         ]

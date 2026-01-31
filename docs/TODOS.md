@@ -3,6 +3,30 @@
 # ✅ NEXT STEPS #
 ==================
 
+1) Prompt ändern:
+
+yakoon>
+
+office.mailing>
+
+exit zeigt vorher/nachher
+
+2) help wird jetzt trivial
+
+Systemmodus:
+
+gruppiert nach Domain/Controller
+
+Fokusmodus:
+
+nur Gateway + aktiver Controller
+
+
+
+==================
+# ✅ NEXT STEPS #
+==================
+
 
 Klar – hier ist dein strukturierter **TODO-Plan für morgen**, sortiert nach Relevanz und Abhängigkeit:
 

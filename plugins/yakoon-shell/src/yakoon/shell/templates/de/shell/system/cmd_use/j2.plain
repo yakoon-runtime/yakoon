@@ -1,0 +1,18 @@
+{%- if section.key == "show" %}
+  {% for c in section.data.controllers %}
+  - {{ c["id"] }}
+    {% if c["is_activatable"] %}
+      (activatable)
+    {% endif %}
+  {% endfor %}
+
+{%- elif section.key == "activated" %}
+Aktiviert: Controller "{{section.data.controller.id}}"
+
+{%- elif section.key == "already_in_shell" %}
+Controller "{{section.data.controller.id}}" ist bereits aktiv.
+
+{%- elif section.key == "name_not_found" %}
+Der Kontroller "{{section.data.name}}" wurde nicht gefunden.
+
+{%- endif %}

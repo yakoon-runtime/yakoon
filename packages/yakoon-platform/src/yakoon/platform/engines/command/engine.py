@@ -123,12 +123,10 @@ class Engine:
 
    async def _send_one(self, session: Session, input_str: str):   
 
+      active_router_id = session.get_active_controller()
       command, request = None, Request(input_str)
       if not request.cmd:
          return await session.fail("Kein Befehl erkannt.")
-
-      active_router_id = session.ctx("gateway", "domain_id", persist=True)
-      active_router_id = "office.mailing"
 
       try:
          if active_router_id:
