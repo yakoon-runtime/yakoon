@@ -1,10 +1,12 @@
 from yakoon.base import ports
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.models.catalog import ControllerInfo
 from yakoon.base.stores.base.registry import StoreRegistry
 
 from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
 from yakoon.platform.services.auditlog import AuditLogService
+from yakoon.platform.services.catalog import ControllerCatalog, SystemCatalogService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.render import RendererService
@@ -18,11 +20,13 @@ from yakoon.platform.stores.factory import create_system_stores
 
 
 async def compose_engine(controllers: ControllerDirectory) -> Engine:
-    
+
+    controller_catalog = _compose_controller_catalog(controllers)
+
     stores = await _compose_stores()
     commands = _compose_commands(controllers)
     templates = _compose_template_sources(controllers)
-    services = _compose_services(stores, templates)
+    services = _compose_services(stores, controller_catalog, templates)
 
     _compose_controllers(controllers, services)
 
@@ -34,6 +38,19 @@ def _compose_controllers(directory: ControllerDirectory, services: ServiceDirect
 
     for controller in directory.get_all():
         controller.connect_services(services.fork())
+
+
+def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCatalog:
+
+    controllers_catalog = []
+    for controller in directory.get_all():
+        controller_info = ControllerInfo(
+            controller.id, controller.is_shell, 
+            controller.is_activatable, controller.is_global_visible,
+            "Controller " + controller.id, domain="") 
+        controllers_catalog.append(controller_info)
+
+    return ControllerCatalog(controllers_catalog)
 
 
 def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
@@ -52,7 +69,10 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
     return commands
 
 
-def _compose_services(stores: StoreRegistry, template_sources: list[TemplateSource]) -> ServiceDirectory:
+def _compose_services(
+        stores: StoreRegistry, 
+        controller_catalog: ControllerCatalog, 
+        template_sources: list[TemplateSource]) -> ServiceDirectory:
     
     services = ServiceDirectory()
     
@@ -62,6 +82,8 @@ def _compose_services(stores: StoreRegistry, template_sources: list[TemplateSour
     services.register_static(ports.ShardedCounterService, ShardedCounterService(ShardAllocator(stores.counters)))
     services.register_static(ports.SessionService, SessionService(stores.sessions)) 
     services.register_static(ports.PresenterService, PresenterService(services))
+    services.register_static(ports.SystemCatalogService, SystemCatalogService(controller_catalog))
+
     return services   
 
 
