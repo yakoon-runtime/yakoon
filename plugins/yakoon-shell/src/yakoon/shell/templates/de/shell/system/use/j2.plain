@@ -1,10 +1,7 @@
 {%- if section.key == "show" %}
-  {% for c in section.data.controllers %}
-  - {{ c["id"] }}
-    {% if c["is_activatable"] %}
-      (activatable)
-    {% endif %}
-  {% endfor %}
+{%- for c in section.data.controllers %}
+  {{c.id}} 
+{%- endfor -%}
 
 {%- elif section.key == "activated" %}
 

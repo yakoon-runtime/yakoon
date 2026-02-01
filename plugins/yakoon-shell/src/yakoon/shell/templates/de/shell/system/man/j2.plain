@@ -5,8 +5,7 @@
 Commands:
 {%- for cmd in section.data.shell_commands %}
   {{ cmd.key }}
-{%- endfor %}
-
+{%- endfor -%}
 {{ "\n" }}
 Available programs:
 {% for c in section.data.controllers %}
@@ -23,7 +22,6 @@ Commands:
 
 {%- elif section.key == "no_manual_entry" -%}
 No manual entry for {{section.data.command_key}}
-
 
 {%- elif section.key == "man_page" -%}
 manual....
