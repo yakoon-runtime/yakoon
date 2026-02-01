@@ -4,6 +4,10 @@
 ---
 
 ## [2025-01-31]
+**Einführung eines Batchcommand**
+Über das Batchcommand können Commands intern commands ausführen. Somit können workflows umgesetzt werden. Der Grund für die Implementierung ist die Verwendung von Shortcuts wie 'su'. Dieses Command wird auf der shell laufen, aber dort intern zu einem anderem Plugin routen über 'use auth; su <user>; exit'. Somit können beliebige Commands aus der Shell aufgerufen werden, ohne dass die Shell überfrachtet wird oder globale gültige Commands (doppelte Keys) notwendig werden.
+
+## [2025-01-31]
 **Shell hält die Hilfe**
 Die Shell benötigt eine das Command 'man', welches das gesamte Hilfesystem darstellt. Auf Template-Ebene liegt die Hilfe immer in den Command-Templates in der Sektion 'man' des Command-Templates.
 
