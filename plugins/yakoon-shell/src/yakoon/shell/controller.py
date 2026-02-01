@@ -15,8 +15,8 @@ class ShellController(BaseController):
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
 
     is_shell: bool = True
-    is_global_visible: bool = True
-    is_activatable: bool = False
+    is_listed: bool = True
+    is_activatable: bool = True
 
     shell_builtins = {"help", "use", "exit"}
 

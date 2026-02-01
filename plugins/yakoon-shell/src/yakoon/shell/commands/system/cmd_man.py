@@ -29,6 +29,9 @@ class CmdMan(Command):
         if not active_controller_id:
             active_controller_id = controller_service.shell()[0].id
 
+        if not controller_service.is_listed(active_controller_id):
+            return
+
         command = None
         for c in command_service.for_controller(active_controller_id):
             if c.key == command_key:
@@ -75,7 +78,7 @@ class CmdMan(Command):
             # 2. program
             # (office.mailing, crm.leads, …)
             controllers = []
-            for c in controller_service.activatable():
+            for c in controller_service.listed():
                 if c != shell:
                     controllers.append(c)
 

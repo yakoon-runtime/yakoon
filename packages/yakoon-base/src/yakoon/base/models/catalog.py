@@ -17,5 +17,5 @@ class ControllerInfo:
     id: str
     is_shell: bool = False
     is_activatable: bool = False
-    is_global_visible: bool = True
+    is_listed: bool = True
     template_source: TemplateSource | None = None  

@@ -23,9 +23,7 @@ class CommandDirectory:
         if active_router_id is None: 
             # Shell mode
             
-            eligible_routers = [
-                r for r in self._routers
-                if r.is_shell or r.is_global_visible]
+            eligible_routers = [r for r in self._routers]
         else:                       
             # Fokusmodus
             
@@ -41,10 +39,10 @@ class CommandDirectory:
 
 class CommandRouter:
 
-    def __init__(self, is_shell, is_global_visible, is_activatable):
+    def __init__(self, is_shell, is_listed, is_activatable):
         
         self.is_shell = is_shell
-        self.is_global_visible = is_global_visible
+        self.is_listed = is_listed
         self.is_activatable = is_activatable
 
         self._groups: dict[str, dict[str, type[Command]]] = {}

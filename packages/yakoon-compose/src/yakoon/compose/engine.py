@@ -53,7 +53,7 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
     for controller in directory.get_all():
         controller_info = ControllerInfo(
             controller.id, controller.is_shell, 
-            controller.is_activatable, controller.is_global_visible,
+            controller.is_activatable, controller.is_listed,
             controller.template_source.clone()) 
         controllers_list.append(controller_info)
 
@@ -82,7 +82,7 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
     for controller in directory.get_all():
         router = CommandRouter(
             controller.is_shell, 
-            controller.is_global_visible, 
+            controller.is_listed, 
             controller.is_activatable)
         for commands_set in controller.commandsets:
             category = getattr(commands_set, "category", "system")

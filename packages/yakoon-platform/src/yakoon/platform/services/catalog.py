@@ -87,14 +87,11 @@ class ControllerCatalogService:
     def activatable(self) -> Sequence[ControllerInfo]:
         return tuple(c for c in self.all() if c.is_activatable)
 
-    def global_visible(self) -> Sequence[ControllerInfo]:
-        return tuple(c for c in self.all() if c.is_global_visible)
+    def listed(self) -> Sequence[ControllerInfo]:
+        return tuple(c for c in self.all() if c.is_listed)
 
     def shell(self) -> Sequence[ControllerInfo]:
         return tuple(c for c in self.all() if c.is_shell)
-
-    def global_visible(self) -> Sequence[ControllerInfo]:
-        return tuple(c for c in self.all() if c.is_global_visible)
 
     def is_shell(self, controller_id: str) -> bool:
         c = self.get(controller_id)
@@ -104,7 +101,7 @@ class ControllerCatalogService:
         c = self.get(controller_id)
         return bool(c and c.is_activatable)
 
-    def is_global_visible(self, controller_id: str) -> bool:
+    def is_listed(self, controller_id: str) -> bool:
         c = self.get(controller_id)
-        return bool(c and c.is_global_visible)
+        return bool(c and c.is_listed)
         
