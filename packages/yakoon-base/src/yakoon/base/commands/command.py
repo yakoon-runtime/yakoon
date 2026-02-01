@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+from pathlib import Path
 
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 from yakoon.base.commands.request import Request
@@ -17,8 +18,8 @@ class Command(ABC):
 
     key: str
     aliases: list[str] = []
-    template_key: str = ""
 
+    template_prefix: str = ""
     controller: BaseController = None
    
     @property
@@ -26,7 +27,8 @@ class Command(ABC):
         return self.controller.services
 
     def get_template_path(self) -> str:
-        return self.template_key
+        sub_template_path = self.controller.template_source.sub_template_path
+        return str(Path(sub_template_path).joinpath(self.template_prefix, self.key))
 
     async def get_namespace(self, session) -> Namespace:
         namespaces = self.services.get(NamespaceService)   
@@ -37,7 +39,7 @@ class Command(ABC):
         presenter = self.services.get(PresenterService) 
         
         return await presenter.create_presenter(
-                self.controller.template_source.name,
+                self.controller.template_source.package,
                 self.get_template_path(), session)
                 
     async def run(self, session: Session, request: Request):

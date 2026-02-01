@@ -7,7 +7,7 @@ from yakoon.base.runtime.session import Session
 class CmdExit(Command):
 
     key = "exit"    
-    template_key = "shell/system/cmd_exit"
+    template_prefix = "system"
 
     requires = ["system"]
 

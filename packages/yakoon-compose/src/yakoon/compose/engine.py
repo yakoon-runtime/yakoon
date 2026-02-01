@@ -51,7 +51,7 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
         controller_info = ControllerInfo(
             controller.id, controller.is_shell, 
             controller.is_activatable, controller.is_global_visible,
-            "Controller " + controller.id, domain="") 
+            controller.template_source.clone()) 
         controllers_list.append(controller_info)
 
     return ControllerCatalog(controllers_list)
@@ -67,7 +67,8 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
         for sets in controller.commandsets:
             for command in sets.commands():
                 command_info = CommandInfo(
-                    command.key, sets.category, controller.id) 
+                    command.key, sets.category, 
+                    controller.id, command.template_prefix) 
                 command_list.append(command_info)
 
     return CommandCatalog(command_list, shell_builtins) 

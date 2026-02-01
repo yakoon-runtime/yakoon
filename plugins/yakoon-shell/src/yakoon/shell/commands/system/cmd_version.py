@@ -11,7 +11,7 @@ from yakoon.base.runtime.session import Session
 class CmdVersion(Command):
 
     key = "version"
-    template_key = "shell/system/cmd_version"
+    template_prefix = "system"
 
     async def run(self, session: Session, request: Request):
 

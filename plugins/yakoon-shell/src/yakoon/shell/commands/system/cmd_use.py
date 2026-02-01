@@ -7,7 +7,7 @@ from yakoon.base.runtime.session import Session
 class CmdUse(Command):
 
     key = "use"    
-    template_key = "shell/system/cmd_use"
+    template_prefix = "system"
 
     requires = ["system"]
 

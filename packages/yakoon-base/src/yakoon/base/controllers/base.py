@@ -29,6 +29,8 @@ class BaseController(ABC):
     is_activatable: bool = True
 
     shell_builtins = {}
+    """Shell builtin commands are always available and independent 
+    of the active program context."""
 
     default_command_groups = []    
     """Names of command groups that are automatically active for every session, 
@@ -39,6 +41,8 @@ class BaseController(ABC):
     Injected at runtime by the platform."""
 
     template_source: TemplateSource = None
+    """TemplateSource for all views of this controller (command output and man pages).
+    View selection is done by template key conventions (cmd_*, man_*)."""
 
     @property
     @abstractmethod

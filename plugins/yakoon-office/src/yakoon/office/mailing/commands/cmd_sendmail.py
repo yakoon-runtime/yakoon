@@ -7,7 +7,6 @@ from yakoon.base.runtime.session import Session
 class CmdSendMail(Command):
 
     key = "sendmail"
-    template_key = "mailing/cmd_sendmail"
 
     async def run(self, session: Session, request: Request):
 

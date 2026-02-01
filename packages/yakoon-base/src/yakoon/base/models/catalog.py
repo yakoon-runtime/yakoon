@@ -1,11 +1,14 @@
 
 from dataclasses import dataclass
 
+from yakoon.base.descriptors.template import TemplateSource
+
 @dataclass(frozen=True, slots=True)
 class CommandInfo:
-    key: str
+    key: str    
     category: str | None = None
     controller_id: str | None = None
+    template_prefix: str | None = None
     permission_groups: tuple[str, ...] = () # später RBAC
 
 
@@ -15,5 +18,4 @@ class ControllerInfo:
     is_shell: bool = False
     is_activatable: bool = False
     is_global_visible: bool = True
-    title: str | None = None
-    domain: str | None = None  
+    template_source: TemplateSource | None = None  

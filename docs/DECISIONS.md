@@ -1,6 +1,46 @@
 ## Reicht ein Commit-Kommentar – oder gehört das in DECISIONS.md?
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
+---
+
+## [2025-01-31]
+**Shell hält die Hilfe**
+Die Shell benötigt eine das Command 'man', welches das gesamte Hilfesystem darstellt. Auf Template-Ebene liegt die Hilfe immer in den Command-Templates in der Sektion 'man' des Command-Templates.
+
+## [2025-01-31]
+**Shell-Mode & Program-Mode**
+Im Prompt des Hosts wird der aktuelle Mode angezeigt.
+
+## [2025-01-30]
+**Einführung einer Shell**
+Bei den Überlegungen zur Architektur der zukünftigen Platform, ist der Gedanke gereift, sich an Unix/Linux anzulehnen. Dabei stellt die Platform das System und die Commandline die Shell dar. Die Shell unterstützt das Starten und Beenden von Programmen (Controllern). Dies geschieht über 'use'. Verlassen der Anwedungen über 'exit'. Die Platform darf somit nur noch Infrastuktur und Dienste bereitstellen. Alles andere muss von Anwendungen (Programs) unterstützt werden. Um die Abstraktion zu verfollständigen, wurde die 'shell' in ein eigenes package verschoben. 'yakoon.shell'. Die Shell unterstützt somit das "Starten" von Programmen über 'use' und befindet sie sich dann im ProgramMode.
+
+
+## [2025-01-30]
+**ServiceDirectory und 'protocol'**
+Die ServiceDirectory wurde umgebaut, um mit 'type' statt 'str' als Schlüssel arbeiten zu können. Zudem werden nun typisierte Rückgaben geliefert. Konsumenten können nun 'protocol'-classes dazu nutzen Dienste an der ServiceDirectory zu registrieren und mittels 'protocol' abzurufen.
+
+## [2025-01-30]
+**Presenter ist nun Service**
+Der 'Presenter' wurde zu einem Service umgebaut um in 'platform' und nicht länger im 'base' zu liegen. 
+
+## [2025-01-28]
+**Template als Ressources nutzbar**
+Durch die Einführung der Klasse 'TemplateSource', welche an Controllern deklariert wird, finden Command-Templates nun ihre Ressourcen in ihrem eigenem Modul. Somit wurde die Schuld, Templates bereitzustellen auf das Module (plugin) verschoben.
+
+## [2025-01-28]
+**Wiederaufname der Entwicklung**
+Folgende Entscheidungen wurden getroffen: 
+1. Web wird vorerst nicht weiter unterstützt, um die Platformentwicklung zu beschleunigen. Fokus liegt auf dem Kern der Anwendung.
+2. Die Anwendung wird auf 4 eigenständige Module mit eigenem '.toml' aufgeteilt: 'base', 'platform', 'hosts' und 'compose'.
+3. Abhängigkeiten werden nicht weiter über die Engine sondern über das Module 'compose' aufgelöst
+4. Dienste werden genutzt, um Informationen innerhalb der Anwendung auszutauschen.
+5. Dienste werden in die Platform verschoben und 'base' erhält Zugriff über die 'ServiceDirectory'. Dort legen die Dienste in Form von 'protocol'-files vor.
+6. Das System wurde aufgeräumt und technische Schuld beglichen. 
+
+## [2025-01-28]
+**Wiederaufname der Entwicklung**
+Nach langer Pause wird die Entwicklung wieder aufgenommen.
 
 ## [2025-06-09]
 **Controller-basierte Modularisierung**

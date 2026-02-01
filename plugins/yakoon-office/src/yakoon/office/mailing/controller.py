@@ -10,16 +10,11 @@ class OfficeMailingController(BaseController):
     id = "office.mailing"
     
     template_source = TemplateSource(
-        name="yakoon.office",
         package="yakoon.office.mailing",
-        package_path="templates"
-    )
+        sub_template_path="mailing")
 
     commandsets = [
         MailingCommands]
         
     async def on_initialize(self, session: Session):
         session.cmd_groups_dynamic = ["office.mailing:system"]
-
-
-

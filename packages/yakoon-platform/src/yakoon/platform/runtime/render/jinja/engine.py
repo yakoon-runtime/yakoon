@@ -41,7 +41,7 @@ def build_env(
 
     # 2) Plugin-Loader: PrefixLoader mappt prefix -> PackageLoader
     plugin_prefix_map = {
-        src.name: PackageLoader(src.package, src.package_path)
+        src.package: PackageLoader(src.package, src.template_path)
         for src in plugin_sources if src
     }
     loaders.append(PrefixLoader(plugin_prefix_map, delimiter=":"))

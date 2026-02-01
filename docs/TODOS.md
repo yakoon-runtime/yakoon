@@ -5,15 +5,20 @@
 
 
 
-2) help wird jetzt trivial
+Login (Module - auth)
+- Ist Login Teil der Shell?
+- Müsste Login nicht vor der Shell aufgerufen werden?
+- Gibt es wirklich nur Login + Shell + Plugin?
+  - Oder müsste es nicht einen Controller-Stack geben, der abgearbeitet wird
+- Begrüssung konnte so aussehen
+ 
+       _                     _ _ _   
+                        | |__   __ _ _ __   __| (_) |_ 
+                        | '_ \ / _` | '_ \ / _` | | __|
+                        | |_) | (_| | | | | (_| | | |_ 
+                        |_.__/ \__,_|_| |_|\__,_|_|\__|
 
-Systemmodus:
 
-gruppiert nach Domain/Controller
-
-Fokusmodus:
-
-nur Gateway + aktiver Controller
 
 
 

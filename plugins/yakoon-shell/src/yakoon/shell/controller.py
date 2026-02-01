@@ -24,10 +24,9 @@ class ShellController(BaseController):
     """Names of command groups that are automatically active for every session, 
     without requiring explicit permissions."""
 
-    template_source: set[TemplateSource] = TemplateSource(
-        name="yakoon.shell",
+    template_source = TemplateSource(
         package="yakoon.shell",
-        package_path="templates")
+        sub_template_path="shell")
 
     shell_builtins = ("exit",) # TODO Ist das die Bezeichnung 
 
