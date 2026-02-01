@@ -56,7 +56,6 @@ class Engine:
       if result:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
-
    
    async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:   
       """
@@ -73,7 +72,13 @@ class Engine:
       await asyncio.create_task(self._run_processing(session, inputs))
       return session
 
-   async def _run_processing(self, session: Session, inputs: list[str]):
+   async def invoke_text(self, session: Session, input_str: str):
+      """Dispatch a single command line as if entered by the user.
+      """
+      inputs = split_batch_input(input_str)
+      return await self._run_processing(session, inputs)
+
+   async def _run_processing(self, session: Session, inputs: list[str]) -> bool:
       """
       Executes a batch of commands sequentially, including prompt handling.
 
@@ -89,13 +94,13 @@ class Engine:
       """
       queue = deque(inputs)
 
-      async def _run_internal_task(raw):
+      async def _run_internal_task(raw) -> bool:
          # Platform-level pre-processing hook before input parsing.
          # Used to validate or prepare the session (e.g., locale, account, command set).
          shell = self._directory.find_shell()
          try:
             await shell.on_shell_validate(session)
-            await self._send_one(session, raw)
+            return await self._send_one(session, raw)
          finally:
             # Final platform-level hook after command execution.
             # Used for post-processing, logging, or global session update
@@ -120,12 +125,19 @@ class Engine:
                if queue:
                   next_raw = queue.popleft()
                   DialogManager.resolve_prompt(session.key, next_raw)
-                  break  # prompt resolved, allow task to continue
+                  continue #break  # prompt resolved, allow task to continue
                else:                   
                   return # Prompt expected, but no further input in batch 
+               
+         try:
+            ok = task.result()
+            return ok
+         except Exception:
+            return False
 
-   async def _send_one(self, session: Session, input_str: str):   
+   async def _send_one(self, session: Session, input_str: str) -> bool:  
 
+      ok = True
       active_router_id = session.get_active_controller()
       command, request = None, Request(input_str)
       if not request.cmd:
@@ -157,17 +169,21 @@ class Engine:
          await controller.on_after_run_command(session, request, command)
 
       except CmdNotFound as exc:
+         ok = False
          await session.fail(f"Unbekannter Befehl: '{request.cmd}'")
 
       except PermissionError as exc:
+         ok = False
          audit = self._services.get(AuditLogService)
          await audit.permission(session, "command", command.key)
          await session.fail(str(exc))
 
       except ValueError as exc:
+         ok = False
          await session.fail(str(exc))
 
       except Exception as exc:
+         ok = False
          audit = self._services.get(AuditLogService)
          await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
@@ -182,3 +198,4 @@ class Engine:
             if controller:
                await controller.on_cleanup(session)
 
+      return ok

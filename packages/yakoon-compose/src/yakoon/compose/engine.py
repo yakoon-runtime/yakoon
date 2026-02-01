@@ -7,6 +7,7 @@ from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
 from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
+from yakoon.platform.services.invoker import CommandInvokerService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.render import RendererService
@@ -34,7 +35,9 @@ async def compose_engine(controllers: ControllerDirectory) -> Engine:
 
     _compose_controllers(controllers, services)
 
-    engine = Engine(controllers, services, commands)    
+    engine = Engine(controllers, services, commands)  
+    services.get(ports.CommandInvokerService).attach(engine)
+
     return engine
 
 
@@ -101,6 +104,7 @@ def _compose_services(
     services.register_static(ports.NamespaceService, NamespaceService())
     services.register_static(ports.SessionService, SessionService(stores.sessions)) 
     services.register_static(ports.PresenterService, PresenterService(services))
+    services.register_static(ports.CommandInvokerService, CommandInvokerService())
 
     services.register_static(
         ports.RendererService, 

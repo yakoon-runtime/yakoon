@@ -75,7 +75,7 @@ class ShellController(BaseController):
         Only invoked if this controller is the registered `system` controller.
         """
         session.cmd_groups = ["shell:system", ]
-        print("todo: on_shell_validate")
+        #print("todo: on_shell_validate")
         return
 
         # builds the commandset for this session

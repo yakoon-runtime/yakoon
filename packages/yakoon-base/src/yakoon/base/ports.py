@@ -5,6 +5,16 @@ from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
 
+class CommandInvokerService(Protocol):
+    """
+    Executes commands through the normal engine pipeline.
+    Used by meta-commands (e.g. batch, aliases) to invoke other commands
+    without bypassing routing, permissions, auditing, or rendering.
+    """
+
+    async def invoke_text(self, session, text: str) -> bool:
+        """Dispatch a single command line as if entered by the user."""
+
 
 class CommandCatalogService(Protocol):
     def for_controller(self, controller_id: str) -> Sequence[CommandInfo]: ...
