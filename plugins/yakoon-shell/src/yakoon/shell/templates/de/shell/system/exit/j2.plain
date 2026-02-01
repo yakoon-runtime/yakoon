@@ -1,6 +1,3 @@
 {%- if section.key == "shell.exit_app" %}
 
-{%- elif section.key == "shell.already_in_shell" %}
-Programm "{{section.data.controller.id}}" ist bereits aktiv.
-
 {%- endif %}

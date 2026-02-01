@@ -41,7 +41,7 @@ class Engine:
       for controller in self._directory.get_all():
          if hasattr(controller, "on_initialize"):
             await controller.on_initialize(session)
-    
+
    async def _find_matching_command(
          self, active_router_id, request: Request, 
          session: Session) -> Optional[Tuple[BaseController, Command]]:
@@ -64,8 +64,10 @@ class Engine:
       Handles session lifecycle, context binding, output routing, and optional batch execution.
       """
       shell = self._directory.find_shell()
-      session = await shell.on_resolve_session(session_key)
+      session: Session = await shell.on_resolve_session(session_key)
       session.bind_io(io)
+      if not session.get_active_controller():
+         session.set_active_controller(shell.id)
 
       inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
       await asyncio.create_task(self._run_processing(session, inputs))

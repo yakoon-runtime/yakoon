@@ -18,9 +18,7 @@ class CmdExit(Command):
 
         shell = controllers.shell()[0]
         active_controller_id = session.get_active_controller()
-        if shell.id == active_controller_id:
-            await presenter.emit("shell.already_in_shell", controller=shell)
-        else:
+        if shell.id != active_controller_id:
             session.set_active_controller(shell.id)
             await self.services.get(SessionService).save(session)
             await presenter.emit("shell.exit_app", controller=shell)
