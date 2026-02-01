@@ -3,6 +3,7 @@ from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.shell.commands.system.cmd_exit import CmdExit
 from yakoon.shell.commands.system.cmd_man import CmdMan
+from yakoon.shell.commands.system.cmd_su import CmdSu
 from yakoon.shell.commands.system.cmd_use import CmdUse
 from yakoon.shell.commands.system.cmd_version import CmdVersion
 from yakoon.shell.commands.system.cmd_welcome import CmdWelcome
@@ -20,4 +21,5 @@ class ShellSystemCommands(CommandSet):
             CmdUse,
             CmdExit,
             CmdMan,
+            CmdSu,
         ]

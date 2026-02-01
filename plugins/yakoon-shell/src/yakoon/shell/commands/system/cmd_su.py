@@ -1,0 +1,16 @@
+from yakoon.base.commands.command import BatchCommand
+from yakoon.base.commands.request import Request
+from yakoon.base.runtime.session import Session
+
+
+class CmdSu(BatchCommand):
+
+    key = "su"    
+    template_prefix = "system"
+
+    batch_commmands = "version; cmd2; cmd3" 
+
+    requires = ["system"]
+
+    async def run(self, session: Session, request: Request):
+        await super().run(session, Request(self.batch_commmands))
