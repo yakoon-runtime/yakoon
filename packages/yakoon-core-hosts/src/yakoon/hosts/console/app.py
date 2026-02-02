@@ -3,6 +3,7 @@ import asyncio
 
 from yakoon.auth.controller import AuthCoreController
 from yakoon.base.models.key import Key
+from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
@@ -22,43 +23,44 @@ from yakoon.office.mailing.controller import OfficeMailingCoreController
 settings.render.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
-#command_inits += ["batch: login stefan; switch; realm; ic stefan; version; switch;"]
+#command_inits += ["use auth", "su", "exit"]
 #command_inits += ["batch: login Stefan; switch realm; ic Stefan"]
 #command_inits += ["batch: login Stefan; switch mesh"]
 #command_inits += ["ping"]
 
 async def run_console():
    
-   session = None
-   output = Output(print, print)
-   session_key = Key.from_parts("yakoon", "bucket", "develop", "cli")
+    session = None
+    output = Output(print, print)
+    session_key = Key.from_parts("yakoon", "bucket", "develop", "cli")
 
-   engine = await compose_engine(
-      controllers=ControllerDirectory(
-         controllers=[
-            ShellCoreController(), 
-            AuthCoreController(),
-            OfficeMailingCoreController()]))
+    engine = await compose_engine(
+        controllers=ControllerDirectory(
+            controllers=[
+                ShellCoreController(), 
+                AuthCoreController(),
+                OfficeMailingCoreController()]))
 
-   await engine.initialize(output)
-   
-   while True:
-    prefix = session.get_active_controller("") if session else ""
+    await engine.initialize(output)
+    
+    while True:
 
-    if command_inits:
-        command = command_inits.pop(0).strip()
-    else:
+        prompt = format_prompt(session)
+
         if session and DialogManager.is_waiting(session):
             mode = DialogManager.get_mode(session)
             if mode == "secret":
-                command = await safe_input_secret(prefix=prefix)
+                command = await safe_input_secret(prompt=prompt)
             else:
-                command = await safe_input(prefix=prefix)
+                command = await safe_input(prompt=prompt)
+
+        elif command_inits:
+            command = command_inits.pop(0).strip()
+
         else:
-            command = await safe_input(prefix=prefix)
+            command = await safe_input(prompt=prompt)
 
-    session = await engine.dispatch(session_key, command, output)
-
+        session = await engine.dispatch(session_key, command, output)
 
 if __name__ == "__main__":    
    asyncio.run(run_console())
