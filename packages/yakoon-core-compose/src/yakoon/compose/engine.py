@@ -5,7 +5,9 @@ from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.stores.base.registry import StoreRegistry
 
 from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
+from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
+from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerifier
 from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
 from yakoon.platform.services.invoker import CommandInvokerService
 from yakoon.platform.services.namespace import NamespaceService
@@ -18,6 +20,7 @@ from yakoon.platform.engines.command.router import CommandDirectory, CommandRout
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.engines.command.engine import Engine
 from yakoon.platform.stores.factory import create_system_stores
+from yakoon.platform.stores.memory.account import InMemoryAccountStore
 
 
 async def compose_engine(controllers: ControllerDirectory) -> Engine:
@@ -107,6 +110,9 @@ def _compose_services(
     services.register_static(ports.SessionService, SessionService(stores.sessions)) 
     services.register_static(ports.PresenterService, PresenterService(services))
     services.register_static(ports.CommandInvokerService, CommandInvokerService())
+    services.register_static(ports.AccountService, AccountService(InMemoryAccountStore()))
+    services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
+    services.register_static(ports.AuthenticationService, AuthenticationService(services))
 
     services.register_static(
         ports.RendererService, 
