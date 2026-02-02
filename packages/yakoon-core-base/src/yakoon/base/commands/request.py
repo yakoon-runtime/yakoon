@@ -21,6 +21,10 @@ class Request:
         except IndexError:
             return default
         
+    def get_rest(self) -> str:
+        parts = self.raw.split(maxsplit=1)
+        return parts[1] if len(parts) == 2 else ""        
+        
     def has_args(self) -> bool:
         return bool(self.args)
 
