@@ -42,7 +42,7 @@ async def run_console():
 
     await engine.initialize(output)
 
-    queue = engine._services.get(ports.CommandQueueService)
+    queue = engine._services.get(ports.SessionCommandQueueService)
     
     while True:
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC
 from pathlib import Path
 
-from yakoon.base.ports import CommandInvokerService, CommandQueueService, NamespaceService, Presenter, PresenterService, SessionService
+from yakoon.base.ports import CommandInvokerService, SessionCommandQueueService, NamespaceService, Presenter, PresenterService, SessionService
 from yakoon.base.commands.request import Request
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
@@ -54,5 +54,5 @@ class BatchCommand(Command):
 
         parts = [p.strip() for p in raw.split(";") if p.strip()]
 
-        queue = self.services.get(CommandQueueService)
+        queue = self.services.get(SessionCommandQueueService)
         queue.push_front_many(session, parts)

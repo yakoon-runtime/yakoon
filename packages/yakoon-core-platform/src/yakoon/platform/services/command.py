@@ -2,8 +2,8 @@ from collections import deque
 from typing import Deque
 
 
-class CommandQueueService:
-    
+class SessionCommandQueueService:
+
     def __init__(self):
         self._q: dict[str, Deque[str]] = {}
 
