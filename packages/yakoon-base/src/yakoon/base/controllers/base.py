@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 class BaseController(ABC):
     """
     Abstract base for all controllers.
-    Provides router and default session/command group config.
     """
     
     id: str = "unnamed"

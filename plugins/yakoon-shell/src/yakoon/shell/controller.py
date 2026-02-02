@@ -18,7 +18,7 @@ class ShellController(BaseController):
     is_listed: bool = True
     is_activatable: bool = True
 
-    shell_builtins = {"help", "use", "exit"}
+    shell_builtins = {"exit", "man"}
 
     default_command_groups = ["system", "account"]     
     """Names of command groups that are automatically active for every session, 
@@ -27,8 +27,6 @@ class ShellController(BaseController):
     template_source = TemplateSource(
         package="yakoon.shell",
         sub_template_path="shell")
-
-    shell_builtins = ("exit",) # TODO Ist das die Bezeichnung 
 
     commandsets = [
         ShellSystemCommands]

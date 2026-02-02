@@ -81,9 +81,11 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
     commands = CommandDirectory()
     for controller in directory.get_all():
         router = CommandRouter(
+            controller.id,
             controller.is_shell, 
             controller.is_listed, 
-            controller.is_activatable)
+            controller.is_activatable, 
+            controller.shell_builtins)
         for commands_set in controller.commandsets:
             category = getattr(commands_set, "category", "system")
             router.register(f"{controller.id}:{category}", commands_set)

@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
     from yakoon.base.commands.commandset import CommandSet
+    from yakoon.base.controllers.base import BaseController
 
 
 class CommandDirectory:
-
+    
     def __init__(self):
+
         self._routers: list[CommandRouter] = []        
 
     def register(self, router_name, router: CommandRouter):
@@ -18,20 +21,22 @@ class CommandDirectory:
 
     def find(self, active_router_id: str, cmd_name: str, cmd_groups: list[str] | None = None) -> tuple[str, Command] | None:
         
-        eligible_routers = None
+        eligible_routers = []
+        shell = [r for r in self._routers if r.is_shell and r.is_activatable][0]
 
-        if active_router_id is None: 
-            # Shell mode
-            
-            eligible_routers = [r for r in self._routers]
+        if shell.id == active_router_id:
+            # only shell router is active
+            eligible_routers = [shell]
         else:                       
-            # Fokusmodus
-            
+            # router from active controller and shell builtins 
             eligible_routers = [
-                r for r in self._routers 
-                if r.is_shell or (r.is_activatable and r.id == active_router_id)]
+                r for r in self._routers \
+                    if r.id == active_router_id and r.is_activatable or r.is_shell]
 
         for router in eligible_routers:
+            if active_router_id != shell.id and router.id == shell.id:
+                if cmd_name not in shell.builtins:
+                    continue
             command = router.instantiate(cmd_name, cmd_groups)
             if command:
                 return router.id, command
@@ -39,11 +44,14 @@ class CommandDirectory:
 
 class CommandRouter:
 
-    def __init__(self, is_shell, is_listed, is_activatable):
-        
+    id: str = None
+
+    def __init__(self, id, is_shell, is_listed, is_activatable, builtins=[]):       
+        self.id = id
         self.is_shell = is_shell
         self.is_listed = is_listed
         self.is_activatable = is_activatable
+        self.builtins = builtins
 
         self._groups: dict[str, dict[str, type[Command]]] = {}
         self._aliases: dict[str, str] = {}

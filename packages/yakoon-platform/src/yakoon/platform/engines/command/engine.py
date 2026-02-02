@@ -50,7 +50,7 @@ class Engine:
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
       cmd_groups += ["office.mailing:system"] # TODO
-      
+           
       find = self._commands.find
       result: tuple[str, Command] = find(active_router_id, request.cmd, cmd_groups)
       if result:
