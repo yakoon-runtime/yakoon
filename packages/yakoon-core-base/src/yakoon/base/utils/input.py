@@ -1,5 +1,5 @@
 import asyncio
-
+import getpass
 
 async def safe_input(prompt: str = "$ ", prefix: str="") -> str:
     """
@@ -17,3 +17,14 @@ async def safe_input(prompt: str = "$ ", prefix: str="") -> str:
     print(prefix + prompt, end="", flush=True)
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, input)
+
+
+async def safe_input_secret(prompt: str = "$ ", prefix: str = "") -> str:
+    """
+    Reads a secret from stdin without echoing (terminal-dependent).
+    Uses getpass in a thread executor to avoid blocking the event loop.
+    """
+    print(prefix + prompt, end="", flush=True)
+    loop = asyncio.get_running_loop()
+    # getpass reads from the terminal and disables echo.
+    return await loop.run_in_executor(None, getpass.getpass, "")
