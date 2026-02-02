@@ -73,20 +73,18 @@ class Engine:
       return await self.resolve_task(session, input_str)
 
    async def resolve_task(self, session: Session, input_str: str) -> Session:
-
       skey = str(session.key)
 
       # 1) Prompt response path
       if DialogManager.is_waiting(session):
          DialogManager.resolve_prompt(session, input_str)
 
-         task = self._active_tasks.get(skey)
-         if task:
-               await self._drive_until_blocked_or_done(session)
-               if task.done():
-                  self._active_tasks.pop(skey, None)
-
+         # Drive the existing active task until it either finishes or asks again
          await self._drive_until_blocked_or_done(session)
+
+         # One consistent end-of-dispatch yield (same as normal path)
+         await asyncio.sleep(0)
+         #print("DISPATCH END")
          return session
 
       # 2) Normal command path
@@ -94,15 +92,10 @@ class Engine:
       self._active_tasks[skey] = task
 
       await self._drive_until_blocked_or_done(session)
-      if task.done():
-         self._active_tasks.pop(skey, None)
 
+      await asyncio.sleep(0)
+      #print("DISPATCH END")
       return session
-
-   #async def _drive_until_blocked_or_done(self, session: Session, task: asyncio.Task):
-   #   # let the task run until it either completes or asks for a prompt
-   #   while not task.done() and not DialogManager.is_waiting(session):
-   #     await asyncio.sleep(0)  # cooperative yield
 
    async def _drive_until_blocked_or_done(self, session: Session):
       task = self._active_tasks.get(str(session.key))
@@ -114,6 +107,9 @@ class Engine:
       # - er erneut promptet
       while not task.done() and not DialogManager.is_waiting(session):
          await asyncio.sleep(0)
+
+      if task.done():
+        self._active_tasks.pop(str(session.key), None)
 
    async def _run_one(self, session: Session, raw: str) -> bool:
       shell = self._directory.find_shell()

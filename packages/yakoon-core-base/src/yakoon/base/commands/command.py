@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC
 from pathlib import Path
 
-from yakoon.base.ports import CommandInvokerService, NamespaceService, Presenter, PresenterService, SessionService
+from yakoon.base.ports import CommandInvokerService, CommandQueueService, NamespaceService, Presenter, PresenterService, SessionService
 from yakoon.base.commands.request import Request
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
@@ -51,14 +51,8 @@ class BatchCommand(Command):
 
      async def run(self, session: Session, request: Request):
         raw = request.raw
-        invoker = self.services.get(CommandInvokerService)
 
         parts = [p.strip() for p in raw.split(";") if p.strip()]
 
-        for cmd in parts:
-            ok = await invoker.invoke_text(session, cmd)
-            if DialogManager.is_waiting(session):
-                return
-
-            if ok is False:
-                return
+        queue = self.services.get(CommandQueueService)
+        queue.push_front_many(session, parts)

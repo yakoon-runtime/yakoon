@@ -21,6 +21,9 @@ class ServiceDirectory:
             key (object): The service key.
             service (object): The ready-to-use service.
         """
+        if isinstance(service, type):
+            raise TypeError("Expected instance, got class. Did you forget ()?")
+
         if not self._allow_override and self._parent and self._parent.contains(key):
             raise ValueError(f"Service override not allowed: {key}")
         

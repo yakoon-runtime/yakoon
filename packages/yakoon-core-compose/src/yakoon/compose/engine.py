@@ -9,6 +9,7 @@ from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerifier
 from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
+from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.invoker import CommandInvokerService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.presenter import PresenterService
@@ -113,6 +114,7 @@ def _compose_services(
     services.register_static(ports.AccountService, AccountService(InMemoryAccountStore()))
     services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
     services.register_static(ports.AuthenticationService, AuthenticationService(services))
+    services.register_static(ports.CommandQueueService, CommandQueueService())
 
     services.register_static(
         ports.RendererService, 

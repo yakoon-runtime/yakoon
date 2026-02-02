@@ -3,6 +3,7 @@ import asyncio
 
 from yakoon.auth.controller import AuthCoreController
 from yakoon.base.models.key import Key
+from yakoon.base import ports 
 from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
@@ -24,9 +25,7 @@ settings.render.render_mode = RenderMode.PLAIN
 
 command_inits = ["welcome"]
 #command_inits += ["use auth", "su", "exit"]
-#command_inits += ["batch: login Stefan; switch realm; ic Stefan"]
-#command_inits += ["batch: login Stefan; switch mesh"]
-#command_inits += ["ping"]
+
 
 async def run_console():
    
@@ -42,6 +41,8 @@ async def run_console():
                 OfficeMailingCoreController()]))
 
     await engine.initialize(output)
+
+    queue = engine._services.get(ports.CommandQueueService)
     
     while True:
 
@@ -50,7 +51,7 @@ async def run_console():
         if session and DialogManager.is_waiting(session):
             mode = DialogManager.get_mode(session)
             if mode == "secret":
-                command = await safe_input_secret(prompt=prompt)
+                command = await safe_input_secret(prompt=prompt) # safe_input_secret(prompt=prompt)
             else:
                 command = await safe_input(prompt=prompt)
 
@@ -58,7 +59,10 @@ async def run_console():
             command = command_inits.pop(0).strip()
 
         else:
-            command = await safe_input(prompt=prompt)
+            command = queue.pop_next(session) if session and queue.has_next(session) else None
+            if command == None:
+                command = await safe_input(prompt=prompt)
+
 
         session = await engine.dispatch(session_key, command, output)
 

@@ -6,11 +6,18 @@ from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
 
+
+class CommandQueueService(Protocol):
+    def push_front_many(self, session, cmds: list[str]) -> None: ...
+    def pop_next(self, session) -> str | None: ...
+    def has_next(self, session) -> bool: ...
+
+
 class SecretVerifier(Protocol):
     def verify(self, account: Account, secret: str) -> bool: ...
 
 
-class AuthenticationService:
+class AuthenticationService(Protocol):
     async def authenticate(self, namespace: Namespace, username: str, secret: str) -> AuthResult: ...
 
     
