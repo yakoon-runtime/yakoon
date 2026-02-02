@@ -1,2 +1,2 @@
 cd ..
-pip install -e packages/yakoon-base -e packages/yakoon-platform -e packages/yakoon-compose -e packages/yakoon-hosts 
+pip install -e packages/yakoon-core-base -e packages/yakoon-core-platform -e packages/yakoon-core-compose -e packages/yakoon-core-hosts 

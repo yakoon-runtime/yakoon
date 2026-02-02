@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "yakoon-shell"
 version = "0.1.0"
-dependencies = ["yakoon-base"]
+dependencies = ["yakoon-core-base"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

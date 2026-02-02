@@ -4,10 +4,10 @@
   "python.analysis.autoSearchPaths": true,
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.extraPaths": [
-    "packages/yakoon-base/src",
-    "packages/yakoon-platform/src",
-    "packages/yakoon-compose/src",
-    "packages/yakoon-hosts/src",
+    "packages/yakoon-core-base/src",
+    "packages/yakoon-core-platform/src",
+    "packages/yakoon-core-compose/src",
+    "packages/yakoon-core-hosts/src",
     "plugins/yakoon-shell/src",
     "plugins/yakoon-office/src"
   ]
