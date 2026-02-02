@@ -5,13 +5,13 @@ from yakoon.base.runtime.session.session import Session
 from yakoon.office.mailing.commands.cmdset import MailingCommands
 
 
-class OfficeMailingController(BaseController):
+class OfficeMailingCoreController(BaseController):
 
     id = "office.mailing"
     
     template_source = TemplateSource(
         package="yakoon.office.mailing",
-        sub_template_path="mailing")
+        sub_template_path="core")
 
     commandsets = [
         MailingCommands]

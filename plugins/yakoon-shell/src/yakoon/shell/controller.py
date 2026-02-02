@@ -9,7 +9,7 @@ from yakoon.base.runtime.session import Session
 from yakoon.shell.commands.system.cmdset import ShellSystemCommands
 
 
-class ShellController(BaseController):
+class ShellCoreController(BaseController):
 
     id: str = "shell"
     """Unique identifier used for command prefix resolution (e.g. realm:look, system:help)."""
@@ -26,7 +26,7 @@ class ShellController(BaseController):
 
     template_source = TemplateSource(
         package="yakoon.shell",
-        sub_template_path="shell")
+        sub_template_path="core")
 
     commandsets = [
         ShellSystemCommands]
