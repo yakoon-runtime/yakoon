@@ -18,8 +18,19 @@ async def ask(session: Session, prompt_text: str) -> str:
     """
     await session.emit(prompt_text)
     return await DialogManager.set_prompt(
-        session, timeout=settings.network.prompt_timed_out)
+        session, 
+        timeout=settings.network.prompt_timed_out)
 
+
+async def ask_secret(session: Session, prompt_text: str) -> str:
+    
+    await session.emit(prompt_text)
+    
+    return await DialogManager.set_prompt(
+        session,
+        timeout=settings.network.prompt_timed_out,
+        mode="secret"
+    )
 
 async def confirm(session: Session, prompt_text: str) -> bool:
     """

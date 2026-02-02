@@ -1,9 +1,26 @@
-from typing import Protocol, Sequence
+from typing import Optional, Protocol, Sequence
 
+from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.models.key import Key
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
+
+class SecretVerifier(Protocol):
+    def verify(self, account: Account, secret: str) -> bool: ...
+
+
+class AuthenticationService:
+    async def authenticate(self, namespace: Namespace, username: str, secret: str) -> AuthResult: ...
+
+    
+class AccountService(Protocol):
+
+    async def get_by_key(self, key: Key) -> Optional[Account]: ...
+    async def get_by_name(self, namespace: Namespace, name: str) -> Optional[Account]: ...    
+    async def save(self, account: Account): ...
+    async def delete_by_key(self, key: Key): ...
+ 
 
 class CommandInvokerService(Protocol):
     """
@@ -68,6 +85,18 @@ class AuditLogService(Protocol):
 class Prompts(Protocol):
 
     async def ask(self, section: str, **data) -> str: ...
+    """     
+    Asks the user for free-text input based on a rendered template section.
+
+    Args:
+        section (str): The section key within the template.
+        **data: Optional data passed to the template.
+
+    Returns:
+        str: The user's input as a string.
+    """
+
+    async def ask_secret(session: Session, prompt_text: str) -> str: ...
     """     
     Asks the user for free-text input based on a rendered template section.
 
