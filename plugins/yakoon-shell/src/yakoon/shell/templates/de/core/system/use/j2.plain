@@ -3,8 +3,6 @@
   {{c.id}} 
 {%- endfor -%}
 
-{%- elif section.key == "activated" %}
-
 {%- elif section.key == "already_in_shell" %}
 Programm "{{section.data.controller.id}}" ist bereits aktiv.
 
