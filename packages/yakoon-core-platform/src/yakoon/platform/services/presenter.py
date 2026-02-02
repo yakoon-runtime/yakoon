@@ -4,7 +4,7 @@ from yakoon.base.runtime.session import Session
 
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.platform.runtime.render.context import RenderContext
-from yakoon.platform.runtime.dialogs.prompts import ask, choice, choice_index, confirm
+from yakoon.platform.runtime.dialogs.prompts import ask, ask_secret, choice, choice_index, confirm
 
 
 class Prompts:
@@ -33,6 +33,20 @@ class Prompts:
         """
         question = await self._renderer.render(self._ctx, section, **data)
         return await ask(self._session, question)
+    
+    async def ask_secret(self, section: str, **data) -> str:
+        """     
+        Asks the user for secret input based on a rendered template section.
+
+        Args:
+            section (str): The section key within the template.
+            **data: Optional data passed to the template.
+
+        Returns:
+            str: The user's input as a string.
+        """
+        question = await self._renderer.render(self._ctx, section, **data)
+        return await ask_secret(self._session, question)
 
     async def confirm(self, section: str, **data) -> bool:
         """
