@@ -3,11 +3,17 @@
 > Dokumentiert wird: Was? Und Warum?
 ---
 
-## [2025-01-31]
+
+
+## [2025-02-02]
+**Rename core Packages**
+Alle Core-Module tragen im Modulename nun '-core-', um sich von den anderen Modules abzugrenzen. Core ist einzigartig, weil es:, nicht optional ist, keine UX hat, kein Plugin ist, und die Runtime überhaupt erst möglich macht. Das ist eine ontologische Sonderstellung. Alles andere – auch Shell, Auth, Office, CRM – sind Programme, also prinzipiell gleichartig. Somit gilt: _Nur Core bekommt ein technisches Präfix._
+
+## [2025-02-01]
 **Einführung eines Batchcommand**
 Über das Batchcommand können Commands intern commands ausführen. Somit können workflows umgesetzt werden. Der Grund für die Implementierung ist die Verwendung von Shortcuts wie 'su'. Dieses Command wird auf der shell laufen, aber dort intern zu einem anderem Plugin routen über 'use auth; su <user>; exit'. Somit können beliebige Commands aus der Shell aufgerufen werden, ohne dass die Shell überfrachtet wird oder globale gültige Commands (doppelte Keys) notwendig werden.
 
-## [2025-01-31]
+## [2025-02-01]
 **Shell hält die Hilfe**
 Die Shell benötigt eine das Command 'man', welches das gesamte Hilfesystem darstellt. Auf Template-Ebene liegt die Hilfe immer in den Command-Templates in der Sektion 'man' des Command-Templates.
 
