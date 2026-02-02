@@ -8,9 +8,11 @@ class CmdSu(BatchCommand):
     key = "su"    
     template_prefix = "system"
 
-    batch_commmands = "version; cmd2; cmd3" 
+    batch_commmands = "use auth; {raw}; exit;"
 
     requires = ["system"]
 
     async def run(self, session: Session, request: Request):
-        await super().run(session, Request(self.batch_commmands))
+       
+        command = self.batch_commmands.format(raw=request.raw)
+        await super().run(session, Request(command))

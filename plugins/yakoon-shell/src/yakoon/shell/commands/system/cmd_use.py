@@ -33,7 +33,6 @@ class CmdUse(Command):
             else:   
                 session.set_active_controller(name)
                 await self.services.get(SessionService).save(session)
-                await presenter.emit("activated", controller=infos[0])        
         else:
             await presenter.emit("name_not_found", name=name)
 

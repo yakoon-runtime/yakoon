@@ -21,4 +21,3 @@ class CmdExit(Command):
         if shell.id != active_controller_id:
             session.set_active_controller(shell.id)
             await self.services.get(SessionService).save(session)
-            await presenter.emit("shell.exit_app", controller=shell)
