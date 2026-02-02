@@ -76,6 +76,17 @@ class Session(Entity):
     def get_active_controller(self, default=None):
         return self.ctx("state", "active_controller_id", default, persist=True)
 
+    def set_identity(self, account_key, username: str):
+        self.set_ctx("auth", "account_key", str(account_key), persist=True)
+        self.set_ctx("auth", "username", username, persist=True)
+        
+    def get_username(self, default: str = "") -> str:
+        return self.ctx("auth", "username", default, persist=True)
+
+    def clear_identity(self):
+        self.rem_ctx("auth", "account_key", persist=True)
+        self.rem_ctx("auth", "username", persist=True)
+
     @classmethod
     def from_row(cls, row: dict):
         data_raw = row.pop("data", {})
