@@ -30,6 +30,7 @@ class Engine:
       self._directory = directory
       self._services = services
       self._commands = commands
+      self._active_tasks: dict[str, asyncio.Task] = {}
    
    async def initialize(self, io: Output):           
       session = Session(None)      
@@ -56,84 +57,71 @@ class Engine:
       if result:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
-   
-   async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:   
-      """
-      Entry point for any user input.
-      Handles session lifecycle, context binding, output routing, and optional batch execution.
-      """
+
+   async def invoke_text(self, session: Session, input_str: str):
+      result = await self.resolve_task(session, input_str)
+      return result
+
+   async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:
       shell = self._directory.find_shell()
       session: Session = await shell.on_resolve_session(session_key)
+
       session.bind_io(io)
       if not session.get_active_controller():
          session.set_active_controller(shell.id)
 
-      inputs = split_batch_input(input_str) if settings.engine.enable_batch else [input_str]  
-      await asyncio.create_task(self._run_processing(session, inputs))
+      return await self.resolve_task(session, input_str)
+
+   async def resolve_task(self, session: Session, input_str: str) -> Session:
+
+      skey = str(session.key)
+
+      # 1) Prompt response path
+      if DialogManager.is_waiting(session):
+         DialogManager.resolve_prompt(session, input_str)
+
+         task = self._active_tasks.get(skey)
+         if task:
+               await self._drive_until_blocked_or_done(session)
+               if task.done():
+                  self._active_tasks.pop(skey, None)
+
+         await self._drive_until_blocked_or_done(session)
+         return session
+
+      # 2) Normal command path
+      task = asyncio.create_task(self._run_one(session, input_str))
+      self._active_tasks[skey] = task
+
+      await self._drive_until_blocked_or_done(session)
+      if task.done():
+         self._active_tasks.pop(skey, None)
+
       return session
 
-   async def invoke_text(self, session: Session, input_str: str):
-      """Dispatch a single command line as if entered by the user.
-      """
-      inputs = split_batch_input(input_str)
-      return await self._run_processing(session, inputs)
+   #async def _drive_until_blocked_or_done(self, session: Session, task: asyncio.Task):
+   #   # let the task run until it either completes or asks for a prompt
+   #   while not task.done() and not DialogManager.is_waiting(session):
+   #     await asyncio.sleep(0)  # cooperative yield
 
-   async def _run_processing(self, session: Session, inputs: list[str]) -> bool:
-      """
-      Executes a batch of commands sequentially, including prompt handling.
+   async def _drive_until_blocked_or_done(self, session: Session):
+      task = self._active_tasks.get(str(session.key))
+      if not task:
+         return
 
-      - Each command runs in an isolated task to allow blocking prompts via `ask()`.
-      - If a prompt is triggered during execution, the next item in the queue is automatically
-         used to resolve it (via `DialogManager.resolve_prompt()`).
-      - If no further input is available when a prompt is active, execution stops.
-      - The final input in the batch can be interpreted as a prompt response if needed.
+      # Lass den Command weiterlaufen, bis:
+      # - fertig ODER
+      # - er erneut promptet
+      while not task.done() and not DialogManager.is_waiting(session):
+         await asyncio.sleep(0)
 
-      Args:
-         session (BaseSession): The session context in which the batch runs.
-         inputs (list[str]): A list of commands and/or prompt responses.
-      """
-      queue = deque(inputs)
-
-      async def _run_internal_task(raw) -> bool:
-         # Platform-level pre-processing hook before input parsing.
-         # Used to validate or prepare the session (e.g., locale, account, command set).
-         shell = self._directory.find_shell()
-         try:
-            await shell.on_shell_validate(session)
-            return await self._send_one(session, raw)
-         finally:
-            # Final platform-level hook after command execution.
-            # Used for post-processing, logging, or global session update
-            await shell.on_shell_finalize(session)
-
-      while queue:
-         await asyncio.sleep(0.01)  # yield control briefly
-         raw = queue.popleft()
-
-         # If this is the final input and a prompt is active → treat it as the response
-         if raw and not queue:
-            if DialogManager.is_waiting(session):
-               DialogManager.resolve_prompt(session, raw)
-               return
-
-         task = asyncio.create_task(_run_internal_task(raw))
-
-         while not task.done():
-            await asyncio.sleep(0.01)
-
-            if DialogManager.is_waiting(session):
-               if queue:
-                  next_raw = queue.popleft()
-                  DialogManager.resolve_prompt(session, next_raw)
-                  continue #break  # prompt resolved, allow task to continue
-               else:                   
-                  return # Prompt expected, but no further input in batch 
-               
-         try:
-            ok = task.result()
-            return ok
-         except Exception:
-            return False
+   async def _run_one(self, session: Session, raw: str) -> bool:
+      shell = self._directory.find_shell()
+      try:
+         await shell.on_shell_validate(session)
+         return await self._send_one(session, raw)
+      finally:
+         await shell.on_shell_finalize(session)
 
    async def _send_one(self, session: Session, input_str: str) -> bool:  
 

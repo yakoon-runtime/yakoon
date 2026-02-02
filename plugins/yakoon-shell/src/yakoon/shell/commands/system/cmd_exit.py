@@ -14,7 +14,6 @@ class CmdExit(Command):
     async def run(self, session: Session, request: Request):
 
         controllers = self.services.get(ControllerCatalogService)
-        presenter = await self.get_presenter(session)
 
         shell = controllers.shell()[0]
         active_controller_id = session.get_active_controller()

@@ -1,6 +1,7 @@
+import asyncio
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
-from yakoon.base.ports import AccountService, AuthenticationService, ControllerCatalogService, NamespaceService, SessionService
+from yakoon.base.ports import AuthenticationService, NamespaceService, SessionService
 from yakoon.base.runtime.session import Session
 
 
@@ -25,7 +26,11 @@ class CmdSu(Command):
         
         result = await auth.authenticate(ns, username, secret)
         if result.ok:
+            account = result.account
+            session.set_identity(account.key, account.name)
+            await self.services.get(SessionService).save(session)
             await presenter.emit("success", user=username)
+
         else:
             await presenter.emit("failed", 
                                  user=username, 
