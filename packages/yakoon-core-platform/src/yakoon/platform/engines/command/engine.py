@@ -49,7 +49,7 @@ class Engine:
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
       cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
-      cmd_groups += ["office.mailing:system"] # TODO
+      cmd_groups += ["office.mailing:system", "auth:system"] # TODO
            
       find = self._commands.find
       result: tuple[str, Command] = find(active_router_id, request.cmd, cmd_groups)
@@ -112,8 +112,8 @@ class Engine:
 
          # If this is the final input and a prompt is active → treat it as the response
          if raw and not queue:
-            if DialogManager.is_waiting(session.key):
-               DialogManager.resolve_prompt(session.key, raw)
+            if DialogManager.is_waiting(session):
+               DialogManager.resolve_prompt(session, raw)
                return
 
          task = asyncio.create_task(_run_internal_task(raw))
@@ -121,10 +121,10 @@ class Engine:
          while not task.done():
             await asyncio.sleep(0.01)
 
-            if DialogManager.is_waiting(session.key):
+            if DialogManager.is_waiting(session):
                if queue:
                   next_raw = queue.popleft()
-                  DialogManager.resolve_prompt(session.key, next_raw)
+                  DialogManager.resolve_prompt(session, next_raw)
                   continue #break  # prompt resolved, allow task to continue
                else:                   
                   return # Prompt expected, but no further input in batch 
@@ -141,7 +141,7 @@ class Engine:
       active_router_id = session.get_active_controller()
       command, request = None, Request(input_str)
       if not request.cmd:
-         return await session.fail("Kein Befehl erkannt.")
+         return  #return await session.fail("Kein Befehl erkannt.")
 
       try:
          if active_router_id:
