@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class BaseSettings:
 
-    settingsdev_mode = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
+    dev_mode = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
 
     # Debugging & Logging
     debug: bool = True
