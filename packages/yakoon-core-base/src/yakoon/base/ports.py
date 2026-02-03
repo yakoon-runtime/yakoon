@@ -7,10 +7,10 @@ from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
 
 
-class SessionCommandQueueService(Protocol):
-    def push_front_many(self, session, cmds: list[str]) -> None: ...
-    def pop_next(self, session) -> str | None: ...
-    def has_next(self, session) -> bool: ...
+class CommandQueueService(Protocol):
+    def enqueue_commands(self, session, cmds: list[str]) -> None: ...
+    def next_command(self, session) -> str | None: ...
+    def has_pending(self, session) -> bool: ...
 
 
 class SecretVerifier(Protocol):
@@ -28,17 +28,6 @@ class AccountService(Protocol):
     async def save(self, account: Account): ...
     async def delete_by_key(self, key: Key): ...
  
-
-class CommandInvokerService(Protocol):
-    """
-    Executes commands through the normal engine pipeline.
-    Used by meta-commands (e.g. batch, aliases) to invoke other commands
-    without bypassing routing, permissions, auditing, or rendering.
-    """
-
-    async def invoke_text(self, session, text: str) -> bool:
-        """Dispatch a single command line as if entered by the user."""
-
 
 class CommandCatalogService(Protocol):
     def for_controller(self, controller_id: str) -> Sequence[CommandInfo]: ...
