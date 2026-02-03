@@ -45,7 +45,7 @@ async def confirm(session: Session, prompt_text: str) -> bool:
         bool: True if confirmed, False otherwise.
     """
     while True:
-        answer = await ask(f"{prompt_text} (y/n)")
+        answer = await ask(session, prompt_text)
         if answer.lower() in ("y", "yes", "j", "ja"):
             return True
         if answer.lower() in ("n", "no", "nein"):
@@ -68,7 +68,7 @@ async def choice(session: Session, prompt_text: str, options: list[str]) -> str:
     """
     options_str = ", ".join(options)
     while True:
-        answer = await ask(f"{prompt_text} ({options_str})")
+        answer = await ask(session, prompt_text)
         if answer in options:
             return answer
         await session.emit(f"Bitte wähle eine der Optionen: {options_str}")
@@ -98,7 +98,7 @@ async def choice_index(session: Session, prompt_text: str, options: list[str]) -
 
     # Dialogschleife
     while True:
-        answer = await ask("Nummer eingeben:")
+        answer = await ask(session, prompt_text)
         if answer.isdigit():
             index = int(answer) - 1
             if 0 <= index < len(options):

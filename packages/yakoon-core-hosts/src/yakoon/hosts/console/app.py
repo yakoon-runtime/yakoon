@@ -64,6 +64,8 @@ async def run_console():
                 command = await safe_input(prompt=prompt)
 
         session = await engine.dispatch(session_key, command, output)
+        if session and session.has_signal("exit_app"):
+            break  
 
 if __name__ == "__main__":    
    asyncio.run(run_console())

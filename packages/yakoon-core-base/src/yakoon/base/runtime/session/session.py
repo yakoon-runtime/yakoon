@@ -87,6 +87,12 @@ class Session(Entity):
         self.rem_ctx("auth", "account_key", persist=True)
         self.rem_ctx("auth", "username", persist=True)
 
+    def has_signal(self, name:str) -> bool:
+        return False
+
+    def signal(self, name):
+        pass
+
     @classmethod
     def from_row(cls, row: dict):
         data_raw = row.pop("data", {})
