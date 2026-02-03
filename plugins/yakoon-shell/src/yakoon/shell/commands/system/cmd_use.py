@@ -17,7 +17,7 @@ class CmdUse(Command):
         presenter = await self.get_presenter(session)
 
         infos = []
-        name = request.get_arg(0)
+        name = request.arg(0)
         if not name:
             infos = controllers.all()
         else:

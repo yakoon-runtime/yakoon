@@ -9,13 +9,11 @@ from yakoon.base.controllers.base import BaseController
 from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
-
-from yakoon.platform.settings import settings
 from yakoon.base.directories.service import ServiceDirectory
+
 from yakoon.platform.runtime.dialogs.manager import DialogManager
 from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.directories.controller import ControllerDirectory
-from yakoon.platform.engines.command.batch import split_batch_input
 
 
 class Engine:
@@ -53,7 +51,7 @@ class Engine:
       cmd_groups += ["office.mailing:system", "auth:system"] # TODO
            
       find = self._commands.find
-      result: tuple[str, Command] = find(active_router_id, request.cmd, cmd_groups)
+      result: tuple[str, Command] = find(active_router_id, request.command(), cmd_groups)
       if result:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
@@ -124,7 +122,7 @@ class Engine:
       ok = True
       active_router_id = session.get_active_controller()
       command, request = None, Request(input_str)
-      if not request.cmd:
+      if not request.command():
          return  #return await session.fail("Kein Befehl erkannt.")
 
       try:
@@ -138,7 +136,7 @@ class Engine:
          # resolve the commands
          result = await self._find_matching_command(active_router_id, request, session)
          if not result:
-            raise CmdNotFound(f"{request.cmd}")
+            raise CmdNotFound(f"{request.command()}")
 
          controller, command = result
          command.controller = controller
@@ -154,7 +152,7 @@ class Engine:
 
       except CmdNotFound as exc:
          ok = False
-         await session.fail(f"Unbekannter Befehl: '{request.cmd}'")
+         await session.fail(f"Unbekannter Befehl: '{request.command()}'")
 
       except PermissionError as exc:
          ok = False

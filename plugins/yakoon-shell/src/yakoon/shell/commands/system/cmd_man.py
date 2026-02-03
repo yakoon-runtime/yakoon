@@ -13,7 +13,7 @@ class CmdMan(Command):
 
     async def run(self, session: Session, request: Request):
 
-        args = request.get_arg(0)
+        args = request.arg(0)
         if not args:
             await self.show_index(session, request)
         else:
@@ -24,7 +24,7 @@ class CmdMan(Command):
         controller_service =self.services.get(ControllerCatalogService)
         command_service = self.services.get(CommandCatalogService)
 
-        command_key = request.get_arg(0)
+        command_key = request.arg(0)
         active_controller_id = session.get_active_controller()
         if not active_controller_id:
             active_controller_id = controller_service.shell()[0].id

@@ -13,7 +13,7 @@ class CmdSwitch(Command):
         services = await self.get_system_services()
         registry = await self.get_controller_directory()
 
-        name = request.get_arg(0)
+        name = request.arg(0)
         if not name:
             name = await presenter.prompts.ask("ask_domain")
 

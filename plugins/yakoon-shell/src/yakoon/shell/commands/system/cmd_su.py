@@ -1,9 +1,9 @@
-from yakoon.base.commands.command import BatchCommand
 from yakoon.base.commands.request import Request
+from yakoon.base.commands.workflow import WorkflowCommand
 from yakoon.base.runtime.session import Session
 
 
-class CmdSu(BatchCommand):
+class CmdSu(WorkflowCommand):
 
     key = "su"    
     template_prefix = "system"
@@ -13,6 +13,9 @@ class CmdSu(BatchCommand):
     requires = ["system"]
 
     async def run(self, session: Session, request: Request):
-       
+
         command = self.batch_commmands.format(raw=request.raw)
-        await super().run(session, Request(command))
+        workflow = Request(command).split_commands()
+
+        self.schedule(session, workflow)
+ 

@@ -29,13 +29,13 @@ class CmdHelpDomain(Command):
 
     async def run(self, session: Session, request: Request):
 
-        if not request.args:
+        if not request._args:
             grouped = get_grouped_commands(self.controller)
             presenter = await self.get_presenter(session)
             return await presenter.emit("show", controller=self.controller, grouped=grouped)
 
         # TODO: Hilfe für unsere Commands
-        key = request.args[0]
+        key = request._args[0]
         cmd = self.controller.router.find_by_key_or_alias(key, session.cmd_groups)
         if cmd:
             await session.emit(f"Hilfe zu: {cmd.key}")
