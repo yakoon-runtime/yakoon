@@ -1,7 +1,7 @@
 from yakoon.base.runtime.session import Session
 
 from yakoon.platform.settings import settings
-from yakoon.platform.runtime.dialogs.manager import DialogManager
+from yakoon.platform.runtime.dialogs.manager import DialogManager, PromptMode
 
 
 async def ask(session: Session, prompt_text: str) -> str:
@@ -29,7 +29,7 @@ async def ask_secret(session: Session, prompt_text: str) -> str:
     return await DialogManager.set_prompt(
         session,
         timeout=settings.network.prompt_timed_out,
-        mode="secret"
+        mode=PromptMode.SECRET
     )
 
 async def confirm(session: Session, prompt_text: str) -> bool:

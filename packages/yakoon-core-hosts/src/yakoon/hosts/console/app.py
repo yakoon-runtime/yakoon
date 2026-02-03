@@ -10,7 +10,7 @@ from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
 from yakoon.base.runtime.session.output import Output
 
-from yakoon.platform.runtime.dialogs.manager import DialogManager
+from yakoon.platform.runtime.dialogs.manager import DialogManager, PromptMode
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.directories.controller import ControllerDirectory
@@ -50,8 +50,8 @@ async def run_console():
 
         if session and DialogManager.is_waiting(session):
             mode = DialogManager.get_mode(session)
-            if mode == "secret":
-                command = await safe_input_secret(prompt=prompt) # safe_input_secret(prompt=prompt)
+            if mode == PromptMode.SECRET:
+                command = await safe_input_secret(prompt=prompt)
             else:
                 command = await safe_input(prompt=prompt)
 

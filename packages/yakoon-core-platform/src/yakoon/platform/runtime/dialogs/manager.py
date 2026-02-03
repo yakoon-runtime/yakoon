@@ -5,6 +5,12 @@ from yakoon.base.runtime.devtools.prompt import UnresolvedPromptMonitor
 from yakoon.base.runtime.session.session import Session
 from yakoon.platform.settings import settings
 
+from enum import StrEnum
+
+class PromptMode(StrEnum):
+    NORMAL = "normal"
+    SECRET = "secret"
+
 
 class DialogManager:
     """
@@ -18,7 +24,7 @@ class DialogManager:
 
     _waiting: dict[str, asyncio.Future] = {}
     _timeouts: dict[str, asyncio.Task] = {}
-    _modes: dict[str, str] = {}  # "normal" | "secret"
+    _modes: dict[str, PromptMode] = {}  # "normal" | "secret"
 
     @classmethod
     def cleanup(cls, session: Session) -> None:
@@ -48,7 +54,7 @@ class DialogManager:
         session: Session,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
-        mode: str = "normal",
+        mode: PromptMode = PromptMode.NORMAL,
     ):
         """
         Registers a new prompt Future for the given session.
@@ -97,13 +103,13 @@ class DialogManager:
         return session_key in cls._waiting
 
     @classmethod
-    def get_mode(cls, session: Session) -> str:
+    def get_mode(cls, session: Session) -> PromptMode:
         """
         Returns the input mode for the currently waiting prompt.
         Defaults to "normal".
         """
         session_key = str(session.key)
-        return cls._modes.get(session_key, "normal")
+        return cls._modes.get(session_key, PromptMode.NORMAL)
 
     @classmethod
     def resolve_prompt(cls, session: Session, value: str) -> bool:
