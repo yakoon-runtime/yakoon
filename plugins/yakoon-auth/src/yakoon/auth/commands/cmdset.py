@@ -1,4 +1,5 @@
 from typing import Sequence, Type
+from yakoon.auth.commands.cmd_whoami import CmdWhoAmI
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
 
@@ -12,4 +13,5 @@ class AuthSystemCommands(CommandSet):
     def commands(cls) -> Sequence[Type[Command]]: 
         return [
             CmdSu,
+            CmdWhoAmI,
         ]
