@@ -42,7 +42,7 @@ async def run_console():
 
     await engine.initialize(output)
 
-    queue = engine._services.get(ports.SessionCommandQueueService)
+    queue = engine._services.get(ports.CommandQueueService)
     
     while True:
 
@@ -59,10 +59,9 @@ async def run_console():
             command = command_inits.pop(0).strip()
 
         else:
-            command = queue.pop_next(session) if session and queue.has_next(session) else None
+            command = queue.next_command(session) if session else None
             if command == None:
                 command = await safe_input(prompt=prompt)
-
 
         session = await engine.dispatch(session_key, command, output)
 

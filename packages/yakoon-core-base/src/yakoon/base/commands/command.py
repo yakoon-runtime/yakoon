@@ -2,13 +2,12 @@ from __future__ import annotations
 from abc import ABC
 from pathlib import Path
 
-from yakoon.base.ports import CommandInvokerService, SessionCommandQueueService, NamespaceService, Presenter, PresenterService, SessionService
+from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 from yakoon.base.commands.request import Request
 from yakoon.base.models.namespace import Namespace
 from yakoon.base.runtime.session.session import Session
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.controllers.base import BaseController
-from yakoon.platform.runtime.dialogs.manager import DialogManager
 
 
 class CmdNotFound(Exception):
@@ -45,14 +44,3 @@ class Command(ABC):
                 
     async def run(self, session: Session, request: Request):
         pass
-
-
-class BatchCommand(Command):
-
-     async def run(self, session: Session, request: Request):
-        raw = request.raw
-
-        parts = [p.strip() for p in raw.split(";") if p.strip()]
-
-        queue = self.services.get(SessionCommandQueueService)
-        queue.push_front_many(session, parts)
