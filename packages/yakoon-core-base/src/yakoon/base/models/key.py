@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 
 
 class Key:
@@ -17,19 +17,21 @@ class Key:
             domain, bucket, scope = ns_part.split("/")
         except ValueError:
             raise ValueError(f"Invalid key format: {raw}")        
-        from yakoon.base.models.namespace import Namespace
+        from yakoon.base.models.ns import Namespace
         return Key(Namespace(domain, bucket, scope), id)
         
     @classmethod
     def from_parts(cls, domain: str, bucket: str, scope: str, id: str) -> "Key":
-        from yakoon.base.models.namespace import Namespace
+        from yakoon.base.models.ns import Namespace
         return cls(namespace=Namespace(domain, bucket, scope), id=id)
     
     @staticmethod
     def is_key(s: str) -> bool:
-        if not isinstance(s, str):
+        try:
+            Key.from_str(s)
+            return True
+        except ValueError:
             return False
-        return "#" in s and s.count("/") == 2
 
     def is_valid(self) -> bool:
         ns = self.namespace

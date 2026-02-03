@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from yakoon.base.models.key import Key
 from typing import Optional, Any
 
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 
 
 class BaseStore(ABC):

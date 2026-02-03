@@ -11,7 +11,7 @@ from yakoon.base.descriptors.template import TemplateSource
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
-    from yakoon.base.models.namespace import Namespace
+    from yakoon.base.models.ns import Namespace
     from yakoon.base.runtime.session import Session
     
     

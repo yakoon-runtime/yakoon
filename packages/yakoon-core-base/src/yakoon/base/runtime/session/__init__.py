@@ -1,2 +1,2 @@
-from .session import Session
+from .session import Session, SessionState
 from .output import Output

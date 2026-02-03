@@ -1,7 +1,7 @@
 
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 from yakoon.base.ports import SessionService
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.runtime.session import Session

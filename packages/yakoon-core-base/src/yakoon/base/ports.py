@@ -3,7 +3,7 @@ from typing import Optional, Protocol, Sequence
 from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.models.key import Key
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 from yakoon.base.runtime.session.session import Session
 
 

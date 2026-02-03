@@ -27,7 +27,7 @@ class CmdSu(Command):
         result = await auth.authenticate(ns, username, secret)
         if result.ok:
             account = result.account
-            session.set_identity(account.key, account.name)
+            session.set_identity(account.key, account.username)
             await self.services.get(SessionService).save(session)
             await presenter.emit("success", user=username)
 

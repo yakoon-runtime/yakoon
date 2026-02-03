@@ -4,7 +4,7 @@ from pathlib import Path
 
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 from yakoon.base.commands.request import Request
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 from yakoon.base.runtime.session.session import Session
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.controllers.base import BaseController

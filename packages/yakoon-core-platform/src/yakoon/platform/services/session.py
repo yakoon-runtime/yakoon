@@ -1,6 +1,5 @@
-from yakoon.base.runtime.session import Session
+from yakoon.base.runtime.session import Session, SessionState
 from yakoon.base.models.key import Key
-from yakoon.base.runtime.session.state import SessionState
 from yakoon.base.stores.base.base_store import BaseStore
 
 
@@ -18,18 +17,12 @@ class SessionService:
         if not row:
             return None
 
-        # strip store meta
-        data = {k: v for k, v in row.items() if not k.startswith("__")}
-        state = SessionState.from_dict(data)
-
-        # build a runtime session (fresh runtime)
+        state = SessionState.from_dict(row)
         return Session.from_state(key=key, state=state)
 
     async def save(self, session: Session) -> None:
-        state = session.state
+        state = session._state
         row = state.to_dict()
-        row["__key__"] = str(session.key)
-        row["__scope__"] = session.key.namespace.to_str()
         await self._store.save(row)
 
     async def get_or_create(self, key: Key, **kwargs) -> tuple[Session, bool]:

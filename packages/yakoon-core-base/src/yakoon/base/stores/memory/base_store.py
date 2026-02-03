@@ -3,7 +3,7 @@ from typing import Any, Optional
 import copy
 
 from yakoon.base.models.key import Key
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 from yakoon.base.stores.base.base_store import BaseStore
 
 
@@ -20,12 +20,10 @@ class MemoryStore(BaseStore):
         return copy.deepcopy(self._rows.get(str(key)))
 
     async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
-        scope = namespace.to_str()
+        ns = namespace.to_str()
         return [
-            copy.deepcopy(obj)
-            for key_str, obj in self._rows.items()
-            if obj.get("__scope__") == scope
-        ][:limit]
+            copy.deepcopy(obj) for obj in self._rows.values() \
+                if str(obj.get("key")).startswith(ns)][:limit]
 
     async def fetch_by_fields(
         self,
@@ -34,19 +32,17 @@ class MemoryStore(BaseStore):
         limit: int = 100,
         **fields: Any
     ) -> list[dict]:
-        scope = namespace.to_str()
+        ns = namespace.to_str()
         return [
-            copy.deepcopy(obj)
-            for obj in self._rows.values()
-            if obj.get("__scope__") == scope and all(obj.get(k) == v for k, v in fields.items())
+            copy.deepcopy(obj) for obj in self._rows.values()\
+                 if str(obj.get("key")).startswith(ns) and \
+                    all(obj.get(k) == v for k, v in fields.items())
         ][:limit]
 
     async def save(self, obj: dict) -> None:
-        if "__key__" not in obj:
-            raise ValueError("Missing '__key__' in row")
-        if "__scope__" not in obj:
-            raise ValueError("Missing '__scope__' in row")
-        key_str = obj["__key__"]
+        if "key" not in obj:
+            raise ValueError("Missing 'key' in obj")
+        key_str = obj["key"]
         self._rows[key_str] = copy.deepcopy(obj)
 
     async def delete_by_key(self, key: Key) -> None:

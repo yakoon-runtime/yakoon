@@ -1,30 +1,40 @@
 
 from typing import Optional
 
-from yakoon.base.models.account import Account
+from yakoon.base.models.account import Account, AccountData
 from yakoon.base.models.key import Key
-from yakoon.base.models.namespace import Namespace
+from yakoon.base.models.ns import Namespace
 from yakoon.base.stores.base.base_store import BaseStore
 
 
-
 class AccountService:
+    """
+    Loads/saves accounts via a dict-based store.
+
+    The store persists plain dict rows. This service maps them to AccountData
+    and returns Account façades to callers.
+    """
 
     def __init__(self, store: BaseStore):
         self.store = store
 
     async def get_by_key(self, key: Key) -> Optional[Account]:
         row = await self.store.get_by_key(key)
-        return Account.from_row(row) if row else None
+        if not row:
+            return None
+        data = AccountData.from_dict(row)
+        return Account(data)
 
-    async def get_by_name(self, namespace: Namespace, name: str) -> Optional[Account]:
-        rows = await self.store.fetch_by_fields(namespace=namespace, name=name, limit=1)        
-        return Account.from_row(rows[0]) if rows else None
-    
-    async def save(self, account: Account):
-        account.validate()
-        await self.store.save(account.to_row())
+    async def get_by_name(self, namespace: Namespace, username: str) -> Optional[Account]:
+        rows = await self.store.fetch_by_fields(namespace=namespace, username=username, limit=1)
+        if not rows:
+            return None
+        data = AccountData.from_dict(rows[0])
+        return Account.from_state(data)
 
-    async def delete_by_key(self, key: Key):
+    async def save(self, account: Account) -> None:
+        row = account.data.to_dict()
+        await self.store.save(row)
+
+    async def delete_by_key(self, key: Key) -> None:
         await self.store.delete_by_key(key)
- 
