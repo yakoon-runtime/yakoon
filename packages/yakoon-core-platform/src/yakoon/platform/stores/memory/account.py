@@ -28,12 +28,10 @@ def load_defaults(store: InMemoryAccountStore):
         key=Key(namespace=ns, id="1"),
         name="stefan",
         password_hash="123",
-        cmd_groups=["realm:system", "realm:account", "realm:character"]
     ))
 
     store.add(Account(
         key=Key(namespace=ns, id="2"),
         name="lara",
         password_hash="456",
-        cmd_groups=["system"]
     ))

@@ -9,11 +9,9 @@ class Account(Entity):
 
     name: str = field(default="")
     password_hash: str = field(default="")
-
-    cmd_groups: list[str] = field(default_factory=list) 
     permissions: list[str] = field(default_factory=lambda: ["system"])
    
-    __json_fields__: ClassVar[list[str]] = ["permissions", "cmd_groups"]
+    __json_fields__: ClassVar[list[str]] = ["permissions"]
 
     def validate(self):
         if not self.name.strip():

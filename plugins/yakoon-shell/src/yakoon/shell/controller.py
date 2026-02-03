@@ -60,8 +60,8 @@ class ShellCoreController(BaseController):
         session_key = session_key or ns.get_key(None)
         sessions = self.services.get(SessionService)
 
-        session = await sessions.load_or_create(session_key)        
-        session.touch() # Updates the last activity.
+        session, _ = await sessions.get_or_create(session_key)        
+        session.touch()
         
         return session
 
@@ -72,7 +72,7 @@ class ShellCoreController(BaseController):
         Used to prepare session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `system` controller.
         """
-        session.cmd_groups = ["shell:system", ]
+        #session.cmd_groups = ["shell:system", ]
         #print("todo: on_shell_validate")
         return
 
@@ -98,8 +98,8 @@ class ShellCoreController(BaseController):
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
         """
-        if required := getattr(command, "requires", []):
-            account = session.ctx("gateway", "account", persist=False)
+        #if required := getattr(command, "requires", []):
+        #    account = session.ctx("gateway", "account", persist=False)
             #if not account or not set(required).issubset(set(account.permissions)):
             #    raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 

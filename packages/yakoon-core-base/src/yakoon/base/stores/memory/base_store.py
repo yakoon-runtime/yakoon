@@ -42,6 +42,10 @@ class MemoryStore(BaseStore):
         ][:limit]
 
     async def save(self, obj: dict) -> None:
+        if "__key__" not in obj:
+            raise ValueError("Missing '__key__' in row")
+        if "__scope__" not in obj:
+            raise ValueError("Missing '__scope__' in row")
         key_str = obj["__key__"]
         self._rows[key_str] = copy.deepcopy(obj)
 

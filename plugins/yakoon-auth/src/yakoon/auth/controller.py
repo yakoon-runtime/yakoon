@@ -59,7 +59,6 @@ class AuthCoreController(BaseController):
         Used to prepare session context (e.g., account, locale, dynamic commands).
         Only invoked if this controller is the registered `system` controller.
         """
-        session.cmd_groups = ["shell:system", ]
         return
 
         # builds the commandset for this session
@@ -84,8 +83,8 @@ class AuthCoreController(BaseController):
         Hook called immediately before a single command is executed.
         Can be used to enforce permissions, inject context, or audit.
         """
-        if required := getattr(command, "requires", []):
-            account = session.ctx("gateway", "account", persist=False)
+        #if required := getattr(command, "requires", []):
+        #    account = session.ctx("gateway", "account", persist=False)
             #if not account or not set(required).issubset(set(account.permissions)):
             #    raise PermissionError(f"Auftrag abgelehnt! Erforderliche Rollen: {', '.join(required)}")
 

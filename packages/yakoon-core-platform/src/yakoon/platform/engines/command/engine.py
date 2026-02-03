@@ -47,9 +47,8 @@ class Engine:
       
       # Include the session-local command group for dynamic routing.
       # This allows commands (e.g. exits or context actions) to be registered
-      cmd_groups = session.cmd_groups + session.cmd_groups_dynamic
-      cmd_groups += ["office.mailing:system", "auth:system"] # TODO
-           
+      cmd_groups = ["shell:system", "office.mailing:system", "auth:system"] # TODO
+
       find = self._commands.find
       result: tuple[str, Command] = find(active_router_id, request.command(), cmd_groups)
       if result:
