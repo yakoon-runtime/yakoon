@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
     from yakoon.base.commands.commandset import CommandSet
-    from yakoon.base.controllers.base import BaseController
 
 
 class CommandDirectory:
@@ -56,19 +55,19 @@ class CommandRouter:
         self._groups: dict[str, dict[str, type[Command]]] = {}
         self._aliases: dict[str, str] = {}
 
-    def register(self, category: str, cmdset: type[CommandSet], *, append: bool = False):
-        if category in self._groups and not append:
-            raise ValueError(f"MeshCommand group '{category}' already exists. Use append=True to add more commands.")
+    def register(self, group: str, cmdset: type[CommandSet], *, append: bool = False):
+        if group in self._groups and not append:
+            raise ValueError(f"Command group '{group}' already exists. Use append=True to add more commands.")
 
-        group = self._groups.setdefault(category, {})
+        group = self._groups.setdefault(group, {})
         for cmd in cmdset.commands():
             key = cmd.key.lower()
             group[key] = cmd
             for alias in getattr(cmd, "aliases", []):
                 self._aliases[alias] = key
 
-    def unregister(self, category: str):
-        self._groups.pop(category, None)
+    def unregister(self, group: str):
+        self._groups.pop(group, None)
 
     def find_by_key_or_alias(self, name: str, groups: list[str] | None = None) -> Command | None:
         if not groups:

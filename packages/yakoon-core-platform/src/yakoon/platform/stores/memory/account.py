@@ -28,11 +28,17 @@ def load_defaults(store: InMemoryAccountStore):
     data = AccountData(
         Key(namespace=ns, id="1"), 
         username="stefan", 
-        password_hash="123")
+        password_hash="123", 
+        allowed_command_groups=[
+            "shell:system", "office.mailing:system", "auth:system"])
+
     store.add(Account(data))
 
     data = AccountData(
         Key(namespace=ns, id="2"), 
         username="lara", 
-        password_hash="456")
+        password_hash="456",
+        allowed_command_groups=[
+            "shell:system"])
+
     store.add(Account(data))

@@ -5,8 +5,8 @@ Verfügbare Domains:
 {% endfor %}
 
 Globale Befehle:
-{% for category, commands in section.data.grouped.items() %}
-- {{category|title}}
+{% for group, commands in section.data.grouped.items() %}
+- {{group|title}}
 {% for cmd in commands %}
    └─ {{ cmd.key }}
 {% endfor %}

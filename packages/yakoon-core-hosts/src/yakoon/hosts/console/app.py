@@ -43,6 +43,7 @@ async def run_console():
     session.bind_io(Output(print, print))
 
     queue.enqueue_commands(session, command_inits)
+    session.add_allowed_groups(["shell:system", "auth:system"])
 
     try:
         while True:

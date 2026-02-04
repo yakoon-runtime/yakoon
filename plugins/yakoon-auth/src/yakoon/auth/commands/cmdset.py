@@ -7,7 +7,7 @@ from yakoon.auth.commands.cmd_su import CmdSu
 
 class AuthSystemCommands(CommandSet):
     
-    category = "system"
+    group = "system"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

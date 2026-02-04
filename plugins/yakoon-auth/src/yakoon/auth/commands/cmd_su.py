@@ -28,6 +28,8 @@ class CmdSu(Command):
         if result.ok:
             account = result.account
             session.set_identity(account.key, account.username)
+            session.add_allowed_groups(account.allowed_command_groups)
+
             await self.services.get(SessionService).save(session)
             await presenter.emit("success", user=username)
 

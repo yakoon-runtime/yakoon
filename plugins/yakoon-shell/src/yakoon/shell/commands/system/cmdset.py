@@ -13,7 +13,7 @@ from yakoon.shell.commands.system.cmd_welcome import CmdWelcome
 
 class ShellSystemCommands(CommandSet):
     
-    category = "system"
+    group = "system"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 

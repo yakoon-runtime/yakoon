@@ -18,10 +18,6 @@ class ShellCoreController(BaseController):
 
     shell_builtins = {"exit", "man"}
 
-    default_command_groups = ["system", "account"]     
-    """Names of command groups that are automatically active for every session, 
-    without requiring explicit permissions."""
-
     template_source = TemplateSource(
         package="yakoon.shell",
         sub_template_path="core")

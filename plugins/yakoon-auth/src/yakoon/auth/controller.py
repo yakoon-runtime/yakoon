@@ -17,8 +17,6 @@ class AuthCoreController(BaseController):
     is_listed: bool = True
     is_activatable: bool = True
 
-    default_command_groups = ["system"]     
-
     template_source = TemplateSource(
         package="yakoon.auth",
         sub_template_path="core")

@@ -30,10 +30,6 @@ class BaseController(ABC):
     shell_builtins = {}
     """Shell builtin commands are always available and independent 
     of the active program context."""
-
-    default_command_groups = []    
-    """Names of command groups that are automatically active for every session, 
-    without requiring explicit permissions."""
  
     services: ServiceDirectory = None
     """Provides bucket-based access to services (e.g. room, account, session). 

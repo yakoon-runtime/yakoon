@@ -35,9 +35,7 @@ class Engine:
          self, active_router_id, request: Request, 
          session: Session) -> Optional[Tuple[BaseController, Command]]:
       
-      # Include the session-local command group for dynamic routing.
-      # This allows commands (e.g. exits or context actions) to be registered
-      cmd_groups = ["shell:system", "office.mailing:system", "auth:system"] # TODO
+      cmd_groups = list(session.allowed_command_groups)
 
       find = self._commands.find
       result: tuple[str, Command] = find(active_router_id, request.command(), cmd_groups)
@@ -128,7 +126,7 @@ class Engine:
          await controller.on_after_run_command(session, request, command)
 
       except CmdNotFound:
-         await session.fail(f"Unbekannter Befehl: '{request.command()}'")
+         await session.fail(f"{request.command()}': command not found... use 'man'")
 
       except PermissionError as exc:
          audit = self._services.get(AuditLogService)

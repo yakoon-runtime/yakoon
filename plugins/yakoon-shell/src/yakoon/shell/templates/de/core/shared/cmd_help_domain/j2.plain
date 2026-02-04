@@ -1,8 +1,8 @@
 {%- if section.key == "show" %}
 Hilfe für Domain: {{ section.data.controller.id }}
-{% for category, commands in section.data.grouped.items() %}
+{% for group, commands in section.data.grouped.items() %}
 
-| Kategorie: {{ category|title }}
+| Kategorie: {{ group|title }}
 >> {% for cmd in commands %}{{ cmd.key }}  {% endfor %}
 
 {% endfor %}

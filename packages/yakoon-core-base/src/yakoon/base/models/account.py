@@ -27,6 +27,8 @@ class AccountData:
 
     last_login: datetime | None = None
     data: dict[str, Any] = field(default_factory=dict)
+    allowed_command_groups: list[str] = field(default_factory=list)
+
 
     def has_role(self, role: str) -> bool:
         """Returns True if the account has the given role."""
@@ -48,6 +50,7 @@ class AccountData:
             "username": self.username,
             "password_hash": self.password_hash,
             "roles": list(self.roles),
+            "allowed_command_groups": list(self.allowed_command_groups),
             "is_disabled": self.is_disabled,
             "last_login": (
                 self.last_login.astimezone(timezone.utc).isoformat()
@@ -70,6 +73,7 @@ class AccountData:
             username=d["username"],
             password_hash=d["password_hash"],
             roles=list(d.get("roles", [])),
+            allowed_command_groups=list(d.get("allowed_command_groups", [])),
             is_disabled=d.get("is_disabled", False),
             data=dict(d.get("data", {})),
         )
@@ -106,6 +110,10 @@ class Account:
     @property
     def password_hash(self) -> str:
         return self.data.password_hash
+
+    @property
+    def allowed_command_groups(self) -> list[str]:
+        return self.data.allowed_command_groups
 
     def has_role(self, role: str) -> bool:
         """Delegates to AccountData.has_role()."""

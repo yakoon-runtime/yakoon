@@ -72,7 +72,7 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
         for sets in controller.commandsets:
             for command in sets.commands():
                 command_info = CommandInfo(
-                    command.key, sets.category, 
+                    command.key, sets.group, 
                     controller.id, command.template_prefix) 
                 command_list.append(command_info)
 
@@ -89,8 +89,8 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
             controller.is_activatable, 
             controller.shell_builtins)
         for commands_set in controller.commandsets:
-            category = getattr(commands_set, "category", "system")
-            router.register(f"{controller.id}:{category}", commands_set)
+            group = getattr(commands_set, "group", "system")
+            router.register(f"{controller.id}:{group}", commands_set)
             commands.register(controller.id, router)
 
     return commands

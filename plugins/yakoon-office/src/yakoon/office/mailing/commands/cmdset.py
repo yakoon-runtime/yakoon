@@ -6,7 +6,7 @@ from yakoon.office.mailing.commands.cmd_sendmail import CmdSendMail
 
 class MailingCommands(CommandSet):
     
-    category = "system"
+    group = "system"
 
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 
