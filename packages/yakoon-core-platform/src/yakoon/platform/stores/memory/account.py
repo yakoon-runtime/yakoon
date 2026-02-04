@@ -1,6 +1,6 @@
 from typing import Optional
 
-from yakoon.base.models.account import Account
+from yakoon.base.models.account import Account, AccountData
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 from yakoon.base.stores.memory.base_store import MemoryStore
@@ -22,14 +22,17 @@ class InMemoryAccountStore(MemoryStore):
 
 
 def load_defaults(store: InMemoryAccountStore):
+    
     ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
 
-    account = Account(Key(namespace=ns, id="1"))
-    account.data.username = "stefan"
-    account.data.password_hash = "123"
-    store.add(account)
+    data = AccountData(
+        Key(namespace=ns, id="1"), 
+        username="stefan", 
+        password_hash="123")
+    store.add(Account(data))
 
-    account = Account(Key(namespace=ns, id="2"))
-    account.data.username = "lara"
-    account.data.password_hash = "455"
-    store.add(account)
+    data = AccountData(
+        Key(namespace=ns, id="2"), 
+        username="lara", 
+        password_hash="456")
+    store.add(Account(data))

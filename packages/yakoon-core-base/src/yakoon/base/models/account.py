@@ -88,8 +88,8 @@ class Account:
     account-related behavior. It does not handle persistence or policy.
     """
 
-    def __init__(self, key: Key):
-        self.data = AccountData(key=key)
+    def __init__(self, data: AccountData):
+        self.data = data
 
     @property
     def key(self) -> Key:
@@ -106,12 +106,6 @@ class Account:
     @property
     def password_hash(self) -> str:
         return self.data.password_hash
-
-    @classmethod
-    def from_state(cls, data: AccountData) -> "Account":
-        s = cls(None)
-        s.data = data
-        return s
 
     def has_role(self, role: str) -> bool:
         """Delegates to AccountData.has_role()."""

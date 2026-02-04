@@ -15,7 +15,7 @@ class AuthenticationService:
         accounts = self._services.get(AccountService)
         verifier = self._services.get(SecretVerifier)
         
-        acc = await accounts.get_by_name(namespace, username)
+        acc = await accounts.get_by_username(namespace, username)
         if not acc:
             return AuthResult(ok=False, reason="unknown-user")
 

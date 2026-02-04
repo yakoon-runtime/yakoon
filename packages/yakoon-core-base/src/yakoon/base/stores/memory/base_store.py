@@ -42,6 +42,8 @@ class MemoryStore(BaseStore):
     async def save(self, obj: dict) -> None:
         if "key" not in obj:
             raise ValueError("Missing 'key' in obj")
+        if not isinstance(obj["key"], str):
+            raise ValueError("'key' must be a string")
         key_str = obj["key"]
         self._rows[key_str] = copy.deepcopy(obj)
 

@@ -16,7 +16,7 @@ def format_prompt(session: Session,
     if not session:
         return default_prompt
 
-    user = session.get_username("")
+    user = session.get_username()
     controller = session.get_active_controller(active_controller)
 
     if user:

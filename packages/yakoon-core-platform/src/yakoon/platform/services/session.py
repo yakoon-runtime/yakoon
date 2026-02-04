@@ -18,10 +18,10 @@ class SessionService:
             return None
 
         state = SessionState.from_dict(row)
-        return Session.from_state(key=key, state=state)
+        return Session.from_state(state)
 
     async def save(self, session: Session) -> None:
-        state = session._state
+        state = session.state
         row = state.to_dict()
         await self._store.save(row)
 
@@ -34,8 +34,8 @@ class SessionService:
         if session:
             return session, False
         
-        state = SessionState.from_dict(kwargs)
-        session = Session.from_state(key, state)
+        state = SessionState(key, **kwargs)
+        session = Session.from_state(state)
         session.touch()
         await self.save(session)
  

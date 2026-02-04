@@ -25,12 +25,12 @@ class AccountService:
         data = AccountData.from_dict(row)
         return Account(data)
 
-    async def get_by_name(self, namespace: Namespace, username: str) -> Optional[Account]:
+    async def get_by_username(self, namespace: Namespace, username: str) -> Optional[Account]:
         rows = await self.store.fetch_by_fields(namespace=namespace, username=username, limit=1)
         if not rows:
             return None
         data = AccountData.from_dict(rows[0])
-        return Account.from_state(data)
+        return Account(data)
 
     async def save(self, account: Account) -> None:
         row = account.data.to_dict()

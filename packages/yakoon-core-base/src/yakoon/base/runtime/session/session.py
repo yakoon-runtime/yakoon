@@ -1,27 +1,33 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from dataclasses import dataclass, asdict
-from typing import Optional, Dict, Any
+from dataclasses import dataclass, asdict, field
+from typing import Optional, Any
 
 from yakoon.base.models.key import Key
 
 
 @dataclass
 class SessionState:
+    """
+    Persistable session state.
 
-    key: Key | None = None
+    Contains only serializable data.
+    The session key is part of the state and is immutable for the lifetime
+    of the session.
+    """
+    key: Key
+
+    active_controller_id: str | None = None
+    account_key: str | None = None
+    username: str | None = None
     last_active: datetime | None = None
-    active_controller_id: Optional[str] = None
-    account_key: Optional[str] = None
-    username: Optional[str] = None
     lang: Optional[str] = "de"
-    data: Dict[str, Any] = None 
-    
+
+    data: dict[str, Any] = field(default_factory=dict)
+
     def to_dict(self) -> dict:
         d = asdict(self)
-        if d["data"] is None:
-            d["data"] = {}
         if self.last_active:
             d["last_active"] = self.last_active.astimezone(timezone.utc).isoformat()
         else:
@@ -32,17 +38,17 @@ class SessionState:
 
     @classmethod
     def from_dict(cls, d: dict) -> "SessionState":
-       d = dict(d or {})
-       d.setdefault("data", {})
-       raw_key = d.pop("key", None)
-       raw_last_active = d.pop("last_active", None)
-       obj = cls(**d)
-       if raw_key:
-           obj.key = Key.from_str(raw_key)
-       if raw_last_active:
-           obj.last_active = datetime.fromisoformat(raw_last_active)
+        if not d or "key" not in d:
+            raise ValueError("SessionState requires a 'key'")
 
-       return obj
+        d = dict(d)
+        raw_key = d.pop("key")
+        raw_last_active = d.pop("last_active", None)
+        state = cls(key=Key.from_str(raw_key),**d)
+        if raw_last_active:
+            state.last_active = datetime.fromisoformat(raw_last_active)
+
+        return state
 
 
 class SessionRuntime:
@@ -65,14 +71,14 @@ class Session:
     Only its state is serializable and stored by the SessionService.
     """
 
-    def __init__(self, key: Key):
+    def __init__(self, state: SessionState):
         """
         Creates a new session with an empty state and fresh runtime context.
 
         Args:
             key (Key): Unique identifier of the session.
         """
-        self._state = SessionState(key=key, data={})
+        self._state = state
         self._runtime = SessionRuntime()
 
     @property
@@ -83,8 +89,12 @@ class Session:
     def key(self) -> Key:
         return self._state.key        
 
+    @property
+    def state(self) -> SessionState:
+        return self._state
+
     @classmethod
-    def from_state(cls, key: Key, state: SessionState) -> "Session":
+    def from_state(cls, state: SessionState) -> "Session":
         """
         Reconstructs a session from a previously persisted SessionState.
 
@@ -93,16 +103,12 @@ class Session:
         from storage.
 
         Args:
-            key (Key): The session identifier.
             state (SessionState): The persisted session state.
 
         Returns:
             Session: A fully initialized session with fresh runtime data.
         """
-        s = cls(None)
-        s._state = state
-        s._state.key = key
-        return s
+        return cls(state)
 
     def touch(self) -> None:
         """
@@ -200,18 +206,6 @@ class Session:
         """
         return self._state.account_key is not None
 
-    def get_username(self, default: str = "") -> str:
-        """
-        Returns the current username or a default value.
-
-        Args:
-            default (str): Value returned if no username is set.
-
-        Returns:
-            str: The username or the default value.
-        """
-        return self._state.username or default
-
     def signal(self, name: str) -> None:
         """
         Emits a runtime-only signal for the session.
@@ -236,15 +230,6 @@ class Session:
             bool: True if the signal is present.
         """
         return name in self._runtime.signals
-
-    def clear_signal(self, name: str) -> None:
-        """
-        Removes a specific runtime signal from the session.
-
-        Args:
-            name (str): Signal identifier.
-        """
-        self._runtime.signals.discard(name)
 
     def clear_signals(self) -> None:
         """
