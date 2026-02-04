@@ -55,10 +55,6 @@ class Engine:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
 
-   async def invoke_text(self, session: Session, input_str: str):
-      result = await self.resolve_task(session, input_str)
-      return result
-
    async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:
       shell = self._directory.find_shell()
       session: Session = await shell.on_resolve_session(session_key)

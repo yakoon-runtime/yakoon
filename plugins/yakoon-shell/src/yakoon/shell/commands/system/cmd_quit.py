@@ -8,7 +8,7 @@ class CmdQuit(Command):
     key = "quit"
     template_prefix = "system"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, _: Request):
 
         presenter = await self.get_presenter(session)
         answer = await presenter.prompts.confirm("ask_really")

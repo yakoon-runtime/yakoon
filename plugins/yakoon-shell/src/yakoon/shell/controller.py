@@ -1,4 +1,3 @@
-
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
@@ -56,10 +55,7 @@ class ShellCoreController(BaseController):
         Returns:
             BaseSession: a session instance bound to the request lifecycle
         """
-        ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
-        session_key = session_key or ns.get_key(None)
         sessions = self.services.get(SessionService)
-
         session, _ = await sessions.get_or_create(session_key)        
         session.touch()
         
