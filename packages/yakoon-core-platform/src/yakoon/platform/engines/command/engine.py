@@ -1,12 +1,9 @@
 import asyncio
-from collections import deque
 from typing import Optional, Tuple
 
 from yakoon.base.ports import AuditLogService
-from yakoon.base.models.key import Key
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.runtime.session.output import Output
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 from yakoon.base.directories.service import ServiceDirectory
@@ -30,16 +27,9 @@ class Engine:
       self._commands = commands
       self._active_tasks: dict[str, asyncio.Task] = {}
    
-   async def initialize(self, io: Output):           
-      session = Session(None)      
-      
-      # Bind the given Output to this session for output and error handling.
-      session.bind_io(io)
-
-      ## initialize the controllers
-      for controller in self._directory.get_all():
-         if hasattr(controller, "on_initialize"):
-            await controller.on_initialize(session)
+   @property
+   def services(self) -> ServiceDirectory:
+        return self._services
 
    async def _find_matching_command(
          self, active_router_id, request: Request, 
@@ -55,18 +45,12 @@ class Engine:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
 
-   async def dispatch(self, session_key: Key, input_str: str, io: Output) -> Session:
-      shell = self._directory.find_shell()
-      session: Session = await shell.on_resolve_session(session_key)
+   async def dispatch(self, session: Session, input_str: str) -> Session:
 
-      session.bind_io(io)
+      skey = str(session.key)
+      shell = self._directory.find_shell()
       if not session.get_active_controller():
          session.set_active_controller(shell.id)
-
-      return await self.resolve_task(session, input_str)
-
-   async def resolve_task(self, session: Session, input_str: str) -> Session:
-      skey = str(session.key)
 
       # 1) Prompt response path
       if DialogManager.is_waiting(session):
@@ -75,19 +59,14 @@ class Engine:
          # Drive the existing active task until it either finishes or asks again
          await self._drive_until_blocked_or_done(session)
 
-         # One consistent end-of-dispatch yield (same as normal path)
-         await asyncio.sleep(0)
          #print("DISPATCH END")
          return session
 
       # 2) Normal command path
-      task = asyncio.create_task(self._run_one(session, input_str))
+      task = asyncio.create_task(self._dispatch_command(session, input_str))
       self._active_tasks[skey] = task
 
       await self._drive_until_blocked_or_done(session)
-
-      await asyncio.sleep(0)
-      #print("DISPATCH END")
       return session
 
    async def _drive_until_blocked_or_done(self, session: Session):
@@ -99,80 +78,76 @@ class Engine:
       # - fertig ODER
       # - er erneut promptet
       while not task.done() and not DialogManager.is_waiting(session):
-         await asyncio.sleep(0)
+         await asyncio.sleep(0.005)
 
       if task.done():
+        _ = task.exception()  # drain
         self._active_tasks.pop(str(session.key), None)
 
-   async def _run_one(self, session: Session, raw: str) -> bool:
-      shell = self._directory.find_shell()
-      try:
-         await shell.on_shell_validate(session)
-         return await self._send_one(session, raw)
-      finally:
-         await shell.on_shell_finalize(session)
+   async def _dispatch_command(self, session: Session, input_str: str) -> bool:
+      request = Request(input_str)
 
-   async def _send_one(self, session: Session, input_str: str) -> bool:  
-
-      ok = True
-      active_router_id = session.get_active_controller()
-      command, request = None, Request(input_str)
+      # Empty input -> noop (or fail, depending on your UX choice)
       if not request.command():
-         return  #return await session.fail("Kein Befehl erkannt.")
+         return True
+
+      # Active controller is the single routing context (S1)
+      controller_id = session.get_active_controller()
+      controller = self._directory.get(controller_id) if controller_id else None
+      if not controller:
+         await session.fail("Kein aktiver Controller gesetzt.")
+         return False
+
+      command = None
 
       try:
-         if active_router_id:
-            # Domain-level hook before resolving the input into a command.
-            # Allows dynamic command registration or early input rewriting.
-            controller = self._directory.get(active_router_id)
-            if controller: # TODO: proxy.on_before_resolve -> dieser löst das intern auf (controller oder websocket)
-               await controller.on_before_resolve(session)
+         # Domain-level hook before resolving the input into a command.
+         # Allows dynamic command registration or early input rewriting.
+         await controller.on_before_resolve(session)
 
-         # resolve the commands
-         result = await self._find_matching_command(active_router_id, request, session)
+         # Resolve command within the single active controller context (+ groups)
+         result = await self._find_matching_command(controller_id, request, session)
          if not result:
-            raise CmdNotFound(f"{request.command()}")
+               raise CmdNotFound(f"{request.command()}")
 
-         controller, command = result
+         resolved_controller, command = result
+
+         # Safety: Under S1, resolved controller should match active controller
+         # (If your router can return a different controller, keep this; otherwise you can drop it.)
+         controller = resolved_controller
+
          command.controller = controller
-                  
-         # Pre-command hook: modify or validate request before execution
+
+         # Pre-command hook
          await controller.on_before_run_command(session, request, command)
-         
-         # Main command execution
+
+         # Execute command
          await command.run(session, request)
 
-         # Post-command hook: cleanup, logging, side effects
+         # Post-command hook
          await controller.on_after_run_command(session, request, command)
 
-      except CmdNotFound as exc:
-         ok = False
+      except CmdNotFound:
          await session.fail(f"Unbekannter Befehl: '{request.command()}'")
 
       except PermissionError as exc:
-         ok = False
          audit = self._services.get(AuditLogService)
-         await audit.permission(session, "command", command.key)
+         # command may be None if permission fails early
+         await audit.permission(session, "command", command.key if command else request.command())
          await session.fail(str(exc))
 
       except ValueError as exc:
-         ok = False
          await session.fail(str(exc))
 
       except Exception as exc:
-         ok = False
          audit = self._services.get(AuditLogService)
          await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
 
-      finally:       
-         if command: 
-            command.controller = None
-         if active_router_id:
-            # Hook called when a domain session is about to end.
-            # Used for cleanup of runtime data, disconnection, or persistence.   
-            controller = self._directory.get(active_router_id)
-            if controller:
-               await controller.on_cleanup(session)
+      finally:
+         if command:
+               command.controller = None
 
-      return ok
+         # Policy 2: cleanup the controller that executed this command
+         # (NOT the current active controller after the command potentially changed it)
+         await controller.on_cleanup(session)

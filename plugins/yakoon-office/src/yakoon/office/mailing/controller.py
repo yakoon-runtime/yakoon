@@ -16,5 +16,3 @@ class OfficeMailingCoreController(BaseController):
     commandsets = [
         MailingCommands]
         
-    async def on_initialize(self, session: Session):
-        session.cmd_groups_dynamic = ["office.mailing:system"]

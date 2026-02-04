@@ -58,16 +58,6 @@ class BaseController(ABC):
         
         return await namespaces.from_session(session)
     
-    async def on_initialize(self, session: Session):
-        """
-        Called after the controller has been fully constructed but before any commands are processed.
-
-        Use this hook to perform asynchronous setup tasks such as loading data, initializing services,
-        or validating infrastructure state (e.g., ensuring the admin account exists).
-
-        This method is guaranteed to run once before the first engine tick or command dispatch.
-        """
-        pass
 
     async def on_before_resolve(self, session: Session):
         """
@@ -91,13 +81,6 @@ class BaseController(ABC):
         Can be used for cleanup, logging, or updating domain state.
         """
         pass
-
-    async def on_enter(self, session: Session):
-        """
-        Called after a user switches into this domain (e.g. via @switch).
-        Used to show welcome messages, check account requirements, or guide login flow.
-        Override this in each domain to define entry behavior.
-        """
 
     async def on_cleanup(self, session: Session):
         """
