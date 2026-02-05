@@ -1,6 +1,15 @@
 from collections import deque
 from typing import Deque
 
+from dataclasses import dataclass
+from typing import Optional
+from uuid import uuid4
+
+from yakoon.base.models.input import DispatchInput
+
+
+
+
 
 class CommandQueueService:
     """
@@ -28,9 +37,9 @@ class CommandQueueService:
         Internally, commands are stored per session key to ensure strict
         isolation between concurrent sessions.
         """
-        self._q: dict[str, Deque[str]] = {}
+        self._q: dict[str, Deque[DispatchInput]] = {}
 
-    def enqueue_commands(self, session, cmds: list[str]) -> None:
+    def enqueue_commands(self, session, cmds: list[str], batch_id: str | None = None) -> str:
         """
         Enqueues multiple commands at the front of the queue for the given session.
 
@@ -45,10 +54,14 @@ class CommandQueueService:
         """
         skey = str(session.key)
         q = self._q.setdefault(skey, deque())
-        for c in reversed(cmds):
-            q.appendleft(c)
 
-    def next_command(self, session) -> str | None:
+        bid = batch_id or uuid4().hex
+        for c in reversed(cmds):
+            q.appendleft(DispatchInput(command=c, batch_id=bid))
+
+        return bid
+
+    def next_input(self, session) -> DispatchInput | None:
         """
         Retrieves and removes the next scheduled command for the given session.
 
@@ -66,11 +79,25 @@ class CommandQueueService:
         if not q:
             return None
 
-        cmd = q.popleft()
+        item = q.popleft()
         if not q:
             self._q.pop(skey, None)
 
-        return cmd
+        return DispatchInput(command=item.command, batch_id=item.batch_id)
+
+
+    def cancel_batch(self, session, batch_id: str) -> None:
+        skey = str(session.key)
+        q = self._q.get(skey)
+        if not q:
+            return
+
+        self._q[skey] = deque(
+            item for item in q if item.batch_id != batch_id
+        )
+
+        if not self._q[skey]:
+            self._q.pop(skey, None)
 
     def has_pending(self, session) -> bool:
         """
