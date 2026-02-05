@@ -8,12 +8,14 @@ from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
-from yakoon.base.runtime.session.output import Output
 
+from yakoon.platform.output.base import Output
+from yakoon.platform.output.console import ConsoleOutput
 from yakoon.platform.runtime.dialogs.manager import DialogManager, PromptMode
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.directories.controller import ControllerDirectory
+
 from yakoon.compose.engine import compose_engine
 
 from yakoon.shell.controller import ShellCoreController
@@ -40,7 +42,7 @@ async def run_console():
     queue = engine.services.get(ports.CommandQueueService)
     sessions = engine.services.get(ports.SessionService)
     session, _ = await sessions.get_or_create(session_key)
-    session.bind_io(Output(print, print))
+    session.bind_io(ConsoleOutput())
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)

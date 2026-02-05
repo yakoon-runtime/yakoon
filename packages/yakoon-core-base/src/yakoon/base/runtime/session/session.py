@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from dataclasses import dataclass, asdict, field
-from typing import Iterable, Optional, Any
+from typing import Mapping, Optional, Any
 
 from yakoon.base.models.key import Key
 from yakoon.base.models.perm import PermissionSet
+from yakoon.base.runtime.output.event import OutputEvent
 
 
 @dataclass
@@ -245,7 +246,10 @@ class Session:
         """
         self._runtime.signals.clear()
 
-    async def emit(self, text: str):
+    async def emit(self, text: str, *,
+                   mime: str = "text/plain", channel: str = "main",
+                   op: str = "append", region: str = "output", 
+                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
         """
         Emits a plain output message via the session's output channel.
 
@@ -254,9 +258,16 @@ class Session:
         Args:
             text (str): The message to emit.
         """
-        await self._runtime.io.out(text)
+        evt = OutputEvent(text=text, mime=mime, 
+                          channel=channel, op=op, region=region, 
+                          meta=dict(meta or {}),)
+        await self._runtime.io.out(evt)
 
-    async def notify(self, text: str):
+
+    async def notify(self, text: str, *,
+                   mime: str = "text/plain", channel: str = "main",
+                   op: str = "append", region: str = "information", 
+                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
         """
         Emits a non-error informational status message.
 
@@ -265,13 +276,22 @@ class Session:
         Args:
             text (str): The status message to display.
         """
-        await self._runtime.io.out(f"> i: {text}")
+        evt = OutputEvent(text=text, mime=mime, 
+                          channel=channel, op=op, region=region, 
+                          meta=dict(meta or {}),)
+        await self._runtime.io.out(evt)
 
-    async def fail(self, text: str):
+    async def fail(self, text: str, *,
+                   mime: str = "text/plain", channel: str = "main",
+                   op: str = "append", region: str = "status", 
+                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
         """
         Emits an error or failure message.
 
         Args:
             text (str): The error message to display.
         """
-        await self._runtime.io.err(f"> e: {text}")
+        evt = OutputEvent(text=text, mime=mime, 
+                          channel=channel, op=op, region=region, 
+                          meta=dict(meta or {}),)
+        await self._runtime.io.err(evt)
