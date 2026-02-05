@@ -4,21 +4,10 @@
     
 
         {
-            "name": "____Yakoon: Loop____",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "yakoon.loop.client",
-            "console": "integratedTerminal",
-            "env": {
-                 "DEV_MODE": "true"
-            },
-        },
-
-        {
             "name": "Yakoon: Run Console",
             "type": "debugpy",
             "request": "launch",
-            "module": "yakoon.hosts.console.app",
+            "module": "yakoon.console.app",
             "console": "integratedTerminal",
             "env": {
                  "DEV_MODE": "true"
