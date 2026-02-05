@@ -10,12 +10,11 @@ class CmdSu(WorkflowCommand):
 
     batch_commmands = "use auth; {raw}; exit;"
 
-    requires = ["system"]
-
     async def run(self, session: Session, request: Request):
 
-        command = self.batch_commmands.format(raw=request.raw)
-        workflow = Request(command).split_commands()
-
+        #session.set_active_controller("auth")
+        workflow = Request(request.raw).split_commands()
         self.schedule(session, workflow)
- 
+
+
+
