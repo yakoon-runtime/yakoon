@@ -1,7 +1,9 @@
 import asyncio
 from typing import Optional, Tuple
 
-from yakoon.base.ports import AuditLogService
+from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.perm import PermBit
+from yakoon.base.ports import AuditLogService, CommandQueueService, PermissionService
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.runtime.session import Session
@@ -32,18 +34,15 @@ class Engine:
         return self._services
 
    async def _find_matching_command(
-         self, active_router_id, request: Request, 
-         session: Session) -> Optional[Tuple[BaseController, Command]]:
+         self, active_router_id, request: Request) -> Optional[Tuple[BaseController, Command]]:
       
-      cmd_groups = list(session.allowed_command_groups)
-
       find = self._commands.find
-      result: tuple[str, Command] = find(active_router_id, request.command(), cmd_groups)
+      result: tuple[str, Command] = find(active_router_id, request.command())
       if result:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
 
-   async def dispatch(self, session: Session, input_str: str) -> Session:
+   async def dispatch(self, session: Session, di: DispatchInput) -> Session:
 
       skey = str(session.key)
       shell = self._directory.find_shell()
@@ -52,7 +51,7 @@ class Engine:
 
       # 1) Prompt response path
       if DialogManager.is_waiting(session):
-         DialogManager.resolve_prompt(session, input_str)
+         DialogManager.resolve_prompt(session, di.command)
 
          # Drive the existing active task until it either finishes or asks again
          await self._drive_until_blocked_or_done(session)
@@ -61,7 +60,7 @@ class Engine:
          return session
 
       # 2) Normal command path
-      task = asyncio.create_task(self._dispatch_command(session, input_str))
+      task = asyncio.create_task(self._dispatch_command(session, di))
       self._active_tasks[skey] = task
 
       await self._drive_until_blocked_or_done(session)
@@ -82,8 +81,9 @@ class Engine:
         _ = task.exception()  # drain
         self._active_tasks.pop(str(session.key), None)
 
-   async def _dispatch_command(self, session: Session, input_str: str) -> bool:
-      request = Request(input_str)
+   async def _dispatch_command(self, session: Session, di: DispatchInput) -> bool:
+      failed = False
+      request = Request(di.command)
 
       # Empty input -> noop (or fail, depending on your UX choice)
       if not request.command():
@@ -104,11 +104,16 @@ class Engine:
          await controller.on_before_resolve(session)
 
          # Resolve command within the single active controller context (+ groups)
-         result = await self._find_matching_command(controller_id, request, session)
+         result = await self._find_matching_command(controller_id, request)
          if not result:
                raise CmdNotFound(f"{request.command()}")
 
          resolved_controller, command = result
+
+         perm_service = self.services.get(PermissionService)
+         fq = f"{resolved_controller.id}:{command.key}"
+         if not perm_service.can_execute(session, fq):
+            raise PermissionError("Permission denied")
 
          # Safety: Under S1, resolved controller should match active controller
          # (If your router can return a different controller, keep this; otherwise you can drop it.)
@@ -126,18 +131,22 @@ class Engine:
          await controller.on_after_run_command(session, request, command)
 
       except CmdNotFound:
+         failed = True
          await session.fail(f"{request.command()}': command not found... use 'man'")
 
       except PermissionError as exc:
+         failed = True
          audit = self._services.get(AuditLogService)
          # command may be None if permission fails early
          await audit.permission(session, "command", command.key if command else request.command())
          await session.fail(str(exc))
 
       except ValueError as exc:
+         failed = True
          await session.fail(str(exc))
 
       except Exception as exc:
+         failed = True
          audit = self._services.get(AuditLogService)
          await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
@@ -145,6 +154,10 @@ class Engine:
       finally:
          if command:
                command.controller = None
+
+         if failed and di.batch_id:
+            queue = self._services.get(CommandQueueService)
+            queue.cancel_batch(session, di.batch_id)
 
          # Policy 2: cleanup the controller that executed this command
          # (NOT the current active controller after the command potentially changed it)

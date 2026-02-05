@@ -1,9 +1,9 @@
 import asyncio
-from uuid import uuid4
 
+from yakoon.base import ports 
 from yakoon.auth.controller import AuthCoreController
 from yakoon.base.models.key import Key
-from yakoon.base import ports 
+from yakoon.base.models.input import DispatchInput
 from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
@@ -42,27 +42,30 @@ async def run_console():
     session, _ = await sessions.get_or_create(session_key)
     session.bind_io(Output(print, print))
 
+    permissions = engine.services.get(ports.PermissionService)
+    permissions.set_bootstrap_permissions(session)
+
     queue.enqueue_commands(session, command_inits)
-    session.add_allowed_groups(["shell:system", "auth:system"])
 
     try:
         while True:
 
             prompt = format_prompt(session)
 
+            di = None
             if DialogManager.is_waiting(session):
                 mode = DialogManager.get_mode(session)
                 if mode == PromptMode.SECRET:
-                    command = await safe_input_secret(prompt=prompt)
+                    di = DispatchInput(await safe_input_secret(prompt=prompt))
                 else:
-                    command = await safe_input(prompt=prompt)
-
+                    di = DispatchInput(await safe_input(prompt=prompt))
             else:
-                command = queue.next_command(session)
-                if command is None:
-                    command = await safe_input(prompt=prompt)
 
-            await engine.dispatch(session, command)
+                di = queue.next_input(session)
+                if not di:
+                    di = DispatchInput(await safe_input(prompt=prompt))
+
+            await engine.dispatch(session, di)
             if session.has_signal("exit_app"):
                 break  
     finally:
