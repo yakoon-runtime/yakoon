@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from yakoon.base.runtime.output.event import OutputEvent
-from yakoon.platform.output.base import DefaultOutput
-
+from yakoon.platform.output.default import DefaultOutput
 
 
 class ConsoleOutput(DefaultOutput):
