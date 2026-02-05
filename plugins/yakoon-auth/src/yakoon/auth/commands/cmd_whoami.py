@@ -8,8 +8,6 @@ class CmdWhoAmI(Command):
 
     key = "whoami"    
 
-    requires = ["system"]
-
     async def run(self, session: Session, request: Request):
 
         presenter = await self.get_presenter(session)

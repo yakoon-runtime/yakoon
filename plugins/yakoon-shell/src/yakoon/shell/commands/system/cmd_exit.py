@@ -9,7 +9,6 @@ class CmdExit(Command):
     key = "exit"    
     template_prefix = "system"
 
-    requires = ["system"]
 
     async def run(self, session: Session, request: Request):
 

@@ -8,8 +8,6 @@ class CmdWelcome(Command):
     key = "welcome"    
     template_prefix = "system"
 
-    requires = ["system"]
-
     async def run(self, session: Session, _: Request):
 
         presenter = await self.get_presenter(session)

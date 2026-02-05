@@ -9,8 +9,6 @@ class CmdUse(Command):
     key = "use"    
     template_prefix = "system"
 
-    requires = ["system"]
-
     async def run(self, session: Session, request: Request):
 
         controllers = self.services.get(ControllerCatalogService)       
