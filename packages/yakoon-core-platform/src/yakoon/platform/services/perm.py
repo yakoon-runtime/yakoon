@@ -1,0 +1,117 @@
+from __future__ import annotations
+
+from typing import Iterable
+from yakoon.base.models.account import Account
+from yakoon.base.models.perm import PermBit, PermBits, Permission, PermissionSet
+from yakoon.base.runtime.session.session import Session
+
+
+class PermissionService:
+
+    _roles: dict[str, list] = {}
+    _directs = [
+            "shell:welcome|rx",
+            "shell:version|rx",
+            "shell:test|rx",
+            "shell:man|rx",
+            "shell:exit|rx",
+            "shell:quit|rx",
+            "shell:su|rx",
+            "auth:su|rx",
+            #"shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
+        ]
+
+    def register_role(self, name: str, specs: list[str]) -> None: 
+        if name in self._roles:
+            raise ValueError(f"Role already registered: {name}")
+        self._roles[name] = specs
+
+    def set_bootstrap_permissions(self, session: Session):
+        session.set_permissions(self.compile_permissions(self._roles, self._directs))
+
+    def apply_account_permissions(self, session: Session, account: Account):
+        bootstrap = self.compile_permissions([], self._directs)
+        account_ps = self.compile_permissions(account.roles, account.permissions)  # falls roles später kommen
+
+        bootstrap.merge(account_ps) 
+        session.set_permissions(bootstrap)
+
+    def can_execute(self, session:Session, perm_key:str) -> bool:
+        return session.permissions.check(perm_key, PermBit.EXECUTE)
+
+    def can_read(self, session:Session, perm_key:str) -> bool:
+        return session.permissions.check(perm_key, PermBit.READ)
+
+    def compile_permissions(self, roles: Iterable[str], direct: Iterable[str]) -> PermissionSet:
+
+        ps = PermissionSet()
+        # roles
+        for role in roles:
+            for spec in self._roles.get(role, []):
+                ps.add(self.parse_permission(spec))
+        # direct
+        for spec in direct:
+            ps.add(self.parse_permission(spec))
+        return ps
+
+    def parse_permission(self, spec: str) -> Permission:
+        """
+        Formats:
+        "auth:su|rx"
+        "auth:su|rx:rx"   (two scopes)
+        "-auth:su|x"      (deny)
+        "-auth:su|rx:--"  (optional future idea; today we only parse r/x)
+        """
+        if not spec or not spec.strip():
+            raise ValueError("Empty permission spec")
+
+        s = spec.strip()
+        deny = s.startswith("-")
+        if deny:
+            s = s[1:].strip()
+
+        if "|" not in s:
+            raise ValueError(f"Invalid permission (missing '|'): {spec}")
+
+        key, rights = s.split("|", 1)
+        key = key.strip()
+        rights = rights.strip()
+
+        if not key:
+            raise ValueError(f"Invalid permission (empty command key): {spec}")
+
+        # scope split: "rx" or "rx:rx"
+        parts = rights.split(":")
+        if len(parts) == 1:
+            return Permission(
+                command_key=key, 
+                scope1=PermBits.from_str(parts[0]), 
+                scope2=None, 
+                deny=deny)
+        if len(parts) == 2:
+            return Permission(
+                command_key=key, 
+                scope1=PermBits.from_str(parts[0]), 
+                scope2=PermBits.from_str(parts[1]), 
+                deny=deny)
+
+        raise ValueError(f"Invalid permission (too many scopes): {spec}")
+
+
+# --- Role expansion (phase 1: map) ------------------------------------------
+
+_ROLE_MAP: dict[str, list[str]] = {
+    "admin": [
+        "auth:su|rx",
+        "shell:use|rx",
+        "office.mailing:send|rx",
+        # ...
+    ],
+    "user": [
+        "shell:use|rx",
+    ],
+}
+
+
+
+

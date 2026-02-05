@@ -29,8 +29,7 @@ def load_defaults(store: InMemoryAccountStore):
         Key(namespace=ns, id="1"), 
         username="stefan", 
         password_hash="123", 
-        allowed_command_groups=[
-            "shell:system", "office.mailing:system", "auth:system"])
+        roles=["admin"])
 
     store.add(Account(data))
 
@@ -38,7 +37,6 @@ def load_defaults(store: InMemoryAccountStore):
         Key(namespace=ns, id="2"), 
         username="lara", 
         password_hash="456",
-        allowed_command_groups=[
-            "shell:system"])
+        roles=["user"])
 
     store.add(Account(data))

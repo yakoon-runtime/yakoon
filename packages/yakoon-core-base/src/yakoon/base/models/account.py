@@ -23,11 +23,11 @@ class AccountData:
     password_hash: str | None = None
 
     roles: list[str] = field(default_factory=list)
-    is_disabled: bool = False
+    permissions: list[str] = field(default_factory=list)
 
+    is_disabled: bool = False
     last_login: datetime | None = None
     data: dict[str, Any] = field(default_factory=dict)
-    allowed_command_groups: list[str] = field(default_factory=list)
 
 
     def has_role(self, role: str) -> bool:
@@ -50,7 +50,7 @@ class AccountData:
             "username": self.username,
             "password_hash": self.password_hash,
             "roles": list(self.roles),
-            "allowed_command_groups": list(self.allowed_command_groups),
+            "permissions": list(self.permissions),
             "is_disabled": self.is_disabled,
             "last_login": (
                 self.last_login.astimezone(timezone.utc).isoformat()
@@ -73,7 +73,7 @@ class AccountData:
             username=d["username"],
             password_hash=d["password_hash"],
             roles=list(d.get("roles", [])),
-            allowed_command_groups=list(d.get("allowed_command_groups", [])),
+            permissions=list(d.get("permissions", [])),
             is_disabled=d.get("is_disabled", False),
             data=dict(d.get("data", {})),
         )
@@ -108,12 +108,12 @@ class Account:
         return self.data.roles
 
     @property
-    def password_hash(self) -> str:
-        return self.data.password_hash
+    def permissions(self) -> list[str]:
+        return self.data.permissions
 
     @property
-    def allowed_command_groups(self) -> list[str]:
-        return self.data.allowed_command_groups
+    def password_hash(self) -> str:
+        return self.data.password_hash
 
     def has_role(self, role: str) -> bool:
         """Delegates to AccountData.has_role()."""

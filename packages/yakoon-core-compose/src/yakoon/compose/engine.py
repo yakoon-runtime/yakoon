@@ -11,6 +11,7 @@ from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerif
 from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
 from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.namespace import NamespaceService
+from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
@@ -37,11 +38,24 @@ async def compose_engine(controllers: ControllerDirectory) -> Engine:
         command_catalog, templates)
 
     _compose_controllers(controllers, services)
+    _compose_permission_roles(services)
 
     engine = Engine(controllers, services, commands)  
 
     return engine
 
+
+def _compose_permission_roles(services: ServiceDirectory):
+
+    permissions = services.get(ports.PermissionService)
+    permissions.register_role("admin", [
+        "auth:su|rx",
+        "shell:use|rx",
+        "office.mailing:sendmail|rx",
+    ])
+    permissions.register_role("user", [
+        "shell:use|rx",
+    ])
 
 def _compose_controllers(directory: ControllerDirectory, services: ServiceDirectory):
 
@@ -89,8 +103,7 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
             controller.is_activatable, 
             controller.shell_builtins)
         for commands_set in controller.commandsets:
-            group = getattr(commands_set, "group", "system")
-            router.register(f"{controller.id}:{group}", commands_set)
+            router.register(controller.id, commands_set)
             commands.register(controller.id, router)
 
     return commands
@@ -112,6 +125,7 @@ def _compose_services(
     services.register_static(ports.AccountService, AccountService(InMemoryAccountStore()))
     services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
     services.register_static(ports.AuthenticationService, AuthenticationService(services))
+    services.register_static(ports.PermissionService, PermissionService())
 
     services.register_static(
         ports.RendererService, 

@@ -5,6 +5,7 @@ from dataclasses import dataclass, asdict, field
 from typing import Iterable, Optional, Any
 
 from yakoon.base.models.key import Key
+from yakoon.base.models.perm import PermissionSet
 
 
 @dataclass
@@ -53,7 +54,7 @@ class SessionState:
 
 @dataclass
 class SessionRuntime:
-    allowed_command_groups: set[str] = field(default_factory=set)
+    permissions: PermissionSet = field(default_factory=PermissionSet)
     data: dict[str, Any] = field(default_factory=dict)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
@@ -93,6 +94,13 @@ class Session:
     def state(self) -> SessionState:
         return self._state
 
+    @property
+    def permissions(self) -> PermissionSet:
+        return self._runtime.permissions
+
+    def set_permissions(self, permset: PermissionSet) -> None:
+        self._runtime.permissions = permset
+
     @classmethod
     def from_state(cls, state: SessionState) -> "Session":
         """
@@ -109,28 +117,6 @@ class Session:
             Session: A fully initialized session with fresh runtime data.
         """
         return cls(state)
-
-    @property
-    def allowed_command_groups(self) -> set[str]:
-        # return the live set (fast membership checks)
-        return set(self._runtime.allowed_command_groups)
-
-    def set_allowed_groups(self, groups: Iterable[str]) -> None:
-        """
-        Replace all allowed groups with the provided ones.
-        Use this after login/su when you want a clean capability set.
-        """
-        self._runtime.allowed_command_groups = set(groups)
-
-    def add_allowed_groups(self, groups: Iterable[str]) -> None:
-        """
-        Add capabilities (idempotent).
-        Use this for incremental grants (e.g., temporary feature flags).
-        """
-        self._runtime.allowed_command_groups.update(groups)
-
-    def has_group(self, group: str) -> bool:
-        return group in self._runtime.allowed_command_groups
 
     def touch(self) -> None:
         """
