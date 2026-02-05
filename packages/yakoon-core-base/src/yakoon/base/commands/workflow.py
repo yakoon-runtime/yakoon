@@ -1,7 +1,6 @@
 
 
 from yakoon.base.commands.command import Command
-from yakoon.base.commands.request import Request
 from yakoon.base.ports import CommandQueueService
 from yakoon.base.runtime.session.session import Session
 
@@ -12,6 +11,6 @@ class WorkflowCommand(Command):
     It does not execute them itself.
     """
 
-    def schedule(self, session, commands: list[str]):
+    def schedule(self, session: Session, commands: list[str]):
         queue = self.services.get(CommandQueueService)
         queue.enqueue_commands(session, commands)
