@@ -2,32 +2,67 @@
 > Faustregel: Wenn du es jemand anderem erklären müsstest → rein damit.
 > Dokumentiert wird: Was? Und Warum?
 ---
+> 1. S1: Pro Session genau ein aktiver Controller.
+> 2. Orchestrierung: Engine orchestriert, Host entscheidet über Lifecycle (Signal).
+> 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
+--
 
 
-## [2025-02-02]
+## [2026-05-02]
+**Service für Permission & Rollen**
+Permissions und Rollen müssen dem System über einen Service zur Verfügung gestellt werden. Damit kann das gesamte Handling in der Platform verbleiben. Die Logik, wie Rechte und Rollen zusammenarbeiten, befindet sich ebenfalls in diesem Service.
+
+## [2026-04-02]
+**Batch & Workflow**
+Durch die Einführung des 'DispatchInput' kann der Host vereinfacht werden. Somit nimmt nun auch die Engine keinen einfachen input:str mehr auf, sondern verwendet intern den DispatchInput. Dieses beinhaltet immer die Benutzereingabe + eine batch_id. Warum ist eine batch_id notwendig? Wenn innerhalb eines batches (Workflow) ein Fehler auftritt (z.B: PermissionDenied), dann dürfen die folgenden Commands (innerhalb der Workflow-Serie) nicht mehr ausgeführt werden. Durch die batch_id kann die Engine diese Commands nun ablehnen und aus der Queue entfernen. => On failure inside batch → cancel remaining batch items. Failure umfasst: PermissionDenied, CmdNotFound, ValueError, InternalError (je nach Policy)
+
+## [2026-04-02]
+**Permissions**
+Permissions werden als Unix-Rechte umgesetzt: rx (read/execute). Das vorherige Konzept über Commandsets wurde aufgelöst, weil es nicht skalierfähig war. Nun kann für jedes Commmand ein Recht (rx) - (spter rx:rx) erteilt oder auch entzogen werden. Der Account unterstützt nun Rollen und Permissions. Beide werden durch das Command 'su' in die aktuelle Session geladen. Durch die Einführung des IdentityMapService, bleiben die kompilierten Berechtigungen übe die Sitzung in der Session enthalten.
+
+## [2026-04-02]
+**Hooks in Controller**
+Die Hooks in Controllern wurden reduziert. Auch wurden alle Hooks aus dem BaseController entfernt, die nur von der Shell genutzt wurden. Das System (Engine) macht nun zwischen Controllern keinen Unterschied mehr.
+
+## [2026-04-02]
+**IdentityMapService**
+Das gesamte System braucht verlässliche Sessions über die Dauer einer Sitzung. Bisher wurde durch jeden Dispatch eine neue Session aus dem Store geladen. Das hatte zur Folge, dass jeder prompt eine neue Session angefordert hat. Im Code führe das dazu, das nach jedem Prompt die Session.runtime leer war. Durch die IdentityMap ist nun sichergestellt, dass Sessions erhalten bleiben.
+
+## [2026-03-02]
+**Domain-Models**
+Domain-Models arbeiten nicht länger mit Vererbung. Stattdessen halten Domain-Models ihre Daten in einem internen Objekt (runtime/data) auf Basis von 'dataclass'. Auch damit Aufwand in PersistensLayer (Store) entsteht, ist es ehrlich. Denn dort gehört die Logik hin und nicht in Form eines Light-OR-Mappers ins Model.
+
+## [2026-03-02]
+**CmdQuit - Beenden des Hosts**
+Um die Eventloop sauber zu beenden, wird in der Session ein Signal gesetzt. Den Host zu benenden ist Zumutung des Hosts und nicht der Engine. Daher darf die Engine den Abbruch der Loop nicht entscheiden -> Signal. Der Host reagiert nur darauf. Ein anderer Host kann somit entscheiden ob er sich beendet oder das Signal ablehnt. Wichtig: Signale dürfen nicht persistiert werden.
+
+## [2026-03-02]
+**Request trifft keine Entscheidung**
+Das Request nimmt nur die Benutereingabe auf. Entscheidet aber selbst nicht, was Command und SubCommand ist. Das ist immer Aufgabe des einzelnen Commands, zu interpretieren, welcher Parameter was bedeutet.
+
+## [2026-02-02]
 **Workflow darf nicht selbst ausführen**
 Loops oder Rekursion im WorkflowCommand = zweiter Scheduler = Fehlerquelle. Das würde dazu führen, dass der Prompt den Workflow unterbricht und die Kontrolle verliert. Daher kommt ein 'CommandQueueService' zum Einsatz. Dieser wird über die HostLoop abgearbeitet.
 
-## [2025-02-02]
+## [2026-02-02]
 **Rename core Packages**
 Alle Core-Module tragen im Modulename nun '-core-', um sich von den anderen Modules abzugrenzen. Core ist einzigartig, weil es:, nicht optional ist, keine UX hat, kein Plugin ist, und die Runtime überhaupt erst möglich macht. Das ist eine ontologische Sonderstellung. Alles andere – auch Shell, Auth, Office, CRM – sind Programme, also prinzipiell gleichartig. Somit gilt: _Nur Core bekommt ein technisches Präfix._
 
-## [2025-02-01]
+## [2026-02-01]
 **Einführung eines WorkflowCommand**
 Über das WorkflowCommand können Commands intern commands ausführen. Somit können workflows umgesetzt werden. Der Grund für die Implementierung ist die Verwendung von Shortcuts wie 'su'. Dieses Command wird auf der shell laufen, aber dort intern zu einem anderem Plugin routen über 'use auth; su <user>; exit'. Somit können beliebige Commands aus der Shell aufgerufen werden, ohne dass die Shell überfrachtet wird oder globale gültige Commands (doppelte Keys) notwendig werden.
 
-## [2025-02-01]
+## [2026-02-01]
 **Shell hält die Hilfe**
 Die Shell benötigt eine das Command 'man', welches das gesamte Hilfesystem darstellt. Auf Template-Ebene liegt die Hilfe immer in den Command-Templates in der Sektion 'man' des Command-Templates.
 
-## [2025-01-31]
+## [2026-01-31]
 **Shell-Mode & Program-Mode**
 Im Prompt des Hosts wird der aktuelle Mode angezeigt.
 
-## [2025-01-30]
+## [2026-01-30]
 **Einführung einer Shell**
 Bei den Überlegungen zur Architektur der zukünftigen Platform, ist der Gedanke gereift, sich an Unix/Linux anzulehnen. Dabei stellt die Platform das System und die Commandline die Shell dar. Die Shell unterstützt das Starten und Beenden von Programmen (Controllern). Dies geschieht über 'use'. Verlassen der Anwedungen über 'exit'. Die Platform darf somit nur noch Infrastuktur und Dienste bereitstellen. Alles andere muss von Anwendungen (Programs) unterstützt werden. Um die Abstraktion zu verfollständigen, wurde die 'shell' in ein eigenes package verschoben. 'yakoon.shell'. Die Shell unterstützt somit das "Starten" von Programmen über 'use' und befindet sie sich dann im ProgramMode.
-
 
 ## [2025-01-30]
 **ServiceDirectory und 'protocol'**
