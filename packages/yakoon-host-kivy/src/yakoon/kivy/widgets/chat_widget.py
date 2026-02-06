@@ -1,0 +1,66 @@
+
+from kivy.uix.boxlayout import BoxLayout
+from kivy.clock import Clock
+from kivy.app import App
+
+
+class ChatWidget(BoxLayout):
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self._scroll_trigger = Clock.create_trigger(self._scroll_to_bottom, 0)
+
+        self._data = []
+        self.runner = None
+        self.session = None
+
+    @property
+    def prompt(self):
+        return self.ids.prompt
+
+    def _is_near_bottom(self):
+        return self.ids.rv.scroll_y <= 0.02
+
+    def _scroll_to_bottom(self, _dt):
+        rv = self.ids.rv
+
+        # Wenn Inhalt kleiner als Viewport ist: nicht "scrollen" (verhindert Bounce)
+        lm = rv.layout_manager
+        if not lm:
+            return
+        if lm.height <= rv.height:
+            return
+
+        rv.scroll_y = 0
+
+    def apply_context(self, ctx):
+        self.append_message(ctx.envelope.text)
+
+        # App schließen, wenn Session signalisiert
+        if self.session and getattr(self.session, "has_signal", None) and self.session.has_signal("exit_app"):
+            Clock.schedule_once(lambda _dt: App.get_running_app().stop(), 0)
+
+    def append_message(self, text: str):
+
+        if not text.endswith("\n"):
+            text += "\n"
+        self._data.append({"text": text})
+        self.ids.rv.data = self._data
+
+        # kein schedule_once scroll_y=0 mehr
+        self._scroll_trigger()
+
+    def submit(self, text:str):
+        
+        #self.append_message(f"shell$ {text}")
+        self.append_message(f"{text}")
+
+        if self.runner:
+            self.runner.submit(text)
+
+        # Fokus behalten
+        Clock.schedule_once(lambda _dt: setattr(self.ids.prompt, "focus", True), 0)
+
+
+from kivy.factory import Factory
+Factory.register("ChatWidget", cls=ChatWidget)

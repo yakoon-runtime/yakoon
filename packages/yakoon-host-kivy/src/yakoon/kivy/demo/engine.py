@@ -1,0 +1,20 @@
+from yakoon.kivy.demo.session import DemoSession
+from yakoon.kivy.models.envelope import Envelope
+
+
+
+class DemoEngine:
+
+    async def dispatch(self, session: DemoSession, text: str):
+        text = (text or "").rstrip()
+
+        if text.lower() in ("exit", "quit"):
+            # optional: signal zum Schließen
+            session.set_signal("exit_app")
+            if session._io:
+                await session._io.emit(Envelope(text="(system) bye"))
+            return
+
+        # Echo
+        if session._io:
+            await session._io.emit(Envelope(text=f"(output) {text}"))

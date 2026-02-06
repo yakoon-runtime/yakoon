@@ -1,0 +1,50 @@
+#:kivy 2.2.0
+#:import dp kivy.metrics.dp
+#:import theme yakoon.kivy.themes.active.active_theme
+
+
+<YkPanel@BoxLayout>:
+    padding: dp(theme.pad)
+    canvas.before:
+        Color:
+            rgba: theme.surface
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(theme.radius)]
+        Color:
+            rgba: theme.border
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(theme.radius))
+            width: 1
+
+
+<YkPrompt@TextInput>:
+    multiline: False
+    padding: dp(theme.pad_sm), dp(theme.pad_sm + 2), dp(theme.pad_sm), dp(theme.pad_sm - 2)
+    foreground_color: theme.text
+    background_normal: ""
+    background_active: ""
+    background_color: theme.surface
+    cursor_color: theme.accent
+    selection_color: [theme.accent[0], theme.accent[1], theme.accent[2], 0.25]
+    hint_text_color: theme.muted
+    font_name: theme.font_mono
+
+
+<YkInputSurface@BoxLayout>:
+    padding: dp(theme.pad_sm)
+    size_hint_y: 1
+
+    canvas.before:
+        Color:
+            rgba: theme.surface_input
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(theme.radius)]
+        Color:
+            rgba: theme.border
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(theme.radius))
+            width: 1

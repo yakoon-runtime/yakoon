@@ -1,0 +1,30 @@
+#:import dp kivy.metrics.dp
+#:import theme yakoon.kivy.themes.active.active_theme
+
+<ChatWidget>:
+    orientation: "vertical"
+    spacing: dp(theme.pad_sm)
+
+    YkPanel:
+        orientation: "vertical"
+        RecycleView:
+            id: rv
+            viewclass: "ChatRow"
+            scroll_type: ['bars', 'content']
+            bar_width: dp(6)
+
+            RecycleBoxLayout:
+                default_size: None, dp(24)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: "vertical"
+                spacing: dp(4)
+                padding: dp(theme.pad), dp(theme.pad)
+
+    PromptWidget:
+        id: prompt
+        hint: "shell$ "
+        height: dp(44)
+        size_hint_y: None
+        on_submit: root.submit(args[1])

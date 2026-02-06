@@ -1,0 +1,24 @@
+#:kivy 2.2.0
+#:import dp kivy.metrics.dp
+#:import theme yakoon.kivy.themes.active.active_theme
+
+<AppRootPage>:
+    orientation: "horizontal"
+    canvas.before:
+        Color:
+            rgba: theme.bg
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        id: sidebar
+        size_hint_x: None
+        width: dp(40)
+
+    # Content area
+    BoxLayout:
+        orientation: "vertical"
+        padding: dp(theme.pad)
+        ChatWidget:
+            id: chat_widget
