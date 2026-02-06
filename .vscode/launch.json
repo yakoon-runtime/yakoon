@@ -15,6 +15,18 @@
         },
 
         {
+            "name": "Yakoon: Run Kivy",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "yakoon.kivy.app",
+            "console": "integratedTerminal",
+            "env": {
+                 "DEV_MODE": "true"
+            },
+        },
+
+
+        {
             "name": "Yakoon: Run Telnet",
             "type": "debugpy",
             "request": "launch",
