@@ -8,7 +8,12 @@ from yakoon.kivy.pages.app_root import AppRootPage
 # wichtig: Widgets registrieren, bevor KV geladen wird (Factory.register etc.)
 from yakoon.kivy import pages, widgets  # noqa: F401
 from yakoon.kivy.utils import fonts     # noqa: F401
-    
+from kivy.config import Config
+
+# ESC soll NICHT die App schließen
+Config.set('kivy', 'exit_on_escape', '0')
+
+
 class YakoonKivyApp(App):
 
     def build(self):
