@@ -7,6 +7,9 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+## [2026-05-02]
+**OutputAdapter**
+Die Session kann Metadaten durch Commands nach an den IO-Adapter leiten. Somit kann ein Command der Außenwelt mitteilen, um welche Information es sich bei dem ausgegebenen Text handelt. Die Engine legt sich bei der Ausgabe nicht fest, sondern rendert nur entsprechende Templates.
 
 ## [2026-05-02]
 **Service für Permission & Rollen**
