@@ -12,7 +12,7 @@ class DefaultTheme(EventDispatcher):
     #bg = [0.15, 0.15, 0.16, 1]
     #surface = [0.20, 0.20, 0.22, 1]
 
-    border = ListProperty([0.20, 0.20, 0.24, 1])
+    border = ListProperty([0.20, 0.20, 0.24, 0]) # no border
 
     text = ListProperty([0.93, 0.93, 0.95, 1])
     muted = ListProperty([0.70, 0.70, 0.75, 1])
