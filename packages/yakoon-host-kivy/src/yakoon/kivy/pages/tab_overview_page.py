@@ -45,6 +45,5 @@ class TabOverviewPage(BoxLayout):
             self.controller.on_new_tab()
 
 
-
 from kivy.factory import Factory
 Factory.register("TabOverviewPage", cls=TabOverviewPage)

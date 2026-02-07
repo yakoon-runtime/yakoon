@@ -5,14 +5,12 @@ from yakoon.kivy.widgets.chat.chat_widget import ChatWidget
 
 class TabsController:
 
-    def __init__(self, app_root, navigator, state: TabState):
+    def __init__(self, runner, app_root, navigator, state: TabState):
  
+        self.runner = runner
         self.app_root = app_root
         self.nav = navigator
         self.state = state
-
-    def set_runner(self, runner):
-        self.runner = runner
     
     def new_chat_tab(self, select: bool = True) -> str:
         self.state.counter += 1
@@ -73,4 +71,4 @@ class TabsController:
             page.focus_prompt()
 
     def active_page(self):
-        return self.state.pages.get(self.app.active_tab_id)
+        return self.state.pages.get(self.state.active_tab_id)

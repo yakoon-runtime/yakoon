@@ -4,6 +4,7 @@ from typing import Optional
 
 
 class SessionRunner:
+    
     def __init__(self, engine, session):
         self.engine = engine
         self.session = session

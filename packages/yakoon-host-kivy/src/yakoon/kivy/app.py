@@ -1,65 +1,19 @@
-from pathlib import Path
 
-from kivy.app import App
+
 from kivy.config import Config
 Config.set('kivy', 'exit_on_escape', '0')
 
-from yakoon.kivy.controllers.app_controller import AppController
-from yakoon.kivy.host.output_adapter import OutputAdapter
-from yakoon.kivy.host.state_provider import UIStateProvider
-from yakoon.kivy.utils.loader import load_layouts
-from yakoon.kivy.pages.app_root_page import AppRootPage
-
-from yakoon.kivy.host.output import KivyOutput
-from yakoon.kivy.host.runner import SessionRunner
-
-# Demo
-from yakoon.kivy.demo.engine import DemoEngine
-from yakoon.kivy.demo.session import DemoSession
-
-# wichtig: Widgets registrieren, bevor KV geladen wird (Factory.register etc.)
+from kivy.app import App
 from yakoon.kivy import pages           # noqa: F401
 from yakoon.kivy import widgets         # noqa: F401
 from yakoon.kivy.utils import fonts     # noqa: F401
 
+from yakoon.kivy.bootstrap.compose import compose_kivy_app
+
 
 class YakoonKivyApp(App):
-
     def build(self):
-        package_root = Path(__file__).resolve().parent
-        load_layouts(package_root)
-
-        engine = DemoEngine()
-        session = DemoSession()
-
-        root = AppRootPage()
-        controller = AppController(root)
-
-        # UI-State Provider (PromptPrefix etc.) – später aus Session/Controller ableiten
-        def ui_state():
-            # Beispiel: dynamischer Prompt
-            prompt = getattr(session, "prompt_prefix", "stefan@app$")
-            return {"prompt_prefix": prompt, "prompt_secret": False}
-
-        ui_state_provider = UIStateProvider(session)
-        kivy_out = KivyOutput(
-            session, 
-            controller.dispatch_context, 
-            ui_state_provider=ui_state_provider)
-
-        # Wichtig: Engine erwartet Output-Adapter, nicht KivyOutput direkt
-        session.bind_io(OutputAdapter(
-            emit_fn=kivy_out.emit,
-            emit_err_fn=kivy_out.emit,
-        ))
-
-        runner = SessionRunner(engine, session)
-        runner.start()
-
-        controller.set_runner(runner)
-        controller.new_chat_tab(select=True)
-
-        return root
+        return compose_kivy_app().root
 
 
 if __name__ == "__main__":

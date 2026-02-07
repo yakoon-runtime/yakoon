@@ -4,14 +4,13 @@ from yakoon.kivy.states.tab_state import TabState
 
 class OverviewController:
 
-    def __init__(self, app_root, navigator, tabs_ctrl, state: TabState):
+    def __init__(self, runner, app_root, navigator, tabs_ctrl, state: TabState):
+
+        self.runner = runner
         self.app_root = app_root
         self.nav = navigator
         self.tabs = tabs_ctrl
         self.state = state
-
-    def set_runner(self, runner):
-        self.runner = runner
 
     def open(self):
         page = self.app_root.ids.get("overview_page")

@@ -4,17 +4,24 @@ from yakoon.kivy.host.context import ViewContext
 from yakoon.kivy.models.envelope import Envelope
 
 
+from typing import Callable, Optional
+
+
 class KivyOutput:
+    def __init__(
+        self,
+        session,
+        on_context: Callable[[object], None],
+        ui_state_provider=None,
+    ):
+        self.session = session
+        self._on_context = on_context
+        self._ui_state_provider = ui_state_provider
 
-    def __init__(self, session, dispatch_context, ui_state_provider=None):
-        self._session = session
-        self._dispatch_context = dispatch_context
-        self._ui_state_provider = ui_state_provider or (lambda: {})
-
-    async def emit(self, envelope):
+    def emit(self, envelope):
         ctx = ViewContext(
-            session=self._session,
+            session=self.session,
             envelope=envelope,
-            ui_state=self._ui_state_provider(),
+            ui_state=self._ui_state_provider,
         )
-        Clock.schedule_once(lambda _dt: self._dispatch_context(ctx), 0)
+        self._on_context(ctx)

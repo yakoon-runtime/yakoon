@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from yakoon.kivy.host.state_provider import UIStateProvider
+from yakoon.kivy.states.state_provider import UIStateProvider
 from yakoon.kivy.models.envelope import Envelope
 
 
@@ -7,4 +7,4 @@ from yakoon.kivy.models.envelope import Envelope
 class ViewContext:
     session: object
     envelope: Envelope
-    ui_state: UIStateProvider
+    ui_state: callable  # returns UIState

@@ -2,18 +2,26 @@ from __future__ import annotations
 from typing import Optional
 
 from yakoon.kivy.host.context import ViewContext
-from yakoon.kivy.controllers.navigator import Navigator
 from yakoon.kivy.controllers.tabs_controller import TabsController
 from yakoon.kivy.controllers.tabs_overview_controller import OverviewController
-from yakoon.kivy.widgets.chat import ChatWidget
 from yakoon.kivy.states.tab_state import TabState
+
+
+class Navigator:
+    def __init__(self, app_root):
+        self.app_root = app_root
+
+    def go(self, name: str):
+        sm = self.app_root.ids.get("sm")
+        if sm:
+            sm.current = name
 
 
 class AppController:
 
-    def __init__(self, app_root):
+    def __init__(self, app_root, runner):
 
-        self.runner = None
+        self.runner = runner
         self.app_root = app_root
         self.app_root.set_controller(self)
 
@@ -23,14 +31,9 @@ class AppController:
         # --- CONTROLLERS ---
         self.nav = Navigator(app_root)
         self.tabs_ctrl = TabsController(
-            app_root, self.nav, self.tab_state)
+            runner, app_root, self.nav, self.tab_state)
         self.overview_ctrl = OverviewController(
-            app_root, self.nav, self.tabs_ctrl, self.tab_state)
-
-    def set_runner(self, runner):
-        self.runner = runner
-        self.tabs_ctrl.set_runner(runner)
-        self.overview_ctrl.set_runner(runner)
+            runner, app_root, self.nav, self.tabs_ctrl, self.tab_state)
 
     # --- delegation API (wird von Views/Root benutzt) ---
     def show_overview(self):
