@@ -6,10 +6,8 @@ from kivy.lang import Builder
 def _sorted_kv(folder: Path) -> list[Path]:
     if not folder.exists():
         return []
-    return sorted(
-        (p for p in folder.rglob("*.kv") if p.is_file()),
-        key=lambda p: p.as_posix(),
-    )
+    return sorted(p for p in folder.rglob("*.kv") if p.is_file())
+
 
 def load_layouts(package_root: Path) -> None:
     layouts = package_root / "layouts"

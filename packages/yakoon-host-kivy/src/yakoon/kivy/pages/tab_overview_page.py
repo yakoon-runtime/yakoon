@@ -50,3 +50,7 @@ class TabOverviewPage(BoxLayout):
             self._open(tab_id)
             # optional: in overview bleiben oder direkt zurück:
             #self.controller.show_overview()
+
+
+from kivy.factory import Factory
+Factory.register("TabOverviewPage", cls=TabOverviewPage)

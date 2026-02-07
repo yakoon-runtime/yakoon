@@ -1,9 +1,10 @@
 #:import dp kivy.metrics.dp
 #:import theme yakoon.kivy.themes.active.active_theme
+#:import NoTransition kivy.uix.screenmanager.NoTransition
 
 <AppRootPage>:
     orientation: "vertical"
-
+    
     # --- Topbar ---
     BoxLayout:
         id: topbar
@@ -59,7 +60,7 @@
                 spacing: 0
                 size_hint_x: None
                 width: self.minimum_width
-                height: dp(6)
+                height: dp(40) #6
 
         # right buttons
         YkIconButton:
@@ -92,6 +93,20 @@
         BoxLayout:
             id: content
             orientation: "vertical"
-            padding: dp(theme.pad)
+            padding: 0, 0
             size_hint_y: 1
-            # hier kommt die aktive Page rein (anfangs ChatPage)
+
+            ScreenManager:
+                id: sm
+                transition: NoTransition()
+
+                Screen:
+                    name: "tabs"
+                    TabViewPage:
+                        id: tabs_page
+
+                Screen:
+                    name: "overview"
+                    TabOverviewPage:
+                        id: overview_page
+

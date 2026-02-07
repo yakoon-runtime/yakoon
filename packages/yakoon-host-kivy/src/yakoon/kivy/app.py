@@ -3,6 +3,7 @@ from kivy.config import Config
 from yakoon.kivy.host.output_adapter import OutputAdapter
 from yakoon.kivy.host.state_provider import UIStateProvider
 from yakoon.platform.output.default import Output
+
 Config.set('kivy', 'exit_on_escape', '0')
 
 from pathlib import Path
@@ -20,7 +21,8 @@ from yakoon.kivy.demo.engine import DemoEngine
 from yakoon.kivy.demo.session import DemoSession
 
 # wichtig: Widgets registrieren, bevor KV geladen wird (Factory.register etc.)
-from yakoon.kivy import pages, widgets  # noqa: F401
+from yakoon.kivy import pages           # noqa: F401
+from yakoon.kivy import widgets         # noqa: F401
 from yakoon.kivy.utils import fonts     # noqa: F401
 
 

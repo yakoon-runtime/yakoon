@@ -1,0 +1,12 @@
+#:import dp kivy.metrics.dp
+#:import theme yakoon.kivy.themes.active.active_theme
+
+<TabViewPage>:
+    orientation: "vertical"
+    padding: dp(theme.pad), dp(theme.pad)
+    spacing: dp(theme.pad)
+
+    BoxLayout:
+        id: content_host
+        orientation: "vertical"
+        size_hint_y: 1
