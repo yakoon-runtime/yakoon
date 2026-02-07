@@ -17,13 +17,6 @@ class AppRootPage(BoxLayout):
     def set_controller(self, controller):
         self.controller = controller
 
-    def on_kv_post(self, base_widget):
-
-        print("AppRootPage ids:", self.ids.keys())
-        
-        # wird aufgerufen, wenn KV + IDs vollständig gebaut sind
-        ##Clock.schedule_once(self._focus_initial, 0)
-
     # Topbar actions (placeholders)
     def on_right_action_1(self): ...
     def on_right_action_2(self): App.get_running_app().stop()
