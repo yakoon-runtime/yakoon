@@ -1,18 +1,15 @@
+from pathlib import Path
+
+from kivy.app import App
 from kivy.config import Config
-
-from yakoon.kivy.host.output_adapter import OutputAdapter
-from yakoon.kivy.host.state_provider import UIStateProvider
-from yakoon.platform.output.default import Output
-
 Config.set('kivy', 'exit_on_escape', '0')
 
-from pathlib import Path
-from kivy.app import App
-
+from yakoon.kivy.controllers.app_controller import AppController
+from yakoon.kivy.host.output_adapter import OutputAdapter
+from yakoon.kivy.host.state_provider import UIStateProvider
 from yakoon.kivy.utils.loader import load_layouts
 from yakoon.kivy.pages.app_root_page import AppRootPage
 
-from yakoon.kivy.host.app_controller import AppController
 from yakoon.kivy.host.output import KivyOutput
 from yakoon.kivy.host.runner import SessionRunner
 
@@ -61,12 +58,6 @@ class YakoonKivyApp(App):
 
         controller.set_runner(runner)
         controller.new_chat_tab(select=True)
-
-        # ChatWidget braucht runner für submit()
-        #root.ids.chat_widget.runner = runner
-
-        # Fokus initial (wie du es willst)
-        root.focus_initial()
 
         return root
 

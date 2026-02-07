@@ -6,6 +6,7 @@ from kivy.properties import NumericProperty, StringProperty
 
 
 class AppRootPage(BoxLayout):
+
     sidebar_width = NumericProperty(0)
 
     # optional: nützlich zum Debuggen / KV-Binding
@@ -18,6 +19,11 @@ class AppRootPage(BoxLayout):
     def set_controller(self, controller):
         self.controller = controller
 
+    # --- Application Terminate ---------------------------------------------
+
+    def stop_app(self):
+        App.get_running_app().stop()
+
     # --- Screen switching -------------------------------------------------
 
     def show_screen(self, name: str):
@@ -28,27 +34,13 @@ class AppRootPage(BoxLayout):
             sm.current = name
         self.current_screen = name
 
-    def show_tabs(self):
-        self.show_screen("tabs")
-        # Fokus nach Screenwechsel
-        if self.controller:
-            self.controller.focus_active()
-
-    def show_overview(self):
-        self.show_screen("overview")
-
     # --- Topbar actions ---------------------------------------------------
 
     def on_right_action_1(self):
-        # Overview öffnen
         if self.controller:
-            # Controller soll rendern, Root nur umschalten
             self.controller.show_overview()
 
     def on_right_action_2(self):
-        App.get_running_app().stop()
-
-    def stop_app(self):
         App.get_running_app().stop()
 
     # --- Sidebar ----------------------------------------------------------
@@ -56,39 +48,11 @@ class AppRootPage(BoxLayout):
     def toggle_sidebar(self):
         self.sidebar_width = dp(220) if self.sidebar_width == 0 else 0
 
-    # --- Tabs UI: Buttons in der Topbar ----------------------------------
+    # --- Tabs UI ----------------------------------------------------------
 
     def on_new_tab(self):
         if self.controller:
-            tab_id = self.controller.new_chat_tab(select=True)
-            self.controller.select_tab(tab_id)
-            # wir zeigen Tabs-Screen (nicht content.clear_widgets)
-            self.show_tabs()
-
-    def render_tabs(self, tabs, active_id: str):
-        area = self.ids.tabs_area
-        area.clear_widgets()
-        for t in tabs:
-            b = self._make_tab_button(t["id"], t["title"], t["id"] == active_id)
-            area.add_widget(b)
-
-    def _make_tab_button(self, tab_id: str, title: str, active: bool):
-        from kivy.factory import Factory
-        btn = Factory.TabPill()
-        btn.tab_id = tab_id
-        btn.text = title
-        btn.active = active
-        btn.bind(on_release=lambda *_: self._select_tab(tab_id))
-        return btn
-
-    def _select_tab(self, tab_id: str):
-        if self.controller:
-            self.controller.select_tab(tab_id)
-            self.show_tabs()
-
-    def focus_initial(self):
-        if self.controller:
-            self.controller.focus_active()
+            self.controller.new_chat_tab(select=True)
 
 
 from kivy.factory import Factory

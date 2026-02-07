@@ -34,22 +34,16 @@ class TabOverviewPage(BoxLayout):
 
     def _open(self, tab_id: str):
         if self.controller:
-            self.controller.select_tab(tab_id)
-            self.controller.show_tabs()
+            self.controller.on_open_tab(tab_id)
 
     def _close(self, tab_id: str):
         if self.controller:
-            self.controller.close_tab(tab_id)
-
-        # Grid neu aufbauen -> update cards
-        self.render(self.controller.tabs)
+            self.controller.on_close_tab(tab_id)
 
     def on_new_tab(self):
         if self.controller:
-            tab_id =self.controller.new_chat_tab(select=True)
-            self._open(tab_id)
-            # optional: in overview bleiben oder direkt zurück:
-            #self.controller.show_overview()
+            self.controller.on_new_tab()
+
 
 
 from kivy.factory import Factory
