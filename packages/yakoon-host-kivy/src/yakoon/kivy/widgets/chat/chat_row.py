@@ -2,7 +2,6 @@ from kivy.uix.label import Label
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.metrics import dp
 
-
     
 class ChatRow(RecycleDataViewBehavior, Label):
 

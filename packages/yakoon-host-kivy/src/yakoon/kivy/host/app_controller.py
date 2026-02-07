@@ -3,6 +3,7 @@ from typing import Optional
 
 from yakoon.kivy.host.context import ViewContext
 from yakoon.kivy.pages.tab_overview_page import TabOverviewPage
+from yakoon.kivy.widgets.chat import ChatWidget
 
 
 class AppController:
@@ -42,7 +43,6 @@ class AppController:
 
     def _create_chat_page(self):
         # du nutzt aktuell ChatWidget – das ist okay als “page content”
-        from yakoon.kivy.widgets.chat_widget import ChatWidget
         w = ChatWidget()
         w.runner = self.runner
 
