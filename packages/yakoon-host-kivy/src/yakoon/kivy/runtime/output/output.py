@@ -1,6 +1,6 @@
 
 from kivy.clock import Clock
-from yakoon.kivy.host.context import ViewContext
+from yakoon.kivy.runtime.context import ViewContext
 from yakoon.kivy.models.envelope import Envelope
 
 

@@ -1,18 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from pathlib import Path
-
 
 from yakoon.kivy.bootstrap.dispatcher import ContextDispatcher
-from yakoon.kivy.demo.engine import DemoEngine
-from yakoon.kivy.demo.session import DemoSession
-from yakoon.kivy.host.output import KivyOutput
-from yakoon.kivy.host.output_adapter import OutputAdapter
-from yakoon.kivy.host.runner import SessionRunner
+from yakoon.kivy.runtime.demo.engine import DemoEngine
+from yakoon.kivy.runtime.demo.session import DemoSession
+from yakoon.kivy.runtime.output import OutputAdapter, KivyOutput
+from yakoon.kivy.runtime.runner import SessionRunner
 from yakoon.kivy.pages.app_root_page import AppRootPage
 from yakoon.kivy.controllers.app_controller import AppController
 from yakoon.kivy.states.state_provider import UIStateProvider
-from yakoon.kivy.utils.loader import load_layouts
 
 
 @dataclass
@@ -26,11 +22,7 @@ class KivyComposition:
     engine: object
 
 
-def compose_kivy_app(package_root: Path | None = None) -> KivyComposition:
-    # 1) Layouts
-    if package_root is None:
-        package_root = Path(__file__).resolve().parents[1]  # .../yakoon/kivy
-    load_layouts(package_root)
+def compose_kivy_app() -> KivyComposition:
 
     # 2) Domain
     engine = DemoEngine()
