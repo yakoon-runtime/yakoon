@@ -29,7 +29,8 @@
             id: btn_first
             size_hint_x: None
             width: dp(40)
-            text: ">"
+            font_name: "Icons"
+            text: "\ue9e2"
             on_release: root.toggle_sidebar()
 
         # left button (40)
@@ -37,7 +38,8 @@
             id: btn_left
             size_hint_x: None
             width: dp(40)
-            text: "+"
+            font_name: "Icons"
+            text: "\uf710"   # add
             on_release: root.on_new_tab()
 
         # Tabs (scrollable)
@@ -64,14 +66,16 @@
             id: btn_right1
             size_hint_x: None
             width: dp(40)
-            text: "?"
+            font_name: "Icons"
+            text: "\ue5c3"
             on_release: root.on_right_action_1()
 
         YkIconButton:
             id: btn_right2
             size_hint_x: None
             width: dp(40)
-            text: "⨯"
+            font_name: "Icons"
+            text: "\ue5d2"
             on_release: root.on_right_action_2()
 
     # --- Body: sidebar + content ---

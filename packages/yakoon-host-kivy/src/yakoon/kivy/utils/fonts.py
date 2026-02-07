@@ -10,3 +10,8 @@ LabelBase.register(
     fn_regular=str(FONTS / "RobotoMono-Regular.ttf"),
     fn_bold=str(FONTS / "RobotoMono-Bold.ttf"),
 )
+
+LabelBase.register(
+    name="Icons",
+    fn_regular=str(FONTS / "material-symbols-outlined-latin-300-normal.ttf")
+)
