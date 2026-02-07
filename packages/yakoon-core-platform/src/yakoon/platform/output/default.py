@@ -1,4 +1,4 @@
-# yakoon/platform/io/output.py
+
 from __future__ import annotations
 
 import inspect

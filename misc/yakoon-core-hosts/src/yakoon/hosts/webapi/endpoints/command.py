@@ -1,4 +1,3 @@
-# yakoon/apps/webapi/endpoints/command.py
 
 from fastapi import APIRouter, Body
 from pydantic import BaseModel

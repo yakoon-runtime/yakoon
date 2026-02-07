@@ -1,5 +1,3 @@
-# yakoon/app/webapi/app.py
-
 from fastapi import FastAPI
 
 from yakoon.apps.webapi.tools.middleware import setup_CORS

@@ -1,4 +1,3 @@
-# yakoon/bootstrap/base_migrator.py
 
 from abc import ABC, abstractmethod
 from pathlib import Path

@@ -1,4 +1,3 @@
-# yakoon/cli.py
 
 from pathlib import Path
 import typer

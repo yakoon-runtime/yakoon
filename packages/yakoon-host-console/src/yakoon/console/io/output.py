@@ -1,4 +1,3 @@
-# yakoon/host/console/console_output.py
 from __future__ import annotations
 from typing import Any
 
