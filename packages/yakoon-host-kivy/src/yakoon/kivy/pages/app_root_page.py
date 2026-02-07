@@ -90,25 +90,6 @@ class AppRootPage(BoxLayout):
         if self.controller:
             self.controller.focus_active()
 
-    # --- Mousewheel: nur im Tabs-Screen -----------------------------------
-
-    def on_touch_down(self, touch):
-        # Nur im Tabs-Screen das Tab-Scroll-Mausrad abfangen.
-        sm = self.ids.get("sm")
-        if sm and sm.current != "tabs":
-            return super().on_touch_down(touch)
-
-        sv = self.ids.get("tabs_scroll")
-        if sv and sv.collide_point(*touch.pos):
-            if touch.button == "scrollup":
-                sv.scroll_x = min(1.0, sv.scroll_x + 0.08)
-                return True
-            if touch.button == "scrolldown":
-                sv.scroll_x = max(0.0, sv.scroll_x - 0.08)
-                return True
-
-        return super().on_touch_down(touch)
-
 
 from kivy.factory import Factory
 Factory.register("AppRootPage", cls=AppRootPage)
