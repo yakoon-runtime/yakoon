@@ -1,35 +1,36 @@
 #:import dp kivy.metrics.dp
 #:import theme yakoon.kivy.themes.active.active_theme
 #:import StencilView kivy.uix.stencilview.StencilView
- 
+
 <PromptWidget>:
-    orientation: "vertical"
+    size_hint_y: None
 
     StencilView:
-    
         YkInputSurface:
-            size_hint_y: 1
-
             size_hint: None, None
             pos: self.parent.pos
             size: self.parent.size
 
-            YkPrompt:
-                id: input
-                multiline: True
+            BoxLayout:
+                orientation: "horizontal"
+                spacing: dp(6)
 
-                size_hint_y: None
-                height: self.minimum_height
+                Label:
+                    id: prefix
+                    text: root.prefix
+                    size_hint_x: None
+                    width: self.texture_size[0]
+                    color: theme.muted
+                    font_name: theme.font_mono
+                    valign: "middle"
+                    text_size: None, self.height
 
-                background_normal: ""
-                background_active: ""
-                background_color: 0,0,0,0   # transparent!
-                foreground_color: theme.text
-
-                cursor_color: theme.accent
-
-                hint_text_color: theme.muted
-                hint_text: root.hint
-
-                password: root.secret
-                on_text_validate: root._submit_internal()
+                YkPrompt:
+                    id: input
+                    multiline: True
+                    size_hint_y: 1
+                    size_hint_x: 1
+                    # wichtig: keine hint_text mehr
+                    hint_text: ""
+                    password: root.secret
+                    background_color: 0,0,0,0

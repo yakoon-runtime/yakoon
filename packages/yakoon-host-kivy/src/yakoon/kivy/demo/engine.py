@@ -17,4 +17,5 @@ class DemoEngine:
 
         # Echo
         if session._io:
+            session.prompt_prefix = "stefan@shell" 
             await session._io.emit(Envelope(text=f"(output) {text}"))

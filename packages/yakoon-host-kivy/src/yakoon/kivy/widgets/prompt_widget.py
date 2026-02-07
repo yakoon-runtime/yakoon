@@ -7,7 +7,8 @@ from kivy.metrics import dp
 
 class PromptWidget(BoxLayout):
 
-    hint = StringProperty("shell$ ")
+    #hint = StringProperty("shell$ ")
+    prefix = StringProperty("shell$")   # wird später von Session gesetzt
     secret = BooleanProperty(False)
     multiline = BooleanProperty(True)
 
@@ -40,7 +41,8 @@ class PromptWidget(BoxLayout):
     def _adjust_height(self):
         ti = self.input
         chrome = dp(16)  # padding/border vom Surface
-        target = ti.minimum_height + chrome
+        #target = ti.minimum_height + chrome
+        target = self.input.minimum_height + dp(16)
         self.height = max(self.min_h, min(self.max_h, target))
 
         if self.height >= self.max_h:

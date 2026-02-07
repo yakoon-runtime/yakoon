@@ -34,7 +34,19 @@ class ChatWidget(BoxLayout):
         rv.scroll_y = 0
 
     def apply_context(self, ctx):
-        self.append_message(ctx.envelope.text)
+        
+        # Output anzeigen
+        if ctx.envelope.text:
+            self.append_message(ctx.envelope.text)
+
+        # 🔑 Prompt-Zustand setzen
+        ui = ctx.ui_state or {}
+
+        if "prompt_prefix" in ui:
+            self.ids.prompt.prefix = ui["prompt_prefix"]
+
+        if "prompt_secret" in ui:
+            self.ids.prompt.secret = ui["prompt_secret"]
 
         # App schließen, wenn Session signalisiert
         if self.session and getattr(self.session, "has_signal", None) and self.session.has_signal("exit_app"):
@@ -52,7 +64,6 @@ class ChatWidget(BoxLayout):
 
     def submit(self, text:str):
         
-        #self.append_message(f"shell$ {text}")
         self.append_message(f"{text}")
 
         if self.runner:
