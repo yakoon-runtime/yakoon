@@ -9,7 +9,7 @@ from pathlib import Path
 from kivy.app import App
 
 from yakoon.kivy.utils.loader import load_layouts
-from yakoon.kivy.pages.app_root import AppRootPage
+from yakoon.kivy.pages.app_root_page import AppRootPage
 
 from yakoon.kivy.host.app_controller import AppController
 from yakoon.kivy.host.output import KivyOutput

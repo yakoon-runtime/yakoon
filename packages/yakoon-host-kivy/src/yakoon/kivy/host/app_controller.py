@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 
 from yakoon.kivy.host.context import ViewContext
+from yakoon.kivy.pages.tab_overview_page import TabOverviewPage
 
 
 class AppController:
@@ -37,6 +38,7 @@ class AppController:
             self.select_tab(tab_id)
 
         self.app_root.render_tabs(self.tabs, self.active_tab_id)
+        return tab_id
 
     def _create_chat_page(self):
         # du nutzt aktuell ChatWidget – das ist okay als “page content”
@@ -91,3 +93,37 @@ class AppController:
         page = self.pages.get(self.active_tab_id)
         if page and hasattr(page, "focus_prompt"):
             page.focus_prompt()
+
+    def show_overview(self):
+        page = TabOverviewPage()
+        page.set_controller(self)
+        page.render(self.tabs)
+
+        content = self.app_root.ids.content
+        content.clear_widgets()
+        content.add_widget(page)
+
+    def show_tabs(self):
+        # zeigt die aktive Tab-Page wieder
+        content = self.app_root.ids.content
+        content.clear_widgets()
+        content.add_widget(self.pages[self.active_tab_id])
+
+        # fokus
+        if hasattr(self.pages[self.active_tab_id], "focus_prompt"):
+            self.pages[self.active_tab_id].focus_prompt()
+
+    def close_tab(self, tab_id: str):
+        if tab_id not in self.pages:
+            return
+        # remove
+        self.pages.pop(tab_id, None)
+        self.tabs = [t for t in self.tabs if t["id"] != tab_id]
+
+        # pick new active if needed
+        if self.active_tab_id == tab_id:
+            self.active_tab_id = self.tabs[0]["id"] if self.tabs else None
+            if self.active_tab_id:
+                self.show_tabs()
+
+        self.app_root.render_tabs(self.tabs, self.active_tab_id)

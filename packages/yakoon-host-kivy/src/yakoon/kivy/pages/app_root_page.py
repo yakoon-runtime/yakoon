@@ -33,7 +33,9 @@ class AppRootPage(BoxLayout):
 
     def on_new_tab(self):
         if self.controller:
-            self.controller.new_chat_tab()
+            tab_id = self.controller.new_chat_tab(select=True)  # muss tab_id zurückgeben
+            self.controller.select_tab(tab_id)
+            self.controller.show_tabs()
 
     # Tabs rendering
     def render_tabs(self, tabs, active_id: str):
@@ -63,8 +65,6 @@ class AppRootPage(BoxLayout):
     def stop_app(self):
         App.get_running_app().stop()
 
-    """def _focus_initial(self, _dt):
-        chat_widget = self.ids.get("chat_widget")
-        if chat_widget and hasattr(chat_widget, "prompt"):
-            chat_widget.prompt.focus_input()
-            """
+    def on_right_action_1(self):
+        if self.controller:
+            self.controller.show_overview()
