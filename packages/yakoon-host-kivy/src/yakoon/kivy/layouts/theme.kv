@@ -48,3 +48,31 @@
         Line:
             rounded_rectangle: (self.x, self.y, self.width, self.height, dp(theme.radius))
             width: 1
+
+
+<YkIconButton@ButtonBehavior+Label>:
+    # public props
+    disabled: False
+
+    size_hint: None, None
+    width: dp(40)
+    height: dp(40)
+    font_name: theme.font_mono
+    font_size: "18sp"
+    color: theme.text
+    halign: "center"
+    valign: "middle"
+    text_size: self.size
+
+    canvas.before:
+        Color:
+            rgba: theme.surface if self.state == "normal" else [theme.surface[0]+0.05, theme.surface[1]+0.05, theme.surface[2]+0.05, 1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(theme.radius)]
+        Color:
+            rgba: theme.border
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(theme.radius))
+            width: 1

@@ -1,24 +1,80 @@
-#:kivy 2.2.0
 #:import dp kivy.metrics.dp
 #:import theme yakoon.kivy.themes.active.active_theme
 
 <AppRootPage>:
-    orientation: "horizontal"
-    canvas.before:
-        Color:
-            rgba: theme.bg
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    orientation: "vertical"
 
+    # --- Topbar ---
     BoxLayout:
-        id: sidebar
-        size_hint_x: None
-        width: dp(40)
+        id: topbar
+        size_hint_y: None
+        height: dp(44)
+        padding: dp(theme.pad_sm), 0
+        spacing: dp(8)
 
-    # Content area
+        canvas.before:
+            Color:
+                rgba: theme.surface
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Color:
+                rgba: theme.border
+            Line:
+                points: self.x, self.y, self.right, self.y
+                width: 1
+
+        # left button (40)
+        YkIconButton:
+            id: btn_first
+            size_hint_x: None
+            width: dp(40)
+            text: ">"
+            on_release: root.toggle_sidebar()
+
+        # left button (40)
+        YkIconButton:
+            id: btn_left
+            size_hint_x: None
+            width: dp(40)
+            text: "+"
+            on_release: root.on_new_tab()
+
+        # dynamic tabs area
+        BoxLayout:
+            id: tabs_area
+            orientation: "horizontal"
+            spacing: dp(6)
+
+        # right buttons
+        YkIconButton:
+            id: btn_right1
+            size_hint_x: None
+            width: dp(40)
+            text: "?"
+            on_release: root.on_right_action_1()
+
+        YkIconButton:
+            id: btn_right2
+            size_hint_x: None
+            width: dp(40)
+            text: "⨯"
+            on_release: root.on_right_action_2()
+
+    # --- Body: sidebar + content ---
     BoxLayout:
-        orientation: "vertical"
-        padding: dp(theme.pad)
-        ChatWidget:
-            id: chat_widget
+        orientation: "horizontal"
+        size_hint_y: 1
+
+        BoxLayout:
+            id: sidebar
+            size_hint_x: None
+            #width: dp(220)
+            width: root.sidebar_width
+
+        BoxLayout:
+            id: content
+            orientation: "vertical"
+            padding: dp(theme.pad)
+            size_hint_y: 1
+            # hier kommt die aktive Page rein (anfangs ChatPage)

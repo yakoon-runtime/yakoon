@@ -12,8 +12,63 @@ class AppController:
 
     def __init__(self, app_root):
         self.app_root = app_root
+        self.app_root.set_controller(self)
 
+        self.tabs = []
+        self.pages = {}
+        self.active_tab_id = None
+        self._tab_counter = 0
+
+    def set_runner(self, runner):
+        self.runner = runner
+
+    def new_chat_tab(self, select: bool = True):
+        self._tab_counter += 1
+        tab_id = f"chat-{self._tab_counter}"
+        title = "chat" if self._tab_counter == 1 else f"chat {self._tab_counter}"
+
+        # neue Page/Widget Instanz
+        chat_page = self._create_chat_page()
+
+        self.tabs.append({"id": tab_id, "title": title})
+        self.pages[tab_id] = chat_page
+
+        if select or self.active_tab_id is None:
+            self.select_tab(tab_id)
+
+        self.app_root.render_tabs(self.tabs, self.active_tab_id)
+
+    def _create_chat_page(self):
+        # du nutzt aktuell ChatWidget – das ist okay als “page content”
+        from yakoon.kivy.widgets.chat_widget import ChatWidget
+        w = ChatWidget()
+        w.runner = self.runner
+
+        # runner injecten (wenn global/shared)
+        if hasattr(self.app_root, "runner") and self.app_root.runner:
+            w.runner = self.app_root.runner
+        return w
+
+    def select_tab(self, tab_id: str):
+        if tab_id not in self.pages:
+            return
+        self.active_tab_id = tab_id
+        self.app_root.render_tabs(self.tabs, self.active_tab_id)
+
+        content = self.app_root.ids.content
+        content.clear_widgets()
+        content.add_widget(self.pages[tab_id])
+    
+        if hasattr(self.pages[tab_id], "focus_prompt"):
+            self.pages[tab_id].focus_prompt()
+
+   
     def dispatch_context(self, ctx: ViewContext) -> None:
+
+        # route output to active page
+        page = self.pages.get(self.active_tab_id)
+        if page:
+            page.apply_context(ctx)
 
         # 1) App-weite Signals (optional, aber praktisch)
         if getattr(ctx.session, "has_signal", None) and ctx.session.has_signal("exit_app"):
@@ -31,3 +86,8 @@ class AppController:
         # Annahme: AppRootPage hat id: chat
         ids = getattr(self.app_root, "ids", {})
         return ids.get("chat_widget")
+
+    def focus_active(self):
+        page = self.pages.get(self.active_tab_id)
+        if page and hasattr(page, "focus_prompt"):
+            page.focus_prompt()

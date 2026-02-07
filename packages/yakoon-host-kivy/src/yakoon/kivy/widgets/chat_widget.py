@@ -64,6 +64,7 @@ class ChatWidget(BoxLayout):
 
     def submit(self, text:str):
         
+        #self.append_message(f"{self.ids.prompt.prefix} {text}")
         self.append_message(f"{text}")
 
         if self.runner:
@@ -71,6 +72,9 @@ class ChatWidget(BoxLayout):
 
         # Fokus behalten
         Clock.schedule_once(lambda _dt: setattr(self.ids.prompt, "focus", True), 0)
+
+    def focus_prompt(self):
+        self.ids.prompt.focus_input()
 
 
 from kivy.factory import Factory
