@@ -68,3 +68,15 @@ class AppRootPage(BoxLayout):
     def on_right_action_1(self):
         if self.controller:
             self.controller.show_overview()
+
+
+    def on_touch_down(self, touch): 
+        sv = self.ids.get("tabs_scroll")
+        if sv and sv.collide_point(*touch.pos):
+            if touch.button == "scrollup":
+                sv.scroll_x = min(1.0, sv.scroll_x + 0.08)
+                return True
+            if touch.button == "scrolldown":
+                sv.scroll_x = max(0.0, sv.scroll_x - 0.08)
+                return True
+        return super().on_touch_down(touch)

@@ -40,11 +40,24 @@
             text: "+"
             on_release: root.on_new_tab()
 
-        # dynamic tabs area
-        BoxLayout:
-            id: tabs_area
-            orientation: "horizontal"
-            spacing: dp(6)
+        # Tabs (scrollable)
+        ScrollView:
+            id: tabs_scroll
+            do_scroll_y: False
+            do_scroll_x: True
+            bar_width: dp(1)
+            scroll_type: ['bars', 'content']
+            effect_cls: 'ScrollEffect'   # optional, verhindert overscroll-bounce
+            size_hint_x: 1
+
+            # dynamic tabs area
+            BoxLayout:
+                id: tabs_area
+                orientation: "horizontal"
+                spacing: 0
+                size_hint_x: None
+                width: self.minimum_width
+                height: dp(6)
 
         # right buttons
         YkIconButton:
