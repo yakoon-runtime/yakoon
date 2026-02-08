@@ -30,7 +30,7 @@ async def run_console():
    
     session_key = Key.from_parts("yakoon", "bucket", "develop", "1",)
     
-    engine = await compose_engine(
+    engine = compose_engine(
         controllers=ControllerDirectory(
             controllers=[
                 ShellCoreController(), 

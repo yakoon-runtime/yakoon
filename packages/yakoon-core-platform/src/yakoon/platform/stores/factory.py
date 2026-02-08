@@ -2,7 +2,7 @@
 from yakoon.base.stores.base.registry import StoreRegistry
 
 
-async def create_system_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
+def create_system_stores(backend: str, *, db_path: str = None, pool=None) -> StoreRegistry:
 
     if backend == "sqlite":
         from yakoon.platform.stores.sqlite._registry import SQLiteStoreRegistry

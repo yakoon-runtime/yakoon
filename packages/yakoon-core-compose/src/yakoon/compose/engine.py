@@ -25,12 +25,12 @@ from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
 
 
-async def compose_engine(controllers: ControllerDirectory) -> Engine:
+def compose_engine(controllers: ControllerDirectory) -> Engine:
 
     command_catalog = _compose_command_catalog(controllers)
     controller_catalog = _compose_controller_catalog(controllers)
 
-    stores = await _compose_stores()
+    stores = _compose_stores()
     commands = _compose_commands(controllers)
     templates = _compose_template_sources(controllers)
     
@@ -158,7 +158,7 @@ def _compose_template_sources(directory: ControllerDirectory) -> list[TemplateSo
     return template_sources
 
 
-async def _compose_stores() -> StoreRegistry:
+def _compose_stores() -> StoreRegistry:
     
-    stores = await create_system_stores("memory", db_path="db/gateway.sqlite3.db")
+    stores = create_system_stores("memory", db_path="db/gateway.sqlite3.db")
     return stores
