@@ -9,6 +9,7 @@ from yakoon.kivy.states.tab_state import TabState
 
 
 class Navigator:
+    
     def __init__(self, app_root):
         self.app_root = app_root
 
@@ -16,7 +17,11 @@ class Navigator:
         sm = self.app_root.ids.get("sm")
         if sm:
             sm.current = name
-
+    
+    def is_current(self, name: str):
+        sm = self.app_root.ids.get("sm")
+        return sm and sm.current == name
+     
 
 class AppController:
 
@@ -38,12 +43,22 @@ class AppController:
             runner, app_root, self.nav, self.tabs_ctrl, self.tab_state)
         
     # --- delegation API (wird von Views/Root benutzt) ---
+
+    def toggle_overview(self):
+        if self.nav.is_current("overview"):
+            self.show_tabs()
+        else:
+            self.show_overview()
+
     def show_overview(self):
+        self.nav.go("overview")
         self.overview_ctrl.open()
+        self.current = self.overview_ctrl
 
     def show_tabs(self):
         self.nav.go("tabs")
         self.tabs_ctrl.focus_active()
+        self.current = self.tabs_ctrl
 
     def new_chat_tab(self, select: bool = True) -> str:
         return self.tabs_ctrl.new_chat_tab(select=select)

@@ -38,7 +38,7 @@ class AppRootPage(BoxLayout):
 
     def on_right_action_1(self):
         if self.controller:
-            self.controller.show_overview()
+            self.controller.toggle_overview()
 
     def on_right_action_2(self):
         App.get_running_app().stop()
