@@ -7,39 +7,47 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
-## [2026-05-02]
+## [2026-02-06]
+**Kivy-UI-Host**
+Neben dem Konsolen-Host wird jetzt ein UI-Kivy-Host bereitgestellt. Dieser orientiert sich an dem Terminal von Gnome und ist multishellfähig.
+
+## [2026-02-05]
+**DialogService**
+Der globale DialogManager wurde aufgelöst, um den letzten globalen Zustand aus der Engine zu entfernen. Danach wurde er in einen 'DialogService' überführt, der nun über die ServiceFactory austauschbar ist.
+
+## [2026-02-05]
 **OutputAdapter**
 Die Session kann Metadaten durch Commands nach an den IO-Adapter leiten. Somit kann ein Command der Außenwelt mitteilen, um welche Information es sich bei dem ausgegebenen Text handelt. Die Engine legt sich bei der Ausgabe nicht fest, sondern rendert nur entsprechende Templates.
 
-## [2026-05-02]
+## [2026-02-05]
 **Service für Permission & Rollen**
 Permissions und Rollen müssen dem System über einen Service zur Verfügung gestellt werden. Damit kann das gesamte Handling in der Platform verbleiben. Die Logik, wie Rechte und Rollen zusammenarbeiten, befindet sich ebenfalls in diesem Service.
 
-## [2026-04-02]
+## [2026-02-04]
 **Batch & Workflow**
 Durch die Einführung des 'DispatchInput' kann der Host vereinfacht werden. Somit nimmt nun auch die Engine keinen einfachen input:str mehr auf, sondern verwendet intern den DispatchInput. Dieses beinhaltet immer die Benutzereingabe + eine batch_id. Warum ist eine batch_id notwendig? Wenn innerhalb eines batches (Workflow) ein Fehler auftritt (z.B: PermissionDenied), dann dürfen die folgenden Commands (innerhalb der Workflow-Serie) nicht mehr ausgeführt werden. Durch die batch_id kann die Engine diese Commands nun ablehnen und aus der Queue entfernen. => On failure inside batch → cancel remaining batch items. Failure umfasst: PermissionDenied, CmdNotFound, ValueError, InternalError (je nach Policy)
 
-## [2026-04-02]
+## [2026-02-04]
 **Permissions**
 Permissions werden als Unix-Rechte umgesetzt: rx (read/execute). Das vorherige Konzept über Commandsets wurde aufgelöst, weil es nicht skalierfähig war. Nun kann für jedes Commmand ein Recht (rx) - (spter rx:rx) erteilt oder auch entzogen werden. Der Account unterstützt nun Rollen und Permissions. Beide werden durch das Command 'su' in die aktuelle Session geladen. Durch die Einführung des IdentityMapService, bleiben die kompilierten Berechtigungen übe die Sitzung in der Session enthalten.
 
-## [2026-04-02]
+## [2026-00-04]
 **Hooks in Controller**
 Die Hooks in Controllern wurden reduziert. Auch wurden alle Hooks aus dem BaseController entfernt, die nur von der Shell genutzt wurden. Das System (Engine) macht nun zwischen Controllern keinen Unterschied mehr.
 
-## [2026-04-02]
+## [2026-02-04]
 **IdentityMapService**
 Das gesamte System braucht verlässliche Sessions über die Dauer einer Sitzung. Bisher wurde durch jeden Dispatch eine neue Session aus dem Store geladen. Das hatte zur Folge, dass jeder prompt eine neue Session angefordert hat. Im Code führe das dazu, das nach jedem Prompt die Session.runtime leer war. Durch die IdentityMap ist nun sichergestellt, dass Sessions erhalten bleiben.
 
-## [2026-03-02]
+## [2026-00-03]
 **Domain-Models**
 Domain-Models arbeiten nicht länger mit Vererbung. Stattdessen halten Domain-Models ihre Daten in einem internen Objekt (runtime/data) auf Basis von 'dataclass'. Auch damit Aufwand in PersistensLayer (Store) entsteht, ist es ehrlich. Denn dort gehört die Logik hin und nicht in Form eines Light-OR-Mappers ins Model.
 
-## [2026-03-02]
+## [2026-02-03]
 **CmdQuit - Beenden des Hosts**
 Um die Eventloop sauber zu beenden, wird in der Session ein Signal gesetzt. Den Host zu benenden ist Zumutung des Hosts und nicht der Engine. Daher darf die Engine den Abbruch der Loop nicht entscheiden -> Signal. Der Host reagiert nur darauf. Ein anderer Host kann somit entscheiden ob er sich beendet oder das Signal ablehnt. Wichtig: Signale dürfen nicht persistiert werden.
 
-## [2026-03-02]
+## [2026-02-03]
 **Request trifft keine Entscheidung**
 Das Request nimmt nur die Benutereingabe auf. Entscheidet aber selbst nicht, was Command und SubCommand ist. Das ist immer Aufgabe des einzelnen Commands, zu interpretieren, welcher Parameter was bedeutet.
 
