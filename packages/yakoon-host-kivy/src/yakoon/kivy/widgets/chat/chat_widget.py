@@ -1,13 +1,14 @@
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
-from kivy.app import App
 
 
 class ChatWidget(BoxLayout):
 
-    def __init__(self, **kw):
+    def __init__(self, on_submit, **kw):
+
         super().__init__(**kw)
+        self.on_submit = on_submit
         self._scroll_trigger = Clock.create_trigger(self._scroll_to_bottom, 0)
 
         self._data = []
@@ -39,8 +40,7 @@ class ChatWidget(BoxLayout):
         if ctx.envelope.text:
             self.append_message(ctx.envelope.text)
 
-        ui = ctx.ui_state()
-
+        ui = ctx.ui_state_provider()
         self.ids.prompt.prefix = ui.prompt_prefix
         self.ids.prompt.secret = ui.prompt_secret
 
@@ -56,11 +56,12 @@ class ChatWidget(BoxLayout):
 
     def submit(self, text:str):
         
-        #self.append_message(f"{self.ids.prompt.prefix} {text}")
-        self.append_message(f"{text}")
+        # echo
+        self.append_message(f"> {self.ids.prompt.prefix} {text}")
+        #self.append_message(f"{text}")
 
-        if self.runner:
-            self.runner.submit(text)
+        if self.on_submit:
+            self.on_submit(text)
 
         # Fokus behalten
         Clock.schedule_once(lambda _dt: setattr(self.ids.prompt, "focus", True), 0)

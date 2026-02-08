@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 from typing import Optional
 
 from yakoon.kivy.runtime.context import ViewContext
@@ -19,22 +20,23 @@ class Navigator:
 
 class AppController:
 
-    def __init__(self, app_root, runner):
+    def __init__(self, app_root, dispatcher, runner):
 
-        self.runner = runner
         self.app_root = app_root
         self.app_root.set_controller(self)
+        self.dispatcher = dispatcher
+        self.runner = runner
 
         # --- STATE ---
         self.tab_state = TabState()
 
         # --- CONTROLLERS ---
         self.nav = Navigator(app_root)
-        self.tabs_ctrl = TabsController(
+        self.tabs_ctrl = TabsController(self.dispatcher,
             runner, app_root, self.nav, self.tab_state)
         self.overview_ctrl = OverviewController(
             runner, app_root, self.nav, self.tabs_ctrl, self.tab_state)
-
+        
     # --- delegation API (wird von Views/Root benutzt) ---
     def show_overview(self):
         self.overview_ctrl.open()

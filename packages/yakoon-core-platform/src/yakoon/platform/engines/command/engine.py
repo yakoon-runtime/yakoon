@@ -60,7 +60,9 @@ class Engine:
          return session
 
       # 2) Normal command path
-      task = asyncio.create_task(self._dispatch_command(session, di))
+      loop = asyncio.get_running_loop()
+      task = loop.create_task(self._dispatch_command(session, di))
+
       self._active_tasks[skey] = task
 
       await self._drive_until_blocked_or_done(session)

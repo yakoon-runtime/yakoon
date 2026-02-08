@@ -1,16 +1,23 @@
 import asyncio
+from concurrent.futures import Future
 import threading
-from typing import Optional
+from typing import Any, Coroutine, Optional
+
+from yakoon.base.models.input import DispatchInput
 
 
 class SessionRunner:
     
-    def __init__(self, engine, session):
+    def __init__(self, engine):
         self.engine = engine
-        self.session = session
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._thread: Optional[threading.Thread] = None
         self._queue: Optional[asyncio.Queue[str]] = None
+
+    def submit_coro(self, coro: Coroutine[Any, Any, Any]) -> Future:
+        if not self._loop:
+            raise RuntimeError("Runner loop not started")
+        return asyncio.run_coroutine_threadsafe(coro, self._loop)
 
     def start(self):
         if self._thread:
@@ -26,16 +33,16 @@ class SessionRunner:
         self._loop.create_task(self._run())
         self._loop.run_forever()
 
-    def submit(self, text: str):
+    def enqueue(self, session, text: str):
         # thread-safe: enqueue in runner loop
         if not self._loop or not self._queue:
             return
-        self._loop.call_soon_threadsafe(self._queue.put_nowait, text)
+        self._loop.call_soon_threadsafe(self._queue.put_nowait, (session, text))
 
     async def _run(self):
         assert self._queue is not None
         while True:
-            text = await self._queue.get()
-            await self.engine.dispatch(self.session, text)
-            if hasattr(self.session, "has_signal") and self.session.has_signal("exit_app"):
+            session, text = await self._queue.get()
+            await self.engine.dispatch(session, DispatchInput(text))
+            if hasattr(session, "has_signal") and session.has_signal("exit_app"):
                 break

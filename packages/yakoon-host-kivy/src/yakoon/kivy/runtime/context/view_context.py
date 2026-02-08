@@ -7,4 +7,4 @@ from yakoon.kivy.models.envelope import Envelope
 class ViewContext:
     session: object
     envelope: Envelope
-    ui_state: callable  # returns UIState
+    ui_state_provider: callable  # returns UIState
