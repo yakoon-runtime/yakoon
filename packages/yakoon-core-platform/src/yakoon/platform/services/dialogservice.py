@@ -1,18 +1,13 @@
 import asyncio
 from typing import Awaitable, Callable
 
+from yakoon.base.models.prompt import PromptMode
 from yakoon.base.runtime.devtools.prompt import UnresolvedPromptMonitor
 from yakoon.base.runtime.session.session import Session
 from yakoon.platform.settings import settings
 
-from enum import StrEnum
 
-class PromptMode(StrEnum):
-    NORMAL = "normal"
-    SECRET = "secret"
-
-
-class DialogManager:
+class DefaultDialogService:
     """
     Manages interactive prompts (e.g. via `ask()`), allowing commands to block
     execution until user input is provided.
@@ -22,35 +17,34 @@ class DialogManager:
 
     DEFAULT_TIMEOUT = 30
 
-    _waiting: dict[str, asyncio.Future] = {}
-    _timeouts: dict[str, asyncio.Task] = {}
-    _modes: dict[str, PromptMode] = {}  # "normal" | "secret"
+    def __init__(self):
+        self._waiting: dict[str, asyncio.Future] = {}
+        self._timeouts: dict[str, asyncio.Task] = {}
+        self._modes: dict[str, PromptMode] = {}  # "normal" | "secret"
 
-    @classmethod
-    def cleanup(cls, session: Session) -> None:
+    def cleanup(self, session: Session) -> None:
         """
         Central cleanup for any prompt end state (resolve, cancel, timeout).
         Ensures no prompt-related state leaks across requests.
         """
         session_key = str(session.key)
 
-        fut = cls._waiting.pop(session_key, None)
+        fut = self._waiting.pop(session_key, None)
         # Do NOT cancel fut here by default - cleanup is used by both resolve/cancel/timeout.
         # Cancel is done explicitly by the caller when needed.
 
-        task = cls._timeouts.pop(session_key, None)
+        task = self._timeouts.pop(session_key, None)
         if task:
             task.cancel()
 
-        cls._modes.pop(session_key, None)
+        self._modes.pop(session_key, None)
 
         if settings.base.dev_mode:
             # safe to call even if not tracked
             UnresolvedPromptMonitor.untrack(session_key)
 
-    @classmethod
     def set_prompt(
-        cls,
+        self,
         session: Session,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
@@ -74,17 +68,17 @@ class DialogManager:
         if settings.base.dev_mode:
             UnresolvedPromptMonitor.track(session_key, fut)
 
-        cls._waiting[session_key] = fut
-        cls._modes[session_key] = mode
+        self._waiting[session_key] = fut
+        self._modes[session_key] = mode
 
-        timeout = timeout or settings.network.prompt_timed_out or cls.DEFAULT_TIMEOUT
+        timeout = timeout or settings.network.prompt_timed_out or self.DEFAULT_TIMEOUT
         if timeout:
             async def auto_expire():
                 await asyncio.sleep(timeout)
 
                 if not fut.done():
                     # Ensure all prompt state is cleaned consistently
-                    cls.cleanup(session)
+                    self.cleanup(session)
                     fut.cancel()
 
                     if on_timeout:
@@ -93,49 +87,45 @@ class DialogManager:
                         await session.fail("Prompt timed out.")
 
             task = asyncio.create_task(auto_expire())
-            cls._timeouts[session_key] = task
+            self._timeouts[session_key] = task
 
         return fut
 
-    @classmethod
-    def is_waiting(cls, session: Session) -> bool:
+    def is_waiting(self, session: Session) -> bool:
         session_key = str(session.key)
-        return session_key in cls._waiting
+        return session_key in self._waiting
 
-    @classmethod
-    def get_mode(cls, session: Session) -> PromptMode:
+    def get_mode(self, session: Session) -> PromptMode:
         """
         Returns the input mode for the currently waiting prompt.
         Defaults to "normal".
         """
         session_key = str(session.key)
-        return cls._modes.get(session_key, PromptMode.NORMAL)
+        return self._modes.get(session_key, PromptMode.NORMAL)
 
-    @classmethod
-    def resolve_prompt(cls, session: Session, value: str) -> bool:
+    def resolve_prompt(self, session: Session, value: str) -> bool:
         session_key = str(session.key)
-        fut = cls._waiting.get(session_key)
+        fut = self._waiting.get(session_key)
 
         if fut and not fut.done():
             # cleanup before setting result to avoid races with timeout task
-            cls.cleanup(session)
+            self.cleanup(session)
             fut.set_result(value)
             return True
 
         # If it's already done or missing, ensure we don't leak mode
-        cls._modes.pop(session_key, None)
+        self._modes.pop(session_key, None)
         return False
 
-    @classmethod
-    def cancel_prompt(cls, session: Session) -> None:
+    def cancel_prompt(self, session: Session) -> None:
         """
         Cancels a prompt manually (e.g. on disconnect).
         """
         session_key = str(session.key)
-        fut = cls._waiting.get(session_key)
+        fut = self._waiting.get(session_key)
 
         # cleanup first (cancel timeout, untrack, remove mode)
-        cls.cleanup(session)
+        self.cleanup(session)
 
         if fut and not fut.done():
             fut.cancel()

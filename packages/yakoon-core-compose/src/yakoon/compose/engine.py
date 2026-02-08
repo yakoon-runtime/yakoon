@@ -10,6 +10,7 @@ from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerifier
 from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
 from yakoon.platform.services.command import CommandQueueService
+from yakoon.platform.services.dialogservice import DefaultDialogService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.presenter import PresenterService
@@ -126,7 +127,8 @@ def _compose_services(
     services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
     services.register_static(ports.AuthenticationService, AuthenticationService(services))
     services.register_static(ports.PermissionService, PermissionService())
-
+    services.register_static(ports.DialogService, DefaultDialogService())
+    
     services.register_static(
         ports.RendererService, 
         RendererService(JinjaEngine(template_sources)))

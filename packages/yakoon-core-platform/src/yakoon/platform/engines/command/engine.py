@@ -3,14 +3,13 @@ from typing import Optional, Tuple
 
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.perm import PermBit
-from yakoon.base.ports import AuditLogService, CommandQueueService, PermissionService
+from yakoon.base.ports import AuditLogService, CommandQueueService, DialogService, PermissionService
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 from yakoon.base.directories.service import ServiceDirectory
 
-from yakoon.platform.runtime.dialogs.manager import DialogManager
 from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.directories.controller import ControllerDirectory
 
@@ -50,8 +49,9 @@ class Engine:
          session.set_active_controller(shell.id)
 
       # 1) Prompt response path
-      if DialogManager.is_waiting(session):
-         DialogManager.resolve_prompt(session, di.command)
+      dialog_service = self.services.get(DialogService)
+      if dialog_service.is_waiting(session):
+         dialog_service.resolve_prompt(session, di.command)
 
          # Drive the existing active task until it either finishes or asks again
          await self._drive_until_blocked_or_done(session)
@@ -74,7 +74,8 @@ class Engine:
       # Lass den Command weiterlaufen, bis:
       # - fertig ODER
       # - er erneut promptet
-      while not task.done() and not DialogManager.is_waiting(session):
+      dialog_service = self.services.get(DialogService)
+      while not task.done() and not dialog_service.is_waiting(session):
          await asyncio.sleep(0.005)
 
       if task.done():

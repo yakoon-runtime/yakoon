@@ -1,10 +1,11 @@
 
-from yakoon.base.ports import RendererService
+from yakoon.base.models.prompt import PromptMode
+from yakoon.base.ports import DialogService, RendererService
 from yakoon.base.runtime.session import Session
 
 from yakoon.base.directories.service import ServiceDirectory
+from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.context import RenderContext
-from yakoon.platform.runtime.dialogs.prompts import ask, ask_secret, choice, choice_index, confirm
 
 
 class Prompts:
@@ -15,10 +16,12 @@ class Prompts:
     confirmations, and choices. 
     """
 
-    def __init__(self, ctx: RenderContext, session: Session, renderer: "RendererService"):
+    def __init__(self, ctx: RenderContext, 
+                 session: Session, renderer: RendererService, dialogs: DialogService):
         self._ctx = ctx
         self._session = session
         self._renderer = renderer
+        self._dialogs = dialogs
 
     async def ask(self, section: str, **data) -> str:
         """     
@@ -32,7 +35,7 @@ class Prompts:
             str: The user's input as a string.
         """
         question = await self._renderer.render(self._ctx, section, **data)
-        return await ask(self._session, question)
+        return await ask(self._dialogs, self._session, question)
     
     async def ask_secret(self, section: str, **data) -> str:
         """     
@@ -46,7 +49,7 @@ class Prompts:
             str: The user's input as a string.
         """
         question = await self._renderer.render(self._ctx, section, **data)
-        return await ask_secret(self._session, question)
+        return await ask_secret(self._dialogs, self._session, question)
 
     async def confirm(self, section: str, **data) -> bool:
         """
@@ -60,7 +63,7 @@ class Prompts:
             bool: True if confirmed, False otherwise.
         """
         question = await self._renderer.render(self._ctx, section, **data)
-        return await confirm(self._session, question, **data)
+        return await confirm(self._dialogs, self._session, question, **data)
 
     async def choice(self, section: str, options: list[str], **data) -> str:
         """
@@ -75,7 +78,7 @@ class Prompts:
             str: The chosen value.
         """        
         question = await self._renderer.render(self._ctx, section, **data)
-        return await choice(self._session, question, options)
+        return await choice(self._dialogs, self._session, question, options)
 
     async def choice_index(self, section: str, options: list[str], **data) -> str:
         """
@@ -90,7 +93,7 @@ class Prompts:
             int: The index of the selected choice (starting at 0).
         """
         question = await self._renderer.render(self._ctx, section, **data)
-        return await choice_index(self._session, question, options)
+        return await choice_index(self._dialogs, self._session, question, options)
 
 
 class Presenter:
@@ -101,7 +104,8 @@ class Presenter:
     messages, failures, and notifications using predefined sections in the template.
     """
     
-    def __init__(self, template_prefix: str, template_key: str, session: Session, renderer: "RendererService") -> RenderContext:
+    def __init__(self, template_prefix: str, template_key: str, 
+                 session: Session, renderer: RendererService, dialogs: DialogService) -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
 
@@ -117,13 +121,16 @@ class Presenter:
         self._prompts = None
         self._session = session
         self._renderer = renderer
+        self._dialogs = dialogs
         self._ctx = RenderContext(
             key=template_key, prefix=template_prefix, lang=session.lang)
 
     @property
     def prompts(self) -> Prompts:
         if not self._prompts:
-            self._prompts = Prompts(self._ctx, self._session, self._renderer)
+            self._prompts = Prompts(
+                self._ctx, self._session, 
+                self._renderer, self._dialogs)
         return self._prompts
 
     async def emit(self, section: str, **data):
@@ -172,5 +179,110 @@ class PresenterService:
         self._services = services
 
     async def create_presenter(self, template_prefix:str, template_key: str, session: Session) -> Presenter:
-        
-        return Presenter(template_prefix, template_key, session, self._services.get(RendererService))
+        dialog_service = self._services.get(DialogService)
+        render_service = self._services.get(RendererService)
+        return Presenter(template_prefix, template_key, session, render_service, dialog_service)
+    
+
+
+async def ask(dialogs: DialogService, session: Session, prompt_text: str) -> str:
+    """     
+    Asks the user for free-text input based on a rendered template section.
+
+    Args:
+        session: BaseSession: The session passed to the template.
+        section (str): The section key within the template.
+        **data: Optional data passed to the template.
+
+    Returns:
+        str: The user's input as a string.
+    """
+    await session.emit(prompt_text)
+
+    return await dialogs.set_prompt(
+        session, 
+        timeout=settings.network.prompt_timed_out)
+
+
+async def ask_secret(dialogs: DialogService, session: Session, prompt_text: str) -> str:
+    
+    await session.emit(prompt_text)
+    
+    return await dialogs.set_prompt(
+        session,
+        timeout=settings.network.prompt_timed_out,
+        mode=PromptMode.SECRET
+    )
+
+async def confirm(dialogs: DialogService, session: Session, prompt_text: str) -> bool:
+    """
+    Asks the user for a yes/no confirmation using a template-based prompt.
+
+    Args:
+        session: BaseSession: The session passed to the template.
+        section (str): The section key within the template.
+        **data: Optional data passed to the template.
+
+    Returns:
+        bool: True if confirmed, False otherwise.
+    """
+    while True:
+        answer = await ask(dialogs, session, prompt_text)
+        if answer.lower() in ("y", "yes", "j", "ja"):
+            return True
+        if answer.lower() in ("n", "no", "nein"):
+            return False
+        await session.emit("Bitte antworte mit 'y' oder 'n'.")
+
+
+async def choice(dialogs: DialogService, session: Session, prompt_text: str, options: list[str]) -> str:
+    """
+    Presents the user with a list of choices and returns the selected value.
+
+    Args:
+        session: BaseSession: The session passed to the template.
+        section (str): The section key within the template.
+        choices (list[str]): List of available options.
+        **data: Optional data passed to the template.
+
+    Returns:
+        str: The chosen value.
+    """
+    options_str = ", ".join(options)
+    while True:
+        answer = await ask(dialogs, session, prompt_text)
+        if answer in options:
+            return answer
+        await session.emit(f"Bitte wähle eine der Optionen: {options_str}")
+
+
+async def choice_index(dialogs: DialogService, session: Session, prompt_text: str, options: list[str]) -> str:
+    """
+    Presents the user with a numbered list of choices and returns the selected index.
+
+    Args:
+        session: BaseSession: The session passed to the template.
+        section (str): The section key within the template.
+        choices (list[str]): List of available options.
+        **data: Optional data passed to the template.
+
+    Returns:
+        int: The index of the selected choice (starting at 0).
+    """
+    if not options:
+        raise ValueError("choice() requires at least one option.")
+
+    # Ausgabe der nummerierten Liste
+    msg = [prompt_text]
+    for idx, opt in enumerate(options, 1):
+        msg.append(f"[{idx}] {opt}")
+    await session.emit("\n".join(msg))
+
+    # Dialogschleife
+    while True:
+        answer = await ask(dialogs, session, prompt_text)
+        if answer.isdigit():
+            index = int(answer) - 1
+            if 0 <= index < len(options):
+                return index, options[index]
+        await session.emit("Bitte eine gültige Nummer eingeben.")

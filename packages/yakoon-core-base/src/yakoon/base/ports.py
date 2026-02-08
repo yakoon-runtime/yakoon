@@ -1,4 +1,4 @@
-from typing import Optional, Protocol, Sequence
+from typing import Awaitable, Callable, Optional, Protocol, Sequence
 
 from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
@@ -6,8 +6,20 @@ from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.perm import PermBit
+from yakoon.base.models.prompt import PromptMode
 from yakoon.base.runtime.session.session import Session
 
+
+class DialogService(Protocol):
+    def cleanup(self, session: Session) -> None: ...
+    def is_waiting(self, session: Session) -> bool: ...
+    def get_mode(self, session: Session) -> PromptMode: ...
+    def resolve_prompt(self, session: Session, value: str) -> bool: ...
+    def cancel_prompt(self, session: Session) -> None: ...
+    def set_prompt(self, session: Session, timeout: float | None = None,
+        on_timeout: Callable[[], Awaitable[None]] | None = None,
+        mode: PromptMode = PromptMode.NORMAL): ...
+    
 
 class CommandQueueService(Protocol):
     def enqueue_commands(self, session, cmds: list[str]) -> None: ...

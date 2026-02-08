@@ -4,11 +4,11 @@ from yakoon.base import ports
 from yakoon.auth.controller import AuthCoreController
 from yakoon.base.models.key import Key
 from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.prompt import PromptMode
 from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
-from yakoon.platform.runtime.dialogs.manager import DialogManager, PromptMode
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.directories.controller import ControllerDirectory
@@ -37,6 +37,7 @@ async def run_console():
                 AuthCoreController(),
                 OfficeMailingCoreController()]))
 
+    dialogs = engine.services.get(ports.DialogService)
     queue = engine.services.get(ports.CommandQueueService)
     sessions = engine.services.get(ports.SessionService)
     session, _ = await sessions.get_or_create(session_key)
@@ -53,8 +54,8 @@ async def run_console():
             prompt = format_prompt(session)
 
             di = None
-            if DialogManager.is_waiting(session):
-                mode = DialogManager.get_mode(session)
+            if dialogs.is_waiting(session):
+                mode = dialogs.get_mode(session)
                 if mode == PromptMode.SECRET:
                     di = DispatchInput(await safe_input_secret(prompt=prompt))
                 else:
