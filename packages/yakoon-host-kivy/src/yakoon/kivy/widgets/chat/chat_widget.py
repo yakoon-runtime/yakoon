@@ -57,7 +57,7 @@ class ChatWidget(BoxLayout):
     def submit(self, text:str):
         
         # echo
-        self.append_message(f"> {self.ids.prompt.prefix} {text}")
+        self.append_message(f"> **{self.ids.prompt.prefix}** '{text}'")
         #self.append_message(f"{text}")
 
         if self.on_submit:
