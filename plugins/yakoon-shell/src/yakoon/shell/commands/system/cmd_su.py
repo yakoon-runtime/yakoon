@@ -13,7 +13,8 @@ class CmdSu(WorkflowCommand):
     async def run(self, session: Session, request: Request):
 
         #session.set_active_controller("auth")
-        workflow = Request(request.raw).split_commands()
+        command = self.batch_commmands.format(raw=request.raw)
+        workflow = Request(command).split_commands()
         self.schedule(session, workflow)
 
 
