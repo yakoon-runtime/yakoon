@@ -33,7 +33,7 @@ class TabCard(ButtonBehavior, BoxLayout):
         self.dispatch("on_open", self.tab_id)
 
     def close(self):
-        # 🔑 verhindert, dass der Card-Release danach noch open triggert
+        # verhindert, dass der Card-Release danach noch open triggert
         self._suppress_open = True
         Clock.schedule_once(self._unsuppress, 0)
         self.dispatch("on_close", self.tab_id)

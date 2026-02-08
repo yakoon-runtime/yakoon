@@ -14,6 +14,8 @@ from yakoon.kivy.bootstrap.compose import compose_kivy_app
 
 class YakoonKivyApp(App):
 
+    title = "Yakoon"
+    
     def build(self):
         self._load_environment()
         return compose_kivy_app().root
