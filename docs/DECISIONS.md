@@ -7,6 +7,11 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+## [2026-02-09]
+**Einführung Workflow & Kontexts (batch.values)**
+Daten zwischen Commands werden nicht mehr implizit über Session-Zustand oder Command-Seiteneffekte weitergereicht, sondern explizit über einen Workflow-gebundenen Kontext (batch.values).
+Begründung: Workflows dienen der Orchestrierung von Commands. Ein expliziter, pro Workflow isolierter Kontext macht Datenflüsse nachvollziehbar, testbar und unabhängig von der Ausführungsumgebung (CLI, Wizard, Form, Remote Host). Commands sind reine Operationen ohne implizite Abhängigkeiten. Workflows definieren sowohl Ablauf als auch Datenfluss. Named Arguments ermöglichen robuste Command-Aufrufe ohne Positionsabhängigkeit.
+
 ## [2026-02-06]
 **Kivy-UI-Host**
 Der UI-Kivy-Host orientiert sich an dem Terminal von Gnome und ist multishellfähig.
