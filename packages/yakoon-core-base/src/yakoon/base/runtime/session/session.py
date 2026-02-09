@@ -5,6 +5,7 @@ from dataclasses import dataclass, asdict, field
 from typing import Mapping, Optional, Any
 
 from yakoon.base.models.key import Key
+from yakoon.base.models.mode import InteractionMode
 from yakoon.base.models.perm import PermissionSet
 from yakoon.base.runtime.output.event import OutputEvent
 from yakoon.base.models.format import OutputFormat
@@ -58,8 +59,8 @@ class SessionState:
 class SessionRuntime:
     permissions: PermissionSet = field(default_factory=PermissionSet)
     data: dict[str, Any] = field(default_factory=dict)
-    #interaction_mode: InteractionMode = "prompt"
-    output_format: OutputFormat = OutputFormat("plain")
+    interaction_mode: InteractionMode = InteractionMode(InteractionMode.WIZARD)
+    output_format: OutputFormat = OutputFormat(OutputFormat.PLAIN)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
 
@@ -103,17 +104,18 @@ class Session:
         return self._runtime.permissions
 
     # ---- interaction_mode ----
-    """@property
+
+    @property
     def interaction_mode(self) -> InteractionMode:
-        return self._runtime.get("interaction_mode", "prompt")
+        return self._runtime.interaction_mode
 
     @interaction_mode.setter
     def interaction_mode(self, value: InteractionMode) -> None:
-        # minimaler Guard; richtige Policy/Permission machst du davor
-        if value not in ("prompt", "wizard", "form"):
-            raise ValueError(f"Invalid interaction_mode: {value}")
-        self._runtime["interaction_mode"] = value
-    """
+        if value.value not in InteractionMode.values():
+            raise ValueError(f"Invalid interaction_mode: {value.value}")
+        self._runtime.interaction_mode = value
+
+    # ---- output_format ----
 
     @property
     def output_format(self) -> OutputFormat:
