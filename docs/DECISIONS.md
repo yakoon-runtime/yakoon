@@ -9,7 +9,27 @@
 
 ## [2026-02-06]
 **Kivy-UI-Host**
-Neben dem Konsolen-Host wird jetzt ein UI-Kivy-Host bereitgestellt. Dieser orientiert sich an dem Terminal von Gnome und ist multishellfähig.
+Der UI-Kivy-Host orientiert sich an dem Terminal von Gnome und ist multishellfähig.
+
+## [2026-02-06]
+**Kiyy als Desktop-Technologien**
+Kivy ist ereignis- und flussorientiert - nicht formularzentriert. Kivy lässt in Render-Logik denken, Qt zwingt UI-Logik zu verwalten. Zudem bleibt Kivy Python-first und ist OpenSource ohne Grauzonen in der Lizenz, die später teurer wird. Kivy steht unter der MIT-Lizenz. QT dagegen hätte dazu beführt, ein Framework zu bedienen. Yakoon lebt aber von:
+- kontinuierlichen Outputs
+- teilweisen Updates (Streaming)
+- Zuständen, die sich im Fluss befinden
+- Kivy zeichnet und kontrolliert den Render-Zyklus
+
+
+## [2026-02-06]
+**Desktop-Technologien als Frontend**
+Für das Frontend wurden Desktoptechnologien gewählt. 
+Desktop heißt: Kontrolle über den Rechner. Eine Desktop-App ist kein „Client“, sie ist ein Agent.
+Yakoon könnte später ein verteiltes Command-Graph-System werden. "Commands auf allen Clients ausführen, die im Netzwerk verfügbar sind". Damit kann sie Dinge, die eine Web-Anwendung prinzipiell nicht kann:
+- Prozesse starten & steuern
+- Lokale Ressourcen orchestrieren
+- Langlaufende Sessions halten
+- Identitäten über Maschinen hinweg stabilisieren
+- Netzwerke von innen heraus bilden
 
 ## [2026-02-05]
 **DialogService**
