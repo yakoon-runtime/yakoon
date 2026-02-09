@@ -1,11 +1,7 @@
 from yakoon.platform.engines.command import Engine, Output
-from yakoon.base.runtime.render.models.mode import RenderMode
 from yakoon.hosts.telnet.utils.ansi import format_codes_to_ansi
-from yakoon.platform.bootstrap.settings import SolutionSettings
 
 
-# Set the global rendering mode to ansi text (no Markdown formatting)
-SolutionSettings.runtime.render_mode = RenderMode.ANSI
 engine = Engine(None)
 
 

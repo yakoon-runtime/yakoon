@@ -122,8 +122,10 @@ class Presenter:
         self._session = session
         self._renderer = renderer
         self._dialogs = dialogs
+        
         self._ctx = RenderContext(
-            key=template_key, prefix=template_prefix, lang=session.lang)
+            key=template_key, prefix=template_prefix, 
+            lang=session.lang, format=session.output_format)
 
     @property
     def prompts(self) -> Prompts:

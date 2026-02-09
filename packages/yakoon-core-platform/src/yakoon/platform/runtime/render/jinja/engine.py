@@ -5,7 +5,6 @@ from yakoon.base.descriptors.template import TemplateSource
 
 from yakoon.platform.settings import settings
 from yakoon.platform.runtime.render.context import RenderContext
-from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.runtime.render.section import RenderSection
 from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.jinja.filters import register_filters
@@ -71,18 +70,14 @@ class JinjaEngine(BaseRenderEngine):
     def __init__(self, sources: Iterable[TemplateSource]):
         self._env = build_env(sources)
 
-    #  def render_template(env: Environment, prefix: str, lang: str, key: str, mode: str, section) -> str:
-    # out = render_template(env, "office.mailing", "de", "mail_send", "markdown", section)
-
-    #async def render(self, env: Environment, prefix: str, ctx: RenderContext, section: RenderSection, mode: RenderMode | None = None) -> str:
-    async def render(self, ctx: RenderContext, section: RenderSection, mode: RenderMode | None = None) -> str:
+    async def render(self, ctx: RenderContext, section: RenderSection) -> str:
         """
         Renders a template from templates/<template_key>/<format>, e.g. cmd_version/js.md
         Fallbacks to js.txt if preferred format not found.
         """
         
-        mode = mode or settings.render.render_mode
-        preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.{mode.value}"
+        format = ctx.format or settings.output.format
+        preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.{format.value}"
         fallback = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.plain"
 
         for name in [preferred, fallback]:
@@ -92,4 +87,4 @@ class JinjaEngine(BaseRenderEngine):
             except TemplateNotFound:
                 continue
 
-        raise LookupError(f"Template missing: {ctx.lang}/{ctx.key} ({mode.value})")
+        raise LookupError(f"Template missing: {ctx.lang}/{ctx.key} ({format.value})")

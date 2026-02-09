@@ -1,7 +1,5 @@
 
 
-from yakoon.platform.settings import settings
-from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
 from yakoon.platform.runtime.render.base import BaseRenderEngine
@@ -9,10 +7,9 @@ from yakoon.platform.runtime.render.base import BaseRenderEngine
 
 class RendererService:
 
-    def __init__(self, engine: BaseRenderEngine, default_mode: RenderMode | None = None):
-        self._mode = default_mode or settings.render.render_mode
+    def __init__(self, engine: BaseRenderEngine):
         self._engine = engine
-
+        
     async def render(self, ctx: RenderContext, key: str, **data) -> str:
         """
         Renders a specific section of a command template with optional data.

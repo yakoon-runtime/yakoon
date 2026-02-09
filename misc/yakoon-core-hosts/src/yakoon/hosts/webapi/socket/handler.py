@@ -2,13 +2,8 @@ import uuid
 import asyncio
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-
 from yakoon.platform.engines.command import Engine, Output
-from yakoon.base.runtime.render.models.mode import RenderMode
-from yakoon.platform.bootstrap.settings import SolutionSettings
 
-# Set the global rendering mode to ansi text (no Markdown formatting)
-SolutionSettings.runtime.render_mode = RenderMode.MARKDOWN
 
 engine = Engine(None)
 

@@ -9,24 +9,19 @@ from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
-from yakoon.platform.settings import settings
-from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.directories.controller import ControllerDirectory
 
 from yakoon.console.io import ConsoleOutput
 from yakoon.compose.engine import compose_engine
 
+from yakoon.base.models.format import OutputFormat
 from yakoon.shell.controller import ShellCoreController
 from yakoon.office.mailing.controller import OfficeMailingCoreController
 
-# Set the global rendering mode to ansi text (no Markdown formatting)
-settings.render.render_mode = RenderMode.PLAIN
 
-command_inits = ["welcome"]
 #command_inits += ["use auth", "su", "exit"]
 
-
-async def run_console():
+async def run_console(command_inits=["welcome"]):
    
     session_key = Key.from_parts("yakoon", "bucket", "develop", "1",)
     
@@ -42,6 +37,7 @@ async def run_console():
     sessions = engine.services.get(ports.SessionService)
     session, _ = await sessions.get_or_create(session_key)
     session.bind_io(ConsoleOutput())
+    session.output_format = OutputFormat.MARKDOWN
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)

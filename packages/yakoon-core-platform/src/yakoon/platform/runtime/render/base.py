@@ -1,7 +1,6 @@
 
 from abc import ABC, abstractmethod
 
-from yakoon.platform.runtime.render.mode import RenderMode
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
 
@@ -23,7 +22,6 @@ class BaseRenderEngine(ABC):
     async def render(
         self,
         ctx: RenderContext,
-        section: RenderSection,
-        mode: RenderMode | None = None
+        section: RenderSection
     ) -> str:
         pass

@@ -4,7 +4,7 @@ from yakoon.platform.settings.engine import EngineSettings
 from yakoon.platform.settings.logging import LoggingSettings
 from yakoon.platform.settings.network import NetSettings
 from yakoon.platform.settings.plugings.ai import AISettings
-from yakoon.platform.settings.render import RenderSettings
+from yakoon.platform.settings.output import OutputSettings
 
 class SaasSettings:
 
@@ -13,7 +13,7 @@ class SaasSettings:
     engine = EngineSettings()
     network = NetSettings()
     logging = LoggingSettings()
-    render = RenderSettings()
+    output = OutputSettings()
 
     cmdsets = CmdSetCategoriesSetting()
 
