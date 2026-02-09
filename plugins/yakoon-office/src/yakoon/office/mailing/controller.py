@@ -11,7 +11,7 @@ class OfficeMailingCoreController(BaseController):
     
     template_source = TemplateSource(
         package="yakoon.office.mailing",
-        sub_template_path="core")
+        template_sub_path="core")
 
     commandsets = [
         MailingCommands]

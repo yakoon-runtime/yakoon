@@ -19,7 +19,7 @@ class AuthCoreController(BaseController):
 
     template_source = TemplateSource(
         package="yakoon.auth",
-        sub_template_path="core")
+        template_sub_path="core")
 
     commandsets = [
         AuthSystemCommands]

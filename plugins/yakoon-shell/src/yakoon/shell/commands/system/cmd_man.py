@@ -48,7 +48,7 @@ class CmdMan(Command):
             template_source = controller.template_source
 
             man_folder = template_source.man_folder
-            template_key = str(Path(template_source.sub_template_path).joinpath(
+            template_key = str(Path(template_source.template_sub_path).joinpath(
                 man_folder, command.template_prefix, command.key))
 
             presenter_service = self.services.get(PresenterService) 

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.base.commands.request import Request
+from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.ports import NamespaceService
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.descriptors.template import TemplateSource
@@ -35,9 +36,13 @@ class BaseController(ABC):
     """Provides bucket-based access to services (e.g. room, account, session). 
     Injected at runtime by the platform."""
 
-    template_source: TemplateSource = None
+    template_source: TemplateSource = TemplateSource(None)
     """TemplateSource for all views of this controller (command output and man pages).
     View selection is done by template key conventions (cmd_*, man_*)."""
+
+    workflow_source: WorkflowSource = WorkflowSource(None)
+    """WorkflowSource for all workflows of this controller.
+    """
 
     @property
     @abstractmethod

@@ -63,19 +63,20 @@ class CommandRouter:
         # alias -> canonical command_key
         self._aliases: dict[str, str] = {}
 
-    def register(self, group: str, cmdset: type[CommandSet], *, append: bool = False) -> None:
+    def register(self, group: str, cmdsets: list[CommandSet], *, append: bool = False) -> None:
         if group in self._groups and not append:
             raise ValueError(
                 f"Command group '{group}' already exists. Use append=True to extend it."
             )
 
         bucket = self._groups.setdefault(group, {})
-        for cmd in cmdset.commands():
-            key = cmd.key.lower()
-            bucket[key] = cmd
+        for cmdset in cmdsets:
+            for cmd in cmdset.commands():
+                key = cmd.key.lower()
+                bucket[key] = cmd
 
-            for alias in getattr(cmd, "aliases", []):
-                self._aliases[alias.lower()] = key
+                for alias in getattr(cmd, "aliases", []):
+                    self._aliases[alias.lower()] = key
 
     def find_by_key_or_alias(self, name: str) -> type[Command] | None:
         """

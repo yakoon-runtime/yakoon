@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 from yakoon.base.descriptors.template import TemplateSource
+from yakoon.base.descriptors.workflow import WorkflowSource
 
 @dataclass(frozen=True, slots=True)
 class CommandInfo:
@@ -19,3 +20,4 @@ class ControllerInfo:
     is_activatable: bool = False
     is_listed: bool = True
     template_source: TemplateSource | None = None  
+    workflow_source: WorkflowSource | None = None  

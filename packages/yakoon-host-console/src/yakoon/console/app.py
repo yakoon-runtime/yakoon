@@ -46,25 +46,30 @@ async def run_console(command_inits=["welcome"]):
 
     try:
         while True:
-
             prompt = format_prompt(session)
-
-            di = None
-            if dialogs.is_waiting(session):
-                mode = dialogs.get_mode(session)
-                if mode == PromptMode.SECRET:
-                    di = DispatchInput(await safe_input_secret(prompt=prompt))
+            try:
+                di = None
+                if dialogs.is_waiting(session):
+                    mode = dialogs.get_mode(session)
+                    if mode == PromptMode.SECRET:
+                        di = DispatchInput(await safe_input_secret(prompt=prompt))
+                    else:
+                        di = DispatchInput(await safe_input(prompt=prompt))
                 else:
-                    di = DispatchInput(await safe_input(prompt=prompt))
-            else:
 
-                di = queue.next_input(session)
-                if not di:
-                    di = DispatchInput(await safe_input(prompt=prompt))
+                    di = queue.next_input(session)
+                    if not di:
+                        di = DispatchInput(await safe_input(prompt=prompt))
 
-            await engine.dispatch(session, di)
-            if session.has_signal("exit_app"):
-                break  
+                await engine.dispatch(session, di)
+                if session.has_signal("exit_app"):
+                    break  
+
+            except KeyboardInterrupt:
+                if dialogs.is_waiting(session): # Ctrl+C wurde gedrückt
+                    await engine.dispatch(session, DispatchInput(command="shell:wf.cancel"))
+                    continue
+
     finally:
         sessions.release(session.key)
 

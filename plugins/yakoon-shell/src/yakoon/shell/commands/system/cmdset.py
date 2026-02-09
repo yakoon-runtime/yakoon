@@ -25,5 +25,5 @@ class ShellSystemCommands(CommandSet):
             CmdExit,
             CmdMan,
             CmdSu,
-            CmdTest,
+            CmdTest,           
         ]

@@ -1,0 +1,17 @@
+from yakoon.base import ports
+from yakoon.base.commands.command import Command
+from yakoon.base.commands.request import Request
+from yakoon.base.runtime.session.session import Session
+
+
+class CmdWfNext(Command):
+
+    key = "wf.next"
+
+    async def run(self, session: Session, request: Request):
+
+        batch_id = request.arg(0)
+        step_id  = request.arg(1)
+
+        wfsvc = self.services.get(ports.WorkflowService)
+        wfsvc.advance_after_run(session, batch_id=batch_id, step_id=step_id)

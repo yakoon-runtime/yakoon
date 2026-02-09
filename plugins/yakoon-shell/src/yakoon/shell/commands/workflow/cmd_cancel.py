@@ -1,0 +1,34 @@
+from yakoon.base import ports
+from yakoon.base.commands.command import Command
+from yakoon.base.commands.request import Request
+from yakoon.base.runtime.session.session import Session
+
+
+class CmdWfCancel(Command):
+
+    key = "wf.cancel"
+
+    async def run(self, session: Session, request: Request):
+
+        wfsvc = self.services.get(ports.WorkflowService)
+        queue = self.services.get(ports.CommandQueueService)
+
+        rt = wfsvc.runtime(session)
+        batch = rt.active_batch()
+        if not batch:
+            await session.notify("Kein aktiver Workflow.")
+            return
+
+        # 1) Queue abbrechen
+        queue.cancel_batch(session, batch.batch_id)
+
+        # 2) Runtime aufräumen
+        rt.remove(batch.batch_id)
+
+        # 3) Dialog ggf. schließen
+        dialogs = self.services.get(ports.DialogService)
+        if dialogs.is_waiting(session):
+            dialogs.cancel_prompt(session)
+
+        # 4) Feedback (optional)
+        await session.write("Workflow abgebrochen.")

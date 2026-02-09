@@ -18,6 +18,12 @@ class PermissionService:
             "shell:quit|rx",
             "shell:su|rx",
             "auth:su|rx",
+
+            "shell:wf.run|x",
+            "shell:wf.prompt|x",
+            "shell:wf.next|x",
+            "shell:wf.cancel|x",
+
             #"shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
         ]
 

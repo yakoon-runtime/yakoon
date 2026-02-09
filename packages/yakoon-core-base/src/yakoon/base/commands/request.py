@@ -37,11 +37,30 @@ class Request:
             return self._args[index]
         except IndexError:
             return default
-        
+
     def rest(self) -> str:
         parts = self._raw.split(maxsplit=1)
         return parts[1] if len(parts) == 2 else ""        
-        
+
+    def option(self, name: str, default=None):
+        key = f"--{name}"
+        try:
+            idx = self._args.index(key)
+        except ValueError:
+            return default
+
+        if idx + 1 >= len(self._args):
+            return default
+
+        value = self._args[idx + 1]
+        if value.startswith("--"):
+            return default
+
+        return value
+
+    def has_option(self, name: str) -> bool:
+        return f"--{name}" in self._args
+
     def has_args(self) -> bool:
         return bool(self._args)
 

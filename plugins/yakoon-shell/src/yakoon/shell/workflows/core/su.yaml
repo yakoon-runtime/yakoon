@@ -1,0 +1,14 @@
+
+start: to_auth
+
+steps:
+  - id: to_auth
+    run: "use auth"
+    next: auth:su
+
+  - id: auth:su
+    run: "su {{user.name}} {{user.password}}"
+    next: leave
+
+  - id: leave
+    run: "exit"

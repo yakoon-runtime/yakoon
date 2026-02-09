@@ -1,9 +1,27 @@
 from yakoon.base.commands.request import Request
-from yakoon.base.commands.workflow import WorkflowCommand
+from yakoon.base.commands.command import Command
+from yakoon.base.ports import WorkflowService
 from yakoon.base.runtime.session import Session
 
 
-class CmdSu(WorkflowCommand):
+class CmdSu(Command):
+
+    key = "su"
+
+    template_prefix = "system"
+
+    async def run(self, session: Session, request: Request):
+        wf = self.services.get(WorkflowService)
+
+        controller_id = self.controller.id
+        batch_id = wf.start(session, controller_id, self.key)  # erzeugt batch + queued ersten step
+
+        # value setzen (damit der run-step später "su.raw" ausführen kann)
+        wf.set_value(session, batch_id, "user.name", request.arg(0))
+        wf.set_value(session, batch_id, "user.password", request.arg(1))
+
+"""
+class __CmdSu(WorkflowCommand):
 
     key = "su"    
     template_prefix = "system"
@@ -16,6 +34,5 @@ class CmdSu(WorkflowCommand):
         command = self.batch_commmands.format(raw=request.raw)
         workflow = Request(command).split_commands()
         self.schedule(session, workflow)
-
-
+"""
 

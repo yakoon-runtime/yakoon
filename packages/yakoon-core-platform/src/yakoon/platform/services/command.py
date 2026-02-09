@@ -1,14 +1,9 @@
 from collections import deque
 from typing import Deque
 
-from dataclasses import dataclass
-from typing import Optional
 from uuid import uuid4
 
 from yakoon.base.models.input import DispatchInput
-
-
-
 
 
 class CommandQueueService:
@@ -83,7 +78,7 @@ class CommandQueueService:
         if not q:
             self._q.pop(skey, None)
 
-        return DispatchInput(command=item.command, batch_id=item.batch_id)
+        return item
 
 
     def cancel_batch(self, session, batch_id: str) -> None:

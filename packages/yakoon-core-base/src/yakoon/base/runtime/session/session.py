@@ -58,11 +58,12 @@ class SessionState:
 @dataclass
 class SessionRuntime:
     permissions: PermissionSet = field(default_factory=PermissionSet)
-    data: dict[str, Any] = field(default_factory=dict)
     interaction_mode: InteractionMode = InteractionMode(InteractionMode.WIZARD)
     output_format: OutputFormat = OutputFormat(OutputFormat.PLAIN)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
+
+    meta: dict[str, Any] = field(default_factory=dict)
 
 
 class Session:

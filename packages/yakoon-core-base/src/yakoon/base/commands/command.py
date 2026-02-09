@@ -27,8 +27,8 @@ class Command(ABC):
         return self.controller.services
 
     def get_template_path(self) -> str:
-        sub_template_path = self.controller.template_source.sub_template_path
-        return str(Path(sub_template_path).joinpath(self.template_prefix, self.key))
+        template_sub_path = self.controller.template_source.template_sub_path
+        return str(Path(template_sub_path).joinpath(self.template_prefix, self.key))
 
     async def get_namespace(self, session) -> Namespace:
         namespaces = self.services.get(NamespaceService)   

@@ -21,6 +21,7 @@ from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.engines.command.engine import Engine
+from yakoon.platform.services.workflow import WorkflowCompileService, WorkflowService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
 
@@ -71,7 +72,8 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
         controller_info = ControllerInfo(
             controller.id, controller.is_shell, 
             controller.is_activatable, controller.is_listed,
-            controller.template_source.clone()) 
+            controller.template_source.clone(),
+            controller.workflow_source.clone()) 
         controllers_list.append(controller_info)
 
     return ControllerCatalog(controllers_list)
@@ -103,9 +105,9 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
             controller.is_listed, 
             controller.is_activatable, 
             controller.shell_builtins)
-        for commands_set in controller.commandsets:
-            router.register(controller.id, commands_set)
-            commands.register(controller.id, router)
+
+        router.register(controller.id, controller.commandsets)
+        commands.register(controller.id, router)
 
     return commands
 
@@ -128,6 +130,8 @@ def _compose_services(
     services.register_static(ports.AuthenticationService, AuthenticationService(services))
     services.register_static(ports.PermissionService, PermissionService())
     services.register_static(ports.DialogService, DefaultDialogService())
+    services.register_static(ports.WorkflowService, WorkflowService(services))
+    services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     
     services.register_static(
         ports.RendererService, 
