@@ -8,24 +8,28 @@ from yakoon.base.runtime.session.session import Session
 
 class PermissionService:
 
-    _roles: dict[str, list] = {}
-    _directs = [
-            "shell:welcome|rx",
-            "shell:version|rx",
-            "shell:test|rx",
-            "shell:man|rx",
-            "shell:exit|rx",
-            "shell:quit|rx",
-            "shell:su|rx",
-            "auth:su|rx",
+    _roles: dict[str, list[str]]
+    _directs: list[str]
 
-            "shell:wf.run|x",
-            "shell:wf.prompt|x",
-            "shell:wf.next|x",
-            "shell:wf.cancel|x",
+    def __init__(self):
 
-            #"shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
-        ]
+        self._roles: dict[str, list[str]] = {}
+        self._directs = [
+                "shell:welcome|rx",
+                "shell:version|rx",
+                "shell:test|rx",
+                "shell:man|rx",
+                "shell:exit|rx",
+                "shell:quit|rx",
+                "shell:su|rx",
+                "auth:su|rx",
+
+                "shell:wf.run|x",
+                "shell:wf.prompt|x",
+                "shell:wf.next|x",
+                "shell:wf.cancel|x",
+                "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
+            ]
 
     def register_role(self, name: str, specs: list[str]) -> None: 
         if name in self._roles:
@@ -33,12 +37,11 @@ class PermissionService:
         self._roles[name] = specs
 
     def set_bootstrap_permissions(self, session: Session):
-        session.set_permissions(self.compile_permissions(self._roles, self._directs))
+        session.set_permissions(self.compile_permissions([], self._directs))
 
     def apply_account_permissions(self, session: Session, account: Account):
         bootstrap = self.compile_permissions([], self._directs)
-        account_ps = self.compile_permissions(account.roles, account.permissions)  # falls roles später kommen
-
+        account_ps = self.compile_permissions(account.roles, account.permissions)
         bootstrap.merge(account_ps) 
         session.set_permissions(bootstrap)
 
@@ -51,13 +54,19 @@ class PermissionService:
     def compile_permissions(self, roles: Iterable[str], direct: Iterable[str]) -> PermissionSet:
 
         ps = PermissionSet()
-        # roles
+
+        # 1) expand roles -> specs
         for role in roles:
-            for spec in self._roles.get(role, []):
+            specs = self._roles.get(role)
+            if specs is None:
+                raise ValueError(f"Unknown role: {role}")
+            for spec in specs:
                 ps.add(self.parse_permission(spec))
-        # direct
+
+        # 2) add direct specs
         for spec in direct:
             ps.add(self.parse_permission(spec))
+
         return ps
 
     def parse_permission(self, spec: str) -> Permission:

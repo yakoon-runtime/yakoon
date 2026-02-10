@@ -16,7 +16,6 @@ class CmdSu(Command):
         controller_id = self.controller.id
         batch_id = wf.start(session, controller_id, self.key)  # erzeugt batch + queued ersten step
 
-        # value setzen (damit der run-step später "su.raw" ausführen kann)
         wf.set_value(session, batch_id, "user.name", request.arg(0))
         wf.set_value(session, batch_id, "user.password", request.arg(1))
 

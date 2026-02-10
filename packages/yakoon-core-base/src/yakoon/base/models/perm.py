@@ -7,35 +7,46 @@ from enum import StrEnum
 
 class PermBit(StrEnum):
     READ = "r"
+    WRITE = "w"
     EXECUTE = "x"
 
 
 @dataclass(frozen=True)
 class PermBits:
     r: bool = False
+    w: bool = False
     x: bool = False
 
     @classmethod
     def from_str(cls, s: str) -> "PermBits":
-        s = (s or "").strip()
-        return cls(r="r" in s, x="x" in s)
+        s = s or ""
+        return cls(
+            r="r" in s,
+            w="w" in s, 
+            x="x" in s)
 
     def __bool__(self) -> bool:
-        return self.r or self.x
+        return self.r or self.w or self.x
 
     def union(self, other: "PermBits") -> "PermBits":
-        return PermBits(r=self.r or other.r, x=self.x or other.x)
+        return PermBits(
+            r=self.r or other.r, 
+            w=self.w or other.w,
+            x=self.x or other.x)
 
     def subtract(self, other: "PermBits") -> "PermBits":
         # remove bits present in other
-        return PermBits(r=self.r and not other.r, x=self.x and not other.x)
+        return PermBits(
+            r=self.r and not other.r, 
+            w=self.w and not other.w, 
+            x=self.x and not other.x)
 
 
 @dataclass(frozen=True)
 class Permission:
     """
     command_key: e.g. "auth:su"
-    bits: PermBits, e.g. rx
+    bits: PermBits, e.g. rwx
     scope1/scope2:
       - scope1 is the "primary" scope (e.g. account)
       - scope2 optional (e.g. group / tenant / controller-context)
@@ -96,7 +107,7 @@ class PermissionSet:
 
     def check(self, command_key: str, need: str = "x", scope2_need: Optional[str] = None) -> bool:
         """
-        need: "r" or "x" or "rx"
+        need: "r" | "w" | "x" | combinations like "rw", "rwx"
         scope2_need: optional second-scope requirement (future use)
         """
         need_bits = PermBits.from_str(need)
@@ -114,6 +125,8 @@ class PermissionSet:
 
         if need_bits.r and not eff1.r:
             return False
+        if need_bits.w and not eff1.w:
+            return False
         if need_bits.x and not eff1.x:
             return False
 
@@ -124,7 +137,10 @@ class PermissionSet:
             eff2 = allow.scope2
             if deny and deny.scope2:
                 eff2 = eff2.subtract(deny.scope2)
+
             if need2_bits.r and not eff2.r:
+                return False
+            if need2_bits.w and not eff2.w:
                 return False
             if need2_bits.x and not eff2.x:
                 return False
@@ -132,10 +148,11 @@ class PermissionSet:
         return True
 
     def to_debug_dict(self) -> dict[str, dict[str, str]]:
+
         def bits_to_str(b: Optional[PermBits]) -> str:
             if not b:
                 return ""
-            return ("r" if b.r else "") + ("x" if b.x else "")
+            return ("r" if b.r else "") + ("w" if b.w else "") + ("x" if b.x else "")
 
         out: dict[str, dict[str, str]] = {}
         keys = set(self._allow.keys()) | set(self._deny.keys())
