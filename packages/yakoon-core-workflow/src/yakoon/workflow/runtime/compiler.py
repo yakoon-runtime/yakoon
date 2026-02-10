@@ -1,4 +1,5 @@
 import re
+import shlex
 from typing import Any
 
 
@@ -17,9 +18,9 @@ def compile_run_command(cmd: str, values: dict[str, Any], *, context: str) -> st
         val = values.get(key)
 
         if val is None or val == "":
-            return ""  # optional: remove whole --flag <value>
+            return ""
 
-        return f"{flag} {val}"
+        return f"{flag} {shlex.quote(str(val))}"
 
     out = _NAMED_ARG_RE.sub(repl_named, out)
 
@@ -27,17 +28,15 @@ def compile_run_command(cmd: str, values: dict[str, Any], *, context: str) -> st
     for k, v in values.items():
         if v is None or v == "":
             continue
-        out = out.replace("{{" + k + "}}", str(v))
+        out = out.replace("{{" + k + "}}", shlex.quote(str(v)))
 
-    # normalize whitespace
+    # normalize whitespace/newlines
+    out = out.replace("\n", " ")
     out = " ".join(out.split())
 
-    # 3) Guardrail: after rendering there must be no unresolved placeholders left
+    # 3) Guardrail: no unresolved placeholders left
     m = _PLACEHOLDER_RE.search(out)
     if m:
-        raise ValueError(
-            f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {out}"
-        )
+        raise ValueError(f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {out}")
 
     return out
-
