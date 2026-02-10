@@ -37,7 +37,12 @@ steps:
     next: create_customer
 
   - id: create_customer
-    run: "crm.customer.create --first {{customer.first_name}} --last {{customer.last_name}} --mail_opt_in {{customer.mail_opt_in}} --mail {{customer.mail}}"
+    run: >
+      crm.customer.create 
+      --first {{customer.first_name}} 
+      --last {{customer.last_name}} 
+      --mail_opt_in {{customer.mail_opt_in}} 
+      --mail {{customer.mail}}
     next: done
 
   - id: done
