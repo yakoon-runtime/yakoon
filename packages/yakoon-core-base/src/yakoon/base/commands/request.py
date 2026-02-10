@@ -40,9 +40,9 @@ class Request:
         except IndexError:
             return default
 
-    def rest(self) -> str:
+    def free_text(self) -> str:
         parts = self._raw.split(maxsplit=1)
-        return parts[1] if len(parts) == 2 else ""        
+        return parts[1].lstrip() if len(parts) == 2 else ""
 
     def option(self, name: str, default=None):
         key = f"--{name}"
