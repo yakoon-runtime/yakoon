@@ -11,6 +11,7 @@
     "packages/yakoon-host-kivy/src",
 
     "plugins/yakoon-auth/src",
+    "plugins/yakoon-crm/src",
     "plugins/yakoon-shell/src",
     "plugins/yakoon-office/src"
   ]

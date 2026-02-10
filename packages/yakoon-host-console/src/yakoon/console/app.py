@@ -9,6 +9,7 @@ from yakoon.base.utils.format import format_prompt
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.base.runtime.devtools import MemoryTrendMonitor
 from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
+from yakoon.crm.customer.controller import CrmCustomerCoreController
 from yakoon.platform.directories.controller import ControllerDirectory
 
 from yakoon.console.io import ConsoleOutput
@@ -29,6 +30,7 @@ async def run_console(command_inits=["welcome"]):
         controllers=ControllerDirectory(
             controllers=[
                 ShellCoreController(), 
+                CrmCustomerCoreController(),
                 AuthCoreController(),
                 OfficeMailingCoreController()]))
 
