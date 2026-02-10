@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
+from enum import Enum, auto
 
 from yakoon.base.models.mode import InteractionMode
 
@@ -36,15 +37,35 @@ class WorkflowDef:
 
 
 @dataclass
+class WorkflowError:
+    code: str            # PERMISSION_DENIED, COMMAND_FAILED, ...
+    message: str
+    step_id: str
+    command: str | None = None
+
+
+class WorkflowStatus(Enum):
+    PREPARED = auto()
+    RUNNING = auto()
+    FAILED = auto()
+    DONE = auto()
+    CANCELLED = auto()
+
+
+@dataclass
 class WorkflowBatch:
     batch_id: str
     interaction_mode: InteractionMode
+    controller_id: str | None = None
     
     workflow_id: Optional[str] = None
-    current_step: Optional[str] = None
     values: Dict[str, Any] = field(default_factory=dict)
 
-    pending_step: Optional[str] = None   # wenn UI-Eingabe erwartet wird
+    current_step: Optional[str] = None
+    pending_step: Optional[str] = None   
+
+    status: WorkflowStatus = WorkflowStatus.RUNNING
+    error: WorkflowError | None = None
 
 
 @dataclass

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 from yakoon.base import ports
-from yakoon.base.models.workflow import WorkflowRuntime
+from yakoon.base.models.workflow import WorkflowError, WorkflowRuntime, WorkflowStatus
 from yakoon.workflow.runtime.compiler import compile_run_command
 
 
@@ -51,6 +51,13 @@ class WorkflowService:
 
     # ---- orchestration (v1: prompt/run/end, linear next) ----
 
+    def set_value(self, session, batch_id: str, key: str, value: Any) -> None:
+        rt = self.runtime(session)
+        batch = rt.get(batch_id)
+        if not batch:
+            raise RuntimeError(f"Unknown workflow batch: {batch_id}")
+        batch.values[key] = value
+
     def start_with_values(self, session, controller_id: str, 
                           workflow_key: str, values: Mapping[str, Any], *,
                           enqueue_first: bool = True, ignore_none: bool = True ) -> str:
@@ -96,7 +103,7 @@ class WorkflowService:
         batch.workflow_key = workflow_key
         batch.current_step = wf.start
         batch.pending_step = None
-
+        batch.status = WorkflowStatus.RUNNING if enqueue_first else WorkflowStatus.PREPARED
         if enqueue_first:
             self.enqueue_next(session, batch_id)
 
@@ -157,6 +164,9 @@ class WorkflowService:
         if not batch or not batch.controller_id or not batch.workflow_key:
             return
 
+        if batch.status == WorkflowStatus.PREPARED:
+            batch.status = WorkflowStatus.RUNNING
+
         wf = self.get_def(batch.controller_id, batch.workflow_key)
         step_id = batch.current_step or wf.start
         step = wf.steps.get(step_id)
@@ -167,6 +177,7 @@ class WorkflowService:
 
         # END
         if step.end:
+            batch.status = WorkflowStatus.DONE
             rt.remove(batch_id)
             return
 
@@ -233,12 +244,31 @@ class WorkflowService:
         batch.current_step = step.next
         self.enqueue_next(session, batch_id)
 
-    def set_value(self, session, batch_id: str, key: str, value: Any) -> None:
+    def fail_batch(self, session, *, batch_id: str, code: str, message: str, command: str | None = None) -> None:
+
         rt = self.runtime(session)
         batch = rt.get(batch_id)
         if not batch:
-            raise RuntimeError(f"Unknown workflow batch: {batch_id}")
-        batch.values[key] = value
+            return
 
-    # ---- tiny templating (v1) ----
+        step_id = batch.pending_step or batch.current_step
+        batch.status = WorkflowStatus.FAILED
+        batch.error = WorkflowError(
+            code=code, 
+            message=message, 
+            step_id=step_id, 
+            command=command)
+
+    def cancel_batch(self, session, *, batch_id: str) -> None:
+
+        rt = self.runtime(session)
+        batch = rt.get(batch_id)
+        if not batch:
+            return
+        
+        batch.status = WorkflowStatus.CANCELLED
+        batch.error = None
+        
+        queue = self.services.get(ports.CommandQueueService)
+        queue.cancel_batch(session, batch_id)
 

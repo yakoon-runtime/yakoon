@@ -1,9 +1,8 @@
 import asyncio
 from typing import Optional, Tuple
 
+from yakoon.base import ports
 from yakoon.base.models.input import DispatchInput
-from yakoon.base.models.perm import PermBit
-from yakoon.base.ports import AuditLogService, CommandQueueService, DialogService, PermissionService
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.runtime.session import Session
@@ -20,9 +19,6 @@ class Engine:
                 directory: ControllerDirectory, 
                 services: ServiceDirectory, 
                 commands: CommandDirectory):
-      """      
-      Creates a new instance of the class engine.
-      """
       self._directory = directory
       self._services = services
       self._commands = commands
@@ -49,7 +45,7 @@ class Engine:
          session.set_active_controller(shell.id)
 
       # 1) Prompt response path
-      dialog_service = self.services.get(DialogService)
+      dialog_service = self.services.get(ports.DialogService)
       if dialog_service.is_waiting(session):
          dialog_service.resolve_prompt(session, di.command)
 
@@ -76,7 +72,7 @@ class Engine:
       # Lass den Command weiterlaufen, bis:
       # - fertig ODER
       # - er erneut promptet
-      dialog_service = self.services.get(DialogService)
+      dialog_service = self.services.get(ports.DialogService)
       while not task.done() and not dialog_service.is_waiting(session):
          await asyncio.sleep(0.005)
 
@@ -113,7 +109,7 @@ class Engine:
 
          resolved_controller, command = result
 
-         perm_service = self.services.get(PermissionService)
+         perm_service = self.services.get(ports.PermissionService)
          fq = f"{resolved_controller.id}:{command.key}"
          if not perm_service.can_execute(session, fq):
             raise PermissionError("Permission denied")
@@ -136,32 +132,44 @@ class Engine:
       except CmdNotFound:
          failed = True
          await session.fail(f"{request.command()}': command not found... use 'man'")
+         self.wf_failed(exc, command, session, di)
 
       except PermissionError as exc:
          failed = True
-         audit = self._services.get(AuditLogService)
+         audit = self._services.get(ports.AuditLogService)
          # command may be None if permission fails early
          await audit.permission(session, "command", command.key if command else request.command())
          await session.fail(str(exc))
+         self.wf_failed(exc, command, session, di)
 
       except ValueError as exc:
          failed = True
          await session.fail(str(exc))
+         self.wf_failed(exc, command, session, di)
 
       except Exception as exc:
          failed = True
-         audit = self._services.get(AuditLogService)
+         audit = self._services.get(ports.AuditLogService)
          await audit.error(exc)
          await session.fail("Ein interner Fehler ist aufgetreten.")
+         self.wf_failed(exc, command, session, di)
 
       finally:
          if command:
                command.controller = None
 
          if failed and di.batch_id:
-            queue = self._services.get(CommandQueueService)
-            queue.cancel_batch(session, di.batch_id)
-
+            wf = self._services.get(ports.WorkflowService)
+            wf.cancel_batch(session, batch_id=di.batch_id)
+            
          # Policy 2: cleanup the controller that executed this command
          # (NOT the current active controller after the command potentially changed it)
          await controller.on_cleanup(session)
+
+   def wf_failed(self, exc: Exception, command: Command, session: Session, di: DispatchInput) -> bool:
+      if di.batch_id:
+         wf = self._services.get(ports.WorkflowService)
+         wf.fail_batch(session, batch_id=di.batch_id,
+               code=exc,
+               message=str(exc),
+               command=command.key)
