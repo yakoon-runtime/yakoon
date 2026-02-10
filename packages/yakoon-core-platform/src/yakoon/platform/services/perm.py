@@ -24,6 +24,8 @@ class PermissionService:
                 "shell:su|rx",
                 "auth:su|rx",
 
+                "crm-customer:create-customer|rx",
+
                 "shell:wf.run|x",
                 "shell:wf.prompt|x",
                 "shell:wf.next|x",
