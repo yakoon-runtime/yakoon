@@ -5,7 +5,7 @@ import json
 import yaml
 import importlib.resources as ir
 
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 from yakoon.base import ports
 from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.models.workflow import PromptDef, StepDef, WorkflowDef, WorkflowRuntime
@@ -14,11 +14,11 @@ from yakoon.base.models.workflow import PromptDef, StepDef, WorkflowDef, Workflo
 class WorkflowNotFound(KeyError):
     pass
 
+_NAMED_ARG_RE = re.compile(
+    r"(?P<flag>--[a-zA-Z0-9][\w\-]*)\s+(?P<ph>\{\{[^}]+\}\})")
 
-_ARG_PATTERN = re.compile(r"""
-    (?P<flag>--\w+)\s+
-    (?P<placeholder>\{\{[^}]+\}\})
-""", re.VERBOSE)
+_PLACEHOLDER_RE = re.compile(
+    r"\{\{\s*([^}]+?)\s*\}\}")
 
 
 class WorkflowService:
@@ -61,11 +61,40 @@ class WorkflowService:
 
     # ---- orchestration (v1: prompt/run/end, linear next) ----
 
-    def start(self, session, controller_id: str, workflow_key: str) -> str:
+    def start_with_values(self, session, controller_id: str, 
+                          workflow_key: str, values: Mapping[str, Any], *,
+                          enqueue_first: bool = True, ignore_none: bool = True ) -> str:
         """
-        Startet einen Run als neue batch_id und queued NUR den ersten Step.
-        interaction_mode kommt ausschließlich aus session.interaction_mode.
+        Convenience wrapper:
+        - creates workflow batch
+        - sets initial batch.values
+        - enqueues first step (default)
+
+        Args:
+            enqueue_first:
+                If True, enqueue the first step AFTER values were set.
+                If False, caller may enqueue manually (rare).
+            ignore_none:
+                If True, keys with value None are not written into batch.values.
+                This keeps 'missing' semantics intact.
         """
+        batch_id = self.start(
+            session,
+            controller_id=controller_id,
+            workflow_key=workflow_key,
+            enqueue_first=False)
+
+        for k, v in values.items():
+            if ignore_none and v is None:
+                continue
+            self.set_value(session, batch_id, k, v)
+
+        if enqueue_first:
+            self.enqueue_next(session, batch_id)
+
+        return batch_id
+
+    def start(self, session, controller_id: str, workflow_key: str, *, enqueue_first: bool = True) -> str:
         wf = self.get_def(controller_id, workflow_key)
 
         queue = self.services.get(ports.CommandQueueService)
@@ -78,8 +107,41 @@ class WorkflowService:
         batch.current_step = wf.start
         batch.pending_step = None
 
-        self.enqueue_next(session, batch_id)
+        if enqueue_first:
+            self.enqueue_next(session, batch_id)
+
         return batch_id
+
+
+    def resume_with_values(self, session, batch_id: str, values: Mapping[str, Any], *, 
+                           ignore_none: bool = True, enqueue_next: bool = True) -> None:
+        """
+        Convenience:
+        - set/override multiple values in an existing workflow batch
+        - then continue workflow by enqueuing the next step (default)
+
+        Typical use:
+        - GUI form submits multiple fields at once
+        - a command collects several values and wants to continue
+
+        wf.resume_with_values(session, batch_id, {
+            "customer.first_name": first,
+            "customer.last_name": last,
+            "customer.email": email,
+        })
+        """
+        rt = self.runtime(session)
+        batch = rt.get(batch_id)
+        if not batch:
+            raise RuntimeError(f"Unknown workflow batch: {batch_id}")
+
+        for k, v in values.items():
+            if ignore_none and v is None:
+                continue
+            self.set_value(session, batch_id, k, v)
+
+        if enqueue_next:
+            self.enqueue_next(session, batch_id)
 
     def get_step(self, session, batch_id: str, step_id: str):
         rt = self.runtime(session)
@@ -127,7 +189,9 @@ class WorkflowService:
 
         # RUN
         if step.run:
-            cmd = self._render_run(step.run, batch.values)
+            cmd = self._render_run(
+                step.run, batch.values, 
+                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}")
             queue.enqueue_commands(
                 session, [cmd, f"wf.next {batch_id} {step.id}"], batch_id=batch_id)
             return
@@ -180,34 +244,44 @@ class WorkflowService:
     # ---- tiny templating (v1) ----
 
     @staticmethod
-    def _render_run(cmd: str, values: dict[str, Any]) -> str:
+    def _render_run(cmd: str, values: dict[str, Any], *, context: str) -> str:
         out = cmd
 
-        # 1) Named arguments behandeln: --flag {{key}}
-        def replace_named(match):
-            flag = match.group("flag")
-            placeholder = match.group("placeholder")
-            key = placeholder[2:-2].strip()  # {{user.name}} -> user.name
+        # (1) Named-Args: --flag {{key}} -> entfernen wenn missing/None/""
+        def repl_named(m: re.Match) -> str:
+            flag = m.group("flag")
+            ph = m.group("ph")
+            key = ph[2:-2].strip()
             val = values.get(key)
 
             if val is None or val == "":
-                return ""  # komplettes Argument entfernen
+                return ""  # kompletten Named-Arg entfernen
 
             return f"{flag} {val}"
 
-        out = _ARG_PATTERN.sub(replace_named, out)
+        out = _NAMED_ARG_RE.sub(repl_named, out)
 
-        # 2) übrige {{key}} ersetzen (positional fallback)
+        # (2) Normale Platzhalter ersetzen: {{key}} -> value, missing bleibt stehen
+        #     Wichtig: wir ersetzen NUR die, die wir tatsächlich haben, damit missing auffällt.
         for k, v in values.items():
-            placeholder = "{{" + k + "}}"
-            if v is None or v == "":
-                out = out.replace(placeholder, "")
-            else:
-                out = out.replace(placeholder, str(v))
+            ph = "{{" + k + "}}"
+            if v is None:
+                # None => wie "nicht vorhanden": placeholder NICHT ersetzen
+                continue
+            out = out.replace(ph, str(v))
 
-        # 3) whitespace normalisieren
+        # whitespace normalisieren
         out = " ".join(out.split())
+
+        # (3) Guardrail: nach Render dürfen keine {{...}} mehr übrig sein
+        _assert_no_placeholders_left(out, context=context)
+
         return out
+
+def _assert_no_placeholders_left(rendered: str, *, context: str) -> None:
+    m = _PLACEHOLDER_RE.search(rendered)
+    if m:
+        raise ValueError(f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {rendered}")
 
 
 class WorkflowFileNotFound(FileNotFoundError):
@@ -223,10 +297,6 @@ class WorkflowCompileService:
     - filename == <workflow_key>.(yaml|yml|json)
     - no caching, no bulk loading
     """
-
-    # ----------------------------
-    # public API
-    # ----------------------------
 
     def load_def(self, source: WorkflowSource, workflow_key: str) -> WorkflowDef:
         """
