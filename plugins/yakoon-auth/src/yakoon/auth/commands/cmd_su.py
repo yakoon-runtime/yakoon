@@ -18,9 +18,9 @@ class CmdSu(Command):
         
         ns = await namespaces.from_session(session)
         
-        username = request.arg(0) or \
+        username = request.arg(0) or request.option("user") or \
             await presenter.prompts.ask("ask_user")
-        secret = request.arg(1) or \
+        secret = request.option("password") or \
             await presenter.prompts.ask_secret("ask_secret") 
         
         result = await auth.authenticate(ns, username, secret)

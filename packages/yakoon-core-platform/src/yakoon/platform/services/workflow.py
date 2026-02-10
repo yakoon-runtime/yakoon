@@ -14,12 +14,6 @@ from yakoon.base.models.workflow import PromptDef, StepDef, WorkflowDef, Workflo
 class WorkflowNotFound(KeyError):
     pass
 
-_NAMED_ARG_RE = re.compile(
-    r"(?P<flag>--[a-zA-Z0-9][\w\-]*)\s+(?P<ph>\{\{[^}]+\}\})")
-
-_PLACEHOLDER_RE = re.compile(
-    r"\{\{\s*([^}]+?)\s*\}\}")
-
 
 class WorkflowService:
     """
@@ -189,7 +183,7 @@ class WorkflowService:
 
         # RUN
         if step.run:
-            cmd = self._render_run(
+            cmd = compile_run_command(
                 step.run, batch.values, 
                 context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}")
             queue.enqueue_commands(
@@ -243,45 +237,45 @@ class WorkflowService:
 
     # ---- tiny templating (v1) ----
 
-    @staticmethod
-    def _render_run(cmd: str, values: dict[str, Any], *, context: str) -> str:
-        out = cmd
 
-        # (1) Named-Args: --flag {{key}} -> entfernen wenn missing/None/""
-        def repl_named(m: re.Match) -> str:
-            flag = m.group("flag")
-            ph = m.group("ph")
-            key = ph[2:-2].strip()
-            val = values.get(key)
+_NAMED_ARG_RE = re.compile(r"(?P<flag>--[a-zA-Z0-9][\w\-]*)\s+(?P<ph>\{\{[^}]+\}\})")
+_PLACEHOLDER_RE = re.compile(r"\{\{\s*([^}]+?)\s*\}\}")
 
-            if val is None or val == "":
-                return ""  # kompletten Named-Arg entfernen
 
-            return f"{flag} {val}"
+def compile_run_command(cmd: str, values: dict[str, Any], *, context: str) -> str:
+    out = cmd
 
-        out = _NAMED_ARG_RE.sub(repl_named, out)
+    # 1) Named args: --flag {{key}}
+    def repl_named(m: re.Match) -> str:
+        flag = m.group("flag")
+        ph = m.group("ph")
+        key = ph[2:-2].strip()
+        val = values.get(key)
 
-        # (2) Normale Platzhalter ersetzen: {{key}} -> value, missing bleibt stehen
-        #     Wichtig: wir ersetzen NUR die, die wir tatsächlich haben, damit missing auffällt.
-        for k, v in values.items():
-            ph = "{{" + k + "}}"
-            if v is None:
-                # None => wie "nicht vorhanden": placeholder NICHT ersetzen
-                continue
-            out = out.replace(ph, str(v))
+        if val is None or val == "":
+            return ""  # optional: remove whole --flag <value>
 
-        # whitespace normalisieren
-        out = " ".join(out.split())
+        return f"{flag} {val}"
 
-        # (3) Guardrail: nach Render dürfen keine {{...}} mehr übrig sein
-        _assert_no_placeholders_left(out, context=context)
+    out = _NAMED_ARG_RE.sub(repl_named, out)
 
-        return out
+    # 2) Replace remaining placeholders ONLY if value exists and is not None/""
+    for k, v in values.items():
+        if v is None or v == "":
+            continue
+        out = out.replace("{{" + k + "}}", str(v))
 
-def _assert_no_placeholders_left(rendered: str, *, context: str) -> None:
-    m = _PLACEHOLDER_RE.search(rendered)
+    # normalize whitespace
+    out = " ".join(out.split())
+
+    # 3) Guardrail: after rendering there must be no unresolved placeholders left
+    m = _PLACEHOLDER_RE.search(out)
     if m:
-        raise ValueError(f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {rendered}")
+        raise ValueError(
+            f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {out}"
+        )
+
+    return out
 
 
 class WorkflowFileNotFound(FileNotFoundError):
