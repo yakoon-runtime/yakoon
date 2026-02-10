@@ -7,6 +7,12 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+## [2026-02-10]
+**Wenn ein Workflow darf nie mahr als der User**
+Bedeutet: Privilege Escalation als Feature ist nicht erlaubt und bewart das System später vor den ganz teuren Security-Debatten bewahrt.
+Wenn ein Workflow mehr darf als der User, bedeutet das faktisch, ein komplettes Policy-System bauen (Run-as, Delegation, Approvals, Audit, Scope, Least-Privilege-Rollen, Secrets, Revocation)
+- Workflows sind Orchestrierung, keine Berechtigungs-Abkürzung.
+
 ## [2026-02-09]
 **Einführung Workflow & Kontexts (batch.values)**
 Daten zwischen Commands werden nicht mehr implizit über Session-Zustand oder Command-Seiteneffekte weitergereicht, sondern explizit über einen Workflow-gebundenen Kontext (batch.values).
