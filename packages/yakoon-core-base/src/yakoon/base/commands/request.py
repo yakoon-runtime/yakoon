@@ -31,10 +31,12 @@ class Request:
 
     def args(self) -> list[str]:
         """Returns all arguments as a list of tokens."""
+        return self._args
 
     def arg(self, index: int, default=None):
+        args = self._pos_args()
         try:
-            return self._args[index]
+            return args[index]
         except IndexError:
             return default
 
@@ -58,6 +60,12 @@ class Request:
 
         return value
 
+    def token(self, index: int, default=None):
+        try:
+            return self._args[index]
+        except IndexError:
+            return default
+
     def has_option(self, name: str) -> bool:
         return f"--{name}" in self._args
 
@@ -76,3 +84,23 @@ class Request:
         - Does not handle quoting or escaping (by design)
         """
         return [p.strip() for p in self._raw.split(separator) if p.strip()]
+
+    def _pos_args(self) -> list[str]:
+        """
+        Returns positional args only, skipping:
+          --flag value
+          --flag (no value)
+        """
+        out: list[str] = []
+        i = 0
+        while i < len(self._args):
+            tok = self._args[i]
+            if tok.startswith("--"):
+                i += 1
+                if i < len(self._args) and not self._args[i].startswith("--"):
+                    i += 1
+                continue
+            out.append(tok)
+            i += 1
+
+        return out
