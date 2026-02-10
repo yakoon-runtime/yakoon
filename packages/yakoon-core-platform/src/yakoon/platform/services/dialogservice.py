@@ -15,7 +15,8 @@ class DefaultDialogService:
     Tracks active prompts by session_key using asyncio Futures.
     """
 
-    DEFAULT_TIMEOUT = 30
+    DEFAULT_TIMEOUT = 60 * 15
+    # Default 15 Minutes
 
     def __init__(self):
         self._waiting: dict[str, asyncio.Future] = {}

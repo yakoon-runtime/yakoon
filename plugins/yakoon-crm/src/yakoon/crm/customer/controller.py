@@ -10,12 +10,12 @@ class CrmCustomerCoreController(BaseController):
     id = "crm-customer"
     
     template_source = TemplateSource(
-        package="yakoon.crm.customer"
-        )
+        package="yakoon.crm.customer",
+        template_sub_path="customer")
 
     workflow_source = WorkflowSource(
-        package="yakoon.crm.customer"
-        )
+        package="yakoon.crm.customer",
+        workflow_sub_path="customer")
 
     commandsets = [
         CrmCustomerCommands]

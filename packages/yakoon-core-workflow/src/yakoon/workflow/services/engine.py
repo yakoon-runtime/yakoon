@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-import re
-import json
-import yaml
-import importlib.resources as ir
 
-from typing import Any, Dict, Mapping
+from typing import Any, Mapping
 from yakoon.base import ports
-from yakoon.base.descriptors.workflow import WorkflowSource
-from yakoon.base.models.workflow import PromptDef, StepDef, WorkflowDef, WorkflowRuntime
+from yakoon.base.models.workflow import WorkflowRuntime
+from yakoon.workflow.runtime.compiler import compile_run_command
 
 
 class WorkflowNotFound(KeyError):
@@ -205,6 +201,15 @@ class WorkflowService:
         batch.values[step.prompt.var] = value
         batch.pending_step = None
 
+        if step.branch:
+            key = str(value).lower()
+            next_id = step.branch.get(key)
+            if not next_id:
+                raise RuntimeError(f"Prompt step '{step.id}': branch has no target for '{key}'")
+            batch.current_step = next_id
+            self.enqueue_next(session, batch_id)
+            return
+
         if not step.next:
             raise RuntimeError(f"Prompt step '{step.id}' has no 'next'")
 
@@ -237,147 +242,3 @@ class WorkflowService:
 
     # ---- tiny templating (v1) ----
 
-
-_NAMED_ARG_RE = re.compile(r"(?P<flag>--[a-zA-Z0-9][\w\-]*)\s+(?P<ph>\{\{[^}]+\}\})")
-_PLACEHOLDER_RE = re.compile(r"\{\{\s*([^}]+?)\s*\}\}")
-
-
-def compile_run_command(cmd: str, values: dict[str, Any], *, context: str) -> str:
-    out = cmd
-
-    # 1) Named args: --flag {{key}}
-    def repl_named(m: re.Match) -> str:
-        flag = m.group("flag")
-        ph = m.group("ph")
-        key = ph[2:-2].strip()
-        val = values.get(key)
-
-        if val is None or val == "":
-            return ""  # optional: remove whole --flag <value>
-
-        return f"{flag} {val}"
-
-    out = _NAMED_ARG_RE.sub(repl_named, out)
-
-    # 2) Replace remaining placeholders ONLY if value exists and is not None/""
-    for k, v in values.items():
-        if v is None or v == "":
-            continue
-        out = out.replace("{{" + k + "}}", str(v))
-
-    # normalize whitespace
-    out = " ".join(out.split())
-
-    # 3) Guardrail: after rendering there must be no unresolved placeholders left
-    m = _PLACEHOLDER_RE.search(out)
-    if m:
-        raise ValueError(
-            f"{context}: unresolved placeholder '{{{{{m.group(1)}}}}}' in: {out}"
-        )
-
-    return out
-
-
-class WorkflowFileNotFound(FileNotFoundError):
-    pass
-
-
-class WorkflowCompileService:
-    """
-    Loads exactly ONE workflow definition from package resources.
-
-    Rules:
-    - 1 workflow == 1 file
-    - filename == <workflow_key>.(yaml|yml|json)
-    - no caching, no bulk loading
-    """
-
-    def load_def(self, source: WorkflowSource, workflow_key: str) -> WorkflowDef:
-        """
-        Load and parse a single workflow file.
-
-        Args:
-            source: WorkflowSource describing the package/path
-            workflow_key: file stem (without extension)
-
-        Returns:
-            Parsed workflow data (dict)
-
-        Raises:
-            WorkflowNotFound if file does not exist
-            ValueError for invalid content
-        """
-        root = ir.files(source.package) / source.workflow_path / source.workflow_sub_path
-        if not root.is_dir():
-            raise WorkflowNotFound(f"Workflow directory not found: {root}")
-
-        path = self._find_file(root, workflow_key)
-        raw_text = path.read_text(encoding="utf-8")
-        raw = self._parse(path.name, raw_text)
-
-        return self._build_workflow_def(workflow_key, raw)
-
-    def _find_file(self, root, workflow_key: str):
-        for ext in (".yaml", ".yml", ".json"):
-            p = root / f"{workflow_key}{ext}"
-            if p.is_file():
-                return p
-        raise WorkflowFileNotFound(f"Workflow not found: {root}/{workflow_key}")
-    
-    def _parse(self, filename: str, raw: str) -> Dict[str, Any]:
-        if filename.endswith(".json"):
-            return json.loads(raw)
-        if filename.endswith((".yaml", ".yml")):
-            data = yaml.safe_load(raw)
-            if data is None:
-                raise ValueError(f"Workflow file '{filename}' is empty")
-            return data
-        raise ValueError(f"Unsupported workflow file: {filename}")
-    
-    def _build_workflow_def(self, workflow_key: str, raw: Dict[str, Any]) -> "WorkflowDef":
-        start = raw.get("start")
-        if not start:
-            raise ValueError(f"{workflow_key}: missing 'start'")
-
-        raw_steps = raw.get("steps")
-        if not isinstance(raw_steps, list) or not raw_steps:
-            raise ValueError(f"{workflow_key}: 'steps' must be a non-empty list")
-
-        steps: Dict[str, StepDef] = {}
-
-        for s in raw_steps:
-            sid = s.get("id")
-            if not sid:
-                raise ValueError(f"{workflow_key}: step without id")
-
-            prompt = None
-            if s.get("prompt") is not None:
-                p = s["prompt"]
-                prompt = PromptDef(
-                    kind=p.get("kind", "text"),
-                    title=p["title"],
-                    var=p.get("var"),
-                    required=bool(p.get("required", True)),
-                )
-
-            step = StepDef(
-                id=sid,
-                run=s.get("run"),
-                prompt=prompt,
-                next=s.get("next"),
-                end=s.get("end"),
-            )
-
-            # Guardrail: exactly one of run/prompt/end
-            actions = sum([step.run is not None, step.prompt is not None, step.end is not None])
-            if actions != 1:
-                raise ValueError(
-                    f"{workflow_key}:{sid}: define exactly one of [run, prompt, end]"
-                )
-
-            steps[sid] = step
-
-        if start not in steps:
-            raise ValueError(f"{workflow_key}: start step '{start}' not found")
-
-        return WorkflowDef(id=workflow_key, start=start, steps=steps)

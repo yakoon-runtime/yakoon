@@ -5,8 +5,10 @@
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.extraPaths": [
     "packages/yakoon-core-base/src",
-    "packages/yakoon-core-platform/src",
     "packages/yakoon-core-compose/src",
+    "packages/yakoon-core-platform/src",
+    "packages/yakoon-core-workflow/src",
+
     "packages/yakoon-host-console/src",
     "packages/yakoon-host-kivy/src",
 

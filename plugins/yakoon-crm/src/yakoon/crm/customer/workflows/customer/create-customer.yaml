@@ -1,0 +1,40 @@
+workflow: kunden_anlage
+version: 1
+
+start: first_name
+
+steps:
+  - id: first_name
+    prompt:
+      kind: text
+      title: "Vorname:"
+      var: customer.first_name
+    next: last_name
+
+  - id: last_name
+    prompt:
+      kind: text
+      title: "Nachname:"
+      var: customer.last_name
+    next: ask_mail
+
+  - id: ask_mail
+    prompt:
+      kind: select
+      title: "E-Mail angeben?"
+      var: customer.mail_opt_in  # default: no
+      default: yes
+      options:
+        - { label: "Ja", value: yes }
+        - { label: "Nein", value: no }
+    branch: { yes: mail, no: done }
+
+  - id: mail
+    prompt:
+      kind: text
+      title: "E-Mail Adresse:"
+      var: customer.mail
+    next: done
+
+  - id: done
+    end: ok

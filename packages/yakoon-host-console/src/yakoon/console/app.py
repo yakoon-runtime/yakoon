@@ -20,9 +20,12 @@ from yakoon.shell.controller import ShellCoreController
 from yakoon.office.mailing.controller import OfficeMailingCoreController
 
 
+command_inits = []
+command_inits = ["use crm-customer", "create-customer"]
+
 #command_inits += ["use auth", "su", "exit"]
 
-async def run_console(command_inits=["welcome"]):
+async def run_console():
    
     session_key = Key.from_parts("yakoon", "bucket", "develop", "1",)
     

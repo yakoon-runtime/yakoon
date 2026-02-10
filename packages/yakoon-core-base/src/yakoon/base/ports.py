@@ -124,74 +124,25 @@ class AuditLogService(Protocol):
     async def permission(self, session, obj, action): ...
 
 
-class Prompts(Protocol):
+class PromptService(Protocol):
+    async def ask(self, session: Session, prompt_text: str) -> str: ...
+    async def ask_secret(self, session: Session, prompt_text: str) -> str: ...
+    async def confirm(self, session: Session, prompt_text: str) -> bool: ...
+    async def choice_value(self, session: Session, prompt_text: str, options: list[dict], *, default: str | None = None) -> str: ...
+    async def choice_index(self, session: Session, prompt_text: str, options: list[str]) -> int: ...
 
-    async def ask(self, section: str, **data) -> str: ...
-    """     
-    Asks the user for free-text input based on a rendered template section.
 
-    Args:
-        section (str): The section key within the template.
-        **data: Optional data passed to the template.
-
-    Returns:
-        str: The user's input as a string.
-    """
-
-    async def ask_secret(session: Session, prompt_text: str) -> str: ...
-    """     
-    Asks the user for free-text input based on a rendered template section.
-
-    Args:
-        section (str): The section key within the template.
-        **data: Optional data passed to the template.
-
-    Returns:
-        str: The user's input as a string.
-    """
-
-    async def confirm(self, section: str, **data) -> bool: ...
-    """
-    Asks the user for a yes/no confirmation using a template-based prompt.
-
-    Args:
-        section (str): The section key within the template.
-        **data: Optional data passed to the template.
-
-    Returns:
-        bool: True if confirmed, False otherwise.
-    """
-
-    async def choice(self, section: str, options: list[str], **data) -> str: ...
-    """
-    Presents the user with a list of choices and returns the selected value.
-
-    Args:
-        section (str): The section key within the template.
-        choices (list[str]): List of available options.
-        **data: Optional data passed to the template.
-
-    Returns:
-        str: The chosen value.
-    """        
-
-    async def choice_index(self, section: str, options: list[str], **data) -> str: ...
-    """
-    Presents the user with a numbered list of choices and returns the selected index.
-
-    Args:
-        section (str): The section key within the template.
-        choices (list[str]): List of available options.
-        **data: Optional data passed to the template.
-
-    Returns:
-        int: The index of the selected choice (starting at 0).
-    """
+class PresenterPrompts(Protocol):
+    async def ask(self, section_key: str, **data) -> str: ...
+    async def ask_secret(self, section_key: str, **data) -> str: ...
+    async def confirm(self, section_key: str, **data) -> bool: ...
+    async def choice_value(self, section_key: str, options: list[dict], *, default: str | None = None, **data) -> str: ...
+    async def choice_index(self, section_key: str, options: list[str], **data) -> int: ...
         
-
+        
 class Presenter(Protocol):
 
-    prompts: Prompts
+    prompts: PresenterPrompts
 
     async def emit(self, section: str, **data) -> None: ...
     """

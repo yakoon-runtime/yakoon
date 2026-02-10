@@ -1,3 +1,5 @@
+workflow: auth_user
+version: 1
 
 start: to_auth
 
@@ -7,8 +9,12 @@ steps:
     next: auth:su
 
   - id: auth:su
-    run: "su {{user.name}} {{user.password}}"
+    run: "su --user {{user.name}} --password {{user.password}}"
     next: leave
 
   - id: leave
     run: "exit"
+    next: done
+  
+  - id: done
+    end: ok

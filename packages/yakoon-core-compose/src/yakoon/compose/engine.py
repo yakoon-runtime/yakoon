@@ -14,6 +14,7 @@ from yakoon.platform.services.dialogservice import DefaultDialogService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.presenter import PresenterService
+from yakoon.platform.services.prompt import PromptService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
 
@@ -21,9 +22,11 @@ from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.engines.command.engine import Engine
-from yakoon.platform.services.workflow import WorkflowCompileService, WorkflowService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
+
+from yakoon.workflow.services.compile import WorkflowCompileService
+from yakoon.workflow.services.engine import WorkflowService
 
 
 def compose_engine(controllers: ControllerDirectory) -> Engine:
@@ -125,6 +128,7 @@ def _compose_services(
     services.register_static(ports.SessionService, SessionService(stores.sessions)) 
     services.register_static(ports.CommandQueueService, CommandQueueService())
     services.register_static(ports.PresenterService, PresenterService(services))
+    services.register_static(ports.PromptService, PromptService(services))
     services.register_static(ports.AccountService, AccountService(InMemoryAccountStore()))
     services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
     services.register_static(ports.AuthenticationService, AuthenticationService(services))
