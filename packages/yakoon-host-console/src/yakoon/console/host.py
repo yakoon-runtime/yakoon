@@ -32,7 +32,7 @@ class ConsoleHost(HostAdapter):
             await self._submit(text)
 
     async def on_idle(self) -> None:
-        # Optional: you can treat idle same as ready, or do nothing.
+        # Optional: idle same as ready, or do nothing.
         return
 
     async def on_exit(self) -> None:
