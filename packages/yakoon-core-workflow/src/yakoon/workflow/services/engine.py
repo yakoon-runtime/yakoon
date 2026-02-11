@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-
+from uuid import uuid4
 from typing import Any, Mapping
 from yakoon.base import ports
 from yakoon.base.models.workflow import WorkflowError, WorkflowRuntime, WorkflowStatus
@@ -94,8 +94,7 @@ class WorkflowService:
     def start(self, session, controller_id: str, workflow_key: str, *, enqueue_first: bool = True) -> str:
         wf = self.get_def(controller_id, workflow_key)
 
-        queue = self.services.get(ports.CommandQueueService)
-        batch_id = queue.enqueue_commands(session, [], batch_id=None)
+        batch_id = uuid4().hex
 
         rt = self.runtime(session)
         batch = rt.ensure(batch_id, interaction_mode=session.interaction_mode)
