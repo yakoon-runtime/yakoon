@@ -7,7 +7,7 @@ import importlib.resources as ir
 
 from typing import Any, Dict
 from yakoon.base.descriptors.workflow import WorkflowSource
-from yakoon.base.models.workflow import PromptDef, StepDef, WorkflowDef
+from yakoon.base.models.workflow import PromptDef, StepDef, SwitchDef, WorkflowDef
 
 
 
@@ -83,6 +83,32 @@ class WorkflowCompileService:
             if not sid:
                 raise ValueError(f"{workflow_key}: step without id")
 
+            # switch
+            switch = None
+            raw_switch = s.get("switch")
+            if raw_switch is not None:
+                if not isinstance(raw_switch, dict):
+                    raise ValueError(f"Step '{sid}': switch must be a mapping")
+
+                expr = raw_switch.get("expr")
+                cases = raw_switch.get("cases")
+                default = raw_switch.get("default")
+
+                if not expr or not isinstance(expr, str):
+                    raise ValueError(f"Step '{sid}': switch.expr must be a non-empty string")
+
+                if not isinstance(cases, dict) or not cases:
+                    raise ValueError(f"Step '{sid}': switch.cases must be a non-empty mapping")
+
+                # normalize case keys
+                norm_cases = {str(k).strip().lower(): v for k, v in cases.items()}
+
+                if default is not None and not isinstance(default, str):
+                    raise ValueError(f"Step '{sid}': switch.default must be a string")
+
+                switch = SwitchDef(expr=expr, cases=norm_cases, default=default)
+
+            # prompt
             prompt = None
             if s.get("prompt") is not None:
                 p = s["prompt"]
@@ -136,19 +162,39 @@ class WorkflowCompileService:
                 prompt=prompt,
                 next=s.get("next"),
                 branch=branch,
+                switch=switch, 
                 end=s.get("end"),
             )
 
             # Guardrail: exactly one of run/prompt/end
-            actions = sum([step.run is not None, step.prompt is not None, step.end is not None])
+            actions = sum([
+                step.run is not None,
+                step.prompt is not None,
+                step.switch is not None, 
+                step.end is not None])
             if actions != 1:
-                raise ValueError(
-                    f"{workflow_key}:{sid}: define exactly one of [run, prompt, end]"
-                )
+                raise ValueError(f"{workflow_key}:{sid}: define exactly one of [run, prompt, switch, end]")
 
             steps[sid] = step
 
         if start not in steps:
             raise ValueError(f"{workflow_key}: start step '{start}' not found")
+    
+        step_ids = set(steps.keys())
+        for step in steps.values():
+            if step.next and step.next not in step_ids:
+                raise ValueError(f"{workflow_key}:{step.id}: next target '{step.next}' not found")
+
+            if step.branch:
+                for k, target in step.branch.items():
+                    if target not in step_ids:
+                        raise ValueError(f"{workflow_key}:{step.id}: branch target '{target}' not found")
+
+            if step.switch:
+                for k, target in step.switch.cases.items():
+                    if target not in step_ids:
+                        raise ValueError(f"{workflow_key}:{step.id}: switch case '{k}' target '{target}' not found")
+                if step.switch.default and step.switch.default not in step_ids:
+                    raise ValueError(f"{workflow_key}:{step.id}: switch default target '{step.switch.default}' not found")
 
         return WorkflowDef(id=workflow_key, start=start, steps=steps)

@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 from yakoon.base import ports
 from yakoon.base.models.input import DispatchInput
+from yakoon.base.commands.command import CommandContext
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.runtime.session import Session
@@ -117,8 +118,7 @@ class Engine:
          # Safety: Under S1, resolved controller should match active controller
          # (If your router can return a different controller, keep this; otherwise you can drop it.)
          controller = resolved_controller
-
-         command.controller = controller
+         command.context = CommandContext(controller, di.batch_id)
 
          # Pre-command hook
          await controller.on_before_run_command(session, request, command)
@@ -156,7 +156,7 @@ class Engine:
 
       finally:
          if command:
-               command.controller = None
+               command.context = None
 
          if failed and di.batch_id:
             wf = self._services.get(ports.WorkflowService)

@@ -23,22 +23,34 @@ steps:
       kind: select
       title: "E-Mail angeben?"
       var: customer.mail_opt_in  # default: no
-      default: yes
+      default: y
       options:
-        - { label: "Ja", value: yes }
-        - { label: "Nein", value: no }
-    branch: { yes: mail, no: done }
+        - { label: "Ja", value: y }
+        - { label: "Nein", value: n }
+    branch: { y: mail, n: done }
 
   - id: mail
     prompt:
       kind: text
       title: "E-Mail Adresse:"
       var: customer.mail
-    next: create_customer
+    next: step_validate
 
-  - id: create_customer
+  - id: step_validate
+    run: wf:crm.customer.validate
+    next: route
+    #on_error: technical_failure
+
+  - id: route
+    switch:
+      expr: "{{validate.state}}"
+      cases:
+        savde: store_customer
+      default: store_customer
+
+  - id: store_customer
     run: >
-      crm.customer.create 
+      wf:crm.customer.store 
       --first {{customer.first_name}} 
       --last {{customer.last_name}} 
       --mail_opt_in {{customer.mail_opt_in}} 

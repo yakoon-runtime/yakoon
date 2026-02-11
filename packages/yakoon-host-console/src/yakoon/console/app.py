@@ -21,7 +21,7 @@ from yakoon.office.mailing.controller import OfficeMailingCoreController
 
 
 command_inits = []
-command_inits = ["use crm-customer", "create-customer"]
+command_inits = ["use crm-customer", "customer-create"]
 
 #command_inits += ["use auth", "su", "exit"]
 

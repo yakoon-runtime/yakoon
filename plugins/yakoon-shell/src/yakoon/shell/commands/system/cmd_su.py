@@ -13,7 +13,7 @@ class CmdSu(Command):
     async def run(self, session: Session, request: Request):
         wf = self.services.get(WorkflowService)
 
-        controller_id = self.controller.id
+        controller_id = self.context.controller.id
         batch_id = wf.start(session, controller_id, 
                             workflow_key=self.key, enqueue_first=False)
 

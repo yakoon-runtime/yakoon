@@ -6,11 +6,12 @@ from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import Session
 
 
-class CmdCreateCustomer(Command):
+class CmdCustomerStore(Command):
 
-    key = "crm.customer.create"
+    key = "wf:crm.customer.store"
 
     async def run(self, session: Session, request: Request):
+
         audits = self.services.get(AuditLogService)
         wf = self.services.get(ports. WorkflowService)
 
@@ -40,4 +41,4 @@ class CmdCreateCustomer(Command):
         #wf.set_value(session, batch_id, "customer.id", customer_id)
 
         # Workflow weiterlaufen lassen
-        #wf.advance_after_run(session, batch_id=batch_id, step_id=step_id)
+        #wf.complete_run_step(session, batch_id=batch_id, step_id=step_id)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
-from enum import Enum, auto
+from enum import StrEnum
 
 from yakoon.base.models.mode import InteractionMode
 
@@ -18,6 +18,13 @@ class PromptDef:
     # optionaler Default (v1: nur select sinnvoll)
     default: Optional[Any] = None
 
+
+@dataclass(frozen=True)
+class SwitchDef:
+    expr: str
+    cases: dict[str, str] = field(default_factory=dict)
+    default: str | None = None
+
     
 @dataclass(frozen=True)
 class StepDef:
@@ -26,6 +33,7 @@ class StepDef:
     prompt: PromptDef | None = None
     next: str | None = None
     branch: dict[str, str] | None = None
+    switch: SwitchDef | None = None   # <— neu
     end: str | None = None
 
 
@@ -44,12 +52,12 @@ class WorkflowError:
     command: str | None = None
 
 
-class WorkflowStatus(Enum):
-    PREPARED = auto()
-    RUNNING = auto()
-    FAILED = auto()
-    DONE = auto()
-    CANCELLED = auto()
+class WorkflowStatus(StrEnum):
+    PREPARED = "prepard"
+    RUNNING = "running"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+    DONE = "done"
 
 
 @dataclass
@@ -75,9 +83,6 @@ class WorkflowRuntime:
 
     def get(self, batch_id: str) -> Optional[WorkflowBatch]:
         return self.batches.get(batch_id)
-
-    def active_batch(self) -> WorkflowBatch | None:
-        return next(iter(self.batches.values()), None)
     
     def ensure(self, batch_id: str, *, interaction_mode: Any) -> WorkflowBatch:
         b = self.batches.get(batch_id)

@@ -14,4 +14,5 @@ class CmdWfNext(Command):
         step_id  = request.arg(1)
 
         wfsvc = self.services.get(ports.WorkflowService)
-        wfsvc.advance_after_run(session, batch_id=batch_id, step_id=step_id)
+        wfsvc.set_value(session, batch_id, "batch_id", batch_id)
+        wfsvc.complete_run_step(session, batch_id=batch_id, step_id=step_id)

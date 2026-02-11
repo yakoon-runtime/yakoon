@@ -3,7 +3,8 @@ from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.workflow.commands.cmd_start import CmdWfStart
 
-from yakoon.crm.customer.commands.cmd_create_customer import CmdCreateCustomer
+from yakoon.crm.customer.commands.cmd_customer_store import CmdCustomerStore
+from yakoon.crm.customer.commands.cmd_customer_validate import CmdCustomerValidate
 
 
 class CrmCustomerCommands(CommandSet):
@@ -13,7 +14,7 @@ class CrmCustomerCommands(CommandSet):
     @classmethod
     def commands(cls) -> Sequence[Type[Command]]: 
         return [
-            CmdWfStart("create-customer"),
-            CmdCreateCustomer,
-            
+            CmdWfStart("customer-create"),
+            CmdCustomerStore,
+            CmdCustomerValidate,            
         ]

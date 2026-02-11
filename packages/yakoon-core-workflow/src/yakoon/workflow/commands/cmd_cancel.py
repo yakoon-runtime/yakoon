@@ -14,7 +14,9 @@ class CmdWfCancel(Command):
         queue = self.services.get(ports.CommandQueueService)
 
         rt = wfsvc.runtime(session)
-        batch = rt.active_batch()
+
+        batch_id = self.context.batch_id
+        batch = rt.get(batch_id)
         if not batch:
             await session.notify("Kein aktiver Workflow.")
             return

@@ -35,7 +35,7 @@ class CmdWfPrompt(Command):
         # TEXT
         if p.kind == "text":
             value = await prompts.ask(session, p.title)
-            wfsvc.apply_prompt_value(session, batch_id=batch_id, step_id=step_id, value=value)
+            wfsvc.complete_prompt_step(session, batch_id=batch_id, step_id=step_id, value=value)
             return
 
         # SELECT (returns option.value)
@@ -46,13 +46,13 @@ class CmdWfPrompt(Command):
                 p.options,
                 default=p.default,   # falls du default schon nutzen willst
             )
-            wfsvc.apply_prompt_value(session, batch_id=batch_id, step_id=step_id, value=value)
+            wfsvc.complete_prompt_step(session, batch_id=batch_id, step_id=step_id, value=value)
             return
 
         # CONFIRM (returns bool)
         if p.kind == "confirm":
             value = await prompts.confirm(session, p.title)
-            wfsvc.apply_prompt_value(session, batch_id=batch_id, step_id=step_id, value=value)
+            wfsvc.complete_prompt_step(session, batch_id=batch_id, step_id=step_id, value=value)
             return
 
         raise RuntimeError(f"Unsupported prompt kind: {p.kind!r}")

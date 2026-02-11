@@ -3,6 +3,7 @@ import shlex
 class Request:
 
     def __init__(self, raw: str):
+        
         self._raw = raw.strip()
 
         if not self._raw:

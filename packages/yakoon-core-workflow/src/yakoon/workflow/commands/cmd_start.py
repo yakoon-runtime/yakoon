@@ -20,9 +20,9 @@ def CmdWfStart(command_key: str, tem_prefix: str="", *, workflow_key: str | None
         key = command_key
         template_prefix = tem_prefix
 
-        async def run(self, session: Session, _: Request):
+        async def run(self, session: Session, request: Request):
             wf = self.services.get(WorkflowService)
-            controller_id = self.controller.id
+            controller_id = self.context.controller.id
 
             batch_id = wf.start(
                 session,

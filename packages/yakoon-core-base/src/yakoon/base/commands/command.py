@@ -1,10 +1,12 @@
 from __future__ import annotations
 from abc import ABC
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
-from yakoon.base.commands.request import Request
 from yakoon.base.models.ns import Namespace
+from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.controllers.base import BaseController
@@ -14,20 +16,27 @@ class CmdNotFound(Exception):
     pass
 
 
+@dataclass(frozen=True)
+class CommandContext:
+    controller: BaseController
+    batch_id: Optional[str] = None
+
+
 class Command(ABC):
 
     key: str
     aliases: list[str] = []
+    context: CommandContext 
 
     template_prefix: str = ""
     controller: BaseController = None
    
     @property
     def services(self) -> ServiceDirectory:
-        return self.controller.services
+        return self.context.controller.services
 
     def get_template_path(self) -> str:
-        template_sub_path = self.controller.template_source.template_sub_path
+        template_sub_path = self.context.controller.template_source.template_sub_path
         return str(Path(template_sub_path).joinpath(self.template_prefix, self.key))
 
     async def get_namespace(self, session) -> Namespace:
@@ -39,7 +48,7 @@ class Command(ABC):
         presenter = self.services.get(PresenterService) 
         
         return await presenter.create_presenter(
-                self.controller.template_source.package,
+                self.context.controller.template_source.package,
                 self.get_template_path(), session)
                 
     async def run(self, session: Session, request: Request):

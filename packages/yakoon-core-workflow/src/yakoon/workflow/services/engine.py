@@ -188,6 +188,27 @@ class WorkflowService:
             batch.pending_step = step.id
             return
 
+        # SWITCH
+        if step.switch:
+            rendered = compile_run_command(
+                step.switch.expr,
+                batch.values,
+                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
+            ).strip()
+
+            key = rendered.strip().lower()
+            next_id = step.switch.cases.get(key)
+
+            if not next_id:
+                if step.switch.default:
+                    next_id = step.switch.default
+                else:
+                    raise RuntimeError(f"Switch step '{step.id}': no case for '{key}' and no default")
+
+            batch.current_step = next_id
+            self.enqueue_next(session, batch_id)
+            return
+
         # RUN
         if step.run:
             cmd = compile_run_command(
@@ -199,7 +220,7 @@ class WorkflowService:
 
         raise ValueError(f"Invalid step '{step.id}': neither prompt nor run nor end")
 
-    def apply_prompt_value(self, session, *, batch_id: str, step_id: str, value: Any) -> None:
+    def complete_prompt_step(self, session, *, batch_id: str, step_id: str, value: Any) -> None:
         rt = self.runtime(session)
         batch = rt.get(batch_id)
         if not batch:
@@ -227,7 +248,7 @@ class WorkflowService:
         batch.current_step = step.next
         self.enqueue_next(session, batch_id)
 
-    def advance_after_run(self, session, *, batch_id: str, step_id: str) -> None:
+    def complete_run_step(self, session, *, batch_id: str, step_id: str) -> None:
         rt = self.runtime(session)
         batch = rt.get(batch_id)
         if not batch:
