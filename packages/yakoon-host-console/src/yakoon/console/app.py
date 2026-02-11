@@ -1,34 +1,24 @@
 import asyncio
 
 from yakoon.base import ports 
-from yakoon.auth.controller import AuthCoreController
 from yakoon.base.models.key import Key
-from yakoon.base.models.input import DispatchInput
-from yakoon.base.models.prompt import PromptMode
-from yakoon.base.utils.format import format_prompt
-from yakoon.base.utils.input import safe_input, safe_input_secret
-from yakoon.base.runtime.devtools import MemoryTrendMonitor
-from yakoon.base.runtime.devtools import UnresolvedPromptMonitor
-from yakoon.crm.customer.controller import CrmCustomerCoreController
+from yakoon.base.models.format import OutputFormat
+
+from yakoon.console.host import ConsoleHost
 from yakoon.platform.directories.controller import ControllerDirectory
+from yakoon.platform.hosts.runner import Runner
 
 from yakoon.console.io import ConsoleOutput
 from yakoon.compose.engine import compose_engine
 
-from yakoon.base.models.format import OutputFormat
-from yakoon.shell.controller import ShellCoreController
+from yakoon.auth.controller import AuthCoreController
+from yakoon.crm.customer.controller import CrmCustomerCoreController
 from yakoon.office.mailing.controller import OfficeMailingCoreController
+from yakoon.shell.controller import ShellCoreController
 
-
-command_inits = []
-command_inits = ["use crm-customer", "customer-create"]
-
-#command_inits += ["use auth", "su", "exit"]
-
-async def run_console():
-   
-    session_key = Key.from_parts("yakoon", "bucket", "develop", "1",)
     
+async def run_console():
+       
     engine = compose_engine(
         controllers=ControllerDirectory(
             controllers=[
@@ -37,44 +27,32 @@ async def run_console():
                 AuthCoreController(),
                 OfficeMailingCoreController()]))
 
-    dialogs = engine.services.get(ports.DialogService)
-    queue = engine.services.get(ports.CommandQueueService)
     sessions = engine.services.get(ports.SessionService)
-    session, _ = await sessions.get_or_create(session_key)
+    session, _ = await sessions.get_or_create(
+        Key.from_parts("yakoon", "bucket", "develop", "1",))
+    
     session.bind_io(ConsoleOutput())
     session.output_format = OutputFormat.MARKDOWN
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)
 
-    queue.enqueue_commands(session, command_inits)
-
     try:
-        while True:
-            prompt = format_prompt(session)
-            try:
-                di = None
-                if dialogs.is_waiting(session):
-                    mode = dialogs.get_mode(session)
-                    if mode == PromptMode.SECRET:
-                        di = DispatchInput(await safe_input_secret(prompt=prompt))
-                    else:
-                        di = DispatchInput(await safe_input(prompt=prompt))
-                else:
 
-                    di = queue.next_input(session)
-                    if not di:
-                        di = DispatchInput(await safe_input(prompt=prompt))
+        async def submit(text: str):
+            await runner.on_user_input(text)
 
-                await engine.dispatch(session, di)
-                if session.has_signal("exit_app"):
-                    break  
+        host = ConsoleHost(submit=submit)
+        runner = Runner(engine=engine, session=session, host=host)
 
-            except KeyboardInterrupt:
-                if dialogs.is_waiting(session): # Ctrl+C wurde gedrückt
-                    await engine.dispatch(session, DispatchInput(command="shell:wf.cancel"))
-                    continue
+        inits = ["use crm-customer", "customer-create"]
+        await runner.start(inits)
 
+    except KeyboardInterrupt: 
+        # Ctrl+C: if a prompt is active, cancel it; otherwise ignore or exit
+        dialogs = engine.services.get(ports.DialogService)
+        if dialogs.is_waiting(session):
+            await runner.on_cancel()
     finally:
         sessions.release(session.key)
 
