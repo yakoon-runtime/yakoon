@@ -19,9 +19,22 @@ class DefaultDialogService:
     # Default 15 Minutes
 
     def __init__(self):
-        self._waiting: dict[str, asyncio.Future] = {}
-        self._timeouts: dict[str, asyncio.Task] = {}
-        self._modes: dict[str, PromptMode] = {}  # "normal" | "secret"
+        self._waiting: dict[str, asyncio.Future] = {}   # TODO cleanup
+        self._timeouts: dict[str, asyncio.Task] = {}    # TODO cleanup
+        self._edges: dict[str, asyncio.Event] = {}      # TODO cleanup
+        self._modes: dict[str, PromptMode] = {}         # TODO cleanup
+
+    def edge_event(self, session: Session) -> asyncio.Event:
+        """
+        Returns an event that is set whenever the prompt state changes for this session.
+        Engine can wait on this to avoid polling.
+        """
+        session_key = str(session.key)
+        ev = self._edges.get(session_key)
+        if ev is None:
+            ev = asyncio.Event()
+            self._edges[session_key] = ev
+        return ev
 
     def cleanup(self, session: Session) -> None:
         """
@@ -43,6 +56,9 @@ class DefaultDialogService:
         if settings.base.dev_mode:
             # safe to call even if not tracked
             UnresolvedPromptMonitor.untrack(session_key)
+
+        # signal: prompt state changed (resolve/cancel/timeout/cleanup)
+        self.edge_event(session).set()
 
     def set_prompt(
         self,
@@ -71,6 +87,9 @@ class DefaultDialogService:
 
         self._waiting[session_key] = fut
         self._modes[session_key] = mode
+
+        # signal: prompt opened
+        self.edge_event(session).set()
 
         timeout = timeout or settings.network.prompt_timed_out or self.DEFAULT_TIMEOUT
         if timeout:
@@ -112,6 +131,8 @@ class DefaultDialogService:
             # cleanup before setting result to avoid races with timeout task
             self.cleanup(session)
             fut.set_result(value)
+            # signal: prompt resolved
+            self.edge_event(session).set()  
             return True
 
         # If it's already done or missing, ensure we don't leak mode
@@ -130,3 +151,4 @@ class DefaultDialogService:
 
         if fut and not fut.done():
             fut.cancel()
+            self.edge_event(session).set()  # signal: prompt cancelled

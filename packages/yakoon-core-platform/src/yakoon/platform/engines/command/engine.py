@@ -24,10 +24,15 @@ class Engine:
       self._services = services
       self._commands = commands
       self._active_tasks: dict[str, asyncio.Task] = {}
-   
+      self._session_locks: dict[str, asyncio.Lock] = {} # TODO: cleanup
+         
    @property
    def services(self) -> ServiceDirectory:
         return self._services
+
+   def _lock(self, session: Session) -> asyncio.Lock:
+      skey = str(session.key)
+      return self._session_locks.setdefault(skey, asyncio.Lock())
 
    async def _find_matching_command(
          self, active_router_id, request: Request) -> Optional[Tuple[BaseController, Command]]:
@@ -46,15 +51,16 @@ class Engine:
          session.set_active_controller(shell.id)
 
       # 1) Prompt response path
-      dialog_service = self.services.get(ports.DialogService)
-      if dialog_service.is_waiting(session):
-         dialog_service.resolve_prompt(session, di.command)
+      async with self._lock(session):
+         dialog_service = self.services.get(ports.DialogService)
+         if dialog_service.is_waiting(session):
+            dialog_service.resolve_prompt(session, di.command)
 
-         # Drive the existing active task until it either finishes or asks again
-         await self._drive_until_blocked_or_done(session)
+            # Drive the existing active task until it either finishes or asks again
+            await self._drive_until_blocked_or_done(session)
 
-         #print("DISPATCH END")
-         return session
+            #print("DISPATCH END")
+            return session
 
       # 2) Normal command path
       loop = asyncio.get_running_loop()
@@ -65,21 +71,41 @@ class Engine:
       await self._drive_until_blocked_or_done(session)
       return session
 
-   async def _drive_until_blocked_or_done(self, session: Session):
-      task = self._active_tasks.get(str(session.key))
+   async def _drive_until_blocked_or_done(self, session: Session) -> None:
+
+      skey = str(session.key)
+      task = self._active_tasks.get(skey)
       if not task:
          return
 
-      # Lass den Command weiterlaufen, bis:
-      # - fertig ODER
-      # - er erneut promptet
-      dialog_service = self.services.get(ports.DialogService)
-      while not task.done() and not dialog_service.is_waiting(session):
-         await asyncio.sleep(0.005)
+      dialogs = self.services.get(ports.DialogService)
 
-      if task.done():
-        _ = task.exception()  # drain
-        self._active_tasks.pop(str(session.key), None)
+      # drive until either:
+      # - task done
+      # - prompt state changes, then re-check
+      while True:
+         if task.done():
+               _ = task.exception()  # drain
+               self._active_tasks.pop(skey, None)
+               return
+
+         if dialogs.is_waiting(session):
+               return
+
+         # wait for either task completion OR a prompt edge
+         edge = dialogs.edge_event(session) 
+         edge.clear()
+
+         edge_task = asyncio.create_task(edge.wait())
+         try:
+               done, _ = await asyncio.wait(
+                  {task, edge_task},
+                  return_when=asyncio.FIRST_COMPLETED,
+               )
+         finally:
+               edge_task.cancel()
+               # don't await cancel; best-effort
+
 
    async def _dispatch_command(self, session: Session, di: DispatchInput) -> bool:
       failed = False
