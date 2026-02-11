@@ -61,4 +61,3 @@ class Runner:
                 await self.host.on_ready(prompt=prompt)
             else:
                 await self.host.on_idle()
-            return
