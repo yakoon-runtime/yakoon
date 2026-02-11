@@ -25,8 +25,8 @@ class PermissionService:
                 "auth:su|rx",
 
                 "crm-customer:customer-create|rx",
-                "crm-customer:wf:crm.customer.store|rx",
-                "crm-customer:wf:crm.customer.validate|rx",
+                "crm-customer:wf:crm.customer.store|x",
+                "crm-customer:wf:crm.customer.validate|x",
             
                 "shell:wf.run|x",
                 "shell:wf.prompt|x",

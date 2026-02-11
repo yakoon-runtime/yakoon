@@ -72,8 +72,9 @@ class CmdMan(Command):
 
             # 1. shell 
             # show alle shell commands
-            shell_commands = command_service.for_controller(shell.id)
-            shell_commands = sorted(shell_commands, key=lambda c: c.key)
+            shell_commands = command_service.for_controller_visible(shell.id, session)
+            if shell_commands:
+                shell_commands = sorted(shell_commands, key=lambda c: c.key)
 
             # 2. program
             # (office.mailing, crm.leads, …)
@@ -92,13 +93,13 @@ class CmdMan(Command):
             # 1. shell-Builtins
             # builtins (help, use, exit, …)
             commands = []
-            for command in command_service.for_controller(shell.id):
+            for command in command_service.for_controller_visible(shell.id, session):
                 if command.key in command_service.shell_builtins():
                     commands.append(command)
 
             # 2. controller commands            
             commands.extend(
-                command_service.for_controller(active_controller_id))
+                command_service.for_controller_visible(active_controller_id, session))
 
             commands = sorted(commands, key=lambda c: c.key)
             await presenter.emit("show_help", 

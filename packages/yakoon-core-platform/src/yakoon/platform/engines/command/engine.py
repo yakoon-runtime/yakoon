@@ -6,6 +6,7 @@ from yakoon.base.models.input import DispatchInput
 from yakoon.base.commands.command import CommandContext
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
+from yakoon.base.models.perm import Permission
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import CmdNotFound, Command
 from yakoon.base.directories.service import ServiceDirectory
@@ -23,8 +24,8 @@ class Engine:
       self._directory = directory
       self._services = services
       self._commands = commands
-      self._active_tasks: dict[str, asyncio.Task] = {}
-      self._session_locks: dict[str, asyncio.Lock] = {} # TODO: cleanup
+      self._active_tasks: dict[str, asyncio.Task] = {}      # TODO: cleanup
+      self._session_locks: dict[str, asyncio.Lock] = {}     # TODO: cleanup
          
    @property
    def services(self) -> ServiceDirectory:
@@ -137,7 +138,7 @@ class Engine:
          resolved_controller, command = result
 
          perm_service = self.services.get(ports.PermissionService)
-         fq = f"{resolved_controller.id}:{command.key}"
+         fq = Permission.fq_key(resolved_controller.id, command.key)
          if not perm_service.can_execute(session, fq):
             raise PermissionError("Permission denied")
 

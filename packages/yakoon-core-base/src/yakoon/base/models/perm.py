@@ -61,6 +61,12 @@ class Permission:
     def is_scoped(self) -> bool:
         return self.scope2 is not None
 
+    staticmethod
+    def fq_key(controller_id, command_key) -> str:
+         """
+         Returns fq_key (fully qualified key)
+         """
+         return f"{controller_id}:{command_key}"
 
 class PermissionSet:
     """

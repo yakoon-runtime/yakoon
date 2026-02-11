@@ -2,7 +2,11 @@
 from dataclasses import asdict
 from typing import Iterable, Sequence
 
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
+from yakoon.base.models.perm import Permission
+from yakoon.base.ports import PermissionService
+from yakoon.base.runtime.session.session import Session
 
 
 class CommandCatalog:
@@ -20,9 +24,10 @@ class CommandCatalog:
 
 class CommandCatalogService:
 
-    __slots__ = ("_by_controller", "_shell_builtins")
+    __slots__ = ("_services", "_by_controller", "_shell_builtins")
 
-    def __init__(self, catalog: CommandCatalog):
+    def __init__(self, services: ServiceDirectory, catalog: CommandCatalog):
+        self._services = services
         by_controller: dict[str, list[CommandInfo]] = {}
         for c in catalog.all():
             by_controller.setdefault(c.controller_id, []).append(c)
@@ -45,6 +50,15 @@ class CommandCatalogService:
 
     def shell_builtins(self) -> Sequence[str]:
         return tuple(sorted(self._shell_builtins))
+
+    def for_controller_visible(self, controller_id: str, session:Session) -> Sequence[CommandInfo]: 
+        results = []
+        perm_service = self._services.get(PermissionService)
+        for command in self.for_controller(controller_id):
+            fq_key = Permission.fq_key(controller_id, command.key)
+            if perm_service.can_read(session, fq_key):
+                results.append(command)
+        return results
 
 
 class ControllerCatalog:

@@ -151,7 +151,7 @@ def _compose_services(
     
     services.register_static(
         ports.CommandCatalogService, 
-        CommandCatalogService(command_catalog))
+        CommandCatalogService(services, command_catalog))
     
     return services   
 
