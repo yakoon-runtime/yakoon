@@ -34,7 +34,7 @@ class CommandQueueService:
         """
         self._q: dict[str, Deque[DispatchInput]] = {}
 
-    def enqueue_commands(self, session, cmds: list[str], batch_id: str | None = None) -> str:
+    def enqueue_commands(self, session, cmds: list[str], batch_id: str | None = None) -> None:
         """
         Enqueues multiple commands at the front of the queue for the given session.
 
@@ -50,11 +50,8 @@ class CommandQueueService:
         skey = str(session.key)
         q = self._q.setdefault(skey, deque())
 
-        bid = batch_id or uuid4().hex
         for c in reversed(cmds):
-            q.appendleft(DispatchInput(command=c, batch_id=bid))
-
-        return bid
+            q.appendleft(DispatchInput(command=c, batch_id=batch_id))
 
     def next_input(self, session) -> DispatchInput | None:
         """
