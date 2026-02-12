@@ -5,7 +5,7 @@ from enum import StrEnum
 from yakoon.base.models.mode import InteractionMode
 
 
-class NotInWorkflowContext(Exception):
+class WorkflowContextRequired(Exception):
     pass
 
 

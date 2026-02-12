@@ -2,11 +2,13 @@ import asyncio
 from typing import Optional, Tuple
 
 from yakoon.base import ports
+from yakoon.base.models.command import CommandKind
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.commands.command import CommandContext
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.perm import Permission
+from yakoon.base.models.workflow import WorkflowContextRequired
 from yakoon.base.runtime.session import Session
 from yakoon.base.commands.command import Command, CmdNotFound
 from yakoon.base.directories.service import ServiceDirectory
@@ -137,6 +139,12 @@ class Engine:
 
          resolved_controller, command = result
 
+         # check workflow context
+         # user cannot start workflow commands without batch
+         if command.requires_workflow and not di.batch_id:
+            raise WorkflowContextRequired()
+
+         # check permissions
          perm_service = self.services.get(ports.PermissionService)
          fq = Permission.fq_key(resolved_controller.id, command.key)
          if not perm_service.can_execute(session, fq):
@@ -156,16 +164,24 @@ class Engine:
          # Post-command hook
          await controller.on_after_run_command(session, request, command)
 
+      except WorkflowContextRequired:
+         failed = True
+         await session.fail(
+             f"{request.command()}': may only be executed from within a workflow.'")
+
       except CmdNotFound:
          failed = True
-         await session.fail(f"{request.command()}': command not found... use 'man'")
+         await session.fail(
+             f"{request.command()}': command not found... use 'man'")
          self.wf_failed(exc, command, session, di)
 
       except PermissionError as exc:
          failed = True
-         audit = self._services.get(ports.AuditLogService)
+
          # command may be None if permission fails early
+         audit = self._services.get(ports.AuditLogService)
          await audit.permission(session, "command", command.key if command else request.command())
+
          await session.fail(str(exc))
          self.wf_failed(exc, command, session, di)
 

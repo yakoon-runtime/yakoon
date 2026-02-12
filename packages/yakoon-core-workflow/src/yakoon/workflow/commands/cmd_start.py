@@ -20,8 +20,6 @@ def CmdWfStart(command_key: str, tem_prefix: str="", *, workflow_key: str | None
 
         key = command_key
         template_prefix = tem_prefix
-        kind = CommandKind.WORKFLOW
-        visibility = CommandVisibility.NORMAL
 
         async def run(self, session: Session, request: Request):
             wf = self.services.get(WorkflowService)

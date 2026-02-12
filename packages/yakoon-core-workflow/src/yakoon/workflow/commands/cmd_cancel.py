@@ -1,20 +1,15 @@
 from yakoon.base import ports
-from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
+from yakoon.base.commands.command import WfCommand, CommandVisibility
 from yakoon.base.commands.request import Request
-from yakoon.base.models.workflow import NotInWorkflowContext
 from yakoon.base.runtime.session.session import Session
 
 
-class CmdWfCancel(Command):
+class CmdWfCancel(WfCommand):
 
     key = "wf.cancel"
-    kind = CommandKind.WORKFLOW
     visibility = CommandVisibility.INTERNAL
 
     async def run(self, session: Session, request: Request):
-
-        if not self.context.is_batch:
-            raise NotInWorkflowContext()
 
         wfsvc = self.services.get(ports.WorkflowService)
         queue = self.services.get(ports.CommandQueueService)

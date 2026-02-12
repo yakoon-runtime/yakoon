@@ -26,6 +26,7 @@ class CommandContext:
     @property
     def is_batch(self):
         return bool(self.batch_id)
+    
 
 class Command(ABC):
 
@@ -38,7 +39,8 @@ class Command(ABC):
 
     kind: CommandKind = CommandKind.USER
     visibility: CommandVisibility = CommandVisibility.NORMAL
-   
+    requires_workflow: bool = False
+
     @property
     def services(self) -> ServiceDirectory:
         return self.context.controller.services
@@ -61,3 +63,9 @@ class Command(ABC):
                 
     async def run(self, session: Session, request: Request):
         pass
+
+
+class WfCommand(Command):
+    kind = CommandKind.WORKFLOW
+    visibility = CommandVisibility.DEVELOPER
+    requires_workflow = True
