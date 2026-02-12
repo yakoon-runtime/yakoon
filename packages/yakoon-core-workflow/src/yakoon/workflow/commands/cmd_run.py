@@ -1,6 +1,7 @@
 from yakoon.base import ports
 from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
 from yakoon.base.commands.request import Request
+from yakoon.base.models.workflow import NotInWorkflowContext
 from yakoon.base.runtime.session.session import Session
 
 
@@ -11,6 +12,10 @@ class CmdWfRun(Command):
     visibility = CommandVisibility.INTERNAL
 
     async def run(self, session: Session, request: Request):
+
+        if not self.context.is_batch:
+            raise NotInWorkflowContext()
+
         key = request.arg(0)                        # "kunden_anlage" oder "shell:kunden_anlage"
         controller_id = self.context.controller.id  # kommt aus deinem Dispatcher
 

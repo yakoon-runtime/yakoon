@@ -23,6 +23,9 @@ class CommandContext:
     controller: BaseController
     batch_id: Optional[str] = None
 
+    @property
+    def is_batch(self):
+        return bool(self.batch_id)
 
 class Command(ABC):
 

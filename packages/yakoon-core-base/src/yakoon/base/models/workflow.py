@@ -5,6 +5,10 @@ from enum import StrEnum
 from yakoon.base.models.mode import InteractionMode
 
 
+class NotInWorkflowContext(Exception):
+    pass
+
+
 @dataclass(frozen=True)
 class PromptDef:
     kind: str                   
