@@ -3,10 +3,14 @@ from dataclasses import dataclass
 
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.descriptors.workflow import WorkflowSource
+from yakoon.base.models.command import CommandKind, CommandVisibility
+
 
 @dataclass(frozen=True, slots=True)
 class CommandInfo:
     key: str    
+    kind: CommandKind 
+    visibility: CommandVisibility
     category: str | None = None
     controller_id: str | None = None
     template_prefix: str | None = None

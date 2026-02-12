@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class InteractionMode(str, Enum): 
+class InteractionMode(StrEnum): 
     """
     Defines the available interaction modes for handling user inputs.
     """

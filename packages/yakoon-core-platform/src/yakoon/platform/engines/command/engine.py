@@ -8,7 +8,7 @@ from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.models.perm import Permission
 from yakoon.base.runtime.session import Session
-from yakoon.base.commands.command import CmdNotFound, Command
+from yakoon.base.commands.command import Command, CmdNotFound
 from yakoon.base.directories.service import ServiceDirectory
 
 from yakoon.platform.engines.command.router import CommandDirectory

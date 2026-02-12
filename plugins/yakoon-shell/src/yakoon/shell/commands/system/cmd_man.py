@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from yakoon.base.commands.command import Command
+from yakoon.base.commands.command import Command, CommandVisibility
 from yakoon.base.commands.request import Request
 from yakoon.base.ports import CommandCatalogService, ControllerCatalogService, PresenterService
 from yakoon.base.runtime.session import Session
@@ -57,7 +57,6 @@ class CmdMan(Command):
                 template_key, session)
 
             await presenter.emit("man_page")
-
                             
     async def show_index(self, session: Session, request: Request):
 
@@ -68,11 +67,13 @@ class CmdMan(Command):
         shell = controller_service.shell()[0]
         active_controller_id = session.get_active_controller()
 
+        mode = self.resolve_man_mode(request)
+
         if not active_controller_id or active_controller_id == shell.id: # shell mode            
 
             # 1. shell 
             # show alle shell commands
-            shell_commands = command_service.for_controller_visible(shell.id, session)
+            shell_commands = command_service.for_man_entries(shell.id, session, mode=mode)
             if shell_commands:
                 shell_commands = sorted(shell_commands, key=lambda c: c.key)
 
@@ -93,15 +94,23 @@ class CmdMan(Command):
             # 1. shell-Builtins
             # builtins (help, use, exit, …)
             commands = []
-            for command in command_service.for_controller_visible(shell.id, session):
+            for command in command_service.for_man_entries(shell.id, session, mode=mode):
                 if command.key in command_service.shell_builtins():
                     commands.append(command)
 
             # 2. controller commands            
             commands.extend(
-                command_service.for_controller_visible(active_controller_id, session))
+                command_service.for_man_entries(active_controller_id, session, mode=mode))
 
             commands = sorted(commands, key=lambda c: c.key)
             await presenter.emit("show_help", 
                             mode='program',
                             commands=commands)
+            
+
+    def resolve_man_mode(self, request:Request) -> str:
+        if request.has_option("internal"):
+            return "internal"
+        if request.has_option("all"):
+            return "all"
+        return "default"

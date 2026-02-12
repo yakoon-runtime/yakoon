@@ -18,6 +18,7 @@ class PermissionService:
                 "shell:welcome|rx",
                 "shell:version|rx",
                 "shell:test|rx",
+                "shell:speed-test|rx",
                 "shell:man|rx",
                 "shell:exit|rx",
                 "shell:quit|rx",
@@ -25,13 +26,14 @@ class PermissionService:
                 "auth:su|rx",
 
                 "crm-customer:customer-create|rx",
-                "crm-customer:wf:crm.customer.store|x",
-                "crm-customer:wf:crm.customer.validate|x",
+                "crm-customer:wf:crm.customer.store|rx",
+                "crm-customer:wf:crm.customer.validate|rx",
             
-                "shell:wf.run|x",
-                "shell:wf.prompt|x",
-                "shell:wf.next|x",
-                "shell:wf.cancel|x",
+                "shell:wf.run|rx",
+                "shell:wf.prompt|rx",
+                "shell:wf.next|rx",
+                "shell:wf.cancel|rx",
+
                 "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
             ]
 

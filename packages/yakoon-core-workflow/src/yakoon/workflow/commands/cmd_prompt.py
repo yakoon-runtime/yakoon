@@ -1,5 +1,5 @@
 from yakoon.base import ports
-from yakoon.base.commands.command import Command
+from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
 
@@ -17,7 +17,10 @@ from yakoon.base import ports
 class CmdWfPrompt(Command):
 
     key = "wf.prompt"
-    
+    kind = CommandKind.WORKFLOW
+    visibility = CommandVisibility.INTERNAL
+
+
     async def run(self, session: Session, request: Request):
     
         batch_id = request.arg(0)

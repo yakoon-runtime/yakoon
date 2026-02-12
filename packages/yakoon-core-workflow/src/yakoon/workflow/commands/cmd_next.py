@@ -1,5 +1,5 @@
 from yakoon.base import ports
-from yakoon.base.commands.command import Command
+from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
 
@@ -7,6 +7,8 @@ from yakoon.base.runtime.session.session import Session
 class CmdWfNext(Command):
 
     key = "wf.next"
+    kind = CommandKind.WORKFLOW
+    visibility = CommandVisibility.INTERNAL
 
     async def run(self, session: Session, request: Request):
 

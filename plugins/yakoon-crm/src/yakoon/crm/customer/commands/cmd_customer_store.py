@@ -1,7 +1,7 @@
 from uuid import uuid4
 from yakoon.base import ports
 from yakoon.base.ports import AuditLogService
-from yakoon.base.commands.command import Command
+from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import Session
 
@@ -9,6 +9,9 @@ from yakoon.base.runtime.session import Session
 class CmdCustomerStore(Command):
 
     key = "wf:crm.customer.store"
+    kind = CommandKind.WORKFLOW
+    visibility = CommandVisibility.DEVELOPER
+
 
     async def run(self, session: Session, request: Request):
 

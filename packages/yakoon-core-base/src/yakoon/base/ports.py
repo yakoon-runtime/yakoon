@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 from typing import Any, Awaitable, Callable, Mapping, Optional, Protocol, Sequence
 
 from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
+from yakoon.base.models.command import CommandKind
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 from yakoon.base.models.input import DispatchInput
@@ -82,6 +85,7 @@ class AccountService(Protocol):
 class CommandCatalogService(Protocol):
     def for_controller(self, controller_id: str) -> Sequence[CommandInfo]: ...
     def for_controller_visible(self, controller_id: str, session:Session) -> Sequence[CommandInfo]: ...
+    def for_man_entries(self, controller_id: str, session:Session, mode: str, kind_filter: CommandKind | None = None): ...
     def keys_for_controller(self, controller_id: str) -> Sequence[str]: ...
     def is_shell_builtin(self, key: str) -> bool: ...
     def shell_builtins(self) -> Sequence[str]: ...

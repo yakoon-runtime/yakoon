@@ -1,5 +1,6 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.runtime.session import Session
 
 
@@ -7,6 +8,8 @@ class CmdTest(Command):
 
     key = "test"    
     template_prefix = "system"
+    kind = CommandKind.BUILTIN
+    visibility = CommandVisibility.DEVELOPER
 
     async def run(self, session: Session, request: Request):
        

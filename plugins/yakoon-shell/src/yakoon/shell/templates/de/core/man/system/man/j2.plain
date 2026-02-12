@@ -1,3 +1,8 @@
 General Commands Manual 
 
 'man'
+
+options:
+- man (normal)
+- man --all
+- man --internal

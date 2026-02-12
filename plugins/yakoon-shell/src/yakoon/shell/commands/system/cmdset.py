@@ -4,6 +4,7 @@ from yakoon.base.commands.commandset import CommandSet
 from yakoon.shell.commands.system.cmd_exit import CmdExit
 from yakoon.shell.commands.system.cmd_man import CmdMan
 from yakoon.shell.commands.system.cmd_quit import CmdQuit
+from yakoon.shell.commands.system.cmd_speed import CmdSpeedTest
 from yakoon.shell.commands.system.cmd_su import CmdSu
 from yakoon.shell.commands.system.cmd_test import CmdTest
 from yakoon.shell.commands.system.cmd_use import CmdUse
@@ -25,5 +26,6 @@ class ShellSystemCommands(CommandSet):
             CmdExit,
             CmdMan,
             CmdSu,
-            CmdTest,           
+            CmdTest,       
+            CmdSpeedTest,    
         ]

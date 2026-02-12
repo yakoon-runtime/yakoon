@@ -92,8 +92,8 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
         for sets in controller.commandsets:
             for command in sets.commands():
                 command_info = CommandInfo(
-                    command.key, sets.group, 
-                    controller.id, command.template_prefix) 
+                    command.key, command.kind, command.visibility,
+                    sets.group, controller.id, command.template_prefix) 
                 command_list.append(command_info)
 
     return CommandCatalog(command_list, shell_builtins) 

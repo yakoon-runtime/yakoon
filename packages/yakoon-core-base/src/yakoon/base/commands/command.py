@@ -1,10 +1,12 @@
 from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 from typing import Optional
 
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
+from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.models.ns import Namespace
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
@@ -30,6 +32,9 @@ class Command(ABC):
 
     template_prefix: str = ""
     controller: BaseController = None
+
+    kind: CommandKind = CommandKind.USER
+    visibility: CommandVisibility = CommandVisibility.NORMAL
    
     @property
     def services(self) -> ServiceDirectory:

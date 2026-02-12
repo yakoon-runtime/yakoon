@@ -1,5 +1,6 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.runtime.session import Session
 
 import time
@@ -10,6 +11,9 @@ class CmdSpeedTest(Command):
 
     _counter: int = 0
     _start_time: float = time.perf_counter()
+
+    kind = CommandKind.BUILTIN
+    visibility = CommandVisibility.DEVELOPER
 
     async def run(self, session: Session, request: Request):
        
