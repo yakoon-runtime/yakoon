@@ -7,10 +7,13 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+## 2026-02-13
+**Einführung von Black Formatter and Ruff Linter**
+Formatierung ist nun projektweit gleich. Potenzielle Fehler wurden entfernt. 
+
 ## [2026-02-10]
 **Wenn ein Workflow darf nie mahr als der User**
-Bedeutet: Privilege Escalation als Feature ist nicht erlaubt und bewart das System später vor den ganz teuren Security-Debatten bewahrt.
-Wenn ein Workflow mehr darf als der User, bedeutet das faktisch, ein komplettes Policy-System bauen (Run-as, Delegation, Approvals, Audit, Scope, Least-Privilege-Rollen, Secrets, Revocation)
+Bedeutet: Privilege Escalation als Feature ist nicht erlaubt und bewart das System später vor den ganz teuren Security-Debatten bewahrt. Wenn ein Workflow mehr darf als der User, bedeutet das faktisch, ein komplettes Policy-System bauen (Run-as, Delegation, Approvals, Audit, Scope, Least-Privilege-Rollen, Secrets, Revocation)
 - Workflows sind Orchestrierung, keine Berechtigungs-Abkürzung.
 
 ## [2026-02-09]
@@ -112,7 +115,7 @@ Die ServiceDirectory wurde umgebaut, um mit 'type' statt 'str' als Schlüssel ar
 
 ## [2025-01-30]
 **Presenter ist nun Service**
-Der 'Presenter' wurde zu einem Service umgebaut um in 'platform' und nicht länger im 'base' zu liegen. 
+Der 'Presenter' wurde zu einem Service umgebaut und ist nun in 'platform' und nicht länger im 'base' zu finden. 
 
 ## [2025-01-28]
 **Template als Ressources nutzbar**

@@ -13,7 +13,7 @@ class CmdSu(Command):
 
     key = "su"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         presenter = await self.get_presenter(session)
         auth = self.services.get(AuthenticationService)
@@ -32,7 +32,7 @@ class CmdSu(Command):
         )
 
         result = await auth.authenticate(ns, username, secret)
-        if result.ok:
+        if result.ok and result.account:
             account = result.account
             session.set_identity(account.key, account.username)
             permissions.apply_account_permissions(session, account)

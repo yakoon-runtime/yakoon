@@ -16,7 +16,7 @@ class CmdSpeedTest(Command):
     kind = CommandKind.BUILTIN
     visibility = CommandVisibility.DEVELOPER
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         CmdSpeedTest._counter += 1
 

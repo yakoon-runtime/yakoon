@@ -20,7 +20,7 @@ def CmdWfStart(
         key = command_key
         template_prefix = tem_prefix
 
-        async def run(self, session: Session, request: Request):
+        async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
             wf = self.services.get(WorkflowService)
             controller_id = self.context.controller.id
 

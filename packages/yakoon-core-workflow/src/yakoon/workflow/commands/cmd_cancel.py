@@ -9,7 +9,7 @@ class CmdWfCancel(WfCommand):
     key = "wf.cancel"
     visibility = CommandVisibility.INTERNAL
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         wfsvc = self.services.get(ports.WorkflowService)
         queue = self.services.get(ports.CommandQueueService)

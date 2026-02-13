@@ -10,7 +10,7 @@ class CmdSu(Command):
 
     template_prefix = "system"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
         wf = self.services.get(WorkflowService)
 
         controller_id = self.context.controller.id

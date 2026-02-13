@@ -13,7 +13,7 @@ class CmdVersion(Command):
     key = "version"
     template_prefix = "system"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         presenter = await self.get_presenter(session)
         await presenter.emit(

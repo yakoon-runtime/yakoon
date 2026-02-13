@@ -48,26 +48,6 @@ class CommandContext:
         return self.batch_id is not None
 
 
-@dataclass(frozen=True, slots=True)
-class CommandResult:
-    """Structured result returned by `Command.run()`.
-
-    Public frameworks live and die by stable contracts. A structured result makes it
-    possible to evolve behavior without breaking callers.
-
-    Attributes:
-        message: Optional short human-readable message (for logs/UI).
-        payload: Optional structured data (engine/UI decides how to display/use it).
-        next_command: Optional command key to suggest/trigger next (useful in flows).
-        meta: Optional metadata for tracing/debugging (should be JSON-serializable).
-    """
-
-    message: str | None = None
-    payload: Any = None
-    next_command: str | None = None
-    meta: dict[str, Any] | None = None
-
-
 class Command(ABC):
     """Base class for all executable commands.
 
@@ -94,7 +74,7 @@ class Command(ABC):
     requires_workflow: bool = False
 
     # Runtime-provided
-    context: CommandContext
+    context: CommandContext | None
 
     # Optional template prefix (controller-dependent)
     template_prefix: str = ""
@@ -102,7 +82,7 @@ class Command(ABC):
     @property
     def services(self) -> ServiceDirectory:
         """Service directory exposed by the active controller."""
-        return self.context.controller.services
+        return self._ensure_controller().services
 
     def ensure_workflow_context(self) -> str:
         """Return the workflow batch id or raise if missing.
@@ -113,6 +93,8 @@ class Command(ABC):
         Raises:
             WorkflowContextRequired: If the command requires workflow context but none exists.
         """
+        if not self.context:
+            raise RuntimeError("runtime context was not set.")
         if not self.context.is_batch:
             raise WorkflowContextRequired(
                 f"Command '{self.key}' requires a workflow batch context."
@@ -122,7 +104,7 @@ class Command(ABC):
 
     def get_template_path(self) -> str:
         """Compute the template path for this command within the controller."""
-        template_sub_path = self.context.controller.template_source.template_sub_path
+        template_sub_path = self._ensure_controller().template_source.template_sub_path
         return str(Path(template_sub_path).joinpath(self.template_prefix, self.key))
 
     async def get_namespace(self, session: Session) -> Namespace:
@@ -134,18 +116,21 @@ class Command(ABC):
         """Create a presenter bound to this command's template path and session."""
         presenter = self.services.get(PresenterService)
         return await presenter.create_presenter(
-            self.context.controller.template_source.package,
+            self._ensure_controller().template_source.package,
             self.get_template_path(),
             session,
         )
 
+    def _ensure_controller(self) -> BaseController:
+        if self.context:
+            return self.context.controller
+        raise Exception("controller not exits")
+
     @abstractmethod
-    async def run(self, session: Session, request: Request) -> CommandResult:
-        """Execute the command and return a structured result.
+    async def run(self, session: Session, request: Request) -> None:
+        """Execute the command and return always None.
 
         Notes:
-            - Do not raise user-facing errors for normal control flow. Prefer encoding
-              outcomes in CommandResult.
             - Reserve exceptions for programmer errors, missing context, or truly
               exceptional states.
         """

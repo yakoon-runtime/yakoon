@@ -9,7 +9,7 @@ class CmdWfRun(WfCommand):
     key = "wf.run"
     visibility = CommandVisibility.INTERNAL
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         key = request.arg(0)  # "kunden_anlage" oder "shell:kunden_anlage"
         controller_id = self.context.controller.id  # kommt aus deinem Dispatcher

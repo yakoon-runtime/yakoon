@@ -10,7 +10,7 @@ class CmdCustomerStore(WfCommand):
 
     key = "wf:crm.customer.store"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         audits = self.services.get(AuditLogService)
 

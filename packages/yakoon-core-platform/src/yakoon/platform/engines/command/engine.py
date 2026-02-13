@@ -40,7 +40,7 @@ class Engine:
     ) -> tuple[BaseController, Command] | None:
 
         find = self._commands.find
-        result: tuple[str, Command] = find(active_router_id, request.command)
+        result: tuple[str, Command] | None = find(active_router_id, request.command)
         if result:
             active_router_id, command = result
             return self._directory.get(active_router_id), command
@@ -100,28 +100,28 @@ class Engine:
 
             edge_task = asyncio.create_task(edge.wait())
             try:
-                done, _ = await asyncio.wait(
+                await asyncio.wait(
                     {task, edge_task},
                     return_when=asyncio.FIRST_COMPLETED,
                 )
             finally:
-                edge_task.cancel()
                 # don't await cancel; best-effort
+                edge_task.cancel()
 
-    async def _dispatch_command(self, session: Session, di: DispatchInput) -> bool:
+    async def _dispatch_command(self, session: Session, di: DispatchInput) -> None:
         failed = False
         request = Request(di.command)
 
         # Empty input -> noop (or fail, depending on your UX choice)
         if not request.command:
-            return True
+            return
 
         # Active controller is the single routing context (S1)
         controller_id = session.get_active_controller()
         controller = self._directory.get(controller_id) if controller_id else None
         if not controller:
             await session.fail("Kein aktiver Controller gesetzt.")
-            return False
+            return
 
         command = None
 
@@ -212,14 +212,18 @@ class Engine:
             await controller.on_cleanup(session)
 
     def wf_failed(
-        self, exc: Exception, command: Command, session: Session, di: DispatchInput
-    ) -> bool:
-        if di.batch_id:
+        self,
+        exc: Exception,
+        command: Command | None,
+        session: Session,
+        di: DispatchInput,
+    ) -> None:
+        if di.batch_id and command:
             wf = self._services.get(ports.WorkflowService)
             wf.fail_batch(
                 session,
                 batch_id=di.batch_id,
-                code=exc,
+                code="",  # TODO code ist empty
                 message=str(exc),
                 command=command.key,
             )

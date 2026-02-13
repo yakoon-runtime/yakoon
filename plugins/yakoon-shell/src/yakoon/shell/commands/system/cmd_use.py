@@ -9,7 +9,7 @@ class CmdUse(Command):
     key = "use"
     template_prefix = "system"
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         controllers = self.services.get(ControllerCatalogService)
         presenter = await self.get_presenter(session)

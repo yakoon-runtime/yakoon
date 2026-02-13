@@ -9,7 +9,7 @@ class CmdWfPrompt(WfCommand):
     key = "wf.prompt"
     visibility = CommandVisibility.INTERNAL
 
-    async def run(self, session: Session, request: Request):
+    async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         batch_id = request.arg(0)
         step_id = request.arg(1)
