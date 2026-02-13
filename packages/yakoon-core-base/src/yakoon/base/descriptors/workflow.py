@@ -1,23 +1,35 @@
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class WorkflowSource:
-    """
-    Defines where workflows for a controller are loaded from.
+    """Describes where a controller's workflow definitions are located.
 
-    The Python package name is used as the loader key.
-    All template resolution below package_path is purely structural.
-    """
-    
-    package: str                       # Python package name, also used as loader key
-    workflow_path: str = "workflows"    # Folder within the package.
-    workflow_sub_path: str = ""        # Prefix/Namespace (shell/system)
+    A WorkflowSource is a structural descriptor. It does not interpret
+    or execute workflows; it only defines their package root.
 
-    def clone(self):        
-        
+    Attributes:
+        package:
+            Python package used as the workflow loader root.
+        workflow_path:
+            Folder inside the package containing workflow definitions.
+        workflow_sub_path:
+            Optional namespace prefix below workflow_path.
+
+    Design notes:
+        - Immutable configuration object.
+        - Owned by the controller.
+        - Resolution logic belongs to the workflow service layer.
+    """
+
+    package: str
+    workflow_path: str = "workflows"
+    workflow_sub_path: str = ""
+
+    def clone(self) -> "WorkflowSource":
+        """Return a copy of this WorkflowSource."""
         return WorkflowSource(
             self.package,
             self.workflow_path,
-            self.workflow_sub_path)
-  
+            self.workflow_sub_path,
+        )

@@ -21,20 +21,3 @@ class CmdSu(Command):
         wf.set_value(session, batch_id, "user.password", request.arg(1))
 
         wf.enqueue_next(session, batch_id)
-
-"""
-class __CmdSu(WorkflowCommand):
-
-    key = "su"    
-    template_prefix = "system"
-
-    batch_commmands = "use auth; {raw}; exit;"
-
-    async def run(self, session: Session, request: Request):
-
-        #session.set_active_controller("auth")
-        command = self.batch_commmands.format(raw=request.raw)
-        workflow = Request(command).split_commands()
-        self.schedule(session, workflow)
-"""
-

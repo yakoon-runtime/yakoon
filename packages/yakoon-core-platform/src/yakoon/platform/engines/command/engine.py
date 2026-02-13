@@ -41,7 +41,7 @@ class Engine:
          self, active_router_id, request: Request) -> Optional[Tuple[BaseController, Command]]:
       
       find = self._commands.find
-      result: tuple[str, Command] = find(active_router_id, request.command())
+      result: tuple[str, Command] = find(active_router_id, request.command)
       if result:
          active_router_id, command = result
          return self._directory.get(active_router_id), command
@@ -115,7 +115,7 @@ class Engine:
       request = Request(di.command)
 
       # Empty input -> noop (or fail, depending on your UX choice)
-      if not request.command():
+      if not request.command:
          return True
 
       # Active controller is the single routing context (S1)
@@ -135,7 +135,7 @@ class Engine:
          # Resolve command within the single active controller context (+ groups)
          result = await self._find_matching_command(controller_id, request)
          if not result:
-               raise CmdNotFound(f"{request.command()}")
+               raise CmdNotFound(f"{request.command}")
 
          resolved_controller, command = result
 
@@ -167,12 +167,12 @@ class Engine:
       except WorkflowContextRequired:
          failed = True
          await session.fail(
-             f"{request.command()}': may only be executed from within a workflow.'")
+             f"{request.command}': may only be executed from within a workflow.'")
 
       except CmdNotFound:
          failed = True
          await session.fail(
-             f"{request.command()}': command not found... use 'man'")
+             f"{request.command}': command not found... use 'man'")
          self.wf_failed(exc, command, session, di)
 
       except PermissionError as exc:
@@ -180,7 +180,7 @@ class Engine:
 
          # command may be None if permission fails early
          audit = self._services.get(ports.AuditLogService)
-         await audit.permission(session, "command", command.key if command else request.command())
+         await audit.permission(session, "command", command.key if command else request.command)
 
          await session.fail(str(exc))
          self.wf_failed(exc, command, session, di)

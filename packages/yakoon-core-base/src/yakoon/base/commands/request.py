@@ -1,57 +1,131 @@
 import shlex
+from typing import Any, Optional
+
 
 class Request:
+    """Parse and query a single command-line style input string.
 
-    def __init__(self, raw: str):
-        
-        self._raw = raw.strip()
+        Tokenization uses `shlex.split(..., posix=True)` and is therefore
+        quoting-aware.
+
+        Conventions:
+            - First token is the command (lowercased).
+            - Remaining tokens are arguments.
+            - Options follow `--name value`.
+            - Flags are options without a value.
+            - Positional arguments exclude option keys and option values.
+
+        This class intentionally represents exactly one command.
+        """
+
+    def __init__(self, raw: str) -> None:
+        """Create a Request from raw user input.
+
+        Args:
+            raw: The raw input string (may contain leading/trailing whitespace).
+
+        Notes:
+            If the input is empty/whitespace, the command and args are empty.
+        """
+        self._raw: str = raw.strip()
 
         if not self._raw:
-            self._command = ""
-            self._args = []
+            self._command: str = ""
+            self._args: list[str] = []
             return
 
         parts = shlex.split(self._raw, posix=True)
-
-        self._command = parts[0].lower()
-        self._args = parts[1:]
+        self._command = parts[0].lower() if parts else ""
+        self._args = parts[1:] if len(parts) > 1 else []
 
     @property
-    def raw(self) -> list[str]:
-        """
-        Returns the original input string.
+    def raw(self) -> str:
+        """The original input string (trimmed).
 
-        This value is immutable and must not be modified.
-        All parsing operations derive from this value.
+        This is the canonical source for any derived parsing.
         """
         return self._raw
 
+    @property
     def command(self) -> str:
-        """Returns the command name (first token)."""
+        """The command name (first token), lowercased."""
         return self._command
 
+    @property
     def args(self) -> list[str]:
-        """Returns all arguments as a list of tokens."""
+        """All argument tokens (everything after the command token)."""
         return self._args
 
-    def arg(self, index: int, default=None):
-        args = self._pos_args()
+    def token(self, index: int, default: Any = None) -> Any:
+        """Return the Nth argument token (0-based) or a default.
+
+        Args:
+            index: Index into `args` (0-based).
+            default: Returned if the index is out of bounds.
+
+        Returns:
+            The token string or `default`.
+        """
         try:
-            return args[index]
+            return self._args[index]
         except IndexError:
             return default
 
-    def free_text(self) -> str:
-        parts = self._raw.split(maxsplit=1)
-        return parts[1].lstrip() if len(parts) == 2 else ""
+    def arg(self, index: int, default: Any = None) -> Any:
+        """Return the Nth positional argument (0-based) or a default.
 
-    def option(self, name: str, default=None):
+        Positional arguments exclude:
+            - option keys: `--name`
+            - option values: the value following an option key (if any)
+
+        Args:
+            index: Index into the positional arguments (0-based).
+            default: Returned if the index is out of bounds.
+
+        Returns:
+            The positional argument string or `default`.
+        """
+        pos = self._pos_args()
+        try:
+            return pos[index]
+        except IndexError:
+            return default
+
+    def has_args(self) -> bool:
+        """Whether there are any argument tokens."""
+        return bool(self._args)
+
+    def arg_count(self) -> int:
+        """Number of argument tokens."""
+        return len(self._args)
+
+    def has_option(self, name: str) -> bool:
+        """Check whether an option key `--name` is present (flag or key-value)."""
+        return f"--{name}" in self._args
+
+    def option(self, name: str, default: Any = None) -> Any:
+        """Return the value for an option of the form `--name value`.
+
+        Args:
+            name: Option name without leading dashes.
+            default: Returned if the option is missing or has no value.
+
+        Returns:
+            The option value token, or `default`.
+
+        Examples:
+            Input:  "cmd --user alice --dry-run"
+            option("user") -> "alice"
+            has_option("dry-run") -> True
+            option("dry-run") -> default (no value by design)
+        """
         key = f"--{name}"
         try:
             idx = self._args.index(key)
         except ValueError:
             return default
 
+        # Missing value or followed by another option -> treat as no-value (flag)
         if idx + 1 >= len(self._args):
             return default
 
@@ -61,46 +135,28 @@ class Request:
 
         return value
 
-    def token(self, index: int, default=None):
-        try:
-            return self._args[index]
-        except IndexError:
-            return default
-
-    def has_option(self, name: str) -> bool:
-        return f"--{name}" in self._args
-
-    def has_args(self) -> bool:
-        return bool(self._args)
-
-    def arg_count(self) -> int:
-        return len(self._args)
-    
-    def split_commands(self, separator: str = ";") -> list[str]:
-        """
-        Splits a raw command string into individual commands.
-
-        - Trims whitespace
-        - Removes empty segments
-        - Does not handle quoting or escaping (by design)
-        """
-        return [p.strip() for p in self._raw.split(separator) if p.strip()]
-
     def _pos_args(self) -> list[str]:
-        """
-        Returns positional args only, skipping:
-          --flag value
-          --flag (no value)
+        """Compute positional arguments by skipping options and option values.
+
+        Rules:
+            - Any token starting with `--` is an option key.
+            - If the following token exists and does not start with `--`,
+              it is treated as the option's value and skipped as well.
+
+        Returns:
+            A list of positional argument tokens.
         """
         out: list[str] = []
         i = 0
         while i < len(self._args):
             tok = self._args[i]
+
             if tok.startswith("--"):
                 i += 1
                 if i < len(self._args) and not self._args[i].startswith("--"):
                     i += 1
                 continue
+
             out.append(tok)
             i += 1
 

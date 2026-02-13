@@ -1,18 +1,31 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Sequence
 
 from yakoon.base.controllers import BaseController
 from yakoon.base.descriptors import TemplateSource
-from yakoon.base.runtime.session.session import Session
 from yakoon.office.mailing.commands.cmdset import MailingCommands
+
+if TYPE_CHECKING:
+    from yakoon.base.commands.commandset import CommandSet
 
 
 class OfficeMailingCoreController(BaseController):
+    """Controller for the Office Mailing domain.
 
-    id = "office.mailing"
-    
+    Provides:
+        - Mailing-related commands
+        - Template root under yakoon.office.mailing:core
+    """
+
+    id: str = "office.mailing"
+
     template_source = TemplateSource(
         package="yakoon.office.mailing",
-        template_sub_path="core")
+        template_sub_path="core",
+    )
 
-    commandsets = [
-        MailingCommands]
-        
+    @property
+    def commandsets(self) -> Sequence[type[CommandSet]]:
+        """Command sets exported by this controller."""
+        return (MailingCommands,)
