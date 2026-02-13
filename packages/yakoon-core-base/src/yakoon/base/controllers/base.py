@@ -109,7 +109,6 @@ class BaseController(ABC):
         namespaces = self.services.get(NamespaceService)
         return await namespaces.from_session(session)
 
-    @abstractmethod
     async def on_before_resolve(self, session: Session) -> None:
         """Hook executed before command resolution.
 
@@ -120,8 +119,8 @@ class BaseController(ABC):
 
         This hook runs regardless of whether a valid command is found later.
         """
+        return None
 
-    @abstractmethod
     async def on_before_run_command(
         self, session: Session, request: Request, command: Command
     ) -> None:
@@ -137,10 +136,8 @@ class BaseController(ABC):
             request: Parsed request that produced this command.
             command: The resolved command about to execute.
         """
-        # default: no-op
         return None
 
-    @abstractmethod
     async def on_after_run_command(
         self, session: Session, request: Request, command: Command
     ) -> None:
@@ -156,10 +153,8 @@ class BaseController(ABC):
             request: Parsed request that produced this command.
             command: The command that just executed.
         """
-        # default: no-op
         return None
 
-    @abstractmethod
     async def on_cleanup(self, session: Session) -> None:
         """Hook executed after a command cycle, even if exceptions occurred.
 
@@ -171,3 +166,4 @@ class BaseController(ABC):
         Args:
             session: Current runtime session.
         """
+        return None
