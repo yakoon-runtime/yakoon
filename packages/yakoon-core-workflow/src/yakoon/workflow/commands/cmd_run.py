@@ -11,10 +11,10 @@ class CmdWfRun(WfCommand):
 
     async def run(self, session: Session, request: Request):
 
-        key = request.arg(0)                        # "kunden_anlage" oder "shell:kunden_anlage"
+        key = request.arg(0)  # "kunden_anlage" oder "shell:kunden_anlage"
         controller_id = self.context.controller.id  # kommt aus deinem Dispatcher
 
-        wfsvc = self.services.get(ports.WorkflowService)        
+        wfsvc = self.services.get(ports.WorkflowService)
         wfsvc.start(
-            session, controller_id, 
-            key, interaction_mode=session.interaction_mode)
+            session, controller_id, key, interaction_mode=session.interaction_mode
+        )

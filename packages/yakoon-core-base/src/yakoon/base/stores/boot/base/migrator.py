@@ -1,10 +1,9 @@
-
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 
 class BaseMigrator(ABC):
-    
+
     def __init__(self, scripts: Path):
         self.scripts = Path(scripts)
 
@@ -34,20 +33,14 @@ class BaseMigrator(ABC):
         return {r[0] for r in rows}
 
     async def _record_applied(self, version: str):
-        await self.execute(
-            "INSERT INTO __migrations (version) VALUES (?)",
-            (version,)
-        )
+        await self.execute("INSERT INTO __migrations (version) VALUES (?)", (version,))
 
     # abstract low-level DB ops
     @abstractmethod
-    async def apply_script(self, sql: str):
-        ...
+    async def apply_script(self, sql: str): ...
 
     @abstractmethod
-    async def execute(self, sql: str, params: tuple):
-        ...
+    async def execute(self, sql: str, params: tuple): ...
 
     @abstractmethod
-    async def fetch_all(self, sql: str, params: tuple) -> list[tuple]:
-        ...
+    async def fetch_all(self, sql: str, params: tuple) -> list[tuple]: ...

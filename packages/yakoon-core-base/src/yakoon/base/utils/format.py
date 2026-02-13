@@ -1,10 +1,9 @@
-
 from yakoon.base.runtime.session.session import Session
 
 
-def format_prompt(session: Session, 
-                  default_prompt="shell", 
-                  active_controller="shell") -> str:
+def format_prompt(
+    session: Session, default_prompt="shell", active_controller="shell"
+) -> str:
     """
     Formats the interactive prompt based on session state.
 

@@ -1,4 +1,3 @@
-
 from yakoon.platform.scaffold.workspace import scaffold_workspace
 
 

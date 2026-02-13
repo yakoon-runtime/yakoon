@@ -20,6 +20,7 @@ class SessionState:
     The session key is part of the state and is immutable for the lifetime
     of the session.
     """
+
     key: Key
 
     active_controller_id: str | None = None
@@ -48,7 +49,7 @@ class SessionState:
         d = dict(d)
         raw_key = d.pop("key")
         raw_last_active = d.pop("last_active", None)
-        state = cls(key=Key.from_str(raw_key),**d)
+        state = cls(key=Key.from_str(raw_key), **d)
         if raw_last_active:
             state.last_active = datetime.fromisoformat(raw_last_active)
 
@@ -90,11 +91,11 @@ class Session:
 
     @property
     def lang(self) -> str:
-        return self._state.lang        
+        return self._state.lang
 
     @property
     def key(self) -> Key:
-        return self._state.key        
+        return self._state.key
 
     @property
     def state(self) -> SessionState:
@@ -275,10 +276,16 @@ class Session:
         """
         self._runtime.signals.clear()
 
-    async def emit(self, text: str, *,
-                   mime: str = "text/plain", channel: str = "main",
-                   op: str = "append", region: str = "output", 
-                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
+    async def emit(
+        self,
+        text: str,
+        *,
+        mime: str = "text/plain",
+        channel: str = "main",
+        op: str = "append",
+        region: str = "output",
+        meta: Optional[Mapping[str, Any]] = None,
+    ) -> None:
         """
         Emits a plain output message via the session's output channel.
 
@@ -287,16 +294,26 @@ class Session:
         Args:
             text (str): The message to emit.
         """
-        evt = OutputEvent(text=text, mime=mime, 
-                          channel=channel, op=op, region=region, 
-                          meta=dict(meta or {}),)
+        evt = OutputEvent(
+            text=text,
+            mime=mime,
+            channel=channel,
+            op=op,
+            region=region,
+            meta=dict(meta or {}),
+        )
         await self._runtime.io.out(evt)
 
-
-    async def notify(self, text: str, *,
-                   mime: str = "text/plain", channel: str = "main",
-                   op: str = "append", region: str = "information", 
-                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
+    async def notify(
+        self,
+        text: str,
+        *,
+        mime: str = "text/plain",
+        channel: str = "main",
+        op: str = "append",
+        region: str = "information",
+        meta: Optional[Mapping[str, Any]] = None,
+    ) -> None:
         """
         Emits a non-error informational status message.
 
@@ -305,22 +322,38 @@ class Session:
         Args:
             text (str): The status message to display.
         """
-        evt = OutputEvent(text=text, mime=mime, 
-                          channel=channel, op=op, region=region, 
-                          meta=dict(meta or {}),)
+        evt = OutputEvent(
+            text=text,
+            mime=mime,
+            channel=channel,
+            op=op,
+            region=region,
+            meta=dict(meta or {}),
+        )
         await self._runtime.io.out(evt)
 
-    async def fail(self, text: str, *,
-                   mime: str = "text/plain", channel: str = "main",
-                   op: str = "append", region: str = "status", 
-                   meta: Optional[Mapping[str, Any]] = None,    ) -> None:
+    async def fail(
+        self,
+        text: str,
+        *,
+        mime: str = "text/plain",
+        channel: str = "main",
+        op: str = "append",
+        region: str = "status",
+        meta: Optional[Mapping[str, Any]] = None,
+    ) -> None:
         """
         Emits an error or failure message.
 
         Args:
             text (str): The error message to display.
         """
-        evt = OutputEvent(text=text, mime=mime, 
-                          channel=channel, op=op, region=region, 
-                          meta=dict(meta or {}),)
+        evt = OutputEvent(
+            text=text,
+            mime=mime,
+            channel=channel,
+            op=op,
+            region=region,
+            meta=dict(meta or {}),
+        )
         await self._runtime.io.err(evt)

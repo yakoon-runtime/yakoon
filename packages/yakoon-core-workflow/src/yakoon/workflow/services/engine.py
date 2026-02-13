@@ -40,12 +40,16 @@ class WorkflowService:
         catalog = self.services.get(ports.ControllerCatalogService)
         info = catalog.get(controller_id)
         if not info or not info.workflow_source:
-            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{workflow_key}")
+            raise WorkflowNotFound(
+                f"Workflow not found: {controller_id}:{workflow_key}"
+            )
 
         loader = self.services.get(ports.WorkflowCompileService)
         wf = loader.load_def(info.workflow_source, workflow_key)
         if not wf:
-            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{workflow_key}")
+            raise WorkflowNotFound(
+                f"Workflow not found: {controller_id}:{workflow_key}"
+            )
 
         return wf
 
@@ -58,9 +62,16 @@ class WorkflowService:
             raise RuntimeError(f"Unknown workflow batch: {batch_id}")
         batch.values[key] = value
 
-    def start_with_values(self, session, controller_id: str, 
-                          workflow_key: str, values: Mapping[str, Any], *,
-                          enqueue_first: bool = True, ignore_none: bool = True ) -> str:
+    def start_with_values(
+        self,
+        session,
+        controller_id: str,
+        workflow_key: str,
+        values: Mapping[str, Any],
+        *,
+        enqueue_first: bool = True,
+        ignore_none: bool = True,
+    ) -> str:
         """
         Convenience wrapper:
         - creates workflow batch
@@ -79,7 +90,8 @@ class WorkflowService:
             session,
             controller_id=controller_id,
             workflow_key=workflow_key,
-            enqueue_first=False)
+            enqueue_first=False,
+        )
 
         for k, v in values.items():
             if ignore_none and v is None:
@@ -91,7 +103,14 @@ class WorkflowService:
 
         return batch_id
 
-    def start(self, session, controller_id: str, workflow_key: str, *, enqueue_first: bool = True) -> str:
+    def start(
+        self,
+        session,
+        controller_id: str,
+        workflow_key: str,
+        *,
+        enqueue_first: bool = True,
+    ) -> str:
         wf = self.get_def(controller_id, workflow_key)
 
         batch_id = uuid4().hex
@@ -102,15 +121,23 @@ class WorkflowService:
         batch.workflow_key = workflow_key
         batch.current_step = wf.start
         batch.pending_step = None
-        batch.status = WorkflowStatus.RUNNING if enqueue_first else WorkflowStatus.PREPARED
+        batch.status = (
+            WorkflowStatus.RUNNING if enqueue_first else WorkflowStatus.PREPARED
+        )
         if enqueue_first:
             self.enqueue_next(session, batch_id)
 
         return batch_id
 
-
-    def resume_with_values(self, session, batch_id: str, values: Mapping[str, Any], *, 
-                           ignore_none: bool = True, enqueue_next: bool = True) -> None:
+    def resume_with_values(
+        self,
+        session,
+        batch_id: str,
+        values: Mapping[str, Any],
+        *,
+        ignore_none: bool = True,
+        enqueue_next: bool = True,
+    ) -> None:
         """
         Convenience:
         - set/override multiple values in an existing workflow batch
@@ -148,7 +175,9 @@ class WorkflowService:
         wf = self.get_def(batch.controller_id, batch.workflow_key)
         step = wf.steps.get(step_id)
         if not step:
-            raise KeyError(f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}")
+            raise KeyError(
+                f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}"
+            )
         return step
 
     def enqueue_next(self, session, batch_id: str) -> None:
@@ -170,7 +199,9 @@ class WorkflowService:
         step_id = batch.current_step or wf.start
         step = wf.steps.get(step_id)
         if not step:
-            raise KeyError(f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}")
+            raise KeyError(
+                f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}"
+            )
 
         queue = self.services.get(ports.CommandQueueService)
 
@@ -183,7 +214,8 @@ class WorkflowService:
         # PROMPT
         if step.prompt:
             queue.enqueue_commands(
-                session, [f"wf.prompt {batch_id} {step.id}"], batch_id=batch_id)
+                session, [f"wf.prompt {batch_id} {step.id}"], batch_id=batch_id
+            )
             batch.pending_step = step.id
             return
 
@@ -202,7 +234,9 @@ class WorkflowService:
                 if step.switch.default:
                     next_id = step.switch.default
                 else:
-                    raise RuntimeError(f"Switch step '{step.id}': no case for '{key}' and no default")
+                    raise RuntimeError(
+                        f"Switch step '{step.id}': no case for '{key}' and no default"
+                    )
 
             batch.current_step = next_id
             self.enqueue_next(session, batch_id)
@@ -211,15 +245,20 @@ class WorkflowService:
         # RUN
         if step.run:
             cmd = compile_run_command(
-                step.run, batch.values, 
-                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}")
+                step.run,
+                batch.values,
+                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
+            )
             queue.enqueue_commands(
-                session, [cmd, f"wf.next {batch_id} {step.id}"], batch_id=batch_id)
+                session, [cmd, f"wf.next {batch_id} {step.id}"], batch_id=batch_id
+            )
             return
 
         raise ValueError(f"Invalid step '{step.id}': neither prompt nor run nor end")
 
-    def complete_prompt_step(self, session, *, batch_id: str, step_id: str, value: Any) -> None:
+    def complete_prompt_step(
+        self, session, *, batch_id: str, step_id: str, value: Any
+    ) -> None:
         rt = self.runtime(session)
         batch = rt.get(batch_id)
         if not batch:
@@ -236,7 +275,9 @@ class WorkflowService:
             key = str(value).lower()
             next_id = step.branch.get(key)
             if not next_id:
-                raise RuntimeError(f"Prompt step '{step.id}': branch has no target for '{key}'")
+                raise RuntimeError(
+                    f"Prompt step '{step.id}': branch has no target for '{key}'"
+                )
             batch.current_step = next_id
             self.enqueue_next(session, batch_id)
             return
@@ -264,7 +305,15 @@ class WorkflowService:
         batch.current_step = step.next
         self.enqueue_next(session, batch_id)
 
-    def fail_batch(self, session, *, batch_id: str, code: str, message: str, command: str | None = None) -> None:
+    def fail_batch(
+        self,
+        session,
+        *,
+        batch_id: str,
+        code: str,
+        message: str,
+        command: str | None = None,
+    ) -> None:
 
         rt = self.runtime(session)
         batch = rt.get(batch_id)
@@ -274,10 +323,8 @@ class WorkflowService:
         step_id = batch.pending_step or batch.current_step
         batch.status = WorkflowStatus.FAILED
         batch.error = WorkflowError(
-            code=code, 
-            message=message, 
-            step_id=step_id, 
-            command=command)
+            code=code, message=message, step_id=step_id, command=command
+        )
 
     def cancel_batch(self, session, *, batch_id: str) -> None:
 
@@ -285,10 +332,9 @@ class WorkflowService:
         batch = rt.get(batch_id)
         if not batch:
             return
-        
+
         batch.status = WorkflowStatus.CANCELLED
         batch.error = None
-        
+
         queue = self.services.get(ports.CommandQueueService)
         queue.cancel_batch(session, batch_id)
-

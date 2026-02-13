@@ -5,11 +5,11 @@ from yakoon.office.mailing.commands.cmd_sendmail import CmdSendMail
 
 
 class MailingCommands(CommandSet):
-    
+
     group = "system"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
+    def commands(cls) -> Sequence[Type[Command]]:
         return [
             CmdSendMail,
         ]

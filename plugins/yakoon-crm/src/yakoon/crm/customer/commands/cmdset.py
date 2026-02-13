@@ -8,13 +8,13 @@ from yakoon.crm.customer.commands.cmd_customer_validate import CmdCustomerValida
 
 
 class CrmCustomerCommands(CommandSet):
-    
+
     group = "customer"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
+    def commands(cls) -> Sequence[Type[Command]]:
         return [
             CmdWfStart("customer-create"),
             CmdCustomerStore,
-            CmdCustomerValidate,            
+            CmdCustomerValidate,
         ]

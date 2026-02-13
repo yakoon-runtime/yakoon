@@ -1,6 +1,5 @@
 from yakoon.platform.engines.command import Engine, Output
 
-
 # Set the global rendering mode to ansi text (no Markdown formatting)
 _engine = Engine(None)
 

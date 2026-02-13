@@ -1,4 +1,3 @@
-
 class RenderSection:
     """
     Identifies a specific output block within a command template.

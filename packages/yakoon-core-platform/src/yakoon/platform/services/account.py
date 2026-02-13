@@ -1,4 +1,3 @@
-
 from typing import Optional
 
 from yakoon.base.models.account import Account, AccountData
@@ -25,8 +24,12 @@ class AccountService:
         data = AccountData.from_dict(row)
         return Account(data)
 
-    async def get_by_username(self, namespace: Namespace, username: str) -> Optional[Account]:
-        rows = await self.store.fetch_by_fields(namespace=namespace, username=username, limit=1)
+    async def get_by_username(
+        self, namespace: Namespace, username: str
+    ) -> Optional[Account]:
+        rows = await self.store.fetch_by_fields(
+            namespace=namespace, username=username, limit=1
+        )
         if not rows:
             return None
         data = AccountData.from_dict(rows[0])

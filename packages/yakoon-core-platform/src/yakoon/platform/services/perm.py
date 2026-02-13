@@ -15,29 +15,26 @@ class PermissionService:
 
         self._roles: dict[str, list[str]] = {}
         self._directs = [
-                "shell:welcome|rx",
-                "shell:version|rx",
-                "shell:test|rx",
-                "shell:speed-test|rx",
-                "shell:man|rx",
-                "shell:exit|rx",
-                "shell:quit|rx",
-                "shell:su|rx",
-                "auth:su|rx",
+            "shell:welcome|rx",
+            "shell:version|rx",
+            "shell:test|rx",
+            "shell:speed-test|rx",
+            "shell:man|rx",
+            "shell:exit|rx",
+            "shell:quit|rx",
+            "shell:su|rx",
+            "auth:su|rx",
+            "crm-customer:customer-create|rx",
+            "crm-customer:wf:crm.customer.store|rx",
+            "crm-customer:wf:crm.customer.validate|rx",
+            "shell:wf.run|rx",
+            "shell:wf.prompt|rx",
+            "shell:wf.next|rx",
+            "shell:wf.cancel|rx",
+            "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
+        ]
 
-                "crm-customer:customer-create|rx",
-                "crm-customer:wf:crm.customer.store|rx",
-                "crm-customer:wf:crm.customer.validate|rx",
-            
-                "shell:wf.run|rx",
-                "shell:wf.prompt|rx",
-                "shell:wf.next|rx",
-                "shell:wf.cancel|rx",
-
-                "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
-            ]
-
-    def register_role(self, name: str, specs: list[str]) -> None: 
+    def register_role(self, name: str, specs: list[str]) -> None:
         if name in self._roles:
             raise ValueError(f"Role already registered: {name}")
         self._roles[name] = specs
@@ -48,16 +45,18 @@ class PermissionService:
     def apply_account_permissions(self, session: Session, account: Account):
         bootstrap = self.compile_permissions([], self._directs)
         account_ps = self.compile_permissions(account.roles, account.permissions)
-        bootstrap.merge(account_ps) 
+        bootstrap.merge(account_ps)
         session.set_permissions(bootstrap)
 
-    def can_execute(self, session:Session, perm_key:str) -> bool:
+    def can_execute(self, session: Session, perm_key: str) -> bool:
         return session.permissions.check(perm_key, PermBit.EXECUTE)
 
-    def can_read(self, session:Session, perm_key:str) -> bool:
+    def can_read(self, session: Session, perm_key: str) -> bool:
         return session.permissions.check(perm_key, PermBit.READ)
 
-    def compile_permissions(self, roles: Iterable[str], direct: Iterable[str]) -> PermissionSet:
+    def compile_permissions(
+        self, roles: Iterable[str], direct: Iterable[str]
+    ) -> PermissionSet:
 
         ps = PermissionSet()
 
@@ -105,16 +104,18 @@ class PermissionService:
         parts = rights.split(":")
         if len(parts) == 1:
             return Permission(
-                command_key=key, 
-                scope1=PermBits.from_str(parts[0]), 
-                scope2=None, 
-                deny=deny)
+                command_key=key,
+                scope1=PermBits.from_str(parts[0]),
+                scope2=None,
+                deny=deny,
+            )
         if len(parts) == 2:
             return Permission(
-                command_key=key, 
-                scope1=PermBits.from_str(parts[0]), 
-                scope2=PermBits.from_str(parts[1]), 
-                deny=deny)
+                command_key=key,
+                scope1=PermBits.from_str(parts[0]),
+                scope2=PermBits.from_str(parts[1]),
+                deny=deny,
+            )
 
         raise ValueError(f"Invalid permission (too many scopes): {spec}")
 
@@ -132,7 +133,3 @@ _ROLE_MAP: dict[str, list[str]] = {
         "shell:use|rx",
     ],
 }
-
-
-
-

@@ -8,11 +8,11 @@ class CmdWfNext(WfCommand):
 
     key = "wf.next"
     visibility = CommandVisibility.INTERNAL
-    
+
     async def run(self, session: Session, request: Request):
 
         batch_id = request.arg(0)
-        step_id  = request.arg(1)
+        step_id = request.arg(1)
 
         wfsvc = self.services.get(ports.WorkflowService)
         wfsvc.set_value(session, batch_id, "batch_id", batch_id)

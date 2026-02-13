@@ -8,4 +8,3 @@ class MemoryStoreRegistry(StoreRegistry):
     def __init__(self):
         self.sessions = InMemorySessionStore()
         self.counters = InMemoryShardCounterStore()
-    

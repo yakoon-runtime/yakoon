@@ -9,7 +9,7 @@ from yakoon.kivy.states.tab_state import TabState
 
 
 class Navigator:
-    
+
     def __init__(self, app_root):
         self.app_root = app_root
 
@@ -17,11 +17,11 @@ class Navigator:
         sm = self.app_root.ids.get("sm")
         if sm:
             sm.current = name
-    
+
     def is_current(self, name: str):
         sm = self.app_root.ids.get("sm")
         return sm and sm.current == name
-     
+
 
 class AppController:
 
@@ -37,11 +37,13 @@ class AppController:
 
         # --- CONTROLLERS ---
         self.nav = Navigator(app_root)
-        self.tabs_ctrl = TabsController(self.dispatcher,
-            runner, app_root, self.nav, self.tab_state)
+        self.tabs_ctrl = TabsController(
+            self.dispatcher, runner, app_root, self.nav, self.tab_state
+        )
         self.overview_ctrl = OverviewController(
-            runner, app_root, self.nav, self.tabs_ctrl, self.tab_state)
-        
+            runner, app_root, self.nav, self.tabs_ctrl, self.tab_state
+        )
+
     # --- delegation API (wird von Views/Root benutzt) ---
 
     def toggle_overview(self):
@@ -73,7 +75,9 @@ class AppController:
 
     # --- output routing ---
     def dispatch_context(self, ctx: ViewContext) -> None:
-        if getattr(ctx.session, "has_signal", None) and ctx.session.has_signal("exit_app"):
+        if getattr(ctx.session, "has_signal", None) and ctx.session.has_signal(
+            "exit_app"
+        ):
             if hasattr(self.app_root, "stop_app"):
                 self.app_root.stop_app()
             return

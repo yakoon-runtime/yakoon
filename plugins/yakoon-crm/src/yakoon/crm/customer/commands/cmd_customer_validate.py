@@ -8,7 +8,6 @@ class CmdCustomerValidate(WfCommand):
 
     key = "wf:crm.customer.validate"
 
-
     async def run(self, session: Session, request: Request):
 
         wf = self.services.get(ports.WorkflowService)

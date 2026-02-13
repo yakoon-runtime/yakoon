@@ -1,4 +1,3 @@
-
 from dataclasses import asdict
 from typing import Iterable, Sequence
 
@@ -12,13 +11,15 @@ from yakoon.base.runtime.session.session import Session
 
 class CommandCatalog:
 
-    def __init__(self, commands: Iterable[CommandInfo], shell_builtins: Sequence[str] = ()):
+    def __init__(
+        self, commands: Iterable[CommandInfo], shell_builtins: Sequence[str] = ()
+    ):
         self._commmands = commands
         self._shell_builtins = set(shell_builtins)
 
     def all(self):
         return self._commmands
-    
+
     def builtins(self):
         return self._shell_builtins
 
@@ -52,7 +53,9 @@ class CommandCatalogService:
     def shell_builtins(self) -> Sequence[str]:
         return tuple(sorted(self._shell_builtins))
 
-    def for_controller_visible(self, controller_id: str, session:Session) -> Sequence[CommandInfo]: 
+    def for_controller_visible(
+        self, controller_id: str, session: Session
+    ) -> Sequence[CommandInfo]:
         out = []
         perm_service = self._services.get(PermissionService)
         for cmd in self.for_controller(controller_id):
@@ -60,8 +63,14 @@ class CommandCatalogService:
             if perm_service.can_read(session, fq_key):
                 out.append(cmd)
         return out
-    
-    def for_man_entries(self, controller_id: str, session:Session, mode: str, kind_filter: CommandKind | None = None):
+
+    def for_man_entries(
+        self,
+        controller_id: str,
+        session: Session,
+        mode: str,
+        kind_filter: CommandKind | None = None,
+    ):
         out = []
         allowed = self._allowed_visibilities(mode)
         for cmd in self.for_controller_visible(controller_id, session):
@@ -78,12 +87,16 @@ class CommandCatalogService:
         if mode == "all":
             return {CommandVisibility.NORMAL, CommandVisibility.DEVELOPER}
         if mode == "internal":
-            return {CommandVisibility.NORMAL, CommandVisibility.DEVELOPER, CommandVisibility.INTERNAL}
+            return {
+                CommandVisibility.NORMAL,
+                CommandVisibility.DEVELOPER,
+                CommandVisibility.INTERNAL,
+            }
         raise ValueError(mode)
 
 
 class ControllerCatalog:
-    
+
     def __init__(self, controllers: Iterable[ControllerInfo]):
         self._controllers = controllers
 
@@ -139,4 +152,3 @@ class ControllerCatalogService:
     def is_listed(self, controller_id: str) -> bool:
         c = self.get(controller_id)
         return bool(c and c.is_listed)
-        

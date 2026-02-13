@@ -10,6 +10,7 @@ class ConsoleHost(HostAdapter):
     - asks for user input when requested
     - forwards the input via the provided submit callback
     """
+
     def __init__(self, submit):
 
         self._submit = submit

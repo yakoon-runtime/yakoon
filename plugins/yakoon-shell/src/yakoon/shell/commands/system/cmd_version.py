@@ -16,13 +16,15 @@ class CmdVersion(Command):
     async def run(self, session: Session, request: Request):
 
         presenter = await self.get_presenter(session)
-        await presenter.emit("show", 
-                version=get_platform_version(),
-                python=platform.python_version(),
-                hostname=platform.node(),
-                uptime=get_uptime(),
-                time=datetime.now(timezone.utc).isoformat())
-        
+        await presenter.emit(
+            "show",
+            version=get_platform_version(),
+            python=platform.python_version(),
+            hostname=platform.node(),
+            uptime=get_uptime(),
+            time=datetime.now(timezone.utc).isoformat(),
+        )
+
 
 _start_time = time.time()
 
@@ -60,10 +62,13 @@ def get_git_tag() -> str | None:
     Returns the tag as a string, or None if unavailable.
     """
     try:
-        return subprocess.check_output(
-            ["git", "describe", "--tags"],
-            stderr=subprocess.DEVNULL
-        ).decode().strip()
+        return (
+            subprocess.check_output(
+                ["git", "describe", "--tags"], stderr=subprocess.DEVNULL
+            )
+            .decode()
+            .strip()
+        )
     except Exception:
         return None
 
@@ -75,8 +80,4 @@ def get_platform_version() -> str:
     2. version.txt file
     Returns a string such as 'v0.7.2' or 'unknown'.
     """
-    return (
-        get_git_tag()
-        or read_version_file()
-        or "unknown"
-    )
+    return get_git_tag() or read_version_file() or "unknown"

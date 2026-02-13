@@ -5,9 +5,10 @@ from yakoon.base.runtime.session import Session
 
 import time
 
+
 class CmdSpeedTest(Command):
 
-    key = "speed-test"    
+    key = "speed-test"
 
     _counter: int = 0
     _start_time: float = time.perf_counter()
@@ -16,7 +17,7 @@ class CmdSpeedTest(Command):
     visibility = CommandVisibility.DEVELOPER
 
     async def run(self, session: Session, request: Request):
-       
+
         CmdSpeedTest._counter += 1
 
         now = time.perf_counter()
@@ -27,6 +28,5 @@ class CmdSpeedTest(Command):
             f"elapsed={elapsed:.3f}s | "
             f"rate={per_sec:.2f}/sec"
         )
-        #if CmdTest._counter % 1000 == 0:
+        # if CmdTest._counter % 1000 == 0:
         await session.emit(msg)
-    

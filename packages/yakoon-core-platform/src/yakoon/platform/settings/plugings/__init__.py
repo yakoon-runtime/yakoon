@@ -1,2 +1,1 @@
-from . ai import AISettings
-
+from .ai import AISettings

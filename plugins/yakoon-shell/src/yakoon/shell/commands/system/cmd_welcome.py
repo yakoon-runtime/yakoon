@@ -5,7 +5,7 @@ from yakoon.base.runtime.session import Session
 
 class CmdWelcome(Command):
 
-    key = "welcome"    
+    key = "welcome"
     template_prefix = "system"
 
     async def run(self, session: Session, _: Request):

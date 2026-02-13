@@ -5,6 +5,7 @@ from typing import Protocol
 
 from yakoon.base.models.prompt import PromptMode
 
+
 class HostAdapter(Protocol):
     async def on_prompt(self, *, prompt: str, mode: PromptMode) -> None: ...
     async def on_ready(self, *, prompt: str) -> None: ...

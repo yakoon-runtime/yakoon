@@ -1,4 +1,3 @@
-
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, BooleanProperty
@@ -48,4 +47,5 @@ class TabCard(ButtonBehavior, BoxLayout):
 
 
 from kivy.factory import Factory
+
 Factory.register("TabCard", cls=TabCard)

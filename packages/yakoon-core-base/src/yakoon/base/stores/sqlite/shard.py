@@ -1,10 +1,8 @@
-
-
 import aiosqlite
 
 
 class SQLiteShardCounterStore:
-    
+
     def __init__(self, db_path: str, table_name: str = "shards"):
         self.db_path = db_path
         self.table_name = table_name

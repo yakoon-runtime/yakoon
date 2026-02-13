@@ -6,6 +6,7 @@ from yakoon.platform.settings.network import NetSettings
 from yakoon.platform.settings.plugings.ai import AISettings
 from yakoon.platform.settings.output import OutputSettings
 
+
 class SaasSettings:
 
     ai = AISettings()

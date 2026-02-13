@@ -1,4 +1,3 @@
-
 from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.base.stores.sqlite.shard import SQLiteShardCounterStore
 from yakoon.platform.stores.sqlite.session import SQLiteSessionStore

@@ -23,6 +23,7 @@ class TabOverviewPage(BoxLayout):
 
     def _make_card(self, tab_id: str, title: str):
         from kivy.factory import Factory
+
         card = Factory.TabCard()
         card.tab_id = tab_id
         card.title = title
@@ -46,4 +47,5 @@ class TabOverviewPage(BoxLayout):
 
 
 from kivy.factory import Factory
+
 Factory.register("TabOverviewPage", cls=TabOverviewPage)

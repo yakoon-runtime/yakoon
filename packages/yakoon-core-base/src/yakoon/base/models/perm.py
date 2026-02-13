@@ -20,26 +20,19 @@ class PermBits:
     @classmethod
     def from_str(cls, s: str) -> "PermBits":
         s = s or ""
-        return cls(
-            r="r" in s,
-            w="w" in s, 
-            x="x" in s)
+        return cls(r="r" in s, w="w" in s, x="x" in s)
 
     def __bool__(self) -> bool:
         return self.r or self.w or self.x
 
     def union(self, other: "PermBits") -> "PermBits":
-        return PermBits(
-            r=self.r or other.r, 
-            w=self.w or other.w,
-            x=self.x or other.x)
+        return PermBits(r=self.r or other.r, w=self.w or other.w, x=self.x or other.x)
 
     def subtract(self, other: "PermBits") -> "PermBits":
         # remove bits present in other
         return PermBits(
-            r=self.r and not other.r, 
-            w=self.w and not other.w, 
-            x=self.x and not other.x)
+            r=self.r and not other.r, w=self.w and not other.w, x=self.x and not other.x
+        )
 
 
 @dataclass(frozen=True)
@@ -52,6 +45,7 @@ class Permission:
       - scope2 optional (e.g. group / tenant / controller-context)
     deny: if True, removes bits instead of adding them
     """
+
     command_key: str
     scope1: PermBits
     scope2: Optional[PermBits] = None
@@ -62,11 +56,13 @@ class Permission:
         return self.scope2 is not None
 
     staticmethod
+
     def fq_key(controller_id, command_key) -> str:
-         """
-         Returns fq_key (fully qualified key)
-         """
-         return f"{controller_id}:{command_key}"
+        """
+        Returns fq_key (fully qualified key)
+        """
+        return f"{controller_id}:{command_key}"
+
 
 class PermissionSet:
     """
@@ -98,7 +94,9 @@ class PermissionSet:
         merged_scope1 = existing.scope1.union(perm.scope1)
         merged_scope2 = None
         if existing.scope2 or perm.scope2:
-            merged_scope2 = (existing.scope2 or PermBits()).union(perm.scope2 or PermBits())
+            merged_scope2 = (existing.scope2 or PermBits()).union(
+                perm.scope2 or PermBits()
+            )
 
         target[perm.command_key] = Permission(
             command_key=perm.command_key,
@@ -111,7 +109,9 @@ class PermissionSet:
         for p in other:
             self.add(p)
 
-    def check(self, command_key: str, need: str = "x", scope2_need: Optional[str] = None) -> bool:
+    def check(
+        self, command_key: str, need: str = "x", scope2_need: Optional[str] = None
+    ) -> bool:
         """
         need: "r" | "w" | "x" | combinations like "rw", "rwx"
         scope2_need: optional second-scope requirement (future use)

@@ -21,7 +21,7 @@ class SQLiteStore(BaseStore):
         self.table_name = table_name
 
     async def get_by_key(self, key: Key) -> Optional[dict]:
-        q = Query.from_(self.table).select('*').where(self.table.__key__ == str(key))
+        q = Query.from_(self.table).select("*").where(self.table.__key__ == str(key))
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:
@@ -30,9 +30,16 @@ class SQLiteStore(BaseStore):
                 row = await cursor.fetchone()
                 return dict(row) if row else None
 
-    async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
+    async def fetch_by_namespace(
+        self, namespace: Namespace, *, limit: int = 100
+    ) -> list[dict]:
         scope = namespace.to_str()
-        q = Query.from_(self.table).select('*').where(self.table.__scope__ == scope).limit(limit)
+        q = (
+            Query.from_(self.table)
+            .select("*")
+            .where(self.table.__scope__ == scope)
+            .limit(limit)
+        )
         sql = str(q)
 
         async with aiosqlite.connect(self.db_path) as db:
@@ -41,8 +48,14 @@ class SQLiteStore(BaseStore):
                 rows = await cursor.fetchall()
                 return [dict(row) for row in rows]
 
-    async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
-        q = Query.from_(self.table).select('*').where(self.table.__scope__ == namespace.to_str())
+    async def fetch_by_fields(
+        self, *, namespace: Namespace, limit: int = 100, **fields: Any
+    ) -> list[dict]:
+        q = (
+            Query.from_(self.table)
+            .select("*")
+            .where(self.table.__scope__ == namespace.to_str())
+        )
 
         for key, value in fields.items():
             q = q.where(self.table[key] == value)
@@ -62,8 +75,8 @@ class SQLiteStore(BaseStore):
         col_sql = ", ".join(columns)
 
         update_fields = [
-            col for col in columns
-            if col != "__key__" and col != "__created_at__"]
+            col for col in columns if col != "__key__" and col != "__created_at__"
+        ]
         update_clause = ", ".join(f"{col} = excluded.{col}" for col in update_fields)
 
         q = f"""
@@ -71,7 +84,7 @@ class SQLiteStore(BaseStore):
         VALUES ({placeholders})
         ON CONFLICT(__key__) DO UPDATE SET {update_clause};
         """
-        
+
         values = list(obj.values())
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(q, values)

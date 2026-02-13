@@ -12,10 +12,9 @@ class RenderContext:
         key (str): Template identifier (e.g. 'account/cmd_login').
         lang (str): Language code (e.g. 'de', 'en').
     """
-   
-    def __init__(self, key:str, prefix:str, lang:str, format: OutputFormat):
+
+    def __init__(self, key: str, prefix: str, lang: str, format: OutputFormat):
         self.key = key
         self.lang = lang
         self.prefix = prefix
         self.format = format
-

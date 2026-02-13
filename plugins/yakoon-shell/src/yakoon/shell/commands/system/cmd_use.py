@@ -6,12 +6,12 @@ from yakoon.base.runtime.session import Session
 
 class CmdUse(Command):
 
-    key = "use"    
+    key = "use"
     template_prefix = "system"
 
     async def run(self, session: Session, request: Request):
 
-        controllers = self.services.get(ControllerCatalogService)       
+        controllers = self.services.get(ControllerCatalogService)
         presenter = await self.get_presenter(session)
 
         infos = []
@@ -22,15 +22,14 @@ class CmdUse(Command):
             controller = controllers.get(name)
             if controller:
                 infos.append(controller)
-        
+
         if infos and not name:
             await presenter.emit("show", controllers=infos)
         elif infos:
             if name == session.get_active_controller():
-                await presenter.emit("already_in_shell", controller=infos[0])       
-            else:   
+                await presenter.emit("already_in_shell", controller=infos[0])
+            else:
                 session.set_active_controller(name)
                 await self.services.get(SessionService).save(session)
         else:
             await presenter.emit("name_not_found", name=name)
-

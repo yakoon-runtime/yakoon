@@ -119,7 +119,9 @@ class BaseController(ABC):
         This hook runs regardless of whether a valid command is found later.
         """
 
-    async def on_before_run_command(self, session: Session, request: Request, command: Command) -> None:
+    async def on_before_run_command(
+        self, session: Session, request: Request, command: Command
+    ) -> None:
         """Hook executed immediately before a command is run.
 
         Intended use:
@@ -135,7 +137,9 @@ class BaseController(ABC):
         # default: no-op
         return None
 
-    async def on_after_run_command(self, session: Session, request: Request, command: Command) -> None:
+    async def on_after_run_command(
+        self, session: Session, request: Request, command: Command
+    ) -> None:
         """Hook executed immediately after a command finished.
 
         Intended use:

@@ -9,11 +9,12 @@ class OutputEvent:
     """
     Minimal output envelope for multi-client rendering.
     """
+
     text: str
-    mime: str = "text/plain"          # "text/plain" | "text/markdown"
-    channel: str = "main"             # "main" | "debug" | "error" | "audit"
-    op: str = "append"                # "append" | "replace"
-    region: str = "output"            # "output" | "prompt" | "status"
+    mime: str = "text/plain"  # "text/plain" | "text/markdown"
+    channel: str = "main"  # "main" | "debug" | "error" | "audit"
+    op: str = "append"  # "append" | "replace"
+    region: str = "output"  # "output" | "prompt" | "status"
     meta: dict[str, Any] = field(default_factory=dict)
 
     @staticmethod
@@ -31,4 +32,3 @@ class OutputEvent:
             region=self.region,
             meta=merged,
         )
-

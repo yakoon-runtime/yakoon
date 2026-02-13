@@ -7,14 +7,13 @@ from yakoon.workflow.commands.cmd_prompt import CmdWfPrompt
 from yakoon.workflow.commands.cmd_run import CmdWfRun
 
 
-
 class ShellWorkflowCommands(CommandSet):
-    
+
     group = "workflow"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
-        return [            
+    def commands(cls) -> Sequence[Type[Command]]:
+        return [
             CmdWfRun,
             CmdWfPrompt,
             CmdWfNext,

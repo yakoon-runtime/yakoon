@@ -26,7 +26,9 @@ class BaseStore(ABC):
         pass
 
     @abstractmethod
-    async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
+    async def fetch_by_fields(
+        self, *, namespace: Namespace, limit: int = 100, **fields: Any
+    ) -> list[dict]:
         """
         Fetch all objects matching the given field/value pairs within a specific namespace.
         Equivalent to a WHERE clause with AND logic.

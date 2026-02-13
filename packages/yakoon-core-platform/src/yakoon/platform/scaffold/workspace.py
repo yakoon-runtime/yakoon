@@ -3,8 +3,7 @@ from pathlib import Path
 
 from yakoon.platform.scaffold.export import ensure_real_runtime
 
-
-TEMPLATE_DIR = Path(__file__).parent / "template" 
+TEMPLATE_DIR = Path(__file__).parent / "template"
 
 
 def scaffold_workspace(app_name: str, target_dir: Path):
@@ -16,7 +15,9 @@ def scaffold_workspace(app_name: str, target_dir: Path):
 
     shutil.copytree(TEMPLATE_DIR, target_dir)
     ensure_real_runtime(target_dir / "runtime")
-    rewrite_imports(target_dir, app_name) # original="yakoon.saas.scaffold.templates.workspace.runtime", replacement=f"{app_name}.runtime")
+    rewrite_imports(
+        target_dir, app_name
+    )  # original="yakoon.saas.scaffold.templates.workspace.runtime", replacement=f"{app_name}.runtime")
     print(f"✅ Scaffold '{app_name}' created at {target_dir}")
 
 

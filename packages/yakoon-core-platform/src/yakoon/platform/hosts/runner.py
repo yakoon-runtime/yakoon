@@ -21,13 +21,13 @@ class Runner:
 
     async def on_user_input(self, text: str) -> None:
         # Host liefert entweder normalen Command ODER Prompt-Antwort.
-        await self.engine.dispatch(
-            self.session, DispatchInput(text))
+        await self.engine.dispatch(self.session, DispatchInput(text))
         await self.drive()
 
     async def on_cancel(self) -> None:
         await self.engine.dispatch(
-            self.session, DispatchInput(command="shell:wf.cancel"))
+            self.session, DispatchInput(command="shell:wf.cancel")
+        )
         await self.drive()
 
     async def drive(self, *, commands: list[str] | None = None) -> None:

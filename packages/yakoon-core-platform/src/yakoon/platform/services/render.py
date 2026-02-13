@@ -1,5 +1,3 @@
-
-
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
 from yakoon.platform.runtime.render.base import BaseRenderEngine
@@ -9,7 +7,7 @@ class RendererService:
 
     def __init__(self, engine: BaseRenderEngine):
         self._engine = engine
-        
+
     async def render(self, ctx: RenderContext, key: str, **data) -> str:
         """
         Renders a specific section of a command template with optional data.
@@ -24,11 +22,13 @@ class RendererService:
 
         Returns:
             str: The rendered template section output.
-        """    
+        """
         section = RenderSection(key, data)
         return await self._engine.render(ctx, section)
 
-    async def render_by_key(self, template_key: str, section: str, lang: str = "de", **data) -> str:
+    async def render_by_key(
+        self, template_key: str, section: str, lang: str = "de", **data
+    ) -> str:
         """
         Renders a section of a template using the current render mode and context.
 

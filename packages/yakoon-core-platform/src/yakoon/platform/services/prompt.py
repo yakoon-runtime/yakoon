@@ -49,7 +49,9 @@ class PromptService:
         session: Session,
         prompt_text: str,
         options: list[dict],
-        *, default: str | None = None) -> str:
+        *,
+        default: str | None = None,
+    ) -> str:
 
         if not options:
             raise ValueError("choice_value() requires at least one option")
@@ -106,11 +108,9 @@ class PromptService:
             await session.emit("Bitte eine gültige Auswahl treffen.")
 
     async def choice_index(
-        self,
-        session: Session,
-        prompt_text: str,
-        options: list[str]) -> int:
-        
+        self, session: Session, prompt_text: str, options: list[str]
+    ) -> int:
+
         if not options:
             raise ValueError("choice_index() requires at least one option")
 

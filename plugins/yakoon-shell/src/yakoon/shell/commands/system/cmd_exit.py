@@ -6,9 +6,8 @@ from yakoon.base.runtime.session import Session
 
 class CmdExit(Command):
 
-    key = "exit"    
+    key = "exit"
     template_prefix = "system"
-
 
     async def run(self, session: Session, request: Request):
 

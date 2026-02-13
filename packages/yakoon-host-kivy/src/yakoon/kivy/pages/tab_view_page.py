@@ -32,4 +32,5 @@ class TabViewPage(BoxLayout):
 
 
 from kivy.factory import Factory
+
 Factory.register("TabViewPage", cls=TabViewPage)

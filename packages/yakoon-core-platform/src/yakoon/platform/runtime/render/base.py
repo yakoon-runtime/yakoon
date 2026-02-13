@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 
 from yakoon.platform.runtime.render.context import RenderContext
@@ -19,9 +18,5 @@ class BaseRenderEngine(ABC):
     """
 
     @abstractmethod
-    async def render(
-        self,
-        ctx: RenderContext,
-        section: RenderSection
-    ) -> str:
+    async def render(self, ctx: RenderContext, section: RenderSection) -> str:
         pass

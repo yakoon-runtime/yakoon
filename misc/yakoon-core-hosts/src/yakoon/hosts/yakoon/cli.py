@@ -1,12 +1,10 @@
-
 from pathlib import Path
 import typer
 import asyncio
 import sys
-    
+
 from yakoon.apps.yakoon.jobs.migrate import migrate_from_config
 from yakoon.apps.yakoon.jobs.scaffold import scaffold_mesh_template
-
 
 cli = typer.Typer()
 
@@ -15,7 +13,7 @@ cli = typer.Typer()
 def testme(foo: str = typer.Option(...)):
     print(f"FOO is: {foo}")
 
-    
+
 @cli.command()
 def migrate(config: str = typer.Option(..., help="Path to store config YAML")):
     """
@@ -23,10 +21,12 @@ def migrate(config: str = typer.Option(..., help="Path to store config YAML")):
     """
     asyncio.run(migrate_from_config(config))
 
+
 @cli.command()
 def scaffold(
     name: str = typer.Argument(..., help="Name of the new workspace project"),
-    target: Path = typer.Option(Path.cwd(), help="Target directory")):
+    target: Path = typer.Option(Path.cwd(), help="Target directory"),
+):
     """
     Scaffold a new mesh-based workspace with adjusted imports.
     """

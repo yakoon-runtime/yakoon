@@ -4,7 +4,6 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from yakoon.platform.engines.command import Engine, Output
 
-
 engine = Engine(None)
 
 router = APIRouter()
@@ -24,9 +23,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         await engine.initialize(output)
-        while True:               
+        while True:
             await asyncio.sleep(0.1)
-            command = await websocket.receive_text()              
+            command = await websocket.receive_text()
 
             await engine.dispatch(session_id, command, output)
 

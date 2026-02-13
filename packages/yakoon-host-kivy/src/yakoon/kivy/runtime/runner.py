@@ -7,7 +7,7 @@ from yakoon.base.models.input import DispatchInput
 
 
 class SessionRunner:
-    
+
     def __init__(self, engine):
         self.engine = engine
         self._loop: Optional[asyncio.AbstractEventLoop] = None

@@ -34,7 +34,9 @@ class CommandQueueService:
         """
         self._q: dict[str, Deque[DispatchInput]] = {}
 
-    def enqueue_commands(self, session, cmds: list[str], batch_id: str | None = None) -> None:
+    def enqueue_commands(
+        self, session, cmds: list[str], batch_id: str | None = None
+    ) -> None:
         """
         Enqueues multiple commands at the front of the queue for the given session.
 
@@ -77,16 +79,13 @@ class CommandQueueService:
 
         return item
 
-
     def cancel_batch(self, session, batch_id: str) -> None:
         skey = str(session.key)
         q = self._q.get(skey)
         if not q:
             return
 
-        self._q[skey] = deque(
-            item for item in q if item.batch_id != batch_id
-        )
+        self._q[skey] = deque(item for item in q if item.batch_id != batch_id)
 
         if not self._q[skey]:
             self._q.pop(skey, None)

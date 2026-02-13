@@ -1,4 +1,3 @@
-
 from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 
@@ -54,11 +53,11 @@ class ChatWidget(BoxLayout):
         # kein schedule_once scroll_y=0 mehr
         self._scroll_trigger()
 
-    def submit(self, text:str):
-        
+    def submit(self, text: str):
+
         # echo
         self.append_message(f"> **{self.ids.prompt.prefix}** '{text}'")
-        #self.append_message(f"{text}")
+        # self.append_message(f"{text}")
 
         if self.on_submit:
             self.on_submit(text)
@@ -71,4 +70,5 @@ class ChatWidget(BoxLayout):
 
 
 from kivy.factory import Factory
+
 Factory.register("ChatWidget", cls=ChatWidget)

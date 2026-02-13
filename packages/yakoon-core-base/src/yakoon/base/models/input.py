@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from typing import Optional
 
@@ -7,5 +6,3 @@ from typing import Optional
 class DispatchInput:
     command: str
     batch_id: str | None = None
-
-

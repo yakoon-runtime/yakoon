@@ -11,7 +11,7 @@ class WorkflowContextRequired(Exception):
 
 @dataclass(frozen=True)
 class PromptDef:
-    kind: str                   
+    kind: str
     title: str
     var: Optional[str] = None
     required: bool = True
@@ -29,7 +29,7 @@ class SwitchDef:
     cases: dict[str, str] = field(default_factory=dict)
     default: str | None = None
 
-    
+
 @dataclass(frozen=True)
 class StepDef:
     id: str
@@ -37,7 +37,7 @@ class StepDef:
     prompt: PromptDef | None = None
     next: str | None = None
     branch: dict[str, str] | None = None
-    switch: SwitchDef | None = None   # <— neu
+    switch: SwitchDef | None = None  # <— neu
     end: str | None = None
 
 
@@ -50,7 +50,7 @@ class WorkflowDef:
 
 @dataclass
 class WorkflowError:
-    code: str            # PERMISSION_DENIED, COMMAND_FAILED, ...
+    code: str  # PERMISSION_DENIED, COMMAND_FAILED, ...
     message: str
     step_id: str
     command: str | None = None
@@ -69,12 +69,12 @@ class WorkflowBatch:
     batch_id: str
     interaction_mode: InteractionMode
     controller_id: str | None = None
-    
+
     workflow_id: Optional[str] = None
     values: Dict[str, Any] = field(default_factory=dict)
 
     current_step: Optional[str] = None
-    pending_step: Optional[str] = None   
+    pending_step: Optional[str] = None
 
     status: WorkflowStatus = WorkflowStatus.RUNNING
     error: WorkflowError | None = None
@@ -87,7 +87,7 @@ class WorkflowRuntime:
 
     def get(self, batch_id: str) -> Optional[WorkflowBatch]:
         return self.batches.get(batch_id)
-    
+
     def ensure(self, batch_id: str, *, interaction_mode: Any) -> WorkflowBatch:
         b = self.batches.get(batch_id)
         if b is None:

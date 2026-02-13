@@ -24,7 +24,7 @@ class ConsoleOutput(DefaultOutput):
         prefix = ""
         if evt.channel != "main":
             prefix += f"[{evt.channel}] "
-        #if evt.region is "output":
+        # if evt.region is "output":
         #    prefix += f"({evt.region}) "
         if evt.region is "information":
             prefix += f"({evt.region}) "

@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 
 from yakoon.base.descriptors.template import TemplateSource
@@ -8,13 +7,13 @@ from yakoon.base.models.command import CommandKind, CommandVisibility
 
 @dataclass(frozen=True, slots=True)
 class CommandInfo:
-    key: str    
-    kind: CommandKind 
+    key: str
+    kind: CommandKind
     visibility: CommandVisibility
     category: str | None = None
     controller_id: str | None = None
     template_prefix: str | None = None
-    permission_groups: tuple[str, ...] = () # später RBAC
+    permission_groups: tuple[str, ...] = ()  # später RBAC
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,5 +22,5 @@ class ControllerInfo:
     is_shell: bool = False
     is_activatable: bool = False
     is_listed: bool = True
-    template_source: TemplateSource | None = None  
-    workflow_source: WorkflowSource | None = None  
+    template_source: TemplateSource | None = None
+    workflow_source: WorkflowSource | None = None

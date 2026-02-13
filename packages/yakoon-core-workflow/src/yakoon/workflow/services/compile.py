@@ -10,7 +10,6 @@ from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.models.workflow import PromptDef, StepDef, SwitchDef, WorkflowDef
 
 
-
 class WorkflowFileNotFound(FileNotFoundError):
     pass
 
@@ -40,7 +39,9 @@ class WorkflowCompileService:
             WorkflowNotFound if file does not exist
             ValueError for invalid content
         """
-        root = ir.files(source.package) / source.workflow_path / source.workflow_sub_path
+        root = (
+            ir.files(source.package) / source.workflow_path / source.workflow_sub_path
+        )
         if not root.is_dir():
             raise WorkflowFileNotFound(f"Workflow directory not found: {root}")
 
@@ -56,7 +57,7 @@ class WorkflowCompileService:
             if p.is_file():
                 return p
         raise WorkflowFileNotFound(f"Workflow not found: {root}/{workflow_key}")
-    
+
     def _parse(self, filename: str, raw: str) -> Dict[str, Any]:
         if filename.endswith(".json"):
             return json.loads(raw)
@@ -66,8 +67,10 @@ class WorkflowCompileService:
                 raise ValueError(f"Workflow file '{filename}' is empty")
             return data
         raise ValueError(f"Unsupported workflow file: {filename}")
-    
-    def _build_workflow_def(self, workflow_key: str, raw: Dict[str, Any]) -> "WorkflowDef":
+
+    def _build_workflow_def(
+        self, workflow_key: str, raw: Dict[str, Any]
+    ) -> "WorkflowDef":
         start = raw.get("start")
         if not start:
             raise ValueError(f"{workflow_key}: missing 'start'")
@@ -95,10 +98,14 @@ class WorkflowCompileService:
                 default = raw_switch.get("default")
 
                 if not expr or not isinstance(expr, str):
-                    raise ValueError(f"Step '{sid}': switch.expr must be a non-empty string")
+                    raise ValueError(
+                        f"Step '{sid}': switch.expr must be a non-empty string"
+                    )
 
                 if not isinstance(cases, dict) or not cases:
-                    raise ValueError(f"Step '{sid}': switch.cases must be a non-empty mapping")
+                    raise ValueError(
+                        f"Step '{sid}': switch.cases must be a non-empty mapping"
+                    )
 
                 # normalize case keys
                 norm_cases = {str(k).strip().lower(): v for k, v in cases.items()}
@@ -114,7 +121,12 @@ class WorkflowCompileService:
                 p = s["prompt"]
                 kind = p.get("kind") or p.get("type") or "text"
 
-                if kind not in {"text", "select", "confirm", "review"}:   # review wenn ihr’s schon drin habt
+                if kind not in {
+                    "text",
+                    "select",
+                    "confirm",
+                    "review",
+                }:  # review wenn ihr’s schon drin habt
                     raise ValueError(f"Unknown prompt kind: {kind}")
 
                 options = p.get("options") or []
@@ -123,16 +135,28 @@ class WorkflowCompileService:
                 # Guards für select
                 if kind == "select":
                     if not isinstance(options, list) or not options:
-                        raise ValueError(f"Prompt '{sid}': select requires non-empty 'options'")
+                        raise ValueError(
+                            f"Prompt '{sid}': select requires non-empty 'options'"
+                        )
                     for opt in options:
-                        if not isinstance(opt, dict) or "label" not in opt or "value" not in opt:
-                            raise ValueError(f"Prompt '{sid}': each option must have label/value")
+                        if (
+                            not isinstance(opt, dict)
+                            or "label" not in opt
+                            or "value" not in opt
+                        ):
+                            raise ValueError(
+                                f"Prompt '{sid}': each option must have label/value"
+                            )
                     # unique values
                     vals = [str(opt["value"]) for opt in options]
                     if len(vals) != len(set(vals)):
-                        raise ValueError(f"Prompt '{sid}': option values must be unique")
+                        raise ValueError(
+                            f"Prompt '{sid}': option values must be unique"
+                        )
                     if default is not None and str(default) not in set(vals):
-                        raise ValueError(f"Prompt '{sid}': default '{default}' not in option values")
+                        raise ValueError(
+                            f"Prompt '{sid}': default '{default}' not in option values"
+                        )
 
                 # Guards für confirm
                 if kind == "confirm":
@@ -162,39 +186,52 @@ class WorkflowCompileService:
                 prompt=prompt,
                 next=s.get("next"),
                 branch=branch,
-                switch=switch, 
+                switch=switch,
                 end=s.get("end"),
             )
 
             # Guardrail: exactly one of run/prompt/end
-            actions = sum([
-                step.run is not None,
-                step.prompt is not None,
-                step.switch is not None, 
-                step.end is not None])
+            actions = sum(
+                [
+                    step.run is not None,
+                    step.prompt is not None,
+                    step.switch is not None,
+                    step.end is not None,
+                ]
+            )
             if actions != 1:
-                raise ValueError(f"{workflow_key}:{sid}: define exactly one of [run, prompt, switch, end]")
+                raise ValueError(
+                    f"{workflow_key}:{sid}: define exactly one of [run, prompt, switch, end]"
+                )
 
             steps[sid] = step
 
         if start not in steps:
             raise ValueError(f"{workflow_key}: start step '{start}' not found")
-    
+
         step_ids = set(steps.keys())
         for step in steps.values():
             if step.next and step.next not in step_ids:
-                raise ValueError(f"{workflow_key}:{step.id}: next target '{step.next}' not found")
+                raise ValueError(
+                    f"{workflow_key}:{step.id}: next target '{step.next}' not found"
+                )
 
             if step.branch:
                 for k, target in step.branch.items():
                     if target not in step_ids:
-                        raise ValueError(f"{workflow_key}:{step.id}: branch target '{target}' not found")
+                        raise ValueError(
+                            f"{workflow_key}:{step.id}: branch target '{target}' not found"
+                        )
 
             if step.switch:
                 for k, target in step.switch.cases.items():
                     if target not in step_ids:
-                        raise ValueError(f"{workflow_key}:{step.id}: switch case '{k}' target '{target}' not found")
+                        raise ValueError(
+                            f"{workflow_key}:{step.id}: switch case '{k}' target '{target}' not found"
+                        )
                 if step.switch.default and step.switch.default not in step_ids:
-                    raise ValueError(f"{workflow_key}:{step.id}: switch default target '{step.switch.default}' not found")
+                    raise ValueError(
+                        f"{workflow_key}:{step.id}: switch default target '{step.switch.default}' not found"
+                    )
 
         return WorkflowDef(id=workflow_key, start=start, steps=steps)

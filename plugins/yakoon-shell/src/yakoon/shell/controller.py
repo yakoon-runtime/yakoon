@@ -8,7 +8,6 @@ from yakoon.base.descriptors.template import TemplateSource
 from yakoon.shell.commands.system.cmdset import ShellSystemCommands
 from yakoon.shell.commands.workflow.cmdset import ShellWorkflowCommands
 
-
 if TYPE_CHECKING:
     from yakoon.base.commands.request import Request
     from yakoon.base.runtime.session import Session
@@ -38,7 +37,7 @@ class ShellCoreController(BaseController):
         "wf.run": "wf.run",
         "wf.prompt": "wf.prompt",
         "wf.next": "wf.next",
-        "wf.cancel": "wf.cancel", 
+        "wf.cancel": "wf.cancel",
     }
 
     template_source = TemplateSource(
@@ -56,7 +55,9 @@ class ShellCoreController(BaseController):
         """Command sets exported by the shell controller."""
         return (ShellSystemCommands, ShellWorkflowCommands)
 
-    async def on_before_run_command(self, session: Session, request: Request, command: Command) -> None:
+    async def on_before_run_command(
+        self, session: Session, request: Request, command: Command
+    ) -> None:
         """Touch session before executing any command.
 
         Notes:

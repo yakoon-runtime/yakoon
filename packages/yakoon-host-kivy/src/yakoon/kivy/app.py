@@ -1,21 +1,22 @@
 from pathlib import Path
 
 from kivy.config import Config
-Config.set('kivy', 'exit_on_escape', '0')
+
+Config.set("kivy", "exit_on_escape", "0")
 
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.text import LabelBase
 
-from yakoon.kivy import pages           # noqa: F401
-from yakoon.kivy import widgets         # noqa: F401
+from yakoon.kivy import pages  # noqa: F401
+from yakoon.kivy import widgets  # noqa: F401
 from yakoon.kivy.bootstrap.compose import compose_kivy_app
 
 
 class YakoonKivyApp(App):
 
     title = "Yakoon"
-    
+
     def build(self):
         self._load_environment()
         return compose_kivy_app().root
@@ -38,9 +39,8 @@ class YakoonKivyApp(App):
 
         LabelBase.register(
             name="Icons",
-            fn_regular=str(FONTS / "material-symbols-outlined-latin-300-normal.ttf")
+            fn_regular=str(FONTS / "material-symbols-outlined-latin-300-normal.ttf"),
         )
-
 
     def _load_layouts(self, base_folder: str) -> None:
 

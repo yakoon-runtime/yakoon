@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class EngineSettings:
 
@@ -12,4 +13,3 @@ class EngineSettings:
 
     enable_telnet: bool = True
     """Enables the Telnet server interface."""
-

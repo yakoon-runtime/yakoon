@@ -1,5 +1,3 @@
-
-
 from yakoon.base.stores.sqlite.base_store import SQLiteStore
 
 

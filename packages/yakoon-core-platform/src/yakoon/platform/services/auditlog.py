@@ -2,7 +2,7 @@ from yakoon.platform.settings import settings
 
 
 class AuditLogService:
-    
+
     async def audit(self, msg: str):
         if settings.logging.log_commands:
             print(f"[AUDIT] {msg}")
@@ -10,7 +10,11 @@ class AuditLogService:
     async def error(self, exc: Exception):
         if settings.logging.log_errors:
             import traceback
-            print("[ERROR]", "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
+
+            print(
+                "[ERROR]",
+                "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
+            )
 
     async def permission(self, session, obj, action):
         if settings.logging.log_permission_denied:

@@ -10,9 +10,10 @@ class UnresolvedPromptMonitor:
 
     Intended for development/debugging to detect hanging or stalled sessions.
     """
+
     _registry: dict[str, tuple[asyncio.Future, float]] = {}
     _task: asyncio.Task | None = None
-    
+
     check_interval = 10
     zombie_threshold = 60
 
@@ -35,7 +36,9 @@ class UnresolvedPromptMonitor:
                         continue
                     age = now - started
                     if age > cls.zombie_threshold:
-                        print(f"[ZOMBIE] Session '{sid}' has unresolved prompt for {int(age)}s.")
+                        print(
+                            f"[ZOMBIE] Session '{sid}' has unresolved prompt for {int(age)}s."
+                        )
                 await asyncio.sleep(cls.check_interval)
 
         if not cls._task:

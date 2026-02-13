@@ -1,4 +1,3 @@
-
 from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 from kivy.metrics import dp
@@ -56,4 +55,5 @@ class AppRootPage(BoxLayout):
 
 
 from kivy.factory import Factory
+
 Factory.register("AppRootPage", cls=AppRootPage)

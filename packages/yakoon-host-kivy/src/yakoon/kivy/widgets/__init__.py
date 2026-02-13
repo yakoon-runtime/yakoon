@@ -1,8 +1,4 @@
+from .chat import PromptWidget, ChatRow, ChatWidget
+from .tab import TabCard
 
-from .chat import PromptWidget, ChatRow, ChatWidget 
-from .tab import  TabCard                           
-
-__all__ = [
-    "ChatRow", "ChatWidget", "PromptWidget", 
-    "TabCard"
-]
+__all__ = ["ChatRow", "ChatWidget", "PromptWidget", "TabCard"]

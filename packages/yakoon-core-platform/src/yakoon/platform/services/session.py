@@ -53,7 +53,9 @@ class SessionService:
       is preserved as long as the Session instance stays in the identity map.
     """
 
-    def __init__(self, store: "BaseStore", identity_map: SessionIdentityMap | None = None) -> None:
+    def __init__(
+        self, store: "BaseStore", identity_map: SessionIdentityMap | None = None
+    ) -> None:
         self.store = store
         self._map = identity_map or SessionIdentityMap()
 

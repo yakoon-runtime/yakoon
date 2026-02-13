@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from typing import TypeVar, cast, Awaitable, Callable
 
@@ -7,7 +6,9 @@ T = TypeVar("T")
 
 class ServiceDirectory:
 
-    def __init__(self, parent: "ServiceDirectory|None" = None, allow_override: bool = False):
+    def __init__(
+        self, parent: "ServiceDirectory|None" = None, allow_override: bool = False
+    ):
         self._parent = parent
         self._allow_override = allow_override
         self._services: dict[object, object] = {}
@@ -26,7 +27,7 @@ class ServiceDirectory:
 
         if not self._allow_override and self._parent and self._parent.contains(key):
             raise ValueError(f"Service override not allowed: {key}")
-        
+
         self._services[key] = service
 
     def register_lazy(self, key: object, factory: Callable[[], Awaitable[object]]):
@@ -39,11 +40,13 @@ class ServiceDirectory:
         """
         if not self._allow_override and self._parent and self._parent.contains(key):
             raise ValueError(f"Service override not allowed: {key}")
-        
+
         self._factories[key] = factory
 
     def contains(self, key: object) -> bool:
-        return key in self._services or (self._parent.contains(key) if self._parent else False)
+        return key in self._services or (
+            self._parent.contains(key) if self._parent else False
+        )
 
     def fork(self, allow_override: bool = False) -> "ServiceDirectory":
         return ServiceDirectory(parent=self, allow_override=allow_override)
@@ -63,12 +66,12 @@ class ServiceDirectory:
             Service: The service for the given context.
         """
         try:
-            if key in self._services:       
+            if key in self._services:
                 return cast(T, self._services[key])
             if key in self._factories:
                 registry = self._factories[key]()
                 self._services[key] = registry
-                return cast(T,registry)           
+                return cast(T, registry)
             if self._parent:
                 return self._parent.get(key)
             raise KeyError(key)

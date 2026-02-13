@@ -5,18 +5,18 @@ from typing import Any, Optional
 class Request:
     """Parse and query a single command-line style input string.
 
-        Tokenization uses `shlex.split(..., posix=True)` and is therefore
-        quoting-aware.
+    Tokenization uses `shlex.split(..., posix=True)` and is therefore
+    quoting-aware.
 
-        Conventions:
-            - First token is the command (lowercased).
-            - Remaining tokens are arguments.
-            - Options follow `--name value`.
-            - Flags are options without a value.
-            - Positional arguments exclude option keys and option values.
+    Conventions:
+        - First token is the command (lowercased).
+        - Remaining tokens are arguments.
+        - Options follow `--name value`.
+        - Flags are options without a value.
+        - Positional arguments exclude option keys and option values.
 
-        This class intentionally represents exactly one command.
-        """
+    This class intentionally represents exactly one command.
+    """
 
     def __init__(self, raw: str) -> None:
         """Create a Request from raw user input.

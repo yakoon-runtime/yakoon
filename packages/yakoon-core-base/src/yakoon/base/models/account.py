@@ -29,7 +29,6 @@ class AccountData:
     last_login: datetime | None = None
     data: dict[str, Any] = field(default_factory=dict)
 
-
     def has_role(self, role: str) -> bool:
         """Returns True if the account has the given role."""
         return role in self.roles
@@ -54,7 +53,8 @@ class AccountData:
             "is_disabled": self.is_disabled,
             "last_login": (
                 self.last_login.astimezone(timezone.utc).isoformat()
-                if self.last_login else None
+                if self.last_login
+                else None
             ),
             "data": dict(self.data),
         }
@@ -82,7 +82,7 @@ class AccountData:
             obj.last_login = datetime.fromisoformat(raw_last_login)
 
         return obj
-        
+
 
 class Account:
     """

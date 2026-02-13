@@ -2,8 +2,8 @@ import shutil
 from pathlib import Path
 from zipfile import ZipFile
 
-
 MESH_SOURCE = Path("yakoon/mesh")
+
 
 def copy_mesh_runtime(target_dir: Path):
     """
@@ -21,7 +21,7 @@ def ensure_real_runtime(path: Path):
         target = path.resolve()
         path.unlink()
         shutil.copytree(target, path)
-        
+
 
 def zip_directory(source_dir: Path, zip_path: Path):
     """

@@ -1,17 +1,20 @@
 from typing import Any, Callable
 from dataclasses import dataclass
 
+
 @dataclass
 class CommandProxy:
     key: str
     description: str = ""
     syntax: str = ""
 
+
 @dataclass
 class ControllerProxy:
     id: str
     commands: dict[str, CommandProxy]  # command_id → spec
     websocket: Any  # WebSocket-Verbindung
+
 
 @dataclass
 class Tenent:

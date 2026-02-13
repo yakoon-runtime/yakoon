@@ -19,14 +19,18 @@ class ControllerDirectory:
         to coordinate domain activation, switching, and global command handling.
         """
 
-        self._controllers: dict[str, BaseController] = {}    
+        self._controllers: dict[str, BaseController] = {}
 
         has_shell, shell_id = False, None
-        for controller in controllers:        
+        for controller in controllers:
             if controller.id in controllers:
-                raise ValueError(f"Duplicate controller names detected: {controller.id}")
+                raise ValueError(
+                    f"Duplicate controller names detected: {controller.id}"
+                )
             if controller.is_shell and has_shell:
-                raise ValueError(f"Duplicate shell controller: {shell_id.id} / {controller.id}")
+                raise ValueError(
+                    f"Duplicate shell controller: {shell_id.id} / {controller.id}"
+                )
             if controller.is_shell:
                 has_shell = True
                 shell_id = controller.id
@@ -36,7 +40,7 @@ class ControllerDirectory:
             raise ValueError(f"No shell controller found")
 
     def find_shell(self) -> BaseController:
-        for controller in self._controllers.values():        
+        for controller in self._controllers.values():
             if controller.is_shell:
                 return controller
 
@@ -50,9 +54,9 @@ class ControllerDirectory:
         Returns:
             BaseController: The matching controller instance.
         """
-        
+
         return self._controllers.get(controller_id)
-    
+
     def get_all(self) -> list[BaseController]:
         """
         Returns all registered domain controllers.

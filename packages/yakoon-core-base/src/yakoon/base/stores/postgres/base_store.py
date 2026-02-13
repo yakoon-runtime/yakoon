@@ -37,18 +37,27 @@ class PostgresStore(BaseStore):
             row = await conn.fetchrow(sql)
             return dict(row) if row else None
 
-    async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
-        q = Query.from_(self.table).select("*").where(
-            self.table.__scope__ == namespace.to_str()
-        ).limit(limit)
+    async def fetch_by_namespace(
+        self, namespace: Namespace, *, limit: int = 100
+    ) -> list[dict]:
+        q = (
+            Query.from_(self.table)
+            .select("*")
+            .where(self.table.__scope__ == namespace.to_str())
+            .limit(limit)
+        )
         sql = str(q)
         async with self.pool.acquire() as conn:
             rows = await conn.fetch(sql)
             return [dict(row) for row in rows]
 
-    async def fetch_by_fields(self, *, namespace: Namespace, limit: int = 100, **fields: Any) -> list[dict]:
-        q = Query.from_(self.table).select("*").where(
-            self.table.__scope__ == namespace.to_str()
+    async def fetch_by_fields(
+        self, *, namespace: Namespace, limit: int = 100, **fields: Any
+    ) -> list[dict]:
+        q = (
+            Query.from_(self.table)
+            .select("*")
+            .where(self.table.__scope__ == namespace.to_str())
         )
         for key, value in fields.items():
             q = q.where(self.table[key] == value)
@@ -69,7 +78,9 @@ class PostgresStore(BaseStore):
         VALUES ({placeholders})
         ON CONFLICT (__key__) DO UPDATE SET data = EXCLUDED.data;
         """
-        values = [json.dumps(v) if isinstance(v, (dict, list)) else v for v in obj.values()]
+        values = [
+            json.dumps(v) if isinstance(v, (dict, list)) else v for v in obj.values()
+        ]
 
         async with self.pool.acquire() as conn:
             await conn.execute(q, *values)

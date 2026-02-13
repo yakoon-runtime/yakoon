@@ -1,4 +1,3 @@
-
 import os
 import pathlib
 from typing import Mapping
@@ -32,7 +31,7 @@ class MigratorRouter:
 
             elif backend == "postgres":
                 pool = await asyncpg.create_pool(cfg["dsn"])
-                #_run_migator(PostgresMigrator(pool, schema_root=self.schema_root))
+                # _run_migator(PostgresMigrator(pool, schema_root=self.schema_root))
                 raise NotImplementedError(backend)
 
             else:

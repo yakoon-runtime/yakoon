@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from typing import Optional
 
@@ -6,10 +5,10 @@ from typing import Optional
 @dataclass
 class Shard:
     prefix: str
-    shard_id: int           # unique shard identifier (could be range end)
-    range_start: int        # inclusive
-    range_end: int          # exclusive
-    value: int              # current counter in this shard
+    shard_id: int  # unique shard identifier (could be range end)
+    range_start: int  # inclusive
+    range_end: int  # exclusive
+    value: int  # current counter in this shard
     created_at: Optional[str] = None
 
     def is_full(self) -> bool:

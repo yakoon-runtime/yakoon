@@ -8,8 +8,10 @@ from typing import Awaitable, Callable
 def ensure_async(fn: Callable[[str], object]) -> Callable[[str], Awaitable[None]]:
     if inspect.iscoroutinefunction(fn):
         return fn  # type: ignore[misc]
+
     async def _wrapped(text: str) -> None:
         fn(text)
+
     return _wrapped
 
 

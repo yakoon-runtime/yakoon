@@ -25,9 +25,9 @@ def compose_kivy_app() -> KivyComposition:
 
     engine = compose_engine(
         controllers=ControllerDirectory(
-            controllers=[
-                ShellCoreController(), 
-                AuthCoreController()]))
+            controllers=[ShellCoreController(), AuthCoreController()]
+        )
+    )
 
     runner = SessionRunner(engine)
     runner.start()

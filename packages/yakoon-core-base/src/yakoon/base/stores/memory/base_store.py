@@ -19,24 +19,25 @@ class MemoryStore(BaseStore):
     async def get_by_key(self, key: Key) -> Optional[dict]:
         return copy.deepcopy(self._rows.get(str(key)))
 
-    async def fetch_by_namespace(self, namespace: Namespace, *, limit: int = 100) -> list[dict]:
-        ns = namespace.to_str()
-        return [
-            copy.deepcopy(obj) for obj in self._rows.values() \
-                if str(obj.get("key")).startswith(ns)][:limit]
-
-    async def fetch_by_fields(
-        self,
-        *,
-        namespace: Namespace,
-        limit: int = 100,
-        **fields: Any
+    async def fetch_by_namespace(
+        self, namespace: Namespace, *, limit: int = 100
     ) -> list[dict]:
         ns = namespace.to_str()
         return [
-            copy.deepcopy(obj) for obj in self._rows.values()\
-                 if str(obj.get("key")).startswith(ns) and \
-                    all(obj.get(k) == v for k, v in fields.items())
+            copy.deepcopy(obj)
+            for obj in self._rows.values()
+            if str(obj.get("key")).startswith(ns)
+        ][:limit]
+
+    async def fetch_by_fields(
+        self, *, namespace: Namespace, limit: int = 100, **fields: Any
+    ) -> list[dict]:
+        ns = namespace.to_str()
+        return [
+            copy.deepcopy(obj)
+            for obj in self._rows.values()
+            if str(obj.get("key")).startswith(ns)
+            and all(obj.get(k) == v for k, v in fields.items())
         ][:limit]
 
     async def save(self, obj: dict) -> None:

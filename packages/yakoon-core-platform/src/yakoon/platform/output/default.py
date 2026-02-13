@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import inspect
@@ -47,7 +46,9 @@ class DefaultOutput:
 
     @staticmethod
     def _normalize(payload: OutputPayload) -> OutputEvent:
-        return payload if isinstance(payload, OutputEvent) else OutputEvent(text=payload)
+        return (
+            payload if isinstance(payload, OutputEvent) else OutputEvent(text=payload)
+        )
 
     @staticmethod
     def to_json(payload: OutputPayload) -> dict[str, Any]:

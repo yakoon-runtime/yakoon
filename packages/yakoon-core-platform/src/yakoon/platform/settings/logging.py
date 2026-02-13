@@ -1,11 +1,9 @@
-
 import os
 from dataclasses import dataclass
 
 
 @dataclass
 class LoggingSettings:
-
 
     log_commands: bool = True
     """Logs every command issued by a session."""

@@ -10,13 +10,13 @@ from yakoon.kivy.widgets.chat.chat_widget import ChatWidget
 class TabsController:
 
     def __init__(self, dispatcher, runner, app_root, navigator, state: TabState):
- 
+
         self.dispatcher = dispatcher
         self.runner = runner
         self.app_root = app_root
         self.nav = navigator
         self.state = state
-    
+
     def new_chat_tab(self, select: bool = True) -> str:
         self.state.counter += 1
         tab_id = f"chat-{self.state.counter}"
@@ -27,7 +27,11 @@ class TabsController:
         self.state.pages[tab_id] = page
 
         task = self.runner.submit_coro(self._create_tab_session(tab_id))
-        task.add_done_callback(lambda t: Clock.schedule_once(lambda _dt: self._on_session_ready(tab_id, t), 0))
+        task.add_done_callback(
+            lambda t: Clock.schedule_once(
+                lambda _dt: self._on_session_ready(tab_id, t), 0
+            )
+        )
 
         if select or self.state.active_tab_id is None:
             self.select(tab_id)
@@ -49,8 +53,10 @@ class TabsController:
     def _refresh_tabs(self):
         tabbar = self.app_root.ids.get("tabbar")
         if tabbar:
-            tabbar.set_tabs(self.state.tabs, self.state.active_tab_id, on_select=self.select)
- 
+            tabbar.set_tabs(
+                self.state.tabs, self.state.active_tab_id, on_select=self.select
+            )
+
     def select(self, tab_id: str):
         if tab_id not in self.state.pages:
             return
@@ -74,7 +80,9 @@ class TabsController:
         self.state.tabs = [t for t in self.state.tabs if t["id"] != tab_id]
 
         if self.state.active_tab_id == tab_id:
-            self.state.active_tab_id = self.state.tabs[0]["id"] if self.state.tabs else None
+            self.state.active_tab_id = (
+                self.state.tabs[0]["id"] if self.state.tabs else None
+            )
             if self.state.active_tab_id:
                 self.select(self.state.active_tab_id)
             else:
@@ -92,17 +100,14 @@ class TabsController:
 
     def _on_session_ready(self, tab_id: str, task):
         session = task.result()
-        
-        self.state.runtimes[tab_id] = \
-            TabRuntime(tab_id=tab_id, session=session)
+
+        self.state.runtimes[tab_id] = TabRuntime(tab_id=tab_id, session=session)
 
         output = KivyOutput(
-            on_context=self.dispatcher,
-            ui_state_provider=UIStateProvider(session))
+            on_context=self.dispatcher, ui_state_provider=UIStateProvider(session)
+        )
 
-        session.bind_io(
-            SessionBoundKivyOutput(session, output))
-
+        session.bind_io(SessionBoundKivyOutput(session, output))
 
     def on_chat_submit(self, text: str):
         tab_id = self.state.active_tab_id

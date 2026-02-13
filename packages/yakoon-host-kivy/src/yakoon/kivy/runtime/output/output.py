@@ -12,9 +12,7 @@ class KivyOutput:
 
     def emit(self, session, evt: OutputEvent):
         ctx = ViewContext(
-            session=session,
-            envelope=evt,
-            ui_state_provider=self._ui_state_provider
+            session=session, envelope=evt, ui_state_provider=self._ui_state_provider
         )
         self._on_context(ctx)
 
@@ -26,4 +24,3 @@ class SessionBoundKivyOutput(DefaultOutput):
             out_fn=lambda evt: kivy_output.emit(session, evt),
             err_fn=lambda evt: kivy_output.emit(session, evt),
         )
-

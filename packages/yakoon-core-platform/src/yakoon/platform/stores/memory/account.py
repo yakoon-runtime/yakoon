@@ -17,26 +17,25 @@ class InMemoryAccountStore(MemoryStore):
         super().__init__()
         load_defaults(self)
 
-    def add(self, account: Account): 
+    def add(self, account: Account):
         self._rows[str(account.key)] = account.data.to_dict()
 
 
 def load_defaults(store: InMemoryAccountStore):
-    
+
     ns = Namespace(domain="yakoon", bucket="bucket", scope="develop")
 
     data = AccountData(
-        Key(namespace=ns, id="1"), 
-        username="stefan", 
-        password_hash="123", 
-        roles=["admin"])
+        Key(namespace=ns, id="1"),
+        username="stefan",
+        password_hash="123",
+        roles=["admin"],
+    )
 
     store.add(Account(data))
 
     data = AccountData(
-        Key(namespace=ns, id="2"), 
-        username="lara", 
-        password_hash="456",
-        roles=["user"])
+        Key(namespace=ns, id="2"), username="lara", password_hash="456", roles=["user"]
+    )
 
     store.add(Account(data))

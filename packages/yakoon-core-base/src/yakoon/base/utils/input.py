@@ -1,7 +1,8 @@
 import asyncio
 import getpass
 
-async def safe_input(prompt: str = "$ ", prefix: str="") -> str:
+
+async def safe_input(prompt: str = "$ ", prefix: str = "") -> str:
     """
     Asynchronously reads user input from stdin without creating extra closures or tasks.
 

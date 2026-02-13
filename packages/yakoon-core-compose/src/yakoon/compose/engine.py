@@ -8,7 +8,12 @@ from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
 from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerifier
-from yakoon.platform.services.catalog import CommandCatalog, CommandCatalogService, ControllerCatalog, ControllerCatalogService
+from yakoon.platform.services.catalog import (
+    CommandCatalog,
+    CommandCatalogService,
+    ControllerCatalog,
+    ControllerCatalogService,
+)
 from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialogservice import DefaultDialogService
 from yakoon.platform.services.namespace import NamespaceService
@@ -37,15 +42,13 @@ def compose_engine(controllers: ControllerDirectory) -> Engine:
     stores = _compose_stores()
     commands = _compose_commands(controllers)
     templates = _compose_template_sources(controllers)
-    
-    services = _compose_services(
-        stores, controller_catalog, 
-        command_catalog, templates)
+
+    services = _compose_services(stores, controller_catalog, command_catalog, templates)
 
     _compose_controllers(controllers, services)
     _compose_permission_roles(services)
 
-    engine = Engine(controllers, services, commands)  
+    engine = Engine(controllers, services, commands)
 
     return engine
 
@@ -53,14 +56,21 @@ def compose_engine(controllers: ControllerDirectory) -> Engine:
 def _compose_permission_roles(services: ServiceDirectory):
 
     permissions = services.get(ports.PermissionService)
-    permissions.register_role("admin", [
-        "auth:su|rx",
-        "shell:use|rx",
-        "office.mailing:sendmail|rx",
-    ])
-    permissions.register_role("user", [
-        "shell:use|rx",
-    ])
+    permissions.register_role(
+        "admin",
+        [
+            "auth:su|rx",
+            "shell:use|rx",
+            "office.mailing:sendmail|rx",
+        ],
+    )
+    permissions.register_role(
+        "user",
+        [
+            "shell:use|rx",
+        ],
+    )
+
 
 def _compose_controllers(directory: ControllerDirectory, services: ServiceDirectory):
 
@@ -73,10 +83,13 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
     controllers_list = []
     for controller in directory.get_all():
         controller_info = ControllerInfo(
-            controller.id, controller.is_shell, 
-            controller.is_activatable, controller.is_listed,
+            controller.id,
+            controller.is_shell,
+            controller.is_activatable,
+            controller.is_listed,
             controller.template_source.clone(),
-            controller.workflow_source.clone()) 
+            controller.workflow_source.clone(),
+        )
         controllers_list.append(controller_info)
 
     return ControllerCatalog(controllers_list)
@@ -92,11 +105,17 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
         for sets in controller.commandsets:
             for command in sets.commands():
                 command_info = CommandInfo(
-                    command.key, command.kind, command.visibility,
-                    sets.group, controller.id, command.template_prefix) 
+                    command.key,
+                    command.kind,
+                    command.visibility,
+                    sets.group,
+                    controller.id,
+                    command.template_prefix,
+                )
                 command_list.append(command_info)
 
-    return CommandCatalog(command_list, shell_builtins) 
+    return CommandCatalog(command_list, shell_builtins)
+
 
 def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
 
@@ -104,10 +123,11 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
     for controller in directory.get_all():
         router = CommandRouter(
             controller.id,
-            controller.is_shell, 
-            controller.is_listed, 
-            controller.is_activatable, 
-            controller.shell_builtins)
+            controller.is_shell,
+            controller.is_listed,
+            controller.is_activatable,
+            controller.shell_builtins,
+        )
 
         router.register(controller.id, controller.commandsets)
         commands.register(controller.id, router)
@@ -116,57 +136,63 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
 
 
 def _compose_services(
-        stores: StoreRegistry, 
-        controller_catalog: ControllerCatalog, 
-        command_catalog: CommandCatalog,
-        template_sources: list[TemplateSource]) -> ServiceDirectory:
-    
+    stores: StoreRegistry,
+    controller_catalog: ControllerCatalog,
+    command_catalog: CommandCatalog,
+    template_sources: list[TemplateSource],
+) -> ServiceDirectory:
+
     services = ServiceDirectory()
-    
+
     services.register_static(ports.AuditLogService, AuditLogService())
     services.register_static(ports.NamespaceService, NamespaceService())
-    services.register_static(ports.SessionService, SessionService(stores.sessions)) 
+    services.register_static(ports.SessionService, SessionService(stores.sessions))
     services.register_static(ports.CommandQueueService, CommandQueueService())
     services.register_static(ports.PresenterService, PresenterService(services))
     services.register_static(ports.PromptService, PromptService(services))
-    services.register_static(ports.AccountService, AccountService(InMemoryAccountStore()))
+    services.register_static(
+        ports.AccountService, AccountService(InMemoryAccountStore())
+    )
     services.register_static(ports.SecretVerifier, ZeroSecretVerifier())
-    services.register_static(ports.AuthenticationService, AuthenticationService(services))
+    services.register_static(
+        ports.AuthenticationService, AuthenticationService(services)
+    )
     services.register_static(ports.PermissionService, PermissionService())
     services.register_static(ports.DialogService, DefaultDialogService())
     services.register_static(ports.WorkflowService, WorkflowService(services))
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
-    
-    services.register_static(
-        ports.RendererService, 
-        RendererService(JinjaEngine(template_sources)))
-    
-    services.register_static(
-        ports.ShardedCounterService, 
-        ShardedCounterService(ShardAllocator(stores.counters)))
 
     services.register_static(
-        ports.ControllerCatalogService, 
-        ControllerCatalogService(controller_catalog))
-    
+        ports.RendererService, RendererService(JinjaEngine(template_sources))
+    )
+
     services.register_static(
-        ports.CommandCatalogService, 
-        CommandCatalogService(services, command_catalog))
-    
-    return services   
+        ports.ShardedCounterService,
+        ShardedCounterService(ShardAllocator(stores.counters)),
+    )
+
+    services.register_static(
+        ports.ControllerCatalogService, ControllerCatalogService(controller_catalog)
+    )
+
+    services.register_static(
+        ports.CommandCatalogService, CommandCatalogService(services, command_catalog)
+    )
+
+    return services
 
 
 def _compose_template_sources(directory: ControllerDirectory) -> list[TemplateSource]:
-    
-    template_sources: list[TemplateSource] = [] 
+
+    template_sources: list[TemplateSource] = []
 
     for controller in directory.get_all():
         template_sources.append(controller.template_source)
- 
+
     return template_sources
 
 
 def _compose_stores() -> StoreRegistry:
-    
+
     stores = create_system_stores("memory", db_path="db/gateway.sqlite3.db")
     return stores

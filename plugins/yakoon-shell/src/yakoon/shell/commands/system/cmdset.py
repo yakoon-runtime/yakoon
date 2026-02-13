@@ -13,11 +13,11 @@ from yakoon.shell.commands.system.cmd_welcome import CmdWelcome
 
 
 class ShellSystemCommands(CommandSet):
-    
+
     group = "system"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]: 
+    def commands(cls) -> Sequence[Type[Command]]:
         return [
             CmdQuit,
             CmdWelcome,
@@ -26,6 +26,6 @@ class ShellSystemCommands(CommandSet):
             CmdExit,
             CmdMan,
             CmdSu,
-            CmdTest,       
-            CmdSpeedTest,    
+            CmdTest,
+            CmdSpeedTest,
         ]

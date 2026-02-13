@@ -1,4 +1,3 @@
-
 def ljust(value: str, width: int) -> str:
     return value.ljust(width)
 

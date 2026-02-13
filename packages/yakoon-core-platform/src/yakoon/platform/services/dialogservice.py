@@ -19,10 +19,10 @@ class DefaultDialogService:
     # Default 15 Minutes
 
     def __init__(self):
-        self._waiting: dict[str, asyncio.Future] = {}   # TODO cleanup
-        self._timeouts: dict[str, asyncio.Task] = {}    # TODO cleanup
-        self._edges: dict[str, asyncio.Event] = {}      # TODO cleanup
-        self._modes: dict[str, PromptMode] = {}         # TODO cleanup
+        self._waiting: dict[str, asyncio.Future] = {}  # TODO cleanup
+        self._timeouts: dict[str, asyncio.Task] = {}  # TODO cleanup
+        self._edges: dict[str, asyncio.Event] = {}  # TODO cleanup
+        self._modes: dict[str, PromptMode] = {}  # TODO cleanup
 
     def edge_event(self, session: Session) -> asyncio.Event:
         """
@@ -93,6 +93,7 @@ class DefaultDialogService:
 
         timeout = timeout or settings.network.prompt_timed_out or self.DEFAULT_TIMEOUT
         if timeout:
+
             async def auto_expire():
                 await asyncio.sleep(timeout)
 
@@ -132,7 +133,7 @@ class DefaultDialogService:
             self.cleanup(session)
             fut.set_result(value)
             # signal: prompt resolved
-            self.edge_event(session).set()  
+            self.edge_event(session).set()
             return True
 
         # If it's already done or missing, ensure we don't leak mode

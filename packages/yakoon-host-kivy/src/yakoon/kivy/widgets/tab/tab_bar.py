@@ -11,12 +11,14 @@ class TabBar(BoxLayout):
     """
     UI-only: renders tab pills and emits on_select(tab_id).
     """
-    
+
     def __init__(self, **kw):
         super().__init__(**kw)
         self._on_select: Optional[Callable[[str], None]] = None
 
-    def set_tabs(self, tabs: list[dict], active_id: str | None, on_select: Callable[[str], None]):
+    def set_tabs(
+        self, tabs: list[dict], active_id: str | None, on_select: Callable[[str], None]
+    ):
         self._on_select = on_select
         self.clear_widgets()
 
@@ -26,8 +28,11 @@ class TabBar(BoxLayout):
             btn = Factory.TabPill()
             btn.tab_id = t["id"]
             btn.text = t["title"]
-            btn.active = (t["id"] == active_id)
-            btn.bind(on_release=lambda _btn, tid=t["id"]: self._on_select and self._on_select(tid))
+            btn.active = t["id"] == active_id
+            btn.bind(
+                on_release=lambda _btn, tid=t["id"]: self._on_select
+                and self._on_select(tid)
+            )
             self.add_widget(btn)
 
 
@@ -35,6 +40,7 @@ class TabBarScroll(ScrollView):
     """
     UI-only: horizontal scroll + mousewheel mapping.
     """
+
     wheel_step = NumericProperty(0.08)
 
     def on_touch_down(self, touch):

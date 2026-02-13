@@ -1,4 +1,3 @@
-
 class Namespace:
     """
     Represents a namespaced identifier context for addressing objects.
@@ -21,8 +20,9 @@ class Namespace:
 
     def get_key(self, id: str) -> "Key":
         from yakoon.base.models.key import Key
+
         return Key(self, id)
-    
+
     def __eq__(self, other):
         return (
             isinstance(other, Namespace)

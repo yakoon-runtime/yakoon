@@ -2,10 +2,10 @@ from kivy.uix.label import Label
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.metrics import dp
 
-    
+
 class ChatRow(RecycleDataViewBehavior, Label):
 
-    min_h = dp(18)   # Minimum
+    min_h = dp(18)  # Minimum
     pad_y = dp(2)
 
     def refresh_view_attrs(self, rv, index, data):
@@ -28,4 +28,5 @@ class ChatRow(RecycleDataViewBehavior, Label):
 
 
 from kivy.factory import Factory
+
 Factory.register("ChatRow", cls=ChatRow)

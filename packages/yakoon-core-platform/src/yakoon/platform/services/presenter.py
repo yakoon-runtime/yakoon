@@ -1,4 +1,3 @@
-
 from yakoon.base.ports import DialogService, PromptService, RendererService
 from yakoon.base.runtime.session import Session
 from yakoon.base.directories.service import ServiceDirectory
@@ -11,39 +10,55 @@ class PresenterPrompts:
     Provides interactive input methods for user sessions using localized templates.
 
     This class encapsulates all prompt-based interactions such as text input,
-    confirmations, and choices. 
+    confirmations, and choices.
     """
 
-    def __init__(self, ctx: RenderContext, 
-                 session: Session, renderer: RendererService, 
-                 dialogs: DialogService,
-                 prompts: PromptService):
-        
+    def __init__(
+        self,
+        ctx: RenderContext,
+        session: Session,
+        renderer: RendererService,
+        dialogs: DialogService,
+        prompts: PromptService,
+    ):
+
         self._ctx = ctx
         self._session = session
         self._renderer = renderer
         self._dialogs = dialogs
         self._prompts = prompts
 
-    async def ask(self, section_key: str, **data) -> str:  
+    async def ask(self, section_key: str, **data) -> str:
         question = await self._renderer.render(self._ctx, section_key, **data)
         return await self._prompts.ask(self._session, question)
-    
+
     async def ask_secret(self, section_key: str, **data) -> str:
         question = await self._renderer.render(self._ctx, section_key, **data)
         return await self._prompts.ask_secret(self._session, question)
 
-    async def confirm(self, section_key: str, **data)  -> bool: 
+    async def confirm(self, section_key: str, **data) -> bool:
         question = await self._renderer.render(self._ctx, section_key, **data)
         return await self._prompts.confirm(self._session, question)
 
-    async def choice_value(self, section_key: str, options: list[dict], *, default: str | None = None, **data) -> str:
+    async def choice_value(
+        self,
+        section_key: str,
+        options: list[dict],
+        *,
+        default: str | None = None,
+        **data
+    ) -> str:
         question = await self._renderer.render(self._ctx, section_key, **data)
-        return await self._prompts.choice_value(self._session, question, options, default=default, **data)
+        return await self._prompts.choice_value(
+            self._session, question, options, default=default, **data
+        )
 
-    async def choice_index(self, section_key: str, options: list[str], **data) -> int: 
+    async def choice_index(self, section_key: str, options: list[str], **data) -> int:
         question = await self._renderer.render(self._ctx, section_key, **data)
-        return await self._prompts.choice_index(self._session, question, options, **data)
+        return await self._prompts.choice_index(
+            self._session, question, options, **data
+        )
+
 
 class Presenter:
     """
@@ -52,10 +67,16 @@ class Presenter:
     Wraps the template context and provides high-level methods for emitting
     messages, failures, and notifications using predefined sections in the template.
     """
-    
-    def __init__(self, template_prefix: str, template_key: str, 
-                 session: Session, renderer: RendererService, 
-                 dialogs: DialogService, prompts: PromptService) -> RenderContext:
+
+    def __init__(
+        self,
+        template_prefix: str,
+        template_key: str,
+        session: Session,
+        renderer: RendererService,
+        dialogs: DialogService,
+        prompts: PromptService,
+    ) -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
 
@@ -63,7 +84,7 @@ class Presenter:
             template_prefix (str): the template prefix
             template_key (str): Relative template path (e.g. 'account/cmd_login').
             session: Session object with language information.
-            renderer: Renderservice to render the template. 
+            renderer: Renderservice to render the template.
 
         Returns:
             RenderContext: Template context with full key and language.
@@ -73,17 +94,24 @@ class Presenter:
         self._renderer_srv = renderer
         self._dialog_srv = dialogs
         self._prompt_srv = prompts
-        
+
         self._ctx = RenderContext(
-            key=template_key, prefix=template_prefix, 
-            lang=session.lang, format=session.output_format)
+            key=template_key,
+            prefix=template_prefix,
+            lang=session.lang,
+            format=session.output_format,
+        )
 
     @property
     def prompts(self) -> PresenterPrompts:
         if not self._prompts:
             self._prompts = PresenterPrompts(
-                self._ctx, self._session, 
-                self._renderer_srv, self._dialog_srv, self._prompt_srv)
+                self._ctx,
+                self._session,
+                self._renderer_srv,
+                self._dialog_srv,
+                self._prompt_srv,
+            )
         return self._prompts
 
     async def emit(self, section: str, **data):
@@ -132,20 +160,18 @@ class PresenterService:
         self._services = services
 
     async def create_presenter(
-            self, template_prefix:str, 
-            template_key: str, session: Session) -> Presenter:
-        
+        self, template_prefix: str, template_key: str, session: Session
+    ) -> Presenter:
+
         dialog_service = self._services.get(DialogService)
         render_service = self._services.get(RendererService)
         prompt_service = self._services.get(PromptService)
-        
+
         return Presenter(
-            template_prefix, 
-            template_key, 
-            session, 
-            render_service, 
-            dialog_service, 
-            prompt_service)
-    
-
-
+            template_prefix,
+            template_key,
+            session,
+            render_service,
+            dialog_service,
+            prompt_service,
+        )

@@ -6,13 +6,13 @@ from yakoon.base.runtime.session import Session
 
 class CmdWhoAmI(Command):
 
-    key = "whoami"    
+    key = "whoami"
 
     async def run(self, session: Session, request: Request):
 
         presenter = await self.get_presenter(session)
 
-        username = session.get_username()        
+        username = session.get_username()
         if username:
             await presenter.emit("show_user", user=username)
         else:

@@ -1,10 +1,11 @@
 from enum import StrEnum
 
 
-class InteractionMode(StrEnum): 
+class InteractionMode(StrEnum):
     """
     Defines the available interaction modes for handling user inputs.
     """
+
     WIZARD = "wizard"
     FORM = "form"
 

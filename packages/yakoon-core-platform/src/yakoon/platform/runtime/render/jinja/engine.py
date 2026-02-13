@@ -19,11 +19,13 @@ from jinja2 import (
     TemplateNotFound,
 )
 
+
 def build_env(
     plugin_sources: Iterable[TemplateSource],
-    platform_package: str = "yakoon.platform.bootstrap",   # Beispiel
+    platform_package: str = "yakoon.platform.bootstrap",  # Beispiel
     platform_templates_path: str = "templates",
-    host_override_dir: Optional[Path] = None) -> Environment:
+    host_override_dir: Optional[Path] = None,
+) -> Environment:
     """
     Reihenfolge ist wichtig:
       1) Host overrides (filesystem) – ganz vorne
@@ -41,7 +43,8 @@ def build_env(
     # 2) Plugin-Loader: PrefixLoader mappt prefix -> PackageLoader
     plugin_prefix_map = {
         src.package: PackageLoader(src.package, src.template_path)
-        for src in plugin_sources if src
+        for src in plugin_sources
+        if src
     }
     loaders.append(PrefixLoader(plugin_prefix_map, delimiter=":"))
 
@@ -53,13 +56,13 @@ def build_env(
 
     env = Environment(
         loader=ChoiceLoader(loaders),
-        autoescape=False,     # Markdown, nicht HTML
+        autoescape=False,  # Markdown, nicht HTML
         trim_blocks=True,
         lstrip_blocks=True,
-        enable_async=False,   # rendert sync (tmpl.render). Async optional.
+        enable_async=False,  # rendert sync (tmpl.render). Async optional.
     )
 
-    register_filters(env)     # Filter einmal zentral
+    register_filters(env)  # Filter einmal zentral
     return env
 
 
@@ -75,7 +78,7 @@ class JinjaEngine(BaseRenderEngine):
         Renders a template from templates/<template_key>/<format>, e.g. cmd_version/js.md
         Fallbacks to js.txt if preferred format not found.
         """
-        
+
         format = ctx.format or settings.output.format
         preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.{format.value}"
         fallback = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.plain"

@@ -1,6 +1,6 @@
 import asyncio
 
-from yakoon.base import ports 
+from yakoon.base import ports
 from yakoon.base.models.key import Key
 from yakoon.base.models.format import OutputFormat
 
@@ -16,21 +16,30 @@ from yakoon.crm.customer.controller import CrmCustomerCoreController
 from yakoon.office.mailing.controller import OfficeMailingCoreController
 from yakoon.shell.controller import ShellCoreController
 
-    
+
 async def run_console():
-       
+
     engine = compose_engine(
         controllers=ControllerDirectory(
             controllers=[
-                ShellCoreController(), 
+                ShellCoreController(),
                 CrmCustomerCoreController(),
                 AuthCoreController(),
-                OfficeMailingCoreController()]))
+                OfficeMailingCoreController(),
+            ]
+        )
+    )
 
     sessions = engine.services.get(ports.SessionService)
     session, _ = await sessions.get_or_create(
-        Key.from_parts("yakoon", "bucket", "develop", "1",))
-    
+        Key.from_parts(
+            "yakoon",
+            "bucket",
+            "develop",
+            "1",
+        )
+    )
+
     session.bind_io(ConsoleOutput())
     session.output_format = OutputFormat.MARKDOWN
 
@@ -45,11 +54,11 @@ async def run_console():
         host = ConsoleHost(submit=submit)
         runner = Runner(engine=engine, session=session, host=host)
 
-        #inits = ["use crm-customer", "customer-create"]
-        inits = []    
+        # inits = ["use crm-customer", "customer-create"]
+        inits = []
         await runner.start(inits)
 
-    except KeyboardInterrupt: 
+    except KeyboardInterrupt:
         # Ctrl+C: if a prompt is active, cancel it; otherwise ignore or exit
         dialogs = engine.services.get(ports.DialogService)
         if dialogs.is_waiting(session):
@@ -58,5 +67,5 @@ async def run_console():
         sessions.release(session.key)
 
 
-if __name__ == "__main__":    
-   asyncio.run(run_console())
+if __name__ == "__main__":
+    asyncio.run(run_console())
