@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Sequence, Type, TYPE_CHECKING
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.base.commands.request import Request
-from yakoon.base.descriptors.workflow import WorkflowSource
-from yakoon.base.ports import NamespaceService
-from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.descriptors.template import TemplateSource
+from yakoon.base.descriptors.workflow import WorkflowSource
+from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.ports import NamespaceService
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
@@ -47,7 +48,7 @@ class BaseController(ABC):
     is_activatable: bool = True
     """If False, the controller cannot be activated as an interactive context."""
 
-    shell_builtins: dict[str, Type["Command"]] = {}
+    shell_builtins: dict[str, type[Command]] = {}
     """Commands available regardless of active controller context.
 
     Warning:
@@ -76,7 +77,7 @@ class BaseController(ABC):
 
     @property
     @abstractmethod
-    def commandsets(self) -> Sequence[Type[CommandSet]]:
+    def commandsets(self) -> Sequence[type[CommandSet]]:
         """Command sets exposed by this controller.
 
         Returns:
@@ -108,6 +109,7 @@ class BaseController(ABC):
         namespaces = self.services.get(NamespaceService)
         return await namespaces.from_session(session)
 
+    @abstractmethod
     async def on_before_resolve(self, session: Session) -> None:
         """Hook executed before command resolution.
 
@@ -119,6 +121,7 @@ class BaseController(ABC):
         This hook runs regardless of whether a valid command is found later.
         """
 
+    @abstractmethod
     async def on_before_run_command(
         self, session: Session, request: Request, command: Command
     ) -> None:
@@ -137,6 +140,7 @@ class BaseController(ABC):
         # default: no-op
         return None
 
+    @abstractmethod
     async def on_after_run_command(
         self, session: Session, request: Request, command: Command
     ) -> None:
@@ -155,6 +159,7 @@ class BaseController(ABC):
         # default: no-op
         return None
 
+    @abstractmethod
     async def on_cleanup(self, session: Session) -> None:
         """Hook executed after a command cycle, even if exceptions occurred.
 

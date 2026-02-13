@@ -1,5 +1,5 @@
-from yakoon.base.runtime.session import Session
 from yakoon.base.models.ns import Namespace
+from yakoon.base.runtime.session import Session
 
 
 class NamespaceService:
@@ -12,8 +12,8 @@ class NamespaceService:
     async def from_session(self, session: Session) -> Namespace:
         return Namespace(
             domain=self._domain,
-            bucket="bucket",  # session.data_storage.get("realm", "bucket", self._domain),
-            scope="develop",  # session.account_id
+            bucket="bucket",
+            scope="develop",
         )
 
     async def get_by_bucket(

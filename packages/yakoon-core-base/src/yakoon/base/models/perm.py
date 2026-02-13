@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Optional
 from enum import StrEnum
 
 
@@ -18,17 +17,17 @@ class PermBits:
     x: bool = False
 
     @classmethod
-    def from_str(cls, s: str) -> "PermBits":
+    def from_str(cls, s: str) -> PermBits:
         s = s or ""
         return cls(r="r" in s, w="w" in s, x="x" in s)
 
     def __bool__(self) -> bool:
         return self.r or self.w or self.x
 
-    def union(self, other: "PermBits") -> "PermBits":
+    def union(self, other: PermBits) -> PermBits:
         return PermBits(r=self.r or other.r, w=self.w or other.w, x=self.x or other.x)
 
-    def subtract(self, other: "PermBits") -> "PermBits":
+    def subtract(self, other: PermBits) -> PermBits:
         # remove bits present in other
         return PermBits(
             r=self.r and not other.r, w=self.w and not other.w, x=self.x and not other.x
@@ -48,15 +47,14 @@ class Permission:
 
     command_key: str
     scope1: PermBits
-    scope2: Optional[PermBits] = None
+    scope2: PermBits | None = None
     deny: bool = False
 
     @property
     def is_scoped(self) -> bool:
         return self.scope2 is not None
 
-    staticmethod
-
+    @staticmethod
     def fq_key(controller_id, command_key) -> str:
         """
         Returns fq_key (fully qualified key)
@@ -110,7 +108,7 @@ class PermissionSet:
             self.add(p)
 
     def check(
-        self, command_key: str, need: str = "x", scope2_need: Optional[str] = None
+        self, command_key: str, need: str = "x", scope2_need: str | None = None
     ) -> bool:
         """
         need: "r" | "w" | "x" | combinations like "rw", "rwx"
@@ -155,7 +153,7 @@ class PermissionSet:
 
     def to_debug_dict(self) -> dict[str, dict[str, str]]:
 
-        def bits_to_str(b: Optional[PermBits]) -> str:
+        def bits_to_str(b: PermBits | None) -> str:
             if not b:
                 return ""
             return ("r" if b.r else "") + ("w" if b.w else "") + ("x" if b.x else "")

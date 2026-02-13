@@ -1,4 +1,3 @@
-import asyncio
 from kivy.clock import Clock
 from yakoon.base.ports import PermissionService, SessionService
 from yakoon.kivy.runtime.output.output import KivyOutput, SessionBoundKivyOutput

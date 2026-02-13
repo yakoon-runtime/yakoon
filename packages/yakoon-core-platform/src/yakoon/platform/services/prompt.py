@@ -2,7 +2,6 @@ from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.prompt import PromptMode
 from yakoon.base.ports import DialogService
 from yakoon.base.runtime.session import Session
-
 from yakoon.platform.settings import settings
 
 

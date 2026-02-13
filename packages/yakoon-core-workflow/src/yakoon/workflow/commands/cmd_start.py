@@ -1,5 +1,4 @@
-from typing import Type
-from yakoon.base.commands.command import Command, CommandKind, CommandVisibility
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.ports import WorkflowService
 from yakoon.base.runtime.session.session import Session
@@ -7,7 +6,7 @@ from yakoon.base.runtime.session.session import Session
 
 def CmdWfStart(
     command_key: str, tem_prefix: str = "", *, workflow_key: str | None = None
-) -> Type[Command]:
+) -> type[Command]:
     """
     Generates a Command class that starts a workflow.
 

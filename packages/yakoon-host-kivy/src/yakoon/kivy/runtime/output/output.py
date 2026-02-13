@@ -1,7 +1,6 @@
-from yakoon.platform.output.default import DefaultOutput
 from yakoon.base.runtime.output.event import OutputEvent
-
 from yakoon.kivy.runtime.context.view_context import ViewContext
+from yakoon.platform.output.default import DefaultOutput
 
 
 class KivyOutput:

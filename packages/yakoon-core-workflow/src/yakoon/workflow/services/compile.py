@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import re
-import json
-import yaml
 import importlib.resources as ir
+import json
+from typing import Any
 
-from typing import Any, Dict
+import yaml
+
 from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.models.workflow import PromptDef, StepDef, SwitchDef, WorkflowDef
 
@@ -58,7 +58,7 @@ class WorkflowCompileService:
                 return p
         raise WorkflowFileNotFound(f"Workflow not found: {root}/{workflow_key}")
 
-    def _parse(self, filename: str, raw: str) -> Dict[str, Any]:
+    def _parse(self, filename: str, raw: str) -> dict[str, Any]:
         if filename.endswith(".json"):
             return json.loads(raw)
         if filename.endswith((".yaml", ".yml")):
@@ -69,8 +69,8 @@ class WorkflowCompileService:
         raise ValueError(f"Unsupported workflow file: {filename}")
 
     def _build_workflow_def(
-        self, workflow_key: str, raw: Dict[str, Any]
-    ) -> "WorkflowDef":
+        self, workflow_key: str, raw: dict[str, Any]
+    ) -> WorkflowDef:
         start = raw.get("start")
         if not start:
             raise ValueError(f"{workflow_key}: missing 'start'")
@@ -79,7 +79,7 @@ class WorkflowCompileService:
         if not isinstance(raw_steps, list) or not raw_steps:
             raise ValueError(f"{workflow_key}: 'steps' must be a non-empty list")
 
-        steps: Dict[str, StepDef] = {}
+        steps: dict[str, StepDef] = {}
 
         for s in raw_steps:
             sid = s.get("id")
@@ -126,7 +126,7 @@ class WorkflowCompileService:
                     "select",
                     "confirm",
                     "review",
-                }:  # review wenn ihr’s schon drin habt
+                }:
                     raise ValueError(f"Unknown prompt kind: {kind}")
 
                 options = p.get("options") or []
@@ -161,7 +161,6 @@ class WorkflowCompileService:
                 # Guards für confirm
                 if kind == "confirm":
                     if p.get("var") is None:
-                        # confirm ohne var wäre sinnlos für Workflows; wenn ihr nur "ack" wollt, dann anders modellieren
                         raise ValueError(f"Prompt '{sid}': confirm requires 'var'")
 
                 prompt = PromptDef(
@@ -201,7 +200,8 @@ class WorkflowCompileService:
             )
             if actions != 1:
                 raise ValueError(
-                    f"{workflow_key}:{sid}: define exactly one of [run, prompt, switch, end]"
+                    f"{workflow_key}:{sid}: \
+                        define exactly one of [run, prompt, switch, end]"
                 )
 
             steps[sid] = step
@@ -217,21 +217,24 @@ class WorkflowCompileService:
                 )
 
             if step.branch:
-                for k, target in step.branch.items():
+                for _, target in step.branch.items():
                     if target not in step_ids:
                         raise ValueError(
-                            f"{workflow_key}:{step.id}: branch target '{target}' not found"
+                            f"{workflow_key}:{step.id}: \
+                                branch target '{target}' not found"
                         )
 
             if step.switch:
                 for k, target in step.switch.cases.items():
                     if target not in step_ids:
                         raise ValueError(
-                            f"{workflow_key}:{step.id}: switch case '{k}' target '{target}' not found"
+                            f"{workflow_key}:{step.id}: \
+                                switch case '{k}' target '{target}' not found"
                         )
                 if step.switch.default and step.switch.default not in step_ids:
                     raise ValueError(
-                        f"{workflow_key}:{step.id}: switch default target '{step.switch.default}' not found"
+                        f"{workflow_key}:{step.id}: \
+                            switch default target '{step.switch.default}' not found"
                     )
 
         return WorkflowDef(id=workflow_key, start=start, steps=steps)

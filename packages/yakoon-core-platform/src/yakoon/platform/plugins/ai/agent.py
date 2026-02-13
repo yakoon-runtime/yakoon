@@ -1,7 +1,7 @@
 from yakoon.platform.settings import settings
 
 
-async def ask_AI(prompt: str, context: dict = {}) -> str:
+async def ask_AI(prompt: str, context: dict) -> str:
 
     backend = settings.ai.backend
     if backend == "openai":

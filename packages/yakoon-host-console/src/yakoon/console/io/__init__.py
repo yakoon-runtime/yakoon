@@ -1,1 +1,1 @@
-from .output import ConsoleOutput
+from .output import ConsoleOutput as ConsoleOutput

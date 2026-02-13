@@ -4,13 +4,14 @@ from kivy.config import Config
 
 Config.set("kivy", "exit_on_escape", "0")
 
-from kivy.app import App
-from kivy.lang import Builder
-from kivy.core.text import LabelBase
-
-from yakoon.kivy import pages  # noqa: F401
-from yakoon.kivy import widgets  # noqa: F401
-from yakoon.kivy.bootstrap.compose import compose_kivy_app
+from kivy.app import App  # noqa: E402
+from kivy.core.text import LabelBase  # noqa: E402
+from kivy.lang import Builder  # noqa: E402
+from yakoon.kivy import (  # noqa: E402
+    pages,  # noqa: F401
+    widgets,  # noqa: F401
+)
+from yakoon.kivy.bootstrap.compose import compose_kivy_app  # noqa: E402
 
 
 class YakoonKivyApp(App):

@@ -1,8 +1,8 @@
 import os
 import pathlib
-from typing import Mapping
+from collections.abc import Mapping
+
 import aiosqlite
-import asyncpg
 
 from yakoon.base.stores.boot.base.migrator import BaseMigrator
 from yakoon.base.stores.boot.sqlite import SqliteMigrator
@@ -16,10 +16,10 @@ class MigratorRouter:
     async def run(self):
 
         async def _run_migator(migrator: BaseMigrator):
-            print(f"Running migration for '{domain}'")
+            # print(f"Running migration for '{domain}'")
             await migrator.run()
 
-        for domain, cfg in self.config.items():
+        for _, cfg in self.config.items():
             backend = cfg["backend"]
             script_path = pathlib.Path(cfg["script_path"])
 
@@ -30,7 +30,7 @@ class MigratorRouter:
                 await _run_migator(SqliteMigrator(db, script_path))
 
             elif backend == "postgres":
-                pool = await asyncpg.create_pool(cfg["dsn"])
+                # pool = await asyncpg.create_pool(cfg["dsn"])
                 # _run_migator(PostgresMigrator(pool, schema_root=self.schema_root))
                 raise NotImplementedError(backend)
 

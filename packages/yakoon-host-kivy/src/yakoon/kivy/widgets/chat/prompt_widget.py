@@ -1,8 +1,9 @@
-from kivy.core.window import Window
-from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import BooleanProperty, NumericProperty, StringProperty
 from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.factory import Factory
 from kivy.metrics import dp
+from kivy.properties import BooleanProperty, NumericProperty, StringProperty
+from kivy.uix.boxlayout import BoxLayout
 
 
 class PromptWidget(BoxLayout):
@@ -40,7 +41,7 @@ class PromptWidget(BoxLayout):
 
     def _adjust_height(self):
         ti = self.input
-        chrome = dp(16)  # padding/border vom Surface
+        # chrome = dp(16)  # padding/border vom Surface
         # target = ti.minimum_height + chrome
         target = self.input.minimum_height + dp(16)
         self.height = max(self.min_h, min(self.max_h, target))
@@ -88,7 +89,5 @@ class PromptWidget(BoxLayout):
         self._submit_internal()
         return True
 
-
-from kivy.factory import Factory
 
 Factory.register("PromptWidget", cls=PromptWidget)

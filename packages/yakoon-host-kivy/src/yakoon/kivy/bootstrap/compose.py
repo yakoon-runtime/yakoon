@@ -1,13 +1,13 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 
 from yakoon.auth.controller import AuthCoreController
 from yakoon.compose.engine import compose_engine
-
 from yakoon.kivy.bootstrap.dispatcher import ContextDispatcher
-from yakoon.kivy.runtime.runner import SessionRunner
-from yakoon.kivy.pages.app_root_page import AppRootPage
 from yakoon.kivy.controllers.app_controller import AppController
+from yakoon.kivy.pages.app_root_page import AppRootPage
+from yakoon.kivy.runtime.runner import SessionRunner
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.shell.controller import ShellCoreController
 

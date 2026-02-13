@@ -1,4 +1,3 @@
-import asyncio
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session import Session

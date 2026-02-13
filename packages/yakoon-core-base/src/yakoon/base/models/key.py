@@ -14,14 +14,14 @@ class Key:
         try:
             ns_part, id = raw.rsplit("#", 1)
             domain, bucket, scope = ns_part.split("/")
-        except ValueError:
-            raise ValueError(f"Invalid key format: {raw}")
+        except ValueError as exc:
+            raise ValueError(f"Invalid key format: {raw}") from exc
         from yakoon.base.models.ns import Namespace
 
         return Key(Namespace(domain, bucket, scope), id)
 
     @classmethod
-    def from_parts(cls, domain: str, bucket: str, scope: str, id: str) -> "Key":
+    def from_parts(cls, domain: str, bucket: str, scope: str, id: str) -> Key:
         from yakoon.base.models.ns import Namespace
 
         return cls(namespace=Namespace(domain, bucket, scope), id=id)
@@ -38,7 +38,7 @@ class Key:
         ns = self.namespace
         return all([ns.domain, ns.bucket, ns.scope, self.id])
 
-    def with_id(self, new_id: str) -> "Key":
+    def with_id(self, new_id: str) -> Key:
         return Key(namespace=self.namespace, id=new_id)
 
     def to_prefix(self) -> str:

@@ -1,6 +1,5 @@
-from abc import ABC
-from typing import Any, Optional
 import copy
+from typing import Any
 
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
@@ -16,7 +15,7 @@ class MemoryStore(BaseStore):
     def __init__(self):
         self._rows: dict[str, dict] = {}  # key = str(Key)
 
-    async def get_by_key(self, key: Key) -> Optional[dict]:
+    async def get_by_key(self, key: Key) -> dict | None:
         return copy.deepcopy(self._rows.get(str(key)))
 
     async def fetch_by_namespace(

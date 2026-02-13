@@ -1,20 +1,16 @@
 import asyncio
-from typing import Optional, Tuple
 
 from yakoon.base import ports
-from yakoon.base.models.command import CommandKind
-from yakoon.base.models.input import DispatchInput
-from yakoon.base.commands.command import CommandContext
+from yakoon.base.commands.command import CmdNotFound, Command, CommandContext
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
+from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.perm import Permission
 from yakoon.base.models.workflow import WorkflowContextRequired
 from yakoon.base.runtime.session import Session
-from yakoon.base.commands.command import Command, CmdNotFound
-from yakoon.base.directories.service import ServiceDirectory
-
-from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.directories.controller import ControllerDirectory
+from yakoon.platform.engines.command.router import CommandDirectory
 
 
 class Engine:
@@ -41,7 +37,7 @@ class Engine:
 
     async def _find_matching_command(
         self, active_router_id, request: Request
-    ) -> Optional[Tuple[BaseController, Command]]:
+    ) -> tuple[BaseController, Command] | None:
 
         find = self._commands.find
         result: tuple[str, Command] = find(active_router_id, request.command)
@@ -153,7 +149,8 @@ class Engine:
                 raise PermissionError("Permission denied")
 
             # Safety: Under S1, resolved controller should match active controller
-            # (If your router can return a different controller, keep this; otherwise you can drop it.)
+            # (If your router can return a different controller, keep this;
+            # otherwise you can drop it.)
             controller = resolved_controller
             command.context = CommandContext(controller, di.batch_id)
 
@@ -172,7 +169,7 @@ class Engine:
                 f"{request.command}': may only be executed from within a workflow.'"
             )
 
-        except CmdNotFound:
+        except CmdNotFound as exc:
             failed = True
             await session.fail(f"{request.command}': command not found... use 'man'")
             self.wf_failed(exc, command, session, di)
@@ -210,7 +207,8 @@ class Engine:
                 wf.cancel_batch(session, batch_id=di.batch_id)
 
             # Policy 2: cleanup the controller that executed this command
-            # (NOT the current active controller after the command potentially changed it)
+            # (NOT the current active controller after the command potentially
+            # changed it)
             await controller.on_cleanup(session)
 
     def wf_failed(

@@ -1,30 +1,28 @@
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Optional
-
-from yakoon.base.descriptors.template import TemplateSource
-
-from yakoon.platform.settings import settings
-from yakoon.platform.runtime.render.context import RenderContext
-from yakoon.platform.runtime.render.section import RenderSection
-from yakoon.platform.runtime.render.base import BaseRenderEngine
-from yakoon.platform.runtime.render.jinja.filters import register_filters
-
 
 from jinja2 import (
-    Environment,
     ChoiceLoader,
+    Environment,
     FileSystemLoader,
     PackageLoader,
     PrefixLoader,
     TemplateNotFound,
 )
 
+from yakoon.base.descriptors.template import TemplateSource
+from yakoon.platform.runtime.render.base import BaseRenderEngine
+from yakoon.platform.runtime.render.context import RenderContext
+from yakoon.platform.runtime.render.jinja.filters import register_filters
+from yakoon.platform.runtime.render.section import RenderSection
+from yakoon.platform.settings import settings
+
 
 def build_env(
     plugin_sources: Iterable[TemplateSource],
     platform_package: str = "yakoon.platform.bootstrap",  # Beispiel
     platform_templates_path: str = "templates",
-    host_override_dir: Optional[Path] = None,
+    host_override_dir: Path | None = None,
 ) -> Environment:
     """
     Reihenfolge ist wichtig:
@@ -75,7 +73,7 @@ class JinjaEngine(BaseRenderEngine):
 
     async def render(self, ctx: RenderContext, section: RenderSection) -> str:
         """
-        Renders a template from templates/<template_key>/<format>, e.g. cmd_version/js.md
+        Renders a template from templates/<template_key>/<format>.
         Fallbacks to js.txt if preferred format not found.
         """
 

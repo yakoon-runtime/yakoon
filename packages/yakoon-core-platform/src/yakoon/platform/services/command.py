@@ -1,7 +1,4 @@
 from collections import deque
-from typing import Deque
-
-from uuid import uuid4
 
 from yakoon.base.models.input import DispatchInput
 
@@ -15,7 +12,7 @@ class CommandQueueService:
 
     Design goals:
     - Provide a single, explicit scheduling mechanism outside of commands.
-    - Allow commands to enqueue follow-up steps dynamically (e.g. continue, retry, exit).
+    - Allow commands to enqueue follow-up steps dynamically (continue, retry, exit ...).
     - Keep the engine deterministic and non-interactive.
     - Ensure the host remains the only scheduler.
 
@@ -32,7 +29,7 @@ class CommandQueueService:
         Internally, commands are stored per session key to ensure strict
         isolation between concurrent sessions.
         """
-        self._q: dict[str, Deque[DispatchInput]] = {}
+        self._q: dict[str, deque[DispatchInput]] = {}
 
     def enqueue_commands(
         self, session, cmds: list[str], batch_id: str | None = None

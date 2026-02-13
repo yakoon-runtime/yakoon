@@ -1,7 +1,7 @@
-from pathlib import Path
-import typer
 import asyncio
-import sys
+from pathlib import Path
+
+import typer
 
 from yakoon.apps.yakoon.jobs.migrate import migrate_from_config
 from yakoon.apps.yakoon.jobs.scaffold import scaffold_mesh_template
@@ -25,7 +25,7 @@ def migrate(config: str = typer.Option(..., help="Path to store config YAML")):
 @cli.command()
 def scaffold(
     name: str = typer.Argument(..., help="Name of the new workspace project"),
-    target: Path = typer.Option(Path.cwd(), help="Target directory"),
+    target: Path = typer.Option(Path.cwd(), help="Target directory"),  # noqa: B008
 ):
     """
     Scaffold a new mesh-based workspace with adjusted imports.

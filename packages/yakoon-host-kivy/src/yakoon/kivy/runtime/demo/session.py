@@ -1,4 +1,3 @@
-from yakoon.kivy.models.envelope import Envelope
 
 
 class DemoSession:

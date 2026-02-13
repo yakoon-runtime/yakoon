@@ -1,18 +1,19 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Sequence, Type
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.descriptors.template import TemplateSource
-
+from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.shell.commands.system.cmdset import ShellSystemCommands
 from yakoon.shell.commands.workflow.cmdset import ShellWorkflowCommands
 
 if TYPE_CHECKING:
-    from yakoon.base.commands.request import Request
-    from yakoon.base.runtime.session import Session
     from yakoon.base.commands.command import Command
     from yakoon.base.commands.commandset import CommandSet
+    from yakoon.base.commands.request import Request
+    from yakoon.base.runtime.session import Session
 
 
 class ShellCoreController(BaseController):
@@ -29,8 +30,6 @@ class ShellCoreController(BaseController):
     is_listed: bool = True
     is_activatable: bool = True
 
-    # Framework-scharf: builtins als Mapping (Key -> Command-Key).
-    # Damit kannst du später Alias/Mapping sauber erweitern, ohne Set-Magie.
     shell_builtins: dict[str, str] = {
         "exit": "exit",
         "man": "man",
@@ -51,7 +50,7 @@ class ShellCoreController(BaseController):
     )
 
     @property
-    def commandsets(self) -> Sequence[Type[CommandSet]]:
+    def commandsets(self) -> Sequence[type[CommandSet]]:
         """Command sets exported by the shell controller."""
         return (ShellSystemCommands, ShellWorkflowCommands)
 
@@ -62,6 +61,7 @@ class ShellCoreController(BaseController):
 
         Notes:
             Keeping this in the controller makes the behavior consistent across all
-            shell commands (system and workflow), without duplicating it in each command.
+            shell commands (system and workflow), without duplicating it in each
+            command.
         """
         session.touch()

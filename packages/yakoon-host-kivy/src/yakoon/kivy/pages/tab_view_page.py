@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from kivy.uix.boxlayout import BoxLayout
+from kivy.factory import Factory
 from kivy.properties import ObjectProperty
+from kivy.uix.boxlayout import BoxLayout
 
 
 class TabViewPage(BoxLayout):
@@ -30,7 +31,5 @@ class TabViewPage(BoxLayout):
         if w and hasattr(w, "focus_prompt"):
             w.focus_prompt()
 
-
-from kivy.factory import Factory
 
 Factory.register("TabViewPage", cls=TabViewPage)

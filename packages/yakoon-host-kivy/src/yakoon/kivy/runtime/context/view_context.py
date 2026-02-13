@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from yakoon.kivy.states.state_provider import UIStateProvider
+
 from yakoon.kivy.models.envelope import Envelope
 
 

@@ -1,8 +1,8 @@
 # yakoon/kivy/host/output_adapter.py
 from __future__ import annotations
-import asyncio
+
 import inspect
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 
 def ensure_async(fn: Callable[[str], object]) -> Callable[[str], Awaitable[None]]:

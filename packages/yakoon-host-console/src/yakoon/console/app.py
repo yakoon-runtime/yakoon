@@ -1,19 +1,16 @@
 import asyncio
 
-from yakoon.base import ports
-from yakoon.base.models.key import Key
-from yakoon.base.models.format import OutputFormat
-
-from yakoon.console.host import ConsoleHost
-from yakoon.platform.directories.controller import ControllerDirectory
-from yakoon.platform.hosts.runner import Runner
-
-from yakoon.console.io import ConsoleOutput
-from yakoon.compose.engine import compose_engine
-
 from yakoon.auth.controller import AuthCoreController
+from yakoon.base import ports
+from yakoon.base.models.format import OutputFormat
+from yakoon.base.models.key import Key
+from yakoon.compose.engine import compose_engine
+from yakoon.console.host import ConsoleHost
+from yakoon.console.io import ConsoleOutput
 from yakoon.crm.customer.controller import CrmCustomerCoreController
 from yakoon.office.mailing.controller import OfficeMailingCoreController
+from yakoon.platform.directories.controller import ControllerDirectory
+from yakoon.platform.hosts.runner import Runner
 from yakoon.shell.controller import ShellCoreController
 
 

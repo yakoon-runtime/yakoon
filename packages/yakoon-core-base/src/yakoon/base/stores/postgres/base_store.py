@@ -1,22 +1,13 @@
+import json
 from contextlib import asynccontextmanager
-from dataclasses import Field
+from typing import Any
+
 import asyncpg
-from pypika import Table, Query
+from pypika import Query, Table
+
 from yakoon.base.models import Key
-from typing import Any, Optional
-import json
-
 from yakoon.base.models.ns import Namespace
 from yakoon.base.stores.base.base_store import BaseStore
-
-import json
-from contextlib import asynccontextmanager
-from typing import Any, Optional
-from pypika import Table, Query
-from yakoon.base.models.key import Key
-from yakoon.base.models.ns import Namespace
-from yakoon.base.stores.base.base_store import BaseStore
-import asyncpg
 
 
 class PostgresStore(BaseStore):
@@ -30,7 +21,7 @@ class PostgresStore(BaseStore):
         self.table = Table(table_name)
         self.table_name = table_name
 
-    async def get_by_key(self, key: Key) -> Optional[dict]:
+    async def get_by_key(self, key: Key) -> dict | None:
         q = Query.from_(self.table).select("*").where(self.table.__key__ == str(key))
         sql = str(q)
         async with self.pool.acquire() as conn:

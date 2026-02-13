@@ -1,4 +1,5 @@
 import asyncio
+
 from yakoon.base.models.prompt import PromptMode
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.platform.hosts.adapter import HostAdapter

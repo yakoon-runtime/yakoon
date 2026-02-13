@@ -1,6 +1,6 @@
-from yakoon.base.ports import AuditLogService
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.ports import AuditLogService
 from yakoon.base.runtime.session import Session
 
 

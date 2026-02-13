@@ -15,9 +15,7 @@ def scaffold_workspace(app_name: str, target_dir: Path):
 
     shutil.copytree(TEMPLATE_DIR, target_dir)
     ensure_real_runtime(target_dir / "runtime")
-    rewrite_imports(
-        target_dir, app_name
-    )  # original="yakoon.saas.scaffold.templates.workspace.runtime", replacement=f"{app_name}.runtime")
+    rewrite_imports(target_dir, app_name)
     print(f"✅ Scaffold '{app_name}' created at {target_dir}")
 
 

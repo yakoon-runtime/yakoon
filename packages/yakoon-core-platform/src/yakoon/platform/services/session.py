@@ -1,8 +1,8 @@
-from yakoon.base.runtime.session import Session, SessionState
-from yakoon.base.models.key import Key
-from yakoon.base.stores.base.base_store import BaseStore
+from typing import Optional
 
-from typing import Optional, Tuple
+from yakoon.base.models.key import Key
+from yakoon.base.runtime.session import Session, SessionState
+from yakoon.base.stores.base.base_store import BaseStore
 
 
 class SessionIdentityMap:
@@ -19,7 +19,7 @@ class SessionIdentityMap:
     """
 
     def __init__(self) -> None:
-        self._live: dict[str, "Session"] = {}
+        self._live: dict[str, Session] = {}
 
     def get(self, key: "Key") -> Optional["Session"]:
         """Returns the live Session instance for the given key, if present."""
@@ -80,7 +80,7 @@ class SessionService:
         self._map.put(session)
         return session
 
-    async def get_or_create(self, key: "Key", **kwargs) -> Tuple["Session", bool]:
+    async def get_or_create(self, key: "Key", **kwargs) -> tuple["Session", bool]:
         """
         Returns a live Session for the key, creating it if needed.
 

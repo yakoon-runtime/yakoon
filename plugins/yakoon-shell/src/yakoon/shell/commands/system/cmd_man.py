@@ -1,5 +1,6 @@
 from pathlib import Path
-from yakoon.base.commands.command import Command, CommandVisibility
+
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.ports import (
     CommandCatalogService,

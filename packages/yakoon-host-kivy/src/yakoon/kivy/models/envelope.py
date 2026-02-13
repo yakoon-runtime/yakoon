@@ -1,6 +1,6 @@
 # models/envelope.py
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any
 
 
 @dataclass
@@ -10,4 +10,4 @@ class Envelope:
     channel: str = "main"
     op: str = "append"
     region: str = "output"
-    meta: Dict[str, Any] = field(default_factory=dict)
+    meta: dict[str, Any] = field(default_factory=dict)

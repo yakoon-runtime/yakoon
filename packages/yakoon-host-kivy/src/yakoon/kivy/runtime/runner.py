@@ -1,7 +1,8 @@
 import asyncio
-from concurrent.futures import Future
 import threading
-from typing import Any, Coroutine, Optional
+from collections.abc import Coroutine
+from concurrent.futures import Future
+from typing import Any
 
 from yakoon.base.models.input import DispatchInput
 
@@ -10,9 +11,9 @@ class SessionRunner:
 
     def __init__(self, engine):
         self.engine = engine
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
-        self._thread: Optional[threading.Thread] = None
-        self._queue: Optional[asyncio.Queue[str]] = None
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread: threading.Thread | None = None
+        self._queue: asyncio.Queue[str] | None = None
 
     def submit_coro(self, coro: Coroutine[Any, Any, Any]) -> Future:
         if not self._loop:

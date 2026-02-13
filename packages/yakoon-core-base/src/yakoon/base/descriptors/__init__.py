@@ -1,1 +1,1 @@
-from .template import TemplateSource
+from .template import TemplateSource as TemplateSource

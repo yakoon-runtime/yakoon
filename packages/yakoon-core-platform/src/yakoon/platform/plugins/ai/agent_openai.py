@@ -1,15 +1,15 @@
 from yakoon.platform.settings import settings
 
 
-async def ask_openai(prompt: str, context: dict = {}) -> str:
+async def ask_openai(prompt: str, context: dict) -> str:
 
     try:
         import openai  # type: ignore
 
         raise NotImplementedError()
         openai.api_key = settings.ai.openai.api_key
-    except:
-        raise RuntimeError(f"Open AI not installed.")
+    except Exception as exc:
+        raise RuntimeError("Open AI not installed.") from exc
 
     model = context.get("model", "gpt-4")
     response = await openai.ChatCompletion.acreate(

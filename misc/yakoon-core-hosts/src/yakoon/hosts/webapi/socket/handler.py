@@ -1,7 +1,8 @@
-import uuid
 import asyncio
+import uuid
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
 from yakoon.platform.engines.command import Engine, Output
 
 engine = Engine(None)

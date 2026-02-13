@@ -1,8 +1,9 @@
 import httpx
+
 from yakoon.platform.settings import settings
 
 
-async def ask_ollama(prompt: str, context: dict = {}) -> str:
+async def ask_ollama(prompt: str, context: dict) -> str:
     payload = {
         "model": context.get("model", "mistral"),
         "prompt": prompt,

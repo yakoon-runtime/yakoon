@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import TypeVar, cast, Awaitable, Callable
+
+from collections.abc import Awaitable, Callable
+from typing import TypeVar, cast
 
 T = TypeVar("T")
 
@@ -7,7 +9,7 @@ T = TypeVar("T")
 class ServiceDirectory:
 
     def __init__(
-        self, parent: "ServiceDirectory|None" = None, allow_override: bool = False
+        self, parent: ServiceDirectory|None = None, allow_override: bool = False
     ):
         self._parent = parent
         self._allow_override = allow_override
@@ -48,7 +50,7 @@ class ServiceDirectory:
             self._parent.contains(key) if self._parent else False
         )
 
-    def fork(self, allow_override: bool = False) -> "ServiceDirectory":
+    def fork(self, allow_override: bool = False) -> ServiceDirectory:
         return ServiceDirectory(parent=self, allow_override=allow_override)
 
     def get(self, key: type[T]) -> T:

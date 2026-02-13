@@ -1,1 +1,1 @@
-from .output import KivyOutput
+from .output import KivyOutput as KivyOutput

@@ -1,6 +1,7 @@
 import pathlib
 
 import aiosqlite
+
 from yakoon.base.stores.boot.base.migrator import BaseMigrator
 
 

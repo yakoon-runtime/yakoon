@@ -1,6 +1,7 @@
+from kivy.factory import Factory
+from kivy.metrics import dp
 from kivy.uix.label import Label
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
-from kivy.metrics import dp
 
 
 class ChatRow(RecycleDataViewBehavior, Label):
@@ -26,7 +27,5 @@ class ChatRow(RecycleDataViewBehavior, Label):
         content_h = self.texture_size[1] + self.pad_y
         self.height = max(self.min_h, content_h)
 
-
-from kivy.factory import Factory
 
 Factory.register("ChatRow", cls=ChatRow)

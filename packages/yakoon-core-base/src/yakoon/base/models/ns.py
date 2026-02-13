@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from yakoon.base.models.key import Key
+
+
 class Namespace:
     """
     Represents a namespaced identifier context for addressing objects.
@@ -18,7 +26,7 @@ class Namespace:
     def to_str(self) -> str:
         return f"{self.domain}/{self.bucket}/{self.scope}"
 
-    def get_key(self, id: str) -> "Key":
+    def get_key(self, id: str) -> Key:
         from yakoon.base.models.key import Key
 
         return Key(self, id)

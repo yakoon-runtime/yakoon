@@ -9,14 +9,17 @@ class ControllerDirectory:
 
     def __init__(self, controllers: list[BaseController]):
         """
-        Defines the interface for a registry that manages all available domain controllers.
+        Defines the interface for a registry that manages all
+        available domain controllers.
 
         A domain registry is responsible for:
-        - Providing access to all registered controllers (e.g. shell, office, minddojo)
-        - Resolving controllers by their unique ID (used in routing, command dispatch, etc.)
+        - Providing access to all registered controllers (e.g. shell, office)
+        - Resolving controllers by their unique ID
+          (used in routing, command dispatch, etc.)
 
-        This interface is typically implemented by the system shell or platform entrypoint
-        to coordinate domain activation, switching, and global command handling.
+        This interface is typically implemented by the system shell or platform
+        entrypoint to coordinate domain activation, switching, and global
+        command handling.
         """
 
         self._controllers: dict[str, BaseController] = {}
@@ -37,7 +40,7 @@ class ControllerDirectory:
             self._controllers[controller.id] = controller
 
         if not has_shell:
-            raise ValueError(f"No shell controller found")
+            raise ValueError("No shell controller found")
 
     def find_shell(self) -> BaseController:
         for controller in self._controllers.values():

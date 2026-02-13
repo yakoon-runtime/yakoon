@@ -1,9 +1,9 @@
-from typing import Sequence, Type
+from collections.abc import Sequence
+
+from yakoon.auth.commands.cmd_su import CmdSu
 from yakoon.auth.commands.cmd_whoami import CmdWhoAmI
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
-
-from yakoon.auth.commands.cmd_su import CmdSu
 
 
 class AuthSystemCommands(CommandSet):
@@ -11,7 +11,7 @@ class AuthSystemCommands(CommandSet):
     group = "system"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]:
+    def commands(cls) -> Sequence[type[Command]]:
         return [
             CmdSu,
             CmdWhoAmI,

@@ -1,5 +1,6 @@
-from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
+from kivy.factory import Factory
+from kivy.uix.boxlayout import BoxLayout
 
 
 class ChatWidget(BoxLayout):
@@ -68,7 +69,5 @@ class ChatWidget(BoxLayout):
     def focus_prompt(self):
         self.ids.prompt.focus_input()
 
-
-from kivy.factory import Factory
 
 Factory.register("ChatWidget", cls=ChatWidget)

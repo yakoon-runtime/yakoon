@@ -1,5 +1,5 @@
-from yakoon.base.commands.request import Request
 from yakoon.base.commands.command import Command
+from yakoon.base.commands.request import Request
 from yakoon.base.ports import WorkflowService
 from yakoon.base.runtime.session import Session
 

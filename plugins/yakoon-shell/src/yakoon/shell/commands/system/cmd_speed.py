@@ -1,9 +1,9 @@
+import time
+
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.runtime.session import Session
-
-import time
 
 
 class CmdSpeedTest(Command):

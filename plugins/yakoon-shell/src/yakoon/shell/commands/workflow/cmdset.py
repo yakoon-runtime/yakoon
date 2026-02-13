@@ -1,4 +1,5 @@
-from typing import Sequence, Type
+from collections.abc import Sequence
+
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.workflow.commands.cmd_cancel import CmdWfCancel
@@ -12,7 +13,7 @@ class ShellWorkflowCommands(CommandSet):
     group = "workflow"
 
     @classmethod
-    def commands(cls) -> Sequence[Type[Command]]:
+    def commands(cls) -> Sequence[type[Command]]:
         return [
             CmdWfRun,
             CmdWfPrompt,

@@ -1,7 +1,7 @@
 import platform
 import subprocess
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
@@ -22,7 +22,7 @@ class CmdVersion(Command):
             python=platform.python_version(),
             hostname=platform.node(),
             uptime=get_uptime(),
-            time=datetime.now(timezone.utc).isoformat(),
+            time=datetime.now(UTC).isoformat(),
         )
 
 

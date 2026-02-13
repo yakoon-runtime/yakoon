@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Awaitable, Callable
 from dataclasses import asdict
-from typing import Any, Awaitable, Callable, Protocol, Union
+from typing import Any, Protocol
 
 from yakoon.base.runtime.output.event import OutputEvent
 
@@ -17,7 +18,7 @@ def ensure_async(fn: Callable[..., Any]) -> Callable[..., Awaitable[Any]]:
     return _wrapped
 
 
-OutputPayload = Union[str, OutputEvent]
+OutputPayload = OutputEvent
 
 
 class Output(Protocol):

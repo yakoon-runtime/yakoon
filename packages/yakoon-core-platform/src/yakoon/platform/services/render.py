@@ -1,6 +1,6 @@
+from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
-from yakoon.platform.runtime.render.base import BaseRenderEngine
 
 
 class RendererService:

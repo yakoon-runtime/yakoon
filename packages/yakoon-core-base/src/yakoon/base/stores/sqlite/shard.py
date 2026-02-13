@@ -37,7 +37,7 @@ class SQLiteShardCounterStore:
             range_end = excluded.range_end,
             value = excluded.value,
             created_at = excluded.created_at
-        """
+        """  # noqa: E501
         async with self._connect() as db:
             await db.execute(query, row)
             await db.commit()

@@ -1,5 +1,5 @@
-from yakoon.platform.engines.command import Engine, Output
 from yakoon.hosts.telnet.utils.ansi import format_codes_to_ansi
+from yakoon.platform.engines.command import Engine, Output
 
 engine = Engine(None)
 

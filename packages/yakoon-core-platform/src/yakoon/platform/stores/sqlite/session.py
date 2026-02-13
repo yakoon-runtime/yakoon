@@ -1,4 +1,4 @@
-from typing import Optional
+
 from yakoon.base.stores.sqlite.base_store import SQLiteStore
 
 
@@ -7,7 +7,7 @@ class SQLiteSessionStore(SQLiteStore):
     def __init__(self, db_path: str):
         super().__init__(db_path=db_path, table_name="sessions")
 
-    async def get_by_token(self, token: str) -> Optional[dict]:
+    async def get_by_token(self, token: str) -> dict | None:
         sessions = await self.fetch_by_fields(token=token, limit=1)
         return sessions[0] if sessions else None
 

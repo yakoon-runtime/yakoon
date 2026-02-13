@@ -1,2 +1,2 @@
-from .memory import MemoryTrendMonitor
-from .prompt import UnresolvedPromptMonitor
+from .memory import MemoryTrendMonitor as MemoryTrendMonitor
+from .prompt import UnresolvedPromptMonitor as UnresolvedPromptMonitor

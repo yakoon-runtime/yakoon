@@ -1,7 +1,8 @@
+from kivy.clock import Clock
+from kivy.factory import Factory
+from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import StringProperty, BooleanProperty
-from kivy.clock import Clock
 
 
 class TabCard(ButtonBehavior, BoxLayout):
@@ -45,7 +46,5 @@ class TabCard(ButtonBehavior, BoxLayout):
     def on_release(self):
         self.open()
 
-
-from kivy.factory import Factory
 
 Factory.register("TabCard", cls=TabCard)

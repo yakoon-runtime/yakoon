@@ -1,8 +1,7 @@
 from abc import ABC
-from typing import Any
 
 
-class StoreRegistry(ABC):
+class StoreRegistry(ABC):  # noqa: B024
     """
     Common interface for all store registries.
     Ensures consistent access to all store components.

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import Any
 from uuid import uuid4
-from typing import Any, Mapping
+
 from yakoon.base import ports
 from yakoon.base.models.workflow import WorkflowError, WorkflowRuntime, WorkflowStatus
 from yakoon.workflow.runtime.compiler import compile_run_command
@@ -13,12 +15,14 @@ class WorkflowNotFound(KeyError):
 
 class WorkflowService:
     """
-    Keine Caches hier: jedes get_def() lädt on-demand über ControllerCatalog + WorkflowLoaderService.
+    Keine Caches hier: jedes get_def() lädt on-demand über ControllerCatalog +
+    WorkflowLoaderService.
 
     Regeln:
     - Workflows sind controller-scoped (controller_id + workflow_key).
     - interaction_mode kommt IMMER aus der Session.
-    - Commands müssen keine split_id/normalize machen (Engine/Router verhindert Cross-Controller).
+    - Commands müssen keine split_id/normalize machen
+    (Engine/Router verhindert Cross-Controller).
     """
 
     def __init__(self, services):

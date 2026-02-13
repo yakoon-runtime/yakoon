@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
+
 from yakoon.base.models.account import Account
 from yakoon.base.models.perm import PermBit, PermBits, Permission, PermissionSet
 from yakoon.base.runtime.session.session import Session

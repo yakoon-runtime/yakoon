@@ -1,7 +1,6 @@
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.ports import DialogService, PromptService, RendererService
 from yakoon.base.runtime.session import Session
-from yakoon.base.directories.service import ServiceDirectory
-
 from yakoon.platform.runtime.render.context import RenderContext
 
 

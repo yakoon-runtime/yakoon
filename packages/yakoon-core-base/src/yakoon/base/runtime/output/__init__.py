@@ -1,1 +1,1 @@
-from .event import OutputEvent
+from .event import OutputEvent as OutputEvent

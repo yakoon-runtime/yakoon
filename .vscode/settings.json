@@ -1,6 +1,5 @@
 {
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-  "python.venvPath": "${workspaceFolder}/venv",
   "python.analysis.autoSearchPaths": true,
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.extraPaths": [
@@ -8,18 +7,21 @@
     "packages/yakoon-core-compose/src",
     "packages/yakoon-core-platform/src",
     "packages/yakoon-core-workflow/src",
-
     "packages/yakoon-host-console/src",
     "packages/yakoon-host-kivy/src",
-
     "plugins/yakoon-auth/src",
     "plugins/yakoon-crm/src",
     "plugins/yakoon-shell/src",
     "plugins/yakoon-office/src"
   ],
-
   "editor.formatOnSave": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
-  }
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "ruff.enable": true,
+  "ruff.organizeImports": true
 }

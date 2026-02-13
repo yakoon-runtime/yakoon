@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
+from kivy.factory import Factory
+from kivy.properties import NumericProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
-from kivy.properties import NumericProperty
 
 
 class TabBar(BoxLayout):
@@ -14,15 +15,13 @@ class TabBar(BoxLayout):
 
     def __init__(self, **kw):
         super().__init__(**kw)
-        self._on_select: Optional[Callable[[str], None]] = None
+        self._on_select: Callable[[str], None] | None = None
 
     def set_tabs(
         self, tabs: list[dict], active_id: str | None, on_select: Callable[[str], None]
     ):
         self._on_select = on_select
         self.clear_widgets()
-
-        from kivy.factory import Factory
 
         for t in tabs:
             btn = Factory.TabPill()

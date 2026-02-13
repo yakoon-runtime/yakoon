@@ -1,5 +1,5 @@
 from yakoon.base import ports
-from yakoon.base.commands.command import WfCommand, CommandVisibility
+from yakoon.base.commands.command import CommandVisibility, WfCommand
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
 

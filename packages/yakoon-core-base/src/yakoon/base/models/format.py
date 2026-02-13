@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """
     Defines the available output formats for template rendering.
     """

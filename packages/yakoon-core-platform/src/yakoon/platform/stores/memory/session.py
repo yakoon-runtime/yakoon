@@ -1,4 +1,3 @@
-from typing import Optional
 
 from yakoon.base.stores.memory.base_store import MemoryStore
 

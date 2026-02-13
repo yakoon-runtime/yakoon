@@ -3,7 +3,9 @@ from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.stores.base.registry import StoreRegistry
-
+from yakoon.platform.directories.controller import ControllerDirectory
+from yakoon.platform.engines.command.engine import Engine
+from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
 from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
 from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
@@ -21,15 +23,10 @@ from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.prompt import PromptService
 from yakoon.platform.services.render import RendererService
-from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
-
-from yakoon.platform.directories.controller import ControllerDirectory
-from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
 from yakoon.platform.services.session import SessionService
-from yakoon.platform.engines.command.engine import Engine
+from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
-
 from yakoon.workflow.services.compile import WorkflowCompileService
 from yakoon.workflow.services.engine import WorkflowService
 

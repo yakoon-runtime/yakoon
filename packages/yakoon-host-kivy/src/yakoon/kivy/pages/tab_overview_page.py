@@ -1,7 +1,9 @@
 # yakoon/kivy/pages/tab_overview_page.py
 from __future__ import annotations
+
+from kivy.factory import Factory
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 
 
 class TabOverviewPage(BoxLayout):
@@ -22,7 +24,6 @@ class TabOverviewPage(BoxLayout):
             grid.add_widget(card)
 
     def _make_card(self, tab_id: str, title: str):
-        from kivy.factory import Factory
 
         card = Factory.TabCard()
         card.tab_id = tab_id
@@ -45,7 +46,5 @@ class TabOverviewPage(BoxLayout):
         if self.controller:
             self.controller.on_new_tab()
 
-
-from kivy.factory import Factory
 
 Factory.register("TabOverviewPage", cls=TabOverviewPage)

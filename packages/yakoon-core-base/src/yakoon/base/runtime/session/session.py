@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from dataclasses import dataclass, asdict, field
-from typing import Mapping, Optional, Any
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
+from typing import Any
 
+from yakoon.base.models.format import OutputFormat
 from yakoon.base.models.key import Key
 from yakoon.base.models.mode import InteractionMode
 from yakoon.base.models.perm import PermissionSet
 from yakoon.base.runtime.output.event import OutputEvent
-from yakoon.base.models.format import OutputFormat
 
 
 @dataclass
@@ -27,14 +28,14 @@ class SessionState:
     account_key: str | None = None
     username: str | None = None
     last_active: datetime | None = None
-    lang: Optional[str] = "de"
+    lang: str | None = "de"
 
     data: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         d = asdict(self)
         if self.last_active:
-            d["last_active"] = self.last_active.astimezone(timezone.utc).isoformat()
+            d["last_active"] = self.last_active.astimezone(UTC).isoformat()
         else:
             d["last_active"] = None
         if self.key:
@@ -42,7 +43,7 @@ class SessionState:
         return d
 
     @classmethod
-    def from_dict(cls, d: dict) -> "SessionState":
+    def from_dict(cls, d: dict) -> SessionState:
         if not d or "key" not in d:
             raise ValueError("SessionState requires a 'key'")
 
@@ -133,7 +134,7 @@ class Session:
         self._runtime.permissions = permset
 
     @classmethod
-    def from_state(cls, state: SessionState) -> "Session":
+    def from_state(cls, state: SessionState) -> Session:
         """
         Reconstructs a session from a previously persisted SessionState.
 
@@ -157,7 +158,7 @@ class Session:
         This should be called on user interaction (e.g. dispatch, prompt input),
         not on every internal execution step.
         """
-        self._state.last_active = datetime.now(timezone.utc)
+        self._state.last_active = datetime.now(UTC)
 
     def bind_io(self, io):
         """
@@ -284,7 +285,7 @@ class Session:
         channel: str = "main",
         op: str = "append",
         region: str = "output",
-        meta: Optional[Mapping[str, Any]] = None,
+        meta: Mapping[str, Any] | None = None,
     ) -> None:
         """
         Emits a plain output message via the session's output channel.
@@ -312,7 +313,7 @@ class Session:
         channel: str = "main",
         op: str = "append",
         region: str = "information",
-        meta: Optional[Mapping[str, Any]] = None,
+        meta: Mapping[str, Any] | None = None,
     ) -> None:
         """
         Emits a non-error informational status message.
@@ -340,7 +341,7 @@ class Session:
         channel: str = "main",
         op: str = "append",
         region: str = "status",
-        meta: Optional[Mapping[str, Any]] = None,
+        meta: Mapping[str, Any] | None = None,
     ) -> None:
         """
         Emits an error or failure message.

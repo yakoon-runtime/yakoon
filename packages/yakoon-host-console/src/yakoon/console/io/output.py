@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Any
 
 from yakoon.base.runtime.output.event import OutputEvent
 from yakoon.platform.output.default import DefaultOutput
@@ -26,9 +25,9 @@ class ConsoleOutput(DefaultOutput):
             prefix += f"[{evt.channel}] "
         # if evt.region is "output":
         #    prefix += f"({evt.region}) "
-        if evt.region is "information":
+        if evt.region == "information":
             prefix += f"({evt.region}) "
-        if evt.region is "status":
+        if evt.region == "status":
             prefix += f"({evt.region}) "
 
         return f"{prefix}{evt.text}"

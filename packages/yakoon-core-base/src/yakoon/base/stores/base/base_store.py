@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from yakoon.base.models.key import Key
-from typing import Optional, Any
+from typing import Any
 
+from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 
 
@@ -12,7 +12,7 @@ class BaseStore(ABC):
     """
 
     @abstractmethod
-    async def get_by_key(self, key: Key) -> Optional[dict]:
+    async def get_by_key(self, key: Key) -> dict | None:
         """
         Retrieve an object using a full typed Key.
         """

@@ -1,20 +1,21 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 from yakoon.base.models.command import CommandKind, CommandVisibility
+from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 
 if TYPE_CHECKING:
-    from typing import Any, Optional
-    from yakoon.base.controllers.base import BaseController
-    from yakoon.base.models.ns import Namespace
+    from typing import Any
+
     from yakoon.base.commands.request import Request
-    from yakoon.base.runtime.session.session import Session
+    from yakoon.base.controllers.base import BaseController
     from yakoon.base.directories.service import ServiceDirectory
+    from yakoon.base.models.ns import Namespace
+    from yakoon.base.runtime.session.session import Session
 
 
 class CmdNotFound(LookupError):
@@ -39,7 +40,7 @@ class CommandContext:
     """
 
     controller: BaseController
-    batch_id: Optional[str] = None
+    batch_id: str | None = None
 
     @property
     def is_batch(self) -> bool:
@@ -61,10 +62,10 @@ class CommandResult:
         meta: Optional metadata for tracing/debugging (should be JSON-serializable).
     """
 
-    message: Optional[str] = None
+    message: str | None = None
     payload: Any = None
-    next_command: Optional[str] = None
-    meta: Optional[dict[str, Any]] = None
+    next_command: str | None = None
+    meta: dict[str, Any] | None = None
 
 
 class Command(ABC):

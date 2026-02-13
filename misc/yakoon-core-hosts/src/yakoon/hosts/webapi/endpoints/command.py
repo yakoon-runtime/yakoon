@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from yakoon.apps.webapi.sessions.handler import handle_input

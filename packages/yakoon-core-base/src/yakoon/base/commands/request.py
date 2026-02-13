@@ -1,5 +1,5 @@
 import shlex
-from typing import Any, Optional
+from typing import Any
 
 
 class Request:

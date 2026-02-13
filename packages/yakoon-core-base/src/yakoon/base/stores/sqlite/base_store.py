@@ -1,10 +1,10 @@
-import aiosqlite
 from contextlib import asynccontextmanager
-from pypika import Table, Query, Field
-from yakoon.base.models.key import Key
-from typing import Any, Optional
-import json
+from typing import Any
 
+import aiosqlite
+from pypika import Query, Table
+
+from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 from yakoon.base.stores.base.base_store import BaseStore
 
@@ -20,7 +20,7 @@ class SQLiteStore(BaseStore):
         self.table = Table(table_name)
         self.table_name = table_name
 
-    async def get_by_key(self, key: Key) -> Optional[dict]:
+    async def get_by_key(self, key: Key) -> dict | None:
         q = Query.from_(self.table).select("*").where(self.table.__key__ == str(key))
         sql = str(q)
 

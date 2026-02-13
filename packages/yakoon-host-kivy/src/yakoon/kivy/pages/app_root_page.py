@@ -1,7 +1,8 @@
-from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
+from kivy.factory import Factory
 from kivy.metrics import dp
 from kivy.properties import NumericProperty, StringProperty
+from kivy.uix.boxlayout import BoxLayout
 
 
 class AppRootPage(BoxLayout):
@@ -53,7 +54,5 @@ class AppRootPage(BoxLayout):
         if self.controller:
             self.controller.new_chat_tab(select=True)
 
-
-from kivy.factory import Factory
 
 Factory.register("AppRootPage", cls=AppRootPage)

@@ -1,5 +1,5 @@
-from yakoon.kivy.runtime.demo.session import DemoSession
 from yakoon.kivy.models.envelope import Envelope
+from yakoon.kivy.runtime.demo.session import DemoSession
 
 
 class DemoEngine:

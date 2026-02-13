@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 
 from yakoon.base.models.format import OutputFormat

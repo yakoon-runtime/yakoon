@@ -1,5 +1,5 @@
 import asyncio
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 from yakoon.base.models.prompt import PromptMode
 from yakoon.base.runtime.devtools.prompt import UnresolvedPromptMonitor
@@ -43,9 +43,10 @@ class DefaultDialogService:
         """
         session_key = str(session.key)
 
-        fut = self._waiting.pop(session_key, None)
-        # Do NOT cancel fut here by default - cleanup is used by both resolve/cancel/timeout.
-        # Cancel is done explicitly by the caller when needed.
+        _ = self._waiting.pop(session_key, None)
+        # Do NOT cancel fut here by default - cleanup is used by both
+        # resolve/cancel/timeout. Cancel is done explicitly
+        # by the caller when needed.
 
         task = self._timeouts.pop(session_key, None)
         if task:

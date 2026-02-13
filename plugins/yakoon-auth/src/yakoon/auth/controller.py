@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
+from yakoon.auth.commands.cmdset import AuthSystemCommands
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.descriptors.template import TemplateSource
-from yakoon.auth.commands.cmdset import AuthSystemCommands
 
 if TYPE_CHECKING:
     from yakoon.base.commands.commandset import CommandSet

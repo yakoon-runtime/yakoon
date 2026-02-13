@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -9,7 +8,7 @@ class Shard:
     range_start: int  # inclusive
     range_end: int  # exclusive
     value: int  # current counter in this shard
-    created_at: Optional[str] = None
+    created_at: str | None = None
 
     def is_full(self) -> bool:
         return self.value >= (self.range_end - self.range_start)

@@ -1,4 +1,3 @@
-from typing import Optional
 
 from yakoon.base.models.account import Account, AccountData
 from yakoon.base.models.key import Key

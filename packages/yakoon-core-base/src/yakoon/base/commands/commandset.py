@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, Sequence, Type, runtime_checkable
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
@@ -20,16 +21,16 @@ class CommandSet(Protocol):
     group: str
 
     @staticmethod
-    def commands() -> Sequence[Type["Command"]]:
+    def commands() -> Sequence[type[Command]]:
         """Return the command classes exposed by this set."""
         ...
 
 
 def build_command_set(
-    commands: Sequence[Type["Command"]],
+    commands: Sequence[type[Command]],
     *,
     grp: str = "unnamed",
-) -> Type[CommandSet]:
+) -> type[CommandSet]:
     """Build an ad-hoc CommandSet from command classes.
 
     This is useful for tests, plugin composition, or dynamic assembly where you
@@ -49,7 +50,7 @@ def build_command_set(
         group = grp
 
         @staticmethod
-        def commands() -> Sequence[Type["Command"]]:
+        def commands() -> Sequence[type[Command]]:
             return commands
 
     return InlineCommandSet

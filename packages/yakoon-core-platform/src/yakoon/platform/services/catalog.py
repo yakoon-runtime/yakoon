@@ -1,5 +1,4 @@
-from dataclasses import asdict
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 from yakoon.base.commands.command import CommandKind, CommandVisibility
 from yakoon.base.directories.service import ServiceDirectory
