@@ -15,8 +15,8 @@ class CmdTest(Command):
 
         presenter = await self.get_presenter(session)
         ask1 = await presenter.prompts.ask("ask1")
-        await session.emit(ask1)
-        ask2 = await presenter.prompts.ask("ask2")
-        await session.emit(ask2)
-        ask3 = await presenter.prompts.ask("ask3")
-        await session.emit(ask3)
+        await session.emit(f" -> {ask1}")
+        ask2 = await presenter.prompts.ask("ask2", policy="customer.age")
+        await session.emit(f" -> {ask2}")
+        ask3 = await presenter.prompts.ask_secret("ask3")
+        await session.emit(f" -> {ask3}")

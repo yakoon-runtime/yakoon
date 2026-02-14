@@ -4,6 +4,7 @@ from yakoon.auth.controller import AuthCoreController
 from yakoon.base import ports
 from yakoon.base.models.format import OutputFormat
 from yakoon.base.models.key import Key
+from yakoon.base.models.mode import InteractionMode
 from yakoon.compose.engine import compose_engine
 from yakoon.console.host import ConsoleHost
 from yakoon.console.io import ConsoleOutput
@@ -39,6 +40,7 @@ async def run_console():
 
     session.bind_io(ConsoleOutput())
     session.output_format = OutputFormat.MARKDOWN
+    session.interaction_mode = InteractionMode.FORM
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)

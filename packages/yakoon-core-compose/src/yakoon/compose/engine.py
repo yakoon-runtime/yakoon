@@ -2,6 +2,7 @@ from yakoon.base import ports
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
+from yakoon.base.models.fields import FieldSpec, FieldType
 from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.engine import Engine
@@ -18,8 +19,10 @@ from yakoon.platform.services.catalog import (
 )
 from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialogservice import DefaultDialogService
+from yakoon.platform.services.fieldspec import FieldSpecRenderService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
+from yakoon.platform.services.policy import PolicyService
 from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.prompt import PromptService
 from yakoon.platform.services.render import RendererService
@@ -44,6 +47,7 @@ def compose_engine(controllers: ControllerDirectory) -> Engine:
 
     _compose_controllers(controllers, services)
     _compose_permission_roles(services)
+    _compose_policies(services)
 
     engine = Engine(controllers, services, commands)
 
@@ -66,6 +70,25 @@ def _compose_permission_roles(services: ServiceDirectory):
         [
             "shell:use|rx",
         ],
+    )
+
+
+def _compose_policies(services: ServiceDirectory):
+    policy = services.get(ports.PolicyService)
+    policy.register_defaults()
+    policy.register_fields(
+        [
+            FieldSpec(key="customer.first_name", type=FieldType.STRING, required=False),
+            FieldSpec(
+                key="customer.age", hint="mit hint", type=FieldType.INT, required=False
+            ),
+            FieldSpec(
+                key="auth.password",
+                hint="kein Echo",
+                type=FieldType.STRING,
+                secret=True,
+            ),
+        ]
     )
 
 
@@ -158,6 +181,10 @@ def _compose_services(
     services.register_static(ports.DialogService, DefaultDialogService())
     services.register_static(ports.WorkflowService, WorkflowService(services))
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
+    services.register_static(ports.PolicyService, PolicyService())
+    services.register_static(
+        ports.FieldSpecRenderService, FieldSpecRenderService(services)
+    )
 
     services.register_static(
         ports.RendererService, RendererService(JinjaEngine(template_sources))

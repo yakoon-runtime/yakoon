@@ -56,7 +56,7 @@ class Engine:
         async with self._lock(session):
             dialog_service = self.services.get(ports.DialogService)
             if dialog_service.is_waiting(session):
-                dialog_service.resolve_prompt(session, di.command)
+                dialog_service.resolve_input(session, di.command)
 
                 # Drive the existing active task until it either finishes or asks again
                 await self._drive_until_blocked_or_done(session)

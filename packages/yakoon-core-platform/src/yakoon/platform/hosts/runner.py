@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from yakoon.base import ports
 from yakoon.base.models.input import DispatchInput
+from yakoon.base.ports import DialogState
 from yakoon.base.runtime.session.session import Session
-from yakoon.base.utils.format import format_prompt
+from yakoon.base.utils.format import format_ps1
 from yakoon.platform.engines.command.engine import Engine
 from yakoon.platform.hosts.adapter import HostAdapter
 
 
 @dataclass
 class Runner:
-
     engine: Engine
     session: Session
     host: HostAdapter
@@ -19,8 +21,16 @@ class Runner:
         await self.drive(commands=commands)
 
     async def on_user_input(self, text: str) -> None:
-        # Host liefert entweder normalen Command ODER Prompt-Antwort.
         await self.engine.dispatch(self.session, DispatchInput(text))
+        await self.drive()
+
+    async def on_form_submit(self, values: dict[str, object]) -> None:
+        """
+        Called by form-capable hosts (Kivy/Qt/Web) when the user submits a form.
+        This resolves the currently waiting dialog and continues pumping.
+        """
+        dialogs = self.engine.services.get(ports.DialogService)
+        dialogs.resolve_input(self.session, values)
         await self.drive()
 
     async def on_cancel(self) -> None:
@@ -41,22 +51,30 @@ class Runner:
                 await self.host.on_exit()
                 return
 
-            # If a prompt is waiting, we stop pumping and tell the host to collect input
-            if dialogs.is_waiting(self.session):
-                mode = dialogs.get_mode(self.session)
-                prompt = format_prompt(self.session)
-                await self.host.on_prompt(prompt=prompt, mode=mode)
+            state = dialogs.state(self.session)
+            ps1 = format_ps1(self.session)
+
+            # Wizard-state (Prompt) handling
+            if state == DialogState.WAITING_WIZARD:
+                field = dialogs.get_field_spec(self.session)
+                # Host renders and collects a single field value.
+                await self.host.on_field(ps1=ps1, field=field)
                 return
 
-            # Otherwise drain queued commands
+            # Form-state handling
+            if state == DialogState.WAITING_FORM:
+                spec = dialogs.get_form_spec(self.session)
+                await self.host.on_form(ps1=ps1, spec=spec)
+                return
+
+            # Drain queued command handling
             di = queue.next_input(self.session)
             if di:
                 await self.engine.dispatch(self.session, di)
                 continue
 
-            # optional: host may show a command prompt / enable input
             if hasattr(self.host, "on_ready"):
-                prompt = format_prompt(self.session)
-                await self.host.on_ready(prompt=prompt)
+                await self.host.on_ready(ps1=ps1)
             else:
                 await self.host.on_idle()
+            return

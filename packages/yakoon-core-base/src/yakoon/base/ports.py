@@ -2,17 +2,43 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from typing import Any, Protocol
+from enum import StrEnum
+from typing import Any, Protocol, TypeAlias
 
 from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.models.command import CommandKind
+from yakoon.base.models.fields import FieldSpec, FormSpec
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
-from yakoon.base.models.prompt import PromptMode
+from yakoon.base.models.policy import PolicyValidationError, PolicyValidationResult
 from yakoon.base.models.workflow import WorkflowDef, WorkflowRuntime
 from yakoon.base.runtime.session.session import Session
+
+
+class FieldSpecRenderService(Protocol):
+    async def build(
+        self,
+        ctx,
+        *,
+        section_key: str,
+        policy: str,
+        **data,
+    ) -> FieldSpec: ...
+
+
+class PolicyService(Protocol):
+    def register_field(self, spec: FieldSpec) -> None: ...
+    def register_fields(self, specs: list[FieldSpec]) -> None: ...
+    def register_defaults() -> None: ...
+    def get_field(self, key: str) -> FieldSpec: ...
+    def validate_field(
+        self, *, field: FieldSpec, raw: object
+    ) -> PolicyValidationResult: ...
+    def validate_form(
+        self, *, spec: FormSpec, raw_values: dict[str, object]
+    ) -> tuple[dict[str, object], list[PolicyValidationError]]: ...
 
 
 class WorkflowService(Protocol):
@@ -74,20 +100,52 @@ class WorkflowCompileService(Protocol):
     def load_def(self, source: Any, workflow_key: str) -> WorkflowDef: ...
 
 
+class DialogState(StrEnum):
+    IDLE = "idle"
+    WAITING_WIZARD = "waiting_wizard"
+    WAITING_FORM = "waiting_form"
+
+
+FieldValue = object
+FormValues: TypeAlias = dict[str, object]
+DialogValue: TypeAlias = FieldSpec | FormValues
+
+
 class DialogService(Protocol):
+
+    # lifecycle
     def cleanup(self, session: Session) -> None: ...
+
+    # state
+    def state(self, session: Session) -> DialogState: ...
     def is_waiting(self, session: Session) -> bool: ...
     def edge_event(self, session: Session) -> asyncio.Event: ...
-    def get_mode(self, session: Session) -> PromptMode: ...
-    def resolve_prompt(self, session: Session, value: str) -> bool: ...
-    def cancel_prompt(self, session: Session) -> None: ...
-    def set_prompt(
+
+    # resolution / cancellation
+    def resolve_input(self, session: Session, value: DialogValue) -> bool: ...
+    def cancel_input(self, session: Session) -> None: ...
+
+    # wizard (single field)
+    def get_field_spec(self, session: Session) -> FieldSpec: ...
+    def wait_field(
         self,
         session: Session,
+        *,
+        field: FieldSpec,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
-        mode: PromptMode = PromptMode.NORMAL,
-    ): ...
+    ) -> asyncio.Future: ...
+
+    # form (multiple fields)
+    def get_form_spec(self, session: Session) -> FormSpec: ...
+    def wait_form(
+        self,
+        session: Session,
+        *,
+        spec: FormSpec,
+        timeout: float | None = None,
+        on_timeout: Callable[[], Awaitable[None]] | None = None,
+    ) -> asyncio.Future: ...
 
 
 class CommandQueueService(Protocol):
@@ -188,36 +246,48 @@ class AuditLogService(Protocol):
 
 
 class PromptService(Protocol):
-    async def ask(self, session: Session, prompt_text: str) -> str: ...
-    async def ask_secret(self, session: Session, prompt_text: str) -> str: ...
-    async def confirm(self, session: Session, prompt_text: str) -> bool: ...
+    async def ask(self, session: Session, field: FieldSpec) -> str: ...
+    async def confirm(self, session: Session, field: FieldSpec) -> bool: ...
     async def choice_value(
         self,
         session: Session,
-        prompt_text: str,
+        field: FieldSpec,
         options: list[dict],
         *,
         default: str | None = None,
     ) -> str: ...
     async def choice_index(
-        self, session: Session, prompt_text: str, options: list[str]
+        self, session: Session, field: FieldSpec, options: list[str]
     ) -> int: ...
 
 
 class PresenterPrompts(Protocol):
-    async def ask(self, section_key: str, **data) -> str: ...
-    async def ask_secret(self, section_key: str, **data) -> str: ...
-    async def confirm(self, section_key: str, **data) -> bool: ...
+
+    async def ask(
+        self, section_key: str, *, policy: str = "system:string", **data
+    ) -> str: ...
+    async def ask_secret(
+        self, section_key: str, *, policy: str = "system:secret", **data
+    ) -> str: ...
+    async def confirm(
+        self, section_key: str, *, policy: str = "system:string", **data
+    ) -> bool: ...
     async def choice_value(
         self,
         section_key: str,
-        options: list[dict],
         *,
+        policy: str = "system:string",
+        options: list[dict],
         default: str | None = None,
         **data,
     ) -> str: ...
     async def choice_index(
-        self, section_key: str, options: list[str], **data
+        self,
+        section_key: str,
+        *,
+        policy: str = "system:string",
+        options: list[str],
+        **data,
     ) -> int: ...
 
 

@@ -1,61 +1,93 @@
+from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.ports import DialogService, PromptService, RendererService
 from yakoon.base.runtime.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
 
 
 class PresenterPrompts:
-    """
-    Provides interactive input methods for user sessions using localized templates.
 
-    This class encapsulates all prompt-based interactions such as text input,
-    confirmations, and choices.
-    """
+    DEFAULT_POLICY = "system:string"
+    DEFAULT_SECRET_POLICY = "system:secret"
 
-    def __init__(
-        self,
-        ctx: RenderContext,
-        session: Session,
-        renderer: RendererService,
-        dialogs: DialogService,
-        prompts: PromptService,
-    ):
-
+    def __init__(self, ctx, session: Session, services: ServiceDirectory):
         self._ctx = ctx
         self._session = session
-        self._renderer = renderer
-        self._dialogs = dialogs
-        self._prompts = prompts
+        self._prompts = services.get(ports.PromptService)
+        self._policy = services.get(ports.PolicyService)
+        self._renderfields = services.get(ports.FieldSpecRenderService)
 
-    async def ask(self, section_key: str, **data) -> str:
-        question = await self._renderer.render(self._ctx, section_key, **data)
-        return await self._prompts.ask(self._session, question)
+    async def ask(
+        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
+    ) -> str:
+        field = await self._renderfields.build(
+            self._ctx,
+            section_key=section_key,
+            policy=policy,
+            **data,
+        )
+        while True:
+            raw = await self._prompts.ask(self._session, field)
+            res = self._policy.validate_field(field=field, raw=raw)
+            if res.ok:
+                return res.value
 
-    async def ask_secret(self, section_key: str, **data) -> str:
-        question = await self._renderer.render(self._ctx, section_key, **data)
-        return await self._prompts.ask_secret(self._session, question)
+            # simplest error output; later: render template section "invalid_input"
+            for err in res.errors:
+                await self._session.emit(f"[{err.field_key}] {err.message}")
 
-    async def confirm(self, section_key: str, **data) -> bool:
-        question = await self._renderer.render(self._ctx, section_key, **data)
-        return await self._prompts.confirm(self._session, question)
+    async def ask_secret(
+        self, section_key: str, *, policy: str = DEFAULT_SECRET_POLICY, **data
+    ) -> str:
+        return await self.ask(section_key, policy=policy, **data)
+
+    async def confirm(
+        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
+    ) -> bool:
+        field = await self._renderfields.build(
+            self._ctx,
+            section_key=section_key,
+            policy=policy,
+            **data,
+        )
+        return await self._prompts.confirm(self._session, field)
 
     async def choice_value(
         self,
         section_key: str,
-        options: list[dict],
         *,
+        policy: str = DEFAULT_POLICY,
+        options: list[dict],
         default: str | None = None,
-        **data
+        **data,
     ) -> str:
-        question = await self._renderer.render(self._ctx, section_key, **data)
+        field = await self._renderfields.build(
+            self._ctx,
+            section_key=section_key,
+            policy=policy,
+            **data,
+        )
         return await self._prompts.choice_value(
-            self._session, question, options, default=default, **data
+            self._session, field, options, default=default
         )
 
-    async def choice_index(self, section_key: str, options: list[str], **data) -> int:
-        question = await self._renderer.render(self._ctx, section_key, **data)
+    async def choice_index(
+        self,
+        section_key: str,
+        *,
+        policy: str = DEFAULT_POLICY,
+        options: list[str],
+        **data,
+    ) -> int:
+        field = await self._renderfields.build(
+            self._ctx,
+            section_key=section_key,
+            policy=policy,
+            **data,
+        )
         return await self._prompts.choice_index(
-            self._session, question, options, **data
+            self._session,
+            field,
+            options,
         )
 
 
@@ -72,9 +104,7 @@ class Presenter:
         template_prefix: str,
         template_key: str,
         session: Session,
-        renderer: RendererService,
-        dialogs: DialogService,
-        prompts: PromptService,
+        services: ServiceDirectory,
     ) -> RenderContext:
         """
         Constructs a RenderContext based on the current session and template key.
@@ -90,9 +120,8 @@ class Presenter:
         """
         self._prompts = None
         self._session = session
-        self._renderer_srv = renderer
-        self._dialog_srv = dialogs
-        self._prompt_srv = prompts
+        self._services = services
+        self.renderer = self._services.get(ports.RendererService)
 
         self._ctx = RenderContext(
             key=template_key,
@@ -104,13 +133,7 @@ class Presenter:
     @property
     def prompts(self) -> PresenterPrompts:
         if not self._prompts:
-            self._prompts = PresenterPrompts(
-                self._ctx,
-                self._session,
-                self._renderer_srv,
-                self._dialog_srv,
-                self._prompt_srv,
-            )
+            self._prompts = PresenterPrompts(self._ctx, self._session, self._services)
         return self._prompts
 
     async def emit(self, section: str, **data):
@@ -123,7 +146,7 @@ class Presenter:
             section (str): Template section key (e.g. "success", "info").
             **data: Optional key-value pairs for template variables.
         """
-        text = await self._renderer_srv.render(self._ctx, section, **data)
+        text = await self.renderer.render(self._ctx, section, **data)
         await self._session.emit(text)
 
     async def fail(self, section: str, **data):
@@ -162,15 +185,9 @@ class PresenterService:
         self, template_prefix: str, template_key: str, session: Session
     ) -> Presenter:
 
-        dialog_service = self._services.get(DialogService)
-        render_service = self._services.get(RendererService)
-        prompt_service = self._services.get(PromptService)
-
         return Presenter(
             template_prefix,
             template_key,
             session,
-            render_service,
-            dialog_service,
-            prompt_service,
+            self._services,
         )

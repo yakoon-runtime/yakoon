@@ -31,7 +31,7 @@ class CmdWfCancel(WfCommand):
         # 3) Dialog ggf. schließen
         dialogs = self.services.get(ports.DialogService)
         if dialogs.is_waiting(session):
-            dialogs.cancel_prompt(session)
+            dialogs.cancel_input(session)
 
         # 4) Feedback (optional)
         await session.write("Workflow abgebrochen.")

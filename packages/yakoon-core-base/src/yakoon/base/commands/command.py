@@ -9,7 +9,6 @@ from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
 
 if TYPE_CHECKING:
-    from typing import Any
 
     from yakoon.base.commands.request import Request
     from yakoon.base.controllers.base import BaseController

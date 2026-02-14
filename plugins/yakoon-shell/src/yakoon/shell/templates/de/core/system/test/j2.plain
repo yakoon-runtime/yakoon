@@ -1,7 +1,7 @@
 {%- if section.key == "ask1" %}
-Ask 1:
+Frage 1
 {%- elif section.key == "ask2" %}
-Ask 2:
+Frage 2
 {%- elif section.key == "ask3" %}
-Ask 3:
+Frage 3
 {%- endif %}

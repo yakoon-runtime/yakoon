@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from yakoon.base.runtime.session.session import Session
-from yakoon.base.utils.format import format_prompt
+from yakoon.base.utils.format import format_ps1
 
 
 @dataclass(frozen=True)
@@ -16,6 +16,6 @@ class UIStateProvider:
         self.session = session
 
     def __call__(self) -> UIState:
-        prompt = format_prompt(self.session)
+        prompt = format_ps1(self.session)
         secret = getattr(self.session, "prompt_secret", False)
         return UIState(prompt_prefix=prompt, prompt_secret=secret)

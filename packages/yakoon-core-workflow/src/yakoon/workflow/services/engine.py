@@ -5,6 +5,7 @@ from typing import Any
 from uuid import uuid4
 
 from yakoon.base import ports
+from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.workflow import WorkflowError, WorkflowRuntime, WorkflowStatus
 from yakoon.workflow.runtime.compiler import compile_run_command
 
@@ -25,7 +26,7 @@ class WorkflowService:
     (Engine/Router verhindert Cross-Controller).
     """
 
-    def __init__(self, services):
+    def __init__(self, services: ServiceDirectory):
         self.services = services
 
     # ---- runtime access ----
