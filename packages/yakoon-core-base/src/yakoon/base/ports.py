@@ -111,6 +111,24 @@ FormValues: TypeAlias = dict[str, object]
 DialogValue: TypeAlias = FieldSpec | FormValues
 
 
+class InputService(Protocol):
+
+    async def ask_field(self, session: Session, field: FieldSpec) -> object: ...
+    async def confirm(self, session: Session, field: FieldSpec) -> bool: ...
+    async def choice_value(
+        self,
+        session: Session,
+        field: FieldSpec,
+        options: list[dict],
+        *,
+        default: str | None = None,
+    ) -> str: ...
+
+    async def choice_index(
+        self, session: Session, field: FieldSpec, options: list[str]
+    ) -> int: ...
+
+
 class DialogService(Protocol):
 
     # lifecycle
@@ -127,14 +145,15 @@ class DialogService(Protocol):
 
     # wizard (single field)
     def get_field_spec(self, session: Session) -> FieldSpec: ...
-    def wait_field(
+
+    """def wait_field(
         self,
         session: Session,
         *,
         field: FieldSpec,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
-    ) -> asyncio.Future: ...
+    ) -> asyncio.Future: ..."""
 
     # form (multiple fields)
     def get_form_spec(self, session: Session) -> FormSpec: ...
@@ -245,29 +264,13 @@ class AuditLogService(Protocol):
     async def permission(self, session, obj, action): ...
 
 
-class PromptService(Protocol):
-    async def ask(self, session: Session, field: FieldSpec) -> str: ...
-    async def confirm(self, session: Session, field: FieldSpec) -> bool: ...
-    async def choice_value(
-        self,
-        session: Session,
-        field: FieldSpec,
-        options: list[dict],
-        *,
-        default: str | None = None,
-    ) -> str: ...
-    async def choice_index(
-        self, session: Session, field: FieldSpec, options: list[str]
-    ) -> int: ...
-
-
 class PresenterPrompts(Protocol):
 
     async def ask(
         self, section_key: str, *, policy: str = "system:string", **data
     ) -> str: ...
     async def ask_secret(
-        self, section_key: str, *, policy: str = "system:secret", **data
+        self, section_key: str, *, policy: str = "system:masked", **data
     ) -> str: ...
     async def confirm(
         self, section_key: str, *, policy: str = "system:string", **data

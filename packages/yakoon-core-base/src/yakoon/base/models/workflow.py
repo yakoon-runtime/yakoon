@@ -15,6 +15,7 @@ class PromptDef:
     title: str
     var: str | None = None
     required: bool = True
+    policy: str | None = None
 
     # nur für select:
     options: list[dict[str, Any]] = field(default_factory=list)

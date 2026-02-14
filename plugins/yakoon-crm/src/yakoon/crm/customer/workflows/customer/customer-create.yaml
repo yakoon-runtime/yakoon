@@ -7,15 +7,17 @@ steps:
   - id: first_name
     prompt:
       kind: text
-      title: "Vorname:"
+      title: "Vorname"
       var: customer.first_name
+      policy: system:string
     next: last_name
 
   - id: last_name
     prompt:
       kind: text
-      title: "Nachname:"
+      title: "Nachname"
       var: customer.last_name
+      policy: system:string
     next: ask_mail
 
   - id: ask_mail
@@ -23,6 +25,7 @@ steps:
       kind: select
       title: "E-Mail angeben?"
       var: customer.mail_opt_in  # default: no
+      policy: system:bool
       default: y
       options:
         - { label: "Ja", value: y }
@@ -32,7 +35,8 @@ steps:
   - id: mail
     prompt:
       kind: text
-      title: "E-Mail Adresse:"
+      title: "E-Mail Adresse"
+      policy: system:string
       var: customer.mail
     next: step_validate
 

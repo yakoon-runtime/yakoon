@@ -167,6 +167,7 @@ class WorkflowCompileService:
                     kind=kind,
                     title=p["title"],
                     var=p.get("var"),
+                    policy=p.get("policy", "system:string"),
                     required=bool(p.get("required", True)),
                     options=options if kind == "select" else [],
                     default=default if kind == "select" else None,

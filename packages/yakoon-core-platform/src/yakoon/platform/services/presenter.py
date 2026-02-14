@@ -5,57 +5,44 @@ from yakoon.platform.runtime.render.context import RenderContext
 
 
 class PresenterPrompts:
-
     DEFAULT_POLICY = "system:string"
-    DEFAULT_SECRET_POLICY = "system:secret"
+    DEFAULT_MASK_POLICY = "system:masked"
 
     def __init__(self, ctx, session: Session, services: ServiceDirectory):
         self._ctx = ctx
         self._session = session
-        self._prompts = services.get(ports.PromptService)
-        self._policy = services.get(ports.PolicyService)
         self._renderfields = services.get(ports.FieldSpecRenderService)
+        self._inputs = services.get(ports.InputService)
 
     async def ask(
         self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
-    ) -> str:
+    ) -> object:
         field = await self._renderfields.build(
             self._ctx,
             section_key=section_key,
             policy=policy,
             **data,
         )
-        while True:
-            raw = await self._prompts.ask(self._session, field)
-            res = self._policy.validate_field(field=field, raw=raw)
-            if res.ok:
-                return res.value
-
-            # simplest error output; later: render template section "invalid_input"
-            for err in res.errors:
-                await self._session.emit(f"[{err.field_key}] {err.message}")
+        return await self._inputs.ask_field(self._session, field)
 
     async def ask_secret(
-        self, section_key: str, *, policy: str = DEFAULT_SECRET_POLICY, **data
-    ) -> str:
+        self, section_key: str, *, policy: str = DEFAULT_MASK_POLICY, **data
+    ) -> object:
         return await self.ask(section_key, policy=policy, **data)
 
-    async def confirm(
-        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
-    ) -> bool:
+    async def confirm(self, section_key: str, **data) -> bool:
         field = await self._renderfields.build(
             self._ctx,
             section_key=section_key,
-            policy=policy,
+            policy=self.DEFAULT_POLICY,
             **data,
         )
-        return await self._prompts.confirm(self._session, field)
+        return await self._inputs.confirm(self._session, field)
 
     async def choice_value(
         self,
         section_key: str,
         *,
-        policy: str = DEFAULT_POLICY,
         options: list[dict],
         default: str | None = None,
         **data,
@@ -63,10 +50,10 @@ class PresenterPrompts:
         field = await self._renderfields.build(
             self._ctx,
             section_key=section_key,
-            policy=policy,
+            policy=self.DEFAULT_POLICY,
             **data,
         )
-        return await self._prompts.choice_value(
+        return await self._inputs.choice_value(
             self._session, field, options, default=default
         )
 
@@ -74,21 +61,16 @@ class PresenterPrompts:
         self,
         section_key: str,
         *,
-        policy: str = DEFAULT_POLICY,
         options: list[str],
         **data,
     ) -> int:
         field = await self._renderfields.build(
             self._ctx,
             section_key=section_key,
-            policy=policy,
+            policy=self.DEFAULT_POLICY,
             **data,
         )
-        return await self._prompts.choice_index(
-            self._session,
-            field,
-            options,
-        )
+        return await self._inputs.choice_index(self._session, field, options)
 
 
 class Presenter:

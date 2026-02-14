@@ -14,8 +14,9 @@ class CmdWfPrompt(WfCommand):
         batch_id = request.arg(0)
         step_id = request.arg(1)
 
-        prompts = self.services.get(ports.PromptService)
         wfsvc = self.services.get(ports.WorkflowService)
+        policies = self.services.get(ports.PolicyService)
+        inputs = self.services.get(ports.InputService)
 
         step = wfsvc.get_step(session, batch_id, step_id)
         if not step.prompt:
@@ -23,9 +24,12 @@ class CmdWfPrompt(WfCommand):
 
         p = step.prompt
 
+        base = policies.get_field(p.policy or "system:string")
+        field = base.fork(key=p.var, label=p.title)
+
         # TEXT
         if p.kind == "text":
-            value = await prompts.ask(session, p.title)
+            value = await inputs.ask_field(session, field)
             wfsvc.complete_prompt_step(
                 session, batch_id=batch_id, step_id=step_id, value=value
             )
@@ -33,9 +37,9 @@ class CmdWfPrompt(WfCommand):
 
         # SELECT (returns option.value)
         if p.kind == "select":
-            value = await prompts.choice_value(
+            value = await inputs.choice_value(
                 session,
-                p.title,
+                field,
                 p.options,
                 default=p.default,  # falls du default schon nutzen willst
             )
@@ -46,7 +50,7 @@ class CmdWfPrompt(WfCommand):
 
         # CONFIRM (returns bool)
         if p.kind == "confirm":
-            value = await prompts.confirm(session, p.title)
+            value = await inputs.confirm(session, field)
             wfsvc.complete_prompt_step(
                 session, batch_id=batch_id, step_id=step_id, value=value
             )

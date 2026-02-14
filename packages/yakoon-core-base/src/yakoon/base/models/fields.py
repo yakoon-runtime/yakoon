@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 
 
@@ -40,6 +40,9 @@ class FieldSpec:
     hint: str = ""
     secret: bool = False
     options: list[SelectOption] | None = None
+
+    def fork(self, **changes) -> "FieldSpec":
+        return replace(self, **changes)
 
 
 @dataclass(frozen=True, slots=True)

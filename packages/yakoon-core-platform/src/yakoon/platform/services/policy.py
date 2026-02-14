@@ -31,7 +31,7 @@ class PolicyService:
         self.register_fields(
             [
                 FieldSpec(key="system:string", type=FieldType.STRING),
-                FieldSpec(key="system:secret", type=FieldType.STRING, secret=True),
+                FieldSpec(key="system:masked", type=FieldType.STRING, secret=True),
                 FieldSpec(key="system:int", type=FieldType.INT),
                 FieldSpec(key="system:bool", type=FieldType.BOOL),
             ]

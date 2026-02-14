@@ -20,11 +20,11 @@ from yakoon.platform.services.catalog import (
 from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialogservice import DefaultDialogService
 from yakoon.platform.services.fieldspec import FieldSpecRenderService
+from yakoon.platform.services.input import InputService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.policy import PolicyService
 from yakoon.platform.services.presenter import PresenterService
-from yakoon.platform.services.prompt import PromptService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
@@ -169,7 +169,6 @@ def _compose_services(
     services.register_static(ports.SessionService, SessionService(stores.sessions))
     services.register_static(ports.CommandQueueService, CommandQueueService())
     services.register_static(ports.PresenterService, PresenterService(services))
-    services.register_static(ports.PromptService, PromptService(services))
     services.register_static(
         ports.AccountService, AccountService(InMemoryAccountStore())
     )
@@ -182,6 +181,8 @@ def _compose_services(
     services.register_static(ports.WorkflowService, WorkflowService(services))
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     services.register_static(ports.PolicyService, PolicyService())
+    services.register_static(ports.InputService, InputService(services))
+
     services.register_static(
         ports.FieldSpecRenderService, FieldSpecRenderService(services)
     )
