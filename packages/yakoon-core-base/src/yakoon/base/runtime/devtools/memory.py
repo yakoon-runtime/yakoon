@@ -4,17 +4,10 @@ from collections import Counter
 
 
 class MemoryTrendMonitor:
-    """
-    Periodically logs the most frequent Python object types in memory.
+    """Periodically logs the most frequent Python object types in memory.
 
-    This is a lightweight diagnostic tool intended for development use only.
-    It runs in the background and prints trends in object allocation,
-    helping identify potential memory leaks or growth patterns.
-
-    Usage:
-        MemoryTrendMonitor.start()
-        ...
-        MemoryTrendMonitor.stop()
+    A lightweight diagnostic tool for development use. Runs in the background,
+    prints trends in object allocation, and helps identify memory leaks or growth.
     """
 
     interval = 5
@@ -23,27 +16,35 @@ class MemoryTrendMonitor:
     _task: asyncio.Task | None = None
 
     @classmethod
-    def start(cls, interval=5):
+    def start(cls, interval: int = 5) -> None:
+        """Starts the memory trend monitor.
+
+        Args:
+            interval: Logging interval in seconds. Defaults to 5.
+        """
         cls.interval = interval
         if not cls._running:
             cls._running = True
             cls._task = asyncio.create_task(cls._run())
 
     @classmethod
-    def stop(cls):
+    def stop(cls) -> None:
+        """Stops the memory trend monitor."""
         cls._running = False
         if cls._task:
             cls._task.cancel()
             cls._task = None
 
     @classmethod
-    async def _run(cls):
+    async def _run(cls) -> None:
+        """Background task that logs memory snapshots at the specified interval."""
         while cls._running:
             await asyncio.sleep(cls.interval)
             cls._log_snapshot()
 
     @classmethod
-    def _log_snapshot(cls):
+    def _log_snapshot(cls) -> None:
+        """Logs the current top object types and their trends."""
         gc.collect()
         now = Counter(type(obj).__name__ for obj in gc.get_objects())
         output = []

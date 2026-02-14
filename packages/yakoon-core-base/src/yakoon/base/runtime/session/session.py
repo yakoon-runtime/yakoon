@@ -14,12 +14,19 @@ from yakoon.base.runtime.output.event import OutputEvent
 
 @dataclass
 class SessionState:
-    """
-    Persistable session state.
+    """Persistable session state.
 
     Contains only serializable data.
-    The session key is part of the state and is immutable for the lifetime
-    of the session.
+    The session key is part of the state and is immutable for the lifetime of the session.
+
+    Attributes:
+        key: Unique session identifier.
+        active_controller_id: ID of the active controller, if any.
+        account_key: Associated account key, if any.
+        username: Associated username, if any.
+        last_active: Timestamp of last activity.
+        lang: Language preference. Defaults to "de".
+        data: Arbitrary session data as key-value pairs.
     """
 
     key: Key
@@ -33,6 +40,11 @@ class SessionState:
     data: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
+        """Serializes the session state to a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the session state.
+        """
         d = asdict(self)
         if self.last_active:
             d["last_active"] = self.last_active.astimezone(UTC).isoformat()
@@ -44,6 +56,17 @@ class SessionState:
 
     @classmethod
     def from_dict(cls, d: dict) -> SessionState:
+        """Deserializes a session state from a dictionary.
+
+        Args:
+            d: Dictionary containing session state data.
+
+        Returns:
+            SessionState: A SessionState instance.
+
+        Raises:
+            ValueError: If the dictionary lacks a 'key'.
+        """
         if not d or "key" not in d:
             raise ValueError("SessionState requires a 'key'")
 
@@ -59,6 +82,17 @@ class SessionState:
 
 @dataclass
 class SessionRuntime:
+    """Runtime state and behavior for an active session.
+
+    Attributes:
+        permissions: Set of permissions for the session.
+        interaction_mode: Current interaction mode.
+        output_format: Preferred output format.
+        signals: Set of active signal flags.
+        io: I/O handler for the session.
+        meta: Arbitrary runtime metadata.
+    """
+
     permissions: PermissionSet = field(default_factory=PermissionSet)
     interaction_mode: InteractionMode = InteractionMode(InteractionMode.WIZARD)
     output_format: OutputFormat = OutputFormat(OutputFormat.PLAIN)
@@ -69,8 +103,7 @@ class SessionRuntime:
 
 
 class Session:
-    """
-    Represents a single interactive session.
+    """Represents a single interactive session.
 
     A Session is a runtime façade that combines:
     - a persistent SessionState (identity, controller, timestamps)
@@ -81,56 +114,78 @@ class Session:
     """
 
     def __init__(self, state: SessionState):
-        """
-        Creates a new session with an empty state and fresh runtime context.
+        """Creates a new session with the given state and fresh runtime context.
 
         Args:
-            key (Key): Unique identifier of the session.
+            state: The persistent state of the session.
         """
         self._state = state
         self._runtime = SessionRuntime()
 
     @property
     def lang(self) -> str:
+        """Returns the language preference of the session."""
         return self._state.lang
 
     @property
     def key(self) -> Key:
+        """Returns the unique session identifier."""
         return self._state.key
 
     @property
     def state(self) -> SessionState:
+        """Returns the persistent state of the session."""
         return self._state
 
     @property
     def permissions(self) -> PermissionSet:
+        """Returns the set of permissions for the session."""
         return self._runtime.permissions
-
-    # ---- interaction_mode ----
 
     @property
     def interaction_mode(self) -> InteractionMode:
+        """Returns the current interaction mode of the session."""
         return self._runtime.interaction_mode
 
     @interaction_mode.setter
     def interaction_mode(self, value: InteractionMode) -> None:
+        """Sets the interaction mode of the session.
+
+        Args:
+            value: The new interaction mode.
+
+        Raises:
+            ValueError: If the interaction mode is invalid.
+        """
         if value.value not in InteractionMode.values():
             raise ValueError(f"Invalid interaction_mode: {value.value}")
         self._runtime.interaction_mode = value
 
-    # ---- output_format ----
-
     @property
     def output_format(self) -> OutputFormat:
+        """Returns the current output format of the session."""
         return self._runtime.output_format
 
     @output_format.setter
     def output_format(self, value: OutputFormat) -> None:
+        """Sets the output format of the session.
+
+        Args:
+            value: The new output format.
+
+        Raises:
+            ValueError: If the output format is invalid.
+        """
         if value.value not in OutputFormat.values():
             raise ValueError(f"Invalid output_format: {value.value}")
         self._runtime.output_format = value
 
     def set_permissions(self, permset: PermissionSet) -> None:
+        """Sets the permissions for the session.
+
+        Args:
+            permset: The new set of permissions.
+        """
         self._runtime.permissions = permset
 
     @classmethod

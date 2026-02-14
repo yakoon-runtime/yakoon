@@ -2,12 +2,9 @@ import asyncio
 
 
 class UnresolvedPromptMonitor:
-    """
-    Periodically checks for unresolved prompts and logs those exceeding a timeout.
+    """Periodically checks for unresolved prompts and logs those exceeding a timeout.
 
-    This monitor tracks registered session prompts (e.g. user inputs waiting on completion)
-    and reports if any exceed a given threshold duration.
-
+    Tracks session prompts (e.g., user inputs) and reports if any exceed the threshold.
     Intended for development/debugging to detect hanging or stalled sessions.
     """
 
@@ -18,15 +15,28 @@ class UnresolvedPromptMonitor:
     zombie_threshold = 60
 
     @classmethod
-    def track(cls, session_id: str, future: asyncio.Future):
+    def track(cls, session_id: str, future: asyncio.Future) -> None:
+        """Registers a session prompt for monitoring.
+
+        Args:
+            session_id: Unique identifier for the session.
+            future: The asyncio.Future representing the unresolved prompt.
+        """
         cls._registry[session_id] = (future, asyncio.get_event_loop().time())
 
     @classmethod
-    def untrack(cls, session_id: str):
+    def untrack(cls, session_id: str) -> None:
+        """Removes a session prompt from monitoring.
+
+        Args:
+            session_id: Unique identifier for the session.
+        """
         cls._registry.pop(session_id, None)
 
     @classmethod
-    def start(cls):
+    def start(cls) -> None:
+        """Starts the unresolved prompt monitor."""
+
         async def _loop():
             while True:
                 now = asyncio.get_event_loop().time()
@@ -45,7 +55,8 @@ class UnresolvedPromptMonitor:
             cls._task = asyncio.create_task(_loop())
 
     @classmethod
-    def stop(cls):
+    def stop(cls) -> None:
+        """Stops the unresolved prompt monitor."""
         if cls._task:
             cls._task.cancel()
             cls._task = None
