@@ -15,6 +15,4 @@ class CmdWfRun(WfCommand):
         controller_id = self.context.controller.id  # kommt aus deinem Dispatcher
 
         wfsvc = self.services.get(ports.WorkflowService)
-        wfsvc.start(
-            session, controller_id, key, interaction_mode=session.interaction_mode
-        )
+        wfsvc.start(session, controller_id, key)

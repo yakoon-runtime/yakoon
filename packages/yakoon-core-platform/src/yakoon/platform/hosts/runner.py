@@ -24,11 +24,7 @@ class Runner:
         await self.engine.dispatch(self.session, DispatchInput(text))
         await self.drive()
 
-    async def on_form_submit(self, values: dict[str, object]) -> None:
-        """
-        Called by form-capable hosts (Kivy/Qt/Web) when the user submits a form.
-        This resolves the currently waiting dialog and continues pumping.
-        """
+    async def on_input_submit(self, values: dict[str, object]) -> None:
         dialogs = self.engine.services.get(ports.DialogService)
         dialogs.resolve_input(self.session, values)
         await self.drive()
@@ -54,17 +50,9 @@ class Runner:
             state = dialogs.state(self.session)
             ps1 = format_ps1(self.session)
 
-            # Wizard-state (Prompt) handling
-            if state == DialogState.WAITING_WIZARD:
-                field = dialogs.get_field_spec(self.session)
-                # Host renders and collects a single field value.
-                await self.host.on_field(ps1=ps1, field=field)
-                return
-
-            # Form-state handling
             if state == DialogState.WAITING_FORM:
                 spec = dialogs.get_form_spec(self.session)
-                await self.host.on_form(ps1=ps1, spec=spec)
+                await self.host.on_input(ps1=ps1, spec=spec)
                 return
 
             # Drain queued command handling

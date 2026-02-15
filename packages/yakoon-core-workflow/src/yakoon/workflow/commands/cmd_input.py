@@ -3,7 +3,6 @@ from yakoon.base.commands.command import WfCommand
 from yakoon.base.commands.request import Request
 from yakoon.base.models.command import CommandVisibility
 from yakoon.base.models.fields import FormSpec
-from yakoon.base.models.mode import InteractionMode
 from yakoon.base.runtime.session.session import Session
 
 
@@ -39,21 +38,16 @@ class CmdWfInput(WfCommand):
 
         # 2) collect values depending on mode
         values: dict[str, object]
-        if session.interaction_mode == InteractionMode.FORM:
-            spec = FormSpec(
-                form_id=f"{batch_id}:{step_id}",
-                batch_id=batch_id,
-                step_key=step_id,
-                title=s.title,
-                fields=fields,
-            )
-            values = await inputs.ask_form(session, spec)
-        else:
-            values = {}
-            for field in fields:
-                values[field.key] = await inputs.ask_field(session, field)
+        spec = FormSpec(
+            form_id=f"{batch_id}:{step_id}",
+            batch_id=batch_id,
+            step_key=step_id,
+            title=s.title,
+            fields=fields,
+        )
+        values = await inputs.ask_form(session, spec)
 
-        # complete input step
+        # 3) complete input step
         wfsvc.complete_input_step(
             session,
             batch_id=batch_id,

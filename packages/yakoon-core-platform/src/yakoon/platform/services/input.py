@@ -9,42 +9,40 @@ from yakoon.platform.settings import settings
 
 class InputService:
     """
-    Interaction patterns built on top of:
-      - DialogService (dialog)
-      - PolicyService (validation/coercion/secret wrapping)
+    Unified interaction layer.
 
-    This is reusable by Presenter and Workflows.
+    Always communicates with DialogService via FormSpec.
+    A single field is represented as FormSpec with one field.
     """
 
     def __init__(self, services: ServiceDirectory):
         self._dialogs = services.get(ports.DialogService)
         self._policy = services.get(ports.PolicyService)
 
-    async def ask(self, session: Session, field: FieldSpec) -> object:
-        return await self._dialogs.wait_field(
-            session,
-            field=field,
-            timeout=settings.network.prompt_timed_out,
-        )
-
-    async def ask_field(self, session: Session, field: FieldSpec) -> object:
-        while True:
-            raw = await self.ask(session, field)
-            res = self._policy.validate_field(field=field, raw=raw)
-            if res.ok:
-                return res.value
-            for err in res.errors:
-                await session.emit(f"[{err.field_key}] {err.message}")
+    # -----------------------------------------------------
+    # Core
+    # -----------------------------------------------------
 
     async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]:
+        """
+        Central input mechanism.
+        Waits for FormSpec submission, validates via PolicyService,
+        repeats on validation errors.
+        """
         while True:
-            raw = await self._dialogs.wait_form(session, spec=spec, timeout=...)
+            raw = await self._dialogs.wait_input(
+                session,
+                spec=spec,
+                timeout=settings.network.prompt_timed_out,
+            )
+
             errors = []
-            out = {}
+            out: dict[str, object] = {}
 
             for field in spec.fields:
                 val = raw.get(field.key)
                 res = self._policy.validate_field(field=field, raw=val)
+
                 if res.ok:
                     out[field.key] = res.value
                 else:
@@ -53,7 +51,16 @@ class InputService:
             # unknown keys?
             unknown = set(raw.keys()) - {f.key for f in spec.fields}
             if unknown:
-                errors.append(ValueError("form", f"Unknown fields: {sorted(unknown)}"))
+                errors.append(
+                    type(
+                        "Err",
+                        (),
+                        {
+                            "field_key": "form",
+                            "message": f"Unknown fields: {sorted(unknown)}",
+                        },
+                    )()
+                )
 
             if not errors:
                 return out
@@ -61,21 +68,31 @@ class InputService:
             for e in errors:
                 await session.emit(f"[{e.field_key}] {e.message}")
 
+    async def ask_field(self, session: Session, field: FieldSpec) -> object:
+        """
+        Convenience wrapper for single-field interaction.
+        """
+        spec = FormSpec(
+            form_id=f"field:{field.key}",
+            batch_id=None,
+            step_key=None,
+            title="",
+            fields=[field],
+        )
+
+        values = await self.ask_form(session, spec)
+        return values[field.key]
+
+    # -----------------------------------------------------
+    # Optional Wizard helpers (legacy convenience)
+    # -----------------------------------------------------
+
     async def confirm(self, session: Session, field: FieldSpec) -> bool:
         """
-        Classic wizard confirm: y/n loop.
-        (Alternatively you can model this as system:bool in PolicyService later.)
+        Could be replaced entirely by system:bool policy later.
         """
-        while True:
-            raw = await self.ask(session, field)
-            a = str(raw or "").strip().casefold()
-
-            if a in ("y", "yes", "j", "ja"):
-                return True
-            if a in ("n", "no", "nein"):
-                return False
-
-            await session.emit("Bitte antworte mit 'y' oder 'n'.")
+        field = field.copy_with(policy="system:bool")  # if you support cloning
+        return bool(await self.ask_field(session, field))
 
     async def choice_value(
         self,
@@ -86,80 +103,18 @@ class InputService:
         default: str | None = None,
     ) -> str:
         """
-        Classic wizard choice:
-          - prints options
-          - accepts number or label/value
-          - returns option value
+        This could also move to PolicyService later.
+        For now implemented as form with options metadata.
         """
-        if not options:
-            raise ValueError("choice_value() requires at least one option")
-
-        # validate & normalize options
-        norm: list[tuple[str, str]] = []
-        values: set[str] = set()
-
-        for opt in options:
-            if "label" not in opt or "value" not in opt:
-                raise ValueError("choice_value() options require keys: label, value")
-
-            label = str(opt["label"])
-            value = str(opt["value"])
-
-            if value in values:
-                raise ValueError(f"choice_value(): duplicate option value: {value!r}")
-
-            values.add(value)
-            norm.append((label, value))
-
-        if default is not None and str(default) not in values:
-            raise ValueError(
-                f"choice_value(): default {default!r} not in option values"
-            )
-
-        # show options (wizard UX)
-        lines = [field.label]
-        for idx, (label, _) in enumerate(norm, 1):
-            lines.append(f"[{idx}] {label}")
-        await session.emit("\n".join(lines))
-
-        # ask loop
-        while True:
-            raw = await self.ask(session, field)
-            a = str(raw or "").strip()
-
-            if not a and default is not None:
-                return str(default)
-
-            if a.isdigit():
-                i = int(a) - 1
-                if 0 <= i < len(norm):
-                    return norm[i][1]
-
-            ac = a.casefold()
-            for label, value in norm:
-                if ac == label.casefold() or ac == value.casefold():
-                    return value
-
-            await session.emit("Bitte eine gültige Auswahl treffen.")
+        field = field.copy_with(options=options, default=default)
+        return str(await self.ask_field(session, field))
 
     async def choice_index(
-        self, session: Session, field: FieldSpec, options: list[str]
+        self,
+        session: Session,
+        field: FieldSpec,
+        options: list[str],
     ) -> int:
-        if not options:
-            raise ValueError("choice_index() requires at least one option")
-
-        lines = [field.label]
-        for idx, opt in enumerate(options, 1):
-            lines.append(f"[{idx}] {opt}")
-        await session.emit("\n".join(lines))
-
-        while True:
-            raw = await self.ask(session, field)
-            a = str(raw or "").strip()
-
-            if a.isdigit():
-                index = int(a) - 1
-                if 0 <= index < len(options):
-                    return index
-
-            await session.emit("Bitte eine gültige Nummer eingeben.")
+        mapped = [{"label": opt, "value": str(i)} for i, opt in enumerate(options)]
+        val = await self.choice_value(session, field, mapped)
+        return int(val)

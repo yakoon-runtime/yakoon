@@ -150,21 +150,9 @@ class DialogService(Protocol):
     def resolve_input(self, session: Session, value: DialogValue) -> bool: ...
     def cancel_input(self, session: Session) -> None: ...
 
-    # wizard (single field)
-    def get_field_spec(self, session: Session) -> FieldSpec: ...
-
-    def wait_field(
-        self,
-        session: Session,
-        *,
-        field: FieldSpec,
-        timeout: float | None = None,
-        on_timeout: Callable[[], Awaitable[None]] | None = None,
-    ) -> asyncio.Future: ...
-
     # form (multiple fields)
     def get_form_spec(self, session: Session) -> FormSpec: ...
-    def wait_form(
+    def wait_input(
         self,
         session: Session,
         *,

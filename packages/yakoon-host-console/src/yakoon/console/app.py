@@ -39,7 +39,6 @@ async def run_console():
 
     session.bind_io(ConsoleOutput())
     session.output_format = OutputFormat.MARKDOWN
-    # session.interaction_mode = InteractionMode.FORM
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)
@@ -53,7 +52,7 @@ async def run_console():
         runner = Runner(engine=engine, session=session, host=host)
 
         inits = ["use crm-customer", "customer-create"]
-        # inits = []
+        inits = []
         await runner.start(inits)
 
     except KeyboardInterrupt:

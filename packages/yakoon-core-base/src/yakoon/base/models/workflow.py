@@ -4,8 +4,6 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
-from yakoon.base.models.mode import InteractionMode
-
 
 class WorkflowContextRequired(Exception):
     pass
@@ -83,7 +81,6 @@ class WorkflowStatus(StrEnum):
 @dataclass
 class WorkflowBatch:
     batch_id: str
-    interaction_mode: InteractionMode
     controller_id: str | None = None
 
     workflow_id: str | None = None
@@ -104,10 +101,10 @@ class WorkflowRuntime:
     def get(self, batch_id: str) -> WorkflowBatch | None:
         return self.batches.get(batch_id)
 
-    def ensure(self, batch_id: str, *, interaction_mode: Any) -> WorkflowBatch:
+    def ensure(self, batch_id: str) -> WorkflowBatch:
         b = self.batches.get(batch_id)
         if b is None:
-            b = WorkflowBatch(batch_id=batch_id, interaction_mode=interaction_mode)
+            b = WorkflowBatch(batch_id=batch_id)
             self.batches[batch_id] = b
         return b
 

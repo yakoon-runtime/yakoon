@@ -26,7 +26,6 @@ class WorkflowService:
 
     Regeln:
     - Workflows sind controller-scoped (controller_id + workflow_key).
-    - interaction_mode kommt IMMER aus der Session.
     - Commands müssen keine split_id/normalize machen
     (Engine/Router verhindert Cross-Controller).
     """
@@ -126,7 +125,7 @@ class WorkflowService:
         batch_id = uuid4().hex
 
         rt = self.runtime(session)
-        batch = rt.ensure(batch_id, interaction_mode=session.interaction_mode)
+        batch = rt.ensure(batch_id)
         batch.controller_id = controller_id
         batch.workflow_key = workflow_key
         batch.current_step = wf.start

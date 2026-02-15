@@ -49,7 +49,14 @@ steps:
   next: done
 
 - id: store_customer_with_mail
-  run: wf:crm.customer.store 
+  run: wf:crm.customer.store
+  args:
+    - "--first_name"
+    - "{{customer.first_name}}"
+    - "--last_name"
+    - "{{customer.last_name}}"
+    - "--mail"
+    - "{{customer.mail}}"
   next: done
 
 - id: step_validate

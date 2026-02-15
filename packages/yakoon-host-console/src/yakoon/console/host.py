@@ -1,6 +1,6 @@
 import asyncio
 
-from yakoon.base.models.fields import FieldSpec, FormSpec
+from yakoon.base.models.fields import FormSpec
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.platform.hosts.adapter import HostAdapter
 
@@ -20,31 +20,7 @@ class ConsoleHost(HostAdapter):
         self._submit = submit
         self._lock = asyncio.Lock()
 
-    async def on_field(self, *, ps1: str, field: FieldSpec) -> None:
-        """
-        Wizard mode: single field.
-        """
-
-        # Build prompt text from field
-        prompt = field.label or field.key
-        if field.hint:
-            prompt = f"{prompt} ({field.hint})"
-
-        prompt = f"{ps1}[{prompt}]"
-
-        async with self._lock:
-            if getattr(field, "secret", False):
-                value = await safe_input_secret(ps1=prompt)
-            else:
-                value = await safe_input(ps1=prompt)
-
-        # Send value back to Runner
-        await self._submit(value)
-
-    async def on_form(self, *, ps1: str, spec: FormSpec) -> None:
-        """
-        Console fallback: degrade form to sequential wizard fields.
-        """
+    async def on_input(self, *, ps1: str, spec: FormSpec) -> None:
 
         values: dict[str, object] = {}
 

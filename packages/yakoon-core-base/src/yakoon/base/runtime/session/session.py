@@ -7,7 +7,6 @@ from typing import Any
 
 from yakoon.base.models.format import OutputFormat
 from yakoon.base.models.key import Key
-from yakoon.base.models.mode import InteractionMode
 from yakoon.base.models.perm import PermissionSet
 from yakoon.base.runtime.output.event import OutputEvent
 
@@ -86,7 +85,6 @@ class SessionRuntime:
 
     Attributes:
         permissions: Set of permissions for the session.
-        interaction_mode: Current interaction mode.
         output_format: Preferred output format.
         signals: Set of active signal flags.
         io: I/O handler for the session.
@@ -94,7 +92,6 @@ class SessionRuntime:
     """
 
     permissions: PermissionSet = field(default_factory=PermissionSet)
-    interaction_mode: InteractionMode = InteractionMode(InteractionMode.WIZARD)
     output_format: OutputFormat = OutputFormat(OutputFormat.PLAIN)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
@@ -141,25 +138,6 @@ class Session:
     def permissions(self) -> PermissionSet:
         """Returns the set of permissions for the session."""
         return self._runtime.permissions
-
-    @property
-    def interaction_mode(self) -> InteractionMode:
-        """Returns the current interaction mode of the session."""
-        return self._runtime.interaction_mode
-
-    @interaction_mode.setter
-    def interaction_mode(self, value: InteractionMode) -> None:
-        """Sets the interaction mode of the session.
-
-        Args:
-            value: The new interaction mode.
-
-        Raises:
-            ValueError: If the interaction mode is invalid.
-        """
-        if value.value not in InteractionMode.values():
-            raise ValueError(f"Invalid interaction_mode: {value.value}")
-        self._runtime.interaction_mode = value
 
     @property
     def output_format(self) -> OutputFormat:
@@ -210,7 +188,7 @@ class Session:
         Marks the session as recently active.
 
         Updates the last_active timestamp in the persistent session state.
-        This should be called on user interaction (e.g. dispatch, prompt input),
+        This should be called on user interaction (e.g. dispatch, user input),
         not on every internal execution step.
         """
         self._state.last_active = datetime.now(UTC)

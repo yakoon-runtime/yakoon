@@ -14,8 +14,8 @@ class CmdCustomerStore(WfCommand):
 
         audits = self.services.get(AuditLogService)
 
-        first = request.option("first")
-        last = request.option("last")
+        first = request.option("first_name")
+        last = request.option("last_name")
         mail_opt_in = request.option("mail_opt_in")
         mail = request.option("mail")
 
