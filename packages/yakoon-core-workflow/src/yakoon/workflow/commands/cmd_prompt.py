@@ -19,9 +19,6 @@ class CmdWfPrompt(WfCommand):
         inputs = self.services.get(ports.InputService)
 
         step = wfsvc.get_step(session, batch_id, step_id)
-        if not step.prompt:
-            raise RuntimeError(f"Step '{step_id}' has no prompt")
-
         p = step.prompt
 
         base = policies.get_field(p.policy or "system:string")
