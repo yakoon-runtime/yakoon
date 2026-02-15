@@ -5,15 +5,15 @@ from yakoon.base.runtime.session.session import Session
 
 
 def CmdWfStart(
-    command_key: str, tem_prefix: str = "", *, workflow_key: str | None = None
+    command_key: str, tem_prefix: str = "", *, alt_command_key: str | None = None
 ) -> type[Command]:
     """
     Generates a Command class that starts a workflow.
 
     - command_key: CLI key (e.g. "create-customer")
-    - workflow_key: workflow file key; defaults to command_key
+    - alt_command_key: workflow file key; defaults to command_key
     """
-    wf_key = workflow_key or command_key
+    wf_key = alt_command_key or command_key
 
     class _CmdWorkflowStart(Command):
 
@@ -27,7 +27,7 @@ def CmdWfStart(
             batch_id = wf.start(
                 session,
                 controller_id,
-                workflow_key=wf_key,
+                command_key=wf_key,
                 enqueue_first=False,
             )
             wf.enqueue_next(session, batch_id)

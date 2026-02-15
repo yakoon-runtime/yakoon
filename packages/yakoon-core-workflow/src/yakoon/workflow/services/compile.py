@@ -55,13 +55,13 @@ class WorkflowFileNotFound(FileNotFoundError):
 
 @dataclass(frozen=True, slots=True)
 class StepContext:
-    workflow_key: str
+    command_key: str
     step_id: str
     raw: dict[str, Any]
 
     def err(self, message: str) -> ValueError:
         # Consistent prefix for grep-ability: workflow:step
-        return ValueError(f"{self.workflow_key}:{self.step_id}: {message}")
+        return ValueError(f"{self.command_key}:{self.step_id}: {message}")
 
     def step_err(self, message: str) -> ValueError:
         # Alternative prefix used by some validations (kept readable)
@@ -307,8 +307,8 @@ class StepAssembler:
         self._switch = SwitchBuilder()
         self._input = InputBuilder()
 
-    def build(self, workflow_key: str, sid: str, raw_step: dict[str, Any]) -> StepDef:
-        ctx = StepContext(workflow_key=workflow_key, step_id=sid, raw=raw_step)
+    def build(self, command_key: str, sid: str, raw_step: dict[str, Any]) -> StepDef:
+        ctx = StepContext(command_key=command_key, step_id=sid, raw=raw_step)
 
         self._legacy.validate(ctx)
 
@@ -340,11 +340,9 @@ class StepAssembler:
 
 
 class GraphValidator:
-    def validate(
-        self, workflow_key: str, steps: dict[str, StepDef], start: str
-    ) -> None:
+    def validate(self, command_key: str, steps: dict[str, StepDef], start: str) -> None:
         if start not in steps:
-            raise ValueError(f"{workflow_key}: start step '{start}' not found.")
+            raise ValueError(f"{command_key}: start step '{start}' not found.")
 
         step_ids = set(steps.keys())
 
@@ -352,7 +350,7 @@ class GraphValidator:
             # next
             if step.next and step.next not in step_ids:
                 raise ValueError(
-                    f"{workflow_key}:{step.id}: next target '{step.next}' not found."
+                    f"{command_key}:{step.id}: next target '{step.next}' not found."
                 )
 
             # input branches targets
@@ -360,7 +358,7 @@ class GraphValidator:
                 for _, target in step.input.branches.cases.items():
                     if target not in step_ids:
                         raise ValueError(
-                            f"{workflow_key}:{step.id}: input branch target '{target}' not found."
+                            f"{command_key}:{step.id}: input branch target '{target}' not found."
                         )
 
             # switch targets
@@ -368,11 +366,11 @@ class GraphValidator:
                 for k, target in step.switch.cases.items():
                     if target not in step_ids:
                         raise ValueError(
-                            f"{workflow_key}:{step.id}: switch case '{k}' target '{target}' not found."
+                            f"{command_key}:{step.id}: switch case '{k}' target '{target}' not found."
                         )
                 if step.switch.default and step.switch.default not in step_ids:
                     raise ValueError(
-                        f"{workflow_key}:{step.id}: switch default target '{step.switch.default}' not found."
+                        f"{command_key}:{step.id}: switch default target '{step.switch.default}' not found."
                     )
 
 
@@ -382,29 +380,29 @@ class WorkflowCompileService:
 
     Rules:
     - 1 workflow == 1 file
-    - filename == <workflow_key>.(yaml|yml|json)
+    - filename == <command_key>.(yaml|yml|json)
     - no caching, no bulk loading
     """
 
-    def load_def(self, source: WorkflowSource, workflow_key: str) -> WorkflowDef:
+    def load_def(self, source: WorkflowSource, command_key: str) -> WorkflowDef:
         root = (
             ir.files(source.package) / source.workflow_path / source.workflow_sub_path
         )
         if not root.is_dir():
             raise WorkflowFileNotFound(f"Workflow directory not found: {root}")
 
-        path = self._find_file(root, workflow_key)
+        path = self._find_file(root, command_key)
         raw_text = path.read_text(encoding="utf-8")
         raw = self._parse(path.name, raw_text)
 
-        return self._build_workflow_def(workflow_key, raw)
+        return self._build_workflow_def(command_key, raw)
 
-    def _find_file(self, root, workflow_key: str):
+    def _find_file(self, root, command_key: str):
         for ext in (".yaml", ".yml", ".json"):
-            p = root / f"{workflow_key}{ext}"
+            p = root / f"{command_key}{ext}"
             if p.is_file():
                 return p
-        raise WorkflowFileNotFound(f"Workflow not found: {root}/{workflow_key}")
+        raise WorkflowFileNotFound(f"Workflow not found: {root}/{command_key}")
 
     def _parse(self, filename: str, raw: str) -> dict[str, Any]:
         if filename.endswith(".json"):
@@ -422,16 +420,14 @@ class WorkflowCompileService:
 
         raise ValueError(f"Unsupported workflow file: {filename}")
 
-    def _build_workflow_def(
-        self, workflow_key: str, raw: dict[str, Any]
-    ) -> WorkflowDef:
+    def _build_workflow_def(self, command_key: str, raw: dict[str, Any]) -> WorkflowDef:
         start = raw.get("start")
         if not start or not isinstance(start, str):
-            raise ValueError(f"{workflow_key}: missing 'start'.")
+            raise ValueError(f"{command_key}: missing 'start'.")
 
         raw_steps = raw.get("steps")
         if not isinstance(raw_steps, list) or not raw_steps:
-            raise ValueError(f"{workflow_key}: 'steps' must be a non-empty list.")
+            raise ValueError(f"{command_key}: 'steps' must be a non-empty list.")
 
         assembler = StepAssembler()
         validator = GraphValidator()
@@ -439,16 +435,16 @@ class WorkflowCompileService:
         steps: dict[str, StepDef] = {}
         for s in raw_steps:
             if not isinstance(s, dict):
-                raise ValueError(f"{workflow_key}: each step must be a mapping.")
+                raise ValueError(f"{command_key}: each step must be a mapping.")
 
             sid = s.get("id")
             if not sid or not isinstance(sid, str):
-                raise ValueError(f"{workflow_key}: step without id.")
+                raise ValueError(f"{command_key}: step without id.")
 
             if sid in steps:
-                raise ValueError(f"{workflow_key}: duplicate step id '{sid}'.")
+                raise ValueError(f"{command_key}: duplicate step id '{sid}'.")
 
-            steps[sid] = assembler.build(workflow_key, sid, s)
+            steps[sid] = assembler.build(command_key, sid, s)
 
-        validator.validate(workflow_key, steps, start)
-        return WorkflowDef(id=workflow_key, start=start, steps=steps)
+        validator.validate(command_key, steps, start)
+        return WorkflowDef(id=command_key, start=start, steps=steps)

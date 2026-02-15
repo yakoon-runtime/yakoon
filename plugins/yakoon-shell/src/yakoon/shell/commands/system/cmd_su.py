@@ -15,7 +15,7 @@ class CmdSu(Command):
 
         controller_id = self.context.controller.id
         batch_id = wf.start(
-            session, controller_id, workflow_key=self.key, enqueue_first=False
+            session, controller_id, command_key=self.key, enqueue_first=False
         )
 
         wf.set_value(session, batch_id, "user.name", request.arg(0))

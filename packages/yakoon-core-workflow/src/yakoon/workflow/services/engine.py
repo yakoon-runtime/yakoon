@@ -25,7 +25,7 @@ class WorkflowService:
     WorkflowLoaderService.
 
     Regeln:
-    - Workflows sind controller-scoped (controller_id + workflow_key).
+    - Workflows sind controller-scoped (controller_id + command_key).
     - Commands müssen keine split_id/normalize machen
     (Engine/Router verhindert Cross-Controller).
     """
@@ -45,20 +45,16 @@ class WorkflowService:
 
     # ---- loading (no caching) ----
 
-    def get_def(self, controller_id: str, workflow_key: str) -> WorkflowDef:
+    def get_def(self, controller_id: str, command_key: str) -> WorkflowDef:
         catalog = self.services.get(ports.ControllerCatalogService)
         info = catalog.get(controller_id)
         if not info or not info.workflow_source:
-            raise WorkflowNotFound(
-                f"Workflow not found: {controller_id}:{workflow_key}"
-            )
+            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{command_key}")
 
         loader = self.services.get(ports.WorkflowCompileService)
-        wf = loader.load_def(info.workflow_source, workflow_key)
+        wf = loader.load_def(info.workflow_source, command_key)
         if not wf:
-            raise WorkflowNotFound(
-                f"Workflow not found: {controller_id}:{workflow_key}"
-            )
+            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{command_key}")
 
         return wf
 
@@ -75,7 +71,7 @@ class WorkflowService:
         self,
         session,
         controller_id: str,
-        workflow_key: str,
+        command_key: str,
         values: Mapping[str, Any],
         *,
         enqueue_first: bool = True,
@@ -98,7 +94,7 @@ class WorkflowService:
         batch_id = self.start(
             session,
             controller_id=controller_id,
-            workflow_key=workflow_key,
+            command_key=command_key,
             enqueue_first=False,
         )
 
@@ -116,18 +112,16 @@ class WorkflowService:
         self,
         session,
         controller_id: str,
-        workflow_key: str,
+        command_key: str,
         *,
         enqueue_first: bool = True,
     ) -> str:
-        wf = self.get_def(controller_id, workflow_key)
+        wf = self.get_def(controller_id, command_key)
 
         batch_id = uuid4().hex
 
         rt = self.runtime(session)
-        batch = rt.ensure(batch_id)
-        batch.controller_id = controller_id
-        batch.workflow_key = workflow_key
+        batch = rt.ensure(batch_id, controller_id, command_key)
         batch.current_step = wf.start
         batch.pending_step = None
         batch.status = (
@@ -178,14 +172,14 @@ class WorkflowService:
     def get_step(self, session, batch_id: str, step_id: str):
         rt = self.runtime(session)
         batch = rt.get(batch_id)
-        if not batch or not batch.controller_id or not batch.workflow_key:
+        if not batch or not batch.controller_id or not batch.command_key:
             raise RuntimeError(f"Unknown workflow batch: {batch_id}")
 
-        wf = self.get_def(batch.controller_id, batch.workflow_key)
+        wf = self.get_def(batch.controller_id, batch.command_key)
         step = wf.steps.get(step_id)
         if not step:
             raise KeyError(
-                f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}"
+                f"Step not found: {batch.controller_id}:{batch.command_key}::{step_id}"
             )
         return step
 
@@ -215,22 +209,22 @@ class WorkflowService:
             return
 
         raise ValueError(
-            f"Invalid step '{batch.controller_id}:{batch.workflow_key}::{step.id}': "
+            f"Invalid step '{batch.controller_id}:{batch.command_key}::{step.id}': "
             "neither input nor switch nor run nor end"
         )
 
     def _resolve_current_step(self, session, batch_id: str):
         rt = self.runtime(session)
         batch = rt.get(batch_id)
-        if not batch or not batch.controller_id or not batch.workflow_key:
+        if not batch or not batch.controller_id or not batch.command_key:
             return rt, None, None, None
 
-        wf = self.get_def(batch.controller_id, batch.workflow_key)
+        wf = self.get_def(batch.controller_id, batch.command_key)
         step_id = batch.current_step or wf.start
         step = wf.steps.get(step_id)
         if not step:
             raise KeyError(
-                f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}"
+                f"Step not found: {batch.controller_id}:{batch.command_key}::{step_id}"
             )
 
         return rt, batch, wf, step
@@ -253,14 +247,14 @@ class WorkflowService:
         rendered = compile_run_command(
             step.switch.expr,
             batch.values,
-            context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
+            context=f"{batch.controller_id}:{batch.command_key}:{step.id}",
         ).strip()
 
         key = rendered.strip().lower()
         next_id = step.switch.cases.get(key) or step.switch.default
         if not next_id:
             raise RuntimeError(
-                f"Switch step '{batch.controller_id}:{batch.workflow_key}::{step.id}': "
+                f"Switch step '{batch.controller_id}:{batch.command_key}::{step.id}': "
                 f"no case for '{key}' and no default"
             )
 
@@ -269,7 +263,7 @@ class WorkflowService:
 
     def _enqueue_run(self, queue, session, batch_id: str, batch, step) -> None:
         run_def = step.run
-        ctx = f"{batch.controller_id}:{batch.workflow_key}:{step.id}"
+        ctx = f"{batch.controller_id}:{batch.command_key}:{step.id}"
 
         cmd = compile_run_command(run_def.key, batch.values, context=ctx)
 

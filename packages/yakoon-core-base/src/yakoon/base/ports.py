@@ -60,7 +60,7 @@ class WorkflowService(Protocol):
     ) -> None: ...
 
     def set_value(self, session: Any, batch_id: str, key: str, value: Any) -> None: ...
-    def get_def(self, controller_id: str, workflow_key: str) -> WorkflowDef: ...
+    def get_def(self, controller_id: str, command_key: str) -> WorkflowDef: ...
     def get_step(self, session: Any, batch_id: str, step_id: str) -> StepDef: ...
 
     def fail_batch(
@@ -78,7 +78,7 @@ class WorkflowService(Protocol):
         self,
         session,
         controller_id: str,
-        workflow_key: str,
+        command_key: str,
         *,
         enqueue_first: bool = True,
     ) -> str: ...
@@ -86,7 +86,7 @@ class WorkflowService(Protocol):
         self,
         session,
         controller_id: str,
-        workflow_key: str,
+        command_key: str,
         values: Mapping[str, Any],
         *,
         enqueue_first: bool = True,
@@ -104,7 +104,7 @@ class WorkflowService(Protocol):
 
 
 class WorkflowCompileService(Protocol):
-    def load_def(self, source: Any, workflow_key: str) -> WorkflowDef: ...
+    def load_def(self, source: Any, command_key: str) -> WorkflowDef: ...
 
 
 class DialogState(StrEnum):

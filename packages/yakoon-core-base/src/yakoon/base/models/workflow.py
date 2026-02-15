@@ -81,9 +81,9 @@ class WorkflowStatus(StrEnum):
 @dataclass
 class WorkflowBatch:
     batch_id: str
-    controller_id: str | None = None
+    controller_id: str  # | None = None
+    command_key: str  # | None = None
 
-    workflow_id: str | None = None
     values: dict[str, Any] = field(default_factory=dict)
 
     current_step: str | None = None
@@ -101,10 +101,14 @@ class WorkflowRuntime:
     def get(self, batch_id: str) -> WorkflowBatch | None:
         return self.batches.get(batch_id)
 
-    def ensure(self, batch_id: str) -> WorkflowBatch:
+    def ensure(
+        self, batch_id: str, controller_id: str, command_key: str
+    ) -> WorkflowBatch:
         b = self.batches.get(batch_id)
         if b is None:
-            b = WorkflowBatch(batch_id=batch_id)
+            b = WorkflowBatch(
+                batch_id=batch_id, controller_id=controller_id, command_key=command_key
+            )
             self.batches[batch_id] = b
         return b
 
