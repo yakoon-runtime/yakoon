@@ -5,17 +5,21 @@ from yakoon.platform.runtime.render.context import RenderContext
 
 
 class PresenterPrompts:
-    DEFAULT_POLICY = "system:string"
-    DEFAULT_MASK_POLICY = "system:masked"
 
-    def __init__(self, ctx, session: Session, services: ServiceDirectory):
+    def __init__(
+        self, ctx: RenderContext, session: Session, services: ServiceDirectory
+    ):
         self._ctx = ctx
         self._session = session
         self._renderfields = services.get(ports.FieldSpecRenderService)
         self._inputs = services.get(ports.InputService)
 
     async def ask(
-        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
+        self,
+        section_key: str,
+        *,
+        policy: str = ports.PresenterPrompts.DEFAULT_POLICY,
+        **data,
     ) -> object:
         field = await self._renderfields.build(
             self._ctx,
@@ -26,51 +30,13 @@ class PresenterPrompts:
         return await self._inputs.ask_field(self._session, field)
 
     async def ask_secret(
-        self, section_key: str, *, policy: str = DEFAULT_MASK_POLICY, **data
+        self,
+        section_key: str,
+        *,
+        policy: str = ports.PresenterPrompts.DEFAULT_MASK_POLICY,
+        **data,
     ) -> object:
         return await self.ask(section_key, policy=policy, **data)
-
-    async def confirm(self, section_key: str, **data) -> bool:
-        field = await self._renderfields.build(
-            self._ctx,
-            section_key=section_key,
-            policy=self.DEFAULT_POLICY,
-            **data,
-        )
-        return await self._inputs.confirm(self._session, field)
-
-    async def choice_value(
-        self,
-        section_key: str,
-        *,
-        options: list[dict],
-        default: str | None = None,
-        **data,
-    ) -> str:
-        field = await self._renderfields.build(
-            self._ctx,
-            section_key=section_key,
-            policy=self.DEFAULT_POLICY,
-            **data,
-        )
-        return await self._inputs.choice_value(
-            self._session, field, options, default=default
-        )
-
-    async def choice_index(
-        self,
-        section_key: str,
-        *,
-        options: list[str],
-        **data,
-    ) -> int:
-        field = await self._renderfields.build(
-            self._ctx,
-            section_key=section_key,
-            policy=self.DEFAULT_POLICY,
-            **data,
-        )
-        return await self._inputs.choice_index(self._session, field, options)
 
 
 class Presenter:
@@ -103,7 +69,7 @@ class Presenter:
         self._prompts = None
         self._session = session
         self._services = services
-        self.renderer = self._services.get(ports.RendererService)
+        self._renderer = self._services.get(ports.RendererService)
 
         self._ctx = RenderContext(
             key=template_key,
@@ -128,7 +94,7 @@ class Presenter:
             section (str): Template section key (e.g. "success", "info").
             **data: Optional key-value pairs for template variables.
         """
-        text = await self.renderer.render(self._ctx, section, **data)
+        text = await self._renderer.render(self._ctx, section, **data)
         await self._session.emit(text)
 
     async def fail(self, section: str, **data):

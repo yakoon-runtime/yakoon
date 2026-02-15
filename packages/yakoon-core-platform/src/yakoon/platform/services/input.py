@@ -19,10 +19,6 @@ class InputService:
         self._dialogs = services.get(ports.DialogService)
         self._policy = services.get(ports.PolicyService)
 
-    # -----------------------------------------------------
-    # Core
-    # -----------------------------------------------------
-
     async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]:
         """
         Central input mechanism.
@@ -82,39 +78,3 @@ class InputService:
 
         values = await self.ask_form(session, spec)
         return values[field.key]
-
-    # -----------------------------------------------------
-    # Optional Wizard helpers (legacy convenience)
-    # -----------------------------------------------------
-
-    async def confirm(self, session: Session, field: FieldSpec) -> bool:
-        """
-        Could be replaced entirely by system:bool policy later.
-        """
-        field = field.copy_with(policy="system:bool")  # if you support cloning
-        return bool(await self.ask_field(session, field))
-
-    async def choice_value(
-        self,
-        session: Session,
-        field: FieldSpec,
-        options: list[dict],
-        *,
-        default: str | None = None,
-    ) -> str:
-        """
-        This could also move to PolicyService later.
-        For now implemented as form with options metadata.
-        """
-        field = field.copy_with(options=options, default=default)
-        return str(await self.ask_field(session, field))
-
-    async def choice_index(
-        self,
-        session: Session,
-        field: FieldSpec,
-        options: list[str],
-    ) -> int:
-        mapped = [{"label": opt, "value": str(i)} for i, opt in enumerate(options)]
-        val = await self.choice_value(session, field, mapped)
-        return int(val)

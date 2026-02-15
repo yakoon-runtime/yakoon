@@ -120,20 +120,8 @@ DialogValue: TypeAlias = FieldSpec | FormValues
 
 class InputService(Protocol):
 
+    async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]: ...
     async def ask_field(self, session: Session, field: FieldSpec) -> object: ...
-    async def confirm(self, session: Session, field: FieldSpec) -> bool: ...
-    async def choice_value(
-        self,
-        session: Session,
-        field: FieldSpec,
-        options: list[dict],
-        *,
-        default: str | None = None,
-    ) -> str: ...
-
-    async def choice_index(
-        self, session: Session, field: FieldSpec, options: list[str]
-    ) -> int: ...
 
 
 class DialogService(Protocol):
@@ -261,32 +249,16 @@ class AuditLogService(Protocol):
 
 class PresenterPrompts(Protocol):
 
+    DEFAULT_POLICY = "system:string"
+    DEFAULT_MASK_POLICY = "system:masked"
+
     async def ask(
-        self, section_key: str, *, policy: str = "system:string", **data
-    ) -> str: ...
+        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
+    ) -> object: ...
+
     async def ask_secret(
-        self, section_key: str, *, policy: str = "system:masked", **data
-    ) -> str: ...
-    async def confirm(
-        self, section_key: str, *, policy: str = "system:string", **data
-    ) -> bool: ...
-    async def choice_value(
-        self,
-        section_key: str,
-        *,
-        policy: str = "system:string",
-        options: list[dict],
-        default: str | None = None,
-        **data,
-    ) -> str: ...
-    async def choice_index(
-        self,
-        section_key: str,
-        *,
-        policy: str = "system:string",
-        options: list[str],
-        **data,
-    ) -> int: ...
+        self, section_key: str, *, policy: str = DEFAULT_MASK_POLICY, **data
+    ) -> object: ...
 
 
 class Presenter(Protocol):
