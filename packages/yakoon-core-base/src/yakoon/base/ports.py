@@ -13,7 +13,7 @@ from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
 from yakoon.base.models.policy import PolicyValidationError, PolicyValidationResult
-from yakoon.base.models.workflow import WorkflowDef, WorkflowRuntime
+from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
 from yakoon.base.runtime.session.session import Session
 
 
@@ -45,16 +45,23 @@ class WorkflowService(Protocol):
     def runtime(self, session: Any) -> WorkflowRuntime: ...
 
     def enqueue_next(self, session: Any, batch_id: str) -> None: ...
-    def complete_prompt_step(
-        self, session: Any, *, batch_id: str, step_id: str, value: Any
+    def complete_input_step(
+        self,
+        session,
+        *,
+        batch_id: str,
+        step_id: str,
+        values: Mapping[str, Any],
+        ignore_none: bool = True,
     ) -> None: ...
+
     def complete_run_step(
         self, session: Any, *, batch_id: str, step_id: str
     ) -> None: ...
 
     def set_value(self, session: Any, batch_id: str, key: str, value: Any) -> None: ...
-    def get_def(self, controller_id: str, workflow_key: str) -> Any: ...
-    def get_step(self, session: Any, batch_id: str, step_id: str) -> Any: ...
+    def get_def(self, controller_id: str, workflow_key: str) -> WorkflowDef: ...
+    def get_step(self, session: Any, batch_id: str, step_id: str) -> StepDef: ...
 
     def fail_batch(
         self,

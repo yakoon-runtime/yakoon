@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -9,19 +11,27 @@ class WorkflowContextRequired(Exception):
     pass
 
 
-@dataclass(frozen=True)
-class PromptDef:
-    kind: str
-    title: str
-    var: str | None = None
+@dataclass(frozen=True, slots=True)
+class InputFieldDef:
+    var: str
+    policy: str = "system:string"
+    title: str = ""
     required: bool = True
-    policy: str | None = None
-
-    # nur für select:
-    options: list[dict[str, Any]] = field(default_factory=list)
-
-    # optionaler Default (v1: nur select sinnvoll)
     default: Any | None = None
+    options: list[dict[str, Any]] = field(default_factory=list)  # label/value dicts
+
+
+@dataclass(frozen=True, slots=True)
+class InputBranchesDef:
+    on: str
+    cases: dict[str, str]  # value -> step_id
+
+
+@dataclass(frozen=True, slots=True)
+class InputDef:
+    title: str
+    fields: list[InputFieldDef]
+    branches: InputBranchesDef | None = None
 
 
 @dataclass(frozen=True)
@@ -31,15 +41,20 @@ class SwitchDef:
     default: str | None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
+class RunDef:
+    key: str  # "wf:crm.customer.store"
+    args: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True, slots=True)
 class StepDef:
     id: str
-    run: str | None = None
-    prompt: PromptDef | None = None
-    next: str | None = None
-    branch: dict[str, str] | None = None
-    switch: SwitchDef | None = None  # <— neu
+    input: InputDef | None = None
+    run: RunDef | None = None
+    switch: SwitchDef | None = None
     end: str | None = None
+    next: str | None = None
 
 
 @dataclass(frozen=True)

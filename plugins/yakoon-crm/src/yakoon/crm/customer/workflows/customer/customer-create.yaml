@@ -1,65 +1,67 @@
 workflow: kunden_anlage
 version: 1
 
-start: first_name
+start: person
 
 steps:
-  - id: first_name
-    prompt:
-      kind: text
-      title: "Vorname"
-      var: customer.first_name
-      policy: system:string
-    next: last_name
+- id: person
+  input:
+    title: "Person"
+    fields:
+      - { var: customer.first_name, policy: system:string, title: "Vorname" }
+      - { var: customer.last_name,  policy: system:string, title: "Nachname" }
+  next: ask_mail
 
-  - id: last_name
-    prompt:
-      kind: text
-      title: "Nachname"
-      var: customer.last_name
-      policy: system:string
-    next: ask_mail
-
-  - id: ask_mail
-    prompt:
-      kind: select
-      title: "E-Mail angeben?"
-      var: customer.mail_opt_in  # default: no
-      policy: system:bool
-      default: y
-      options:
-        - { label: "Ja", value: y }
-        - { label: "Nein", value: n }
-    branch: { y: mail, n: done }
-
-  - id: mail
-    prompt:
-      kind: text
-      title: "E-Mail Adresse"
-      policy: system:string
-      var: customer.mail
-    next: step_validate
-
-  - id: step_validate
-    run: wf:crm.customer.validate
-    next: route
-    #on_error: technical_failure
-
-  - id: route
-    switch:
-      expr: "{{validate.state}}"
+- id: ask_mail
+  input:
+    title: "E-Mail angeben?"
+    fields:
+      - var: customer.mail_opt_in
+        policy: system:bool
+        title: "E-Mail angeben?"
+        default: true
+        options:
+          - { label: "Ja", value: true }
+          - { label: "Nein", value: false }
+    branches:
+      on: customer.mail_opt_in
       cases:
-        savde: store_customer
-      default: store_customer
+        true: ask_mail_address
+        false: store_customer
 
-  - id: store_customer
-    run: >
-      wf:crm.customer.store 
-      --first {{customer.first_name}} 
-      --last {{customer.last_name}} 
-      --mail_opt_in {{customer.mail_opt_in}} 
-      --mail {{customer.mail}}
-    next: done
+- id: ask_mail_address
+  input:
+    title: "E-Mail"
+    fields:
+      - var: customer.mail
+        policy: system:string   # später: system:email
+        title: "E-Mail-Adresse"
+        required: true
+  next: store_customer_with_mail
 
-  - id: done
-    end: ok
+- id: store_customer
+  run: wf:crm.customer.store 
+  args:
+    - "--first_name"
+    - "{{customer.first_name}}"
+    - "--last_name"
+    - "{{customer.last_name}}"
+  next: done
+
+- id: store_customer_with_mail
+  run: wf:crm.customer.store 
+  next: done
+
+- id: step_validate
+  run: wf:crm.customer.validate
+  next: route
+
+- id: route
+  switch:
+    expr: "{{validate.state}}"
+    cases:
+      save: done
+    default: done
+
+- id: done
+  end: ok

@@ -34,7 +34,7 @@ class ShellCoreController(BaseController):
         "exit": "exit",
         "man": "man",
         "wf.run": "wf.run",
-        "wf.prompt": "wf.prompt",
+        "wf.input": "wf.input",
         "wf.next": "wf.next",
         "wf.cancel": "wf.cancel",
     }

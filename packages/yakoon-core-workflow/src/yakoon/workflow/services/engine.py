@@ -6,7 +6,12 @@ from uuid import uuid4
 
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.models.workflow import WorkflowError, WorkflowRuntime, WorkflowStatus
+from yakoon.base.models.workflow import (
+    WorkflowDef,
+    WorkflowError,
+    WorkflowRuntime,
+    WorkflowStatus,
+)
 from yakoon.workflow.runtime.compiler import compile_run_command
 
 
@@ -41,7 +46,7 @@ class WorkflowService:
 
     # ---- loading (no caching) ----
 
-    def get_def(self, controller_id: str, workflow_key: str):
+    def get_def(self, controller_id: str, workflow_key: str) -> WorkflowDef:
         catalog = self.services.get(ports.ControllerCatalogService)
         info = catalog.get(controller_id)
         if not info or not info.workflow_source:
@@ -186,19 +191,40 @@ class WorkflowService:
         return step
 
     def enqueue_next(self, session, batch_id: str) -> None:
-        """
-        Enqueued exakt 1 'next thing':
-          - prompt-step => wf.prompt <batch_id> <step_id>
-          - run-step    => <real_command>; wf.next <batch_id> <step_id>
-          - end-step    => cleanup
-        """
+        rt, batch, wf, step = self._resolve_current_step(session, batch_id)
+        if not batch:
+            return
+
+        self._ensure_running(batch)
+
+        queue = self.services.get(ports.CommandQueueService)
+
+        if step.end:
+            self._enqueue_end(rt, batch_id, batch)
+            return
+
+        if step.input:
+            self._enqueue_input(queue, session, batch_id, batch, step)
+            return
+
+        if step.switch:
+            self._enqueue_switch(session, batch_id, batch, step)
+            return
+
+        if step.run:
+            self._enqueue_run(queue, session, batch_id, batch, step)
+            return
+
+        raise ValueError(
+            f"Invalid step '{batch.controller_id}:{batch.workflow_key}::{step.id}': "
+            "neither input nor switch nor run nor end"
+        )
+
+    def _resolve_current_step(self, session, batch_id: str):
         rt = self.runtime(session)
         batch = rt.get(batch_id)
         if not batch or not batch.controller_id or not batch.workflow_key:
-            return
-
-        if batch.status == WorkflowStatus.PREPARED:
-            batch.status = WorkflowStatus.RUNNING
+            return rt, None, None, None
 
         wf = self.get_def(batch.controller_id, batch.workflow_key)
         step_id = batch.current_step or wf.start
@@ -208,61 +234,65 @@ class WorkflowService:
                 f"Step not found: {batch.controller_id}:{batch.workflow_key}::{step_id}"
             )
 
-        queue = self.services.get(ports.CommandQueueService)
+        return rt, batch, wf, step
 
-        # END
-        if step.end:
-            batch.status = WorkflowStatus.DONE
-            rt.remove(batch_id)
-            return
+    def _ensure_running(self, batch) -> None:
+        if batch.status == WorkflowStatus.PREPARED:
+            batch.status = WorkflowStatus.RUNNING
 
-        # PROMPT
-        if step.prompt:
-            queue.enqueue_commands(
-                session, [f"wf.prompt {batch_id} {step.id}"], batch_id=batch_id
+    def _enqueue_end(self, rt: WorkflowRuntime, batch_id: str, batch) -> None:
+        batch.status = WorkflowStatus.DONE
+        rt.remove(batch_id)
+
+    def _enqueue_input(self, queue, session, batch_id: str, batch, step) -> None:
+        queue.enqueue_commands(
+            session, [f"wf.input {batch_id} {step.id}"], batch_id=batch_id
+        )
+        batch.pending_step = step.id
+
+    def _enqueue_switch(self, session, batch_id: str, batch, step) -> None:
+        rendered = compile_run_command(
+            step.switch.expr,
+            batch.values,
+            context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
+        ).strip()
+
+        key = rendered.strip().lower()
+        next_id = step.switch.cases.get(key) or step.switch.default
+        if not next_id:
+            raise RuntimeError(
+                f"Switch step '{batch.controller_id}:{batch.workflow_key}::{step.id}': "
+                f"no case for '{key}' and no default"
             )
-            batch.pending_step = step.id
-            return
 
-        # SWITCH
-        if step.switch:
-            rendered = compile_run_command(
-                step.switch.expr,
-                batch.values,
-                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
-            ).strip()
+        batch.current_step = next_id
+        self.enqueue_next(session, batch_id)
 
-            key = rendered.strip().lower()
-            next_id = step.switch.cases.get(key)
+    def _enqueue_run(self, queue, session, batch_id: str, batch, step) -> None:
+        run_def = step.run
+        ctx = f"{batch.controller_id}:{batch.workflow_key}:{step.id}"
 
-            if not next_id:
-                if step.switch.default:
-                    next_id = step.switch.default
-                else:
-                    raise RuntimeError(
-                        f"Switch step '{step.id}': no case for '{key}' and no default"
-                    )
+        cmd = compile_run_command(run_def.key, batch.values, context=ctx)
 
-            batch.current_step = next_id
-            self.enqueue_next(session, batch_id)
-            return
+        if run_def.args:
+            rendered_args = [
+                compile_run_command(arg, batch.values, context=ctx)
+                for arg in run_def.args
+            ]
+            cmd = cmd + " " + " ".join(rendered_args)
 
-        # RUN
-        if step.run:
-            cmd = compile_run_command(
-                step.run,
-                batch.values,
-                context=f"{batch.controller_id}:{batch.workflow_key}:{step.id}",
-            )
-            queue.enqueue_commands(
-                session, [cmd, f"wf.next {batch_id} {step.id}"], batch_id=batch_id
-            )
-            return
+        queue.enqueue_commands(
+            session, [cmd, f"wf.next {batch_id} {step.id}"], batch_id=batch_id
+        )
 
-        raise ValueError(f"Invalid step '{step.id}': neither prompt nor run nor end")
-
-    def complete_prompt_step(
-        self, session, *, batch_id: str, step_id: str, value: Any
+    def complete_input_step(
+        self,
+        session,
+        *,
+        batch_id: str,
+        step_id: str,
+        values: Mapping[str, Any],
+        ignore_none: bool = True,
     ) -> None:
         rt = self.runtime(session)
         batch = rt.get(batch_id)
@@ -270,27 +300,34 @@ class WorkflowService:
             return
 
         step = self.get_step(session, batch_id, step_id)
-        if not step.prompt or not step.prompt.var:
-            raise RuntimeError(f"Step {step_id} is not a prompt with 'var'")
+        if not step.input:
+            raise RuntimeError(f"Step {step_id} is not an input step")
 
-        batch.values[step.prompt.var] = value
+        # commit values
+        for k, v in values.items():
+            if ignore_none and v is None:
+                continue
+            batch.values[k] = v
+
         batch.pending_step = None
 
-        if step.branch:
-            key = str(value).lower()
-            next_id = step.branch.get(key)
+        # branches
+        next_id = step.next
+        br = step.input.branches
+        if br is not None:
+            raw = batch.values.get(br.on)
+            key = "" if raw is None else str(raw).strip().lower()
+            next_id = br.cases.get(key)
             if not next_id:
                 raise RuntimeError(
-                    f"Prompt step '{step.id}': branch has no target for '{key}'"
+                    f"Input step '{step.id}': branches has no target for '{key}'"
                 )
-            batch.current_step = next_id
-            self.enqueue_next(session, batch_id)
+
+        if not next_id:
+            rt.remove(batch_id)
             return
 
-        if not step.next:
-            raise RuntimeError(f"Prompt step '{step.id}' has no 'next'")
-
-        batch.current_step = step.next
+        batch.current_step = next_id
         self.enqueue_next(session, batch_id)
 
     def complete_run_step(self, session, *, batch_id: str, step_id: str) -> None:

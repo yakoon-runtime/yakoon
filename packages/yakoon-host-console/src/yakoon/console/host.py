@@ -52,7 +52,7 @@ class ConsoleHost(HostAdapter):
             prompt = field.label or field.key
             if field.hint:
                 prompt = f"{prompt} ({field.hint})"
-            prompt = f"{prompt}: "
+            prompt = f"{ps1}[{prompt}]"
 
             async with self._lock:
                 if getattr(field, "secret", False):

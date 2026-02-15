@@ -34,6 +34,14 @@ class PolicyService:
                 FieldSpec(key="system:masked", type=FieldType.STRING, secret=True),
                 FieldSpec(key="system:int", type=FieldType.INT),
                 FieldSpec(key="system:bool", type=FieldType.BOOL),
+                FieldSpec(
+                    key="system:email",
+                    label="",
+                    type=FieldType.STRING,
+                    required=False,
+                    hint="name@example.com",
+                    pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                ),
             ]
         )
 
@@ -113,9 +121,9 @@ class PolicyService:
 
         if t == FieldType.BOOL:
             v = raw.lower()
-            if v in ("y", "yes", "ja", "true", "1"):
+            if v in {"true", "t", "1", "yes", "y", "ja", "j"}:
                 return True
-            if v in ("n", "no", "nein", "false", "0"):
+            if v in {"false", "f", "0", "no", "n", "nein"}:
                 return False
             raise ValueError("Bitte ja/nein eingeben.")
 

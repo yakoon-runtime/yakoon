@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.models.fields import FieldSpec
+from yakoon.base.models.fields import FieldSpec, FormSpec
 from yakoon.base.runtime.session.session import Session
 from yakoon.platform.settings import settings
 
@@ -35,6 +35,31 @@ class InputService:
                 return res.value
             for err in res.errors:
                 await session.emit(f"[{err.field_key}] {err.message}")
+
+    async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]:
+        while True:
+            raw = await self._dialogs.wait_form(session, spec=spec, timeout=...)
+            errors = []
+            out = {}
+
+            for field in spec.fields:
+                val = raw.get(field.key)
+                res = self._policy.validate_field(field=field, raw=val)
+                if res.ok:
+                    out[field.key] = res.value
+                else:
+                    errors.extend(res.errors)
+
+            # unknown keys?
+            unknown = set(raw.keys()) - {f.key for f in spec.fields}
+            if unknown:
+                errors.append(ValueError("form", f"Unknown fields: {sorted(unknown)}"))
+
+            if not errors:
+                return out
+
+            for e in errors:
+                await session.emit(f"[{e.field_key}] {e.message}")
 
     async def confirm(self, session: Session, field: FieldSpec) -> bool:
         """

@@ -39,6 +39,8 @@ class FieldSpec:
     required: bool = False
     hint: str = ""
     secret: bool = False
+    pattern: str = ""
+    default: str = ""
     options: list[SelectOption] | None = None
 
     def fork(self, **changes) -> "FieldSpec":

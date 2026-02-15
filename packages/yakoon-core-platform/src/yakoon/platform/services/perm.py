@@ -29,7 +29,7 @@ class PermissionService:
             "crm-customer:wf:crm.customer.store|rx",
             "crm-customer:wf:crm.customer.validate|rx",
             "shell:wf.run|rx",
-            "shell:wf.prompt|rx",
+            "shell:wf.input|rx",
             "shell:wf.next|rx",
             "shell:wf.cancel|rx",
             "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
