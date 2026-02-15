@@ -7,9 +7,64 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
-## 2026-02-13
-**Einführung von Black Formatter and Ruff Linter**
-Formatierung ist nun projektweit gleich. Potenzielle Fehler wurden entfernt. 
+## 2026-02-15
+**Unified Input Model (FormSpec Only)**
+* Auflösung der Trennung zwischen *Wizard* und *Form* im Kernel.
+* Einführung eines einheitlichen Input-Vertrags über **FormSpec**.
+* Ein einzelnes Prompt ist nun ein FormSpec mit genau einem Field.
+* Entfernt:
+  * `WAITING_WIZARD`
+  * `wait_field()`
+  * Prompt-basierte Workflow-Steps
+* Neuer Workflow-Step: `input`
+* `prompt`-Step vollständig entfernt.
+* Host erhält immer eine Liste strukturierter Felder:
+  * `key`
+  * `label`
+  * `hint`
+  * `required`
+  * `secret`
+  * `options`
+  * `default`
+* UI entscheidet selbstständig über Rendering (Wizard-sequenziell oder echtes Formular).
+Der Kernel ist vollständig UI-agnostisch. Dialoglogik und Darstellung sind sauber entkoppelt.
+
+## 2026-02-14
+**Einführung des Policy-Systems**
+* Einführung eines zentralen `PolicyService`.
+* Feldtyp, Validierung und Coercion werden über Policies definiert.
+* Workflows und Presenter arbeiten nur noch mit Policy-Referenzen (z.B. `system:string`, `system:bool`).
+* `system:bool` unterstützt flexible Eingaben (y/n, ja/nein, true/false, 1/0).
+* Validierung ist vollständig aus Prompt-/Workflow-Code ausgelagert.
+Input ist nun deklarativ typisiert und konsistent validiert.
+
+## 2026-02-14
+**Strukturierte Run-Definition**
+* Einführung von `RunDef(key, args)`.
+* `run` + `args` klar getrennt.
+* Compiler-Regel:
+  Wenn `args` gesetzt sind, darf `run` keine Whitespaces enthalten.
+* DSL wird strikt validiert.
+Workflow-Definition ist formaler, sicherer und weniger fehleranfällig.
+
+## 2026-02-14
+**Compiler-Refactoring**
+Zerlegung des Workflow-Compilers in Builder:
+  * `RunBuilder`
+  * `InputBuilder`
+  * `SwitchBuilder`
+  * `StepAssembler`
+  * `GraphValidator`
+* Verbesserte Fehlermeldungen (`workflow:step` Präfix).
+* YAML 1.2 Bool-Handling eingeführt (kein `on:` → `True` Bug mehr).
+
+## 2026-02-14
+**Projektweite Formatierung & Linting**
+* Einführung von **Black** (Formatter).
+* Einführung von **Ruff** (Linter).
+* Entfernen inkonsistenter Formatierung.
+* Frühzeitige Erkennung potenzieller Fehler.
+Einheitlicher Code-Stil und höhere Wartbarkeit.
 
 ## [2026-02-10]
 **Wenn ein Workflow darf nie mahr als der User**
