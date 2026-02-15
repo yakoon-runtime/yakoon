@@ -21,7 +21,7 @@ class FieldSpecRenderService:
     ) -> FieldSpec:
 
         policies = self._services.get(ports.PolicyService)
-        pol = policies.get_field(policy)
+        pol = policies.get_policy(policy)
 
         render_srv = self._services.get(ports.RendererService)
         label = await render_srv.render(ctx, section_key, **data)

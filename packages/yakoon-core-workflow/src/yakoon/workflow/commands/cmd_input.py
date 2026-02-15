@@ -25,11 +25,11 @@ class CmdWfInput(WfCommand):
         # 1) build fieldspecs
         fields = []
         for f in s.fields:
-            base = policies.get_field(f.policy or "system:string")
-            # options/default are step-specific overrides
-            field = base.fork(
+            policy_key = f.policy or "system:string"
+            field = policies.materialize_field(
+                policy_key,
                 key=f.var,
-                label=f.title or base.label,
+                label=f.title or f.var,  # title ist WF-Label, sonst fallback
                 required=f.required,
                 options=f.options or None,
                 default=f.default,

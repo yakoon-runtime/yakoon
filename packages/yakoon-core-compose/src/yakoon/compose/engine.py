@@ -2,7 +2,8 @@ from yakoon.base import ports
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
-from yakoon.base.models.fields import FieldSpec, FieldType
+from yakoon.base.models.fields import FieldType
+from yakoon.base.models.policy import FieldPolicy
 from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.engine import Engine
@@ -76,13 +77,15 @@ def _compose_permission_roles(services: ServiceDirectory):
 def _compose_policies(services: ServiceDirectory):
     policy = services.get(ports.PolicyService)
     policy.register_defaults()
-    policy.register_fields(
+    policy.register_policies(
         [
-            FieldSpec(key="customer.first_name", type=FieldType.STRING, required=False),
-            FieldSpec(
+            FieldPolicy(
+                key="customer.first_name", type=FieldType.STRING, required=False
+            ),
+            FieldPolicy(
                 key="customer.age", hint="mit hint", type=FieldType.INT, required=False
             ),
-            FieldSpec(
+            FieldPolicy(
                 key="auth.password",
                 hint="kein Echo",
                 type=FieldType.STRING,

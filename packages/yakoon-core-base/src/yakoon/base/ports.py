@@ -12,7 +12,11 @@ from yakoon.base.models.fields import FieldSpec, FormSpec
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.key import Key
 from yakoon.base.models.ns import Namespace
-from yakoon.base.models.policy import PolicyValidationError, PolicyValidationResult
+from yakoon.base.models.policy import (
+    FieldPolicy,
+    PolicyValidationResult,
+    RawValue,
+)
 from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
 from yakoon.base.runtime.session.session import Session
 
@@ -29,16 +33,27 @@ class FieldSpecRenderService(Protocol):
 
 
 class PolicyService(Protocol):
-    def register_field(self, spec: FieldSpec) -> None: ...
-    def register_fields(self, specs: list[FieldSpec]) -> None: ...
+    def register_policy(self, policy: FieldPolicy) -> None: ...
+    def register_policies(self, policies: list[FieldPolicy]) -> None: ...
+    def get_policy(self, key: str) -> FieldPolicy: ...
+    def register_validator(self, key: str, fn) -> None: ...
+    def get_validator(self, key: str) -> callable: ...
     def register_defaults(self) -> None: ...
-    def get_field(self, key: str) -> FieldSpec: ...
     def validate_field(
-        self, *, field: FieldSpec, raw: object
+        self, *, field: FieldSpec, raw: RawValue
     ) -> PolicyValidationResult: ...
-    def validate_form(
-        self, *, spec: FormSpec, raw_values: dict[str, object]
-    ) -> tuple[dict[str, object], list[PolicyValidationError]]: ...
+    def materialize_field(
+        self,
+        policy_key: str,
+        *,
+        key: str,
+        label: str,
+        required: bool | None = None,
+        hint: str | None = None,
+        secret: bool | None = None,
+        options: list[dict] | None = None,
+        default: object | None = None,
+    ) -> FieldSpec: ...
 
 
 class WorkflowService(Protocol):

@@ -38,9 +38,21 @@ class InputService:
             for field in spec.fields:
                 val = raw.get(field.key)
                 res = self._policy.validate_field(field=field, raw=val)
-
                 if res.ok:
-                    out[field.key] = res.value
+                    coerced = res.value
+
+                    for vkey in getattr(field, "validators", ()):
+                        validator = self._policy.get_validator(vkey)
+                        vres = await validator(
+                            session=session,
+                            field=field,
+                            value=coerced,
+                            values=out,
+                        )
+                        if not vres.ok:
+                            errors.extend(vres.errors)
+
+                    out[field.key] = coerced
                 else:
                     errors.extend(res.errors)
 

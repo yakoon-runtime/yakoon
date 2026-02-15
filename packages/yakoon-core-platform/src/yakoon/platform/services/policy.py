@@ -1,7 +1,8 @@
 import re
 
-from yakoon.base.models.fields import FieldSpec, FieldType, SecretValue
+from yakoon.base.models.fields import FieldSpec, FieldType, SecretValue, SelectOption
 from yakoon.base.models.policy import (
+    FieldPolicy,
     PolicyValidationError,
     PolicyValidationResult,
     RawValue,
@@ -9,47 +10,44 @@ from yakoon.base.models.policy import (
 
 
 class PolicyService:
-    """
-    Central policy registry and validator/coercer for fields.
-
-    - Stores FieldSpecs (type, required, secret, options, pattern, etc.)
-    - Validates and coerces raw inputs into canonical values
-    - Wraps secrets in SecretValue
-    """
-
     def __init__(self):
-        self._fields: dict[str, FieldSpec] = {}
+        self._policies: dict[str, FieldPolicy] = {}
+        self._validators: dict[str, callable] = {}
 
-    def register_field(self, spec: FieldSpec) -> None:
-        self._fields[spec.key] = spec
+    def register_policy(self, policy: FieldPolicy) -> None:
+        self._policies[policy.key] = policy
 
-    def register_fields(self, specs: list[FieldSpec]) -> None:
-        for spec in specs:
-            self._fields[spec.key] = spec
+    def register_policies(self, policies: list[FieldPolicy]) -> None:
+        for p in policies:
+            self.register_policy(p)
+
+    def get_policy(self, key: str) -> FieldPolicy:
+        try:
+            return self._policies[key]
+        except KeyError as e:
+            raise KeyError(f"Unknown policy '{key}'") from e
+
+    def register_validator(self, key: str, fn) -> None:
+        self._validators[key] = fn
+
+    def get_validator(self, key: str) -> callable:
+        return self._validators[key]
 
     def register_defaults(self):
-        self.register_fields(
+        self.register_policies(
             [
-                FieldSpec(key="system:string", type=FieldType.STRING),
-                FieldSpec(key="system:masked", type=FieldType.STRING, secret=True),
-                FieldSpec(key="system:int", type=FieldType.INT),
-                FieldSpec(key="system:bool", type=FieldType.BOOL),
-                FieldSpec(
+                FieldPolicy(key="system:string", type=FieldType.STRING),
+                FieldPolicy(key="system:masked", type=FieldType.STRING, secret=True),
+                FieldPolicy(key="system:int", type=FieldType.INT),
+                FieldPolicy(key="system:bool", type=FieldType.BOOL),
+                FieldPolicy(
                     key="system:email",
-                    label="",
                     type=FieldType.STRING,
-                    required=False,
                     hint="name@example.com",
                     pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                 ),
             ]
         )
-
-    def get_field(self, key: str) -> FieldSpec:
-        try:
-            return self._fields[key]
-        except KeyError:
-            raise RuntimeError(f"Unknown field policy: {key}") from KeyError
 
     def validate_field(
         self, *, field: FieldSpec, raw: RawValue
@@ -100,6 +98,42 @@ class PolicyService:
                 )
 
         return PolicyValidationResult(ok=True, value=self._wrap_secret(field, coerced))
+
+    def materialize_field(
+        self,
+        policy_key: str,
+        *,
+        key: str,
+        label: str,
+        required: bool | None = None,
+        hint: str | None = None,
+        secret: bool | None = None,
+        options: list[dict] | None = None,
+        default: object | None = None,
+    ) -> FieldSpec:
+        pol = self.get_policy(policy_key)
+
+        # base from policy
+        opt = options if options is not None else (pol.options or None)
+        sel = (
+            None
+            if not opt
+            else [SelectOption(value=o["value"], label=o["label"]) for o in opt]
+        )
+
+        return FieldSpec(
+            key=key,
+            label=label,
+            type=pol.type,
+            required=pol.required if required is None else required,
+            hint=pol.hint if hint is None else hint,
+            secret=pol.secret if secret is None else secret,
+            pattern=pol.pattern,
+            default=pol.default if default is None else default,
+            options=sel,
+            # if you add validators to FieldSpec:
+            validators=pol.validators,
+        )
 
     def _coerce(self, field: FieldSpec, raw: str) -> object:
         t = field.type
