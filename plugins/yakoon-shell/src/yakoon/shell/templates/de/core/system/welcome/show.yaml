@@ -1,0 +1,20 @@
+kind: message
+role: info
+title: null
+blocks:
+  - type: text
+    text: |
+      ''    ''    '''''    ''   ''    ''''''    ''''''    '''    ''
+       '    '    '     '   ''  ''    '      '  '      '   '  '   ''
+        '  '     '     '   '''''     '      '  '      '   '   '  ''
+         ''      '''''''   ''  ''    '      '  '      '   '    ''''
+         ''      '     '   ''   ''    ''''''    ''''''    '     '''
+  - type: text
+    text: "Was du jetzt tun kannst:"
+  - type: list
+    items:
+      - "man              - Zeigt Manual für Befehle"
+      - "use <prg>        - Startet ein Programm"
+      - "version          - Zeigt Systeminformationen"
+meta:
+  code: "shell.welcome.show"

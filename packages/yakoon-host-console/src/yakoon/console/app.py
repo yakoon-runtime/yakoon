@@ -2,7 +2,6 @@ import asyncio
 
 from yakoon.auth.controller import AuthCoreController
 from yakoon.base import ports
-from yakoon.base.models.format import OutputFormat
 from yakoon.base.models.key import Key
 from yakoon.compose.engine import compose_engine
 from yakoon.console.host import ConsoleHost
@@ -38,7 +37,6 @@ async def run_console():
     )
 
     session.bind_io(ConsoleOutput())
-    session.output_format = OutputFormat.MARKDOWN
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)

@@ -11,6 +11,7 @@ from yakoon.base.models.command import CommandKind
 from yakoon.base.models.fields import FieldSpec, FormSpec
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.key import Key
+from yakoon.base.models.message import MessageSpec
 from yakoon.base.models.ns import Namespace
 from yakoon.base.models.policy import (
     FieldPolicy,
@@ -19,6 +20,12 @@ from yakoon.base.models.policy import (
 )
 from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
 from yakoon.base.runtime.session.session import Session
+from yakoon.platform.runtime.render.context import RenderContext
+
+
+class MessageSpecService(Protocol):
+
+    async def parse_spec(self, yaml_text: str) -> MessageSpec: ...
 
 
 class FieldSpecRenderService(Protocol):
@@ -246,7 +253,10 @@ class SessionService(Protocol):
 
 
 class RendererService(Protocol):
-    async def render(self, ctx, key: str, **data) -> str: ...
+    async def render_text(self, ctx: RenderContext, key: str, **data) -> str: ...
+    async def render_spec(
+        self, ctx: RenderContext, key: str, **data
+    ) -> MessageSpec: ...
 
 
 class NamespaceService(Protocol):

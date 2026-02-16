@@ -1,3 +1,6 @@
+from yakoon.base import ports
+from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.models.message import MessageSpec
 from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
@@ -5,41 +8,15 @@ from yakoon.platform.runtime.render.section import RenderSection
 
 class RendererService:
 
-    def __init__(self, engine: BaseRenderEngine):
+    def __init__(self, services: ServiceDirectory, engine: BaseRenderEngine):
+        self._services = services
         self._engine = engine
 
-    async def render(self, ctx: RenderContext, key: str, **data) -> str:
-        """
-        Renders a specific section of a command template with optional data.
-
-        This is a shorthand for passing a RenderSection object manually,
-        useful for compact calls when the section is known.
-
-        Args:
-            ctx (RenderContext): The context specifying template path and language.
-            key (str): The section key to render (e.g. 'success', 'error').
-            **data: Optional keyword arguments passed to the template.
-
-        Returns:
-            str: The rendered template section output.
-        """
+    async def render_text(self, ctx: RenderContext, key: str, **data) -> str:
         section = RenderSection(key, data)
         return await self._engine.render(ctx, section)
 
-    async def render_by_key(
-        self, template_key: str, section: str, lang: str = "de", **data
-    ) -> str:
-        """
-        Renders a section of a template using the current render mode and context.
-
-        Args:
-            template_key: logical name of the template (e.g. 'cmd_login')
-            section: section name (e.g. 'error', 'success')
-            lang: language folder (default: 'de')
-            **data: variables passed into the section context
-
-        Returns:
-            Rendered string (Markdown, plain text, etc.)
-        """
-        ctx = RenderContext(key=template_key, lang=lang)
-        return await self.render(ctx, section, data)
+    async def render_spec(self, ctx: RenderContext, key: str, **data) -> MessageSpec:
+        yaml_text = await self.render_text(ctx, key, **data)
+        messages = self._services.get(ports.MessageSpecService)
+        return await messages.parse_spec(yaml_text)

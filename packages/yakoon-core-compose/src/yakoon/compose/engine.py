@@ -22,6 +22,7 @@ from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialogservice import DefaultDialogService
 from yakoon.platform.services.fieldspec import FieldSpecRenderService
 from yakoon.platform.services.input import InputService
+from yakoon.platform.services.message import MessageSpecService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.policy import PolicyService
@@ -185,13 +186,14 @@ def _compose_services(
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     services.register_static(ports.PolicyService, PolicyService())
     services.register_static(ports.InputService, InputService(services))
+    services.register_static(ports.MessageSpecService, MessageSpecService())
 
     services.register_static(
         ports.FieldSpecRenderService, FieldSpecRenderService(services)
     )
 
     services.register_static(
-        ports.RendererService, RendererService(JinjaEngine(template_sources))
+        ports.RendererService, RendererService(services, JinjaEngine(template_sources))
     )
 
     services.register_static(

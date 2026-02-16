@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
@@ -7,38 +5,30 @@ from typing import Any
 
 @dataclass(frozen=True, slots=True)
 class OutputEvent:
-    """Minimal output envelope for multi-client rendering.
+    """Structured output envelope for multi-client rendering.
 
     Attributes:
-        text: The content to render.
-        mime: MIME type of the content (e.g., "text/plain" or "text/markdown").
+        payload: Structured payload to render (e.g. MessageSpec dict).
+        mime: MIME type of the payload (e.g., "application/yakoon.message+json").
         channel: Target channel (e.g., "main", "debug", "error", or "audit").
         op: Operation type ("append" or "replace").
         region: Target region ("output", "prompt", or "status").
         meta: Additional metadata as key-value pairs.
     """
 
-    text: str
-    mime: str = "text/plain"
+    payload: Any
+    mime: str = "application/yakoon.message+json"
     channel: str = "main"
     op: str = "append"
     region: str = "output"
     meta: dict[str, Any] = field(default_factory=dict)
 
     @staticmethod
-    def from_text(text: str, **meta: Any) -> OutputEvent:
-        """Creates an OutputEvent from plain text.
+    def from_payload(payload: Any, **meta: Any) -> "OutputEvent":
+        """Creates an OutputEvent from a structured payload."""
+        return OutputEvent(payload=payload, meta=meta)
 
-        Args:
-            text: The content to render.
-            **meta: Additional metadata as key-value pairs.
-
-        Returns:
-            An OutputEvent instance with the given text and metadata.
-        """
-        return OutputEvent(text=text, meta=meta)
-
-    def with_meta(self, extra: Mapping[str, Any]) -> OutputEvent:
+    def with_meta(self, extra: Mapping[str, Any]) -> "OutputEvent":
         """Returns a new OutputEvent with merged metadata.
 
         Args:
@@ -50,7 +40,7 @@ class OutputEvent:
         merged = dict(self.meta)
         merged.update(extra)
         return OutputEvent(
-            text=self.text,
+            payload=self.payload,
             mime=self.mime,
             channel=self.channel,
             op=self.op,

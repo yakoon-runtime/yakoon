@@ -5,7 +5,6 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from yakoon.base.models.format import OutputFormat
 from yakoon.base.models.key import Key
 from yakoon.base.models.perm import PermissionSet
 from yakoon.base.runtime.output.event import OutputEvent
@@ -92,7 +91,6 @@ class SessionRuntime:
     """
 
     permissions: PermissionSet = field(default_factory=PermissionSet)
-    output_format: OutputFormat = OutputFormat(OutputFormat.PLAIN)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
 
@@ -138,25 +136,6 @@ class Session:
     def permissions(self) -> PermissionSet:
         """Returns the set of permissions for the session."""
         return self._runtime.permissions
-
-    @property
-    def output_format(self) -> OutputFormat:
-        """Returns the current output format of the session."""
-        return self._runtime.output_format
-
-    @output_format.setter
-    def output_format(self, value: OutputFormat) -> None:
-        """Sets the output format of the session.
-
-        Args:
-            value: The new output format.
-
-        Raises:
-            ValueError: If the output format is invalid.
-        """
-        if value.value not in OutputFormat.values():
-            raise ValueError(f"Invalid output_format: {value.value}")
-        self._runtime.output_format = value
 
     def set_permissions(self, permset: PermissionSet) -> None:
         """Sets the permissions for the session.
@@ -312,24 +291,16 @@ class Session:
 
     async def emit(
         self,
-        text: str,
+        payload: Any,
         *,
-        mime: str = "text/plain",
+        mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "output",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Emits a plain output message via the session's output channel.
-
-        This is typically used for normal command output.
-
-        Args:
-            text (str): The message to emit.
-        """
         evt = OutputEvent(
-            text=text,
+            payload=payload,
             mime=mime,
             channel=channel,
             op=op,
@@ -340,24 +311,16 @@ class Session:
 
     async def notify(
         self,
-        text: str,
+        payload: Any,
         *,
-        mime: str = "text/plain",
+        mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "information",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Emits a non-error informational status message.
-
-        This is commonly used for confirmations or system notifications.
-
-        Args:
-            text (str): The status message to display.
-        """
         evt = OutputEvent(
-            text=text,
+            payload=payload,
             mime=mime,
             channel=channel,
             op=op,
@@ -368,22 +331,16 @@ class Session:
 
     async def fail(
         self,
-        text: str,
+        payload: Any,
         *,
-        mime: str = "text/plain",
+        mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "status",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Emits an error or failure message.
-
-        Args:
-            text (str): The error message to display.
-        """
         evt = OutputEvent(
-            text=text,
+            payload=payload,
             mime=mime,
             channel=channel,
             op=op,

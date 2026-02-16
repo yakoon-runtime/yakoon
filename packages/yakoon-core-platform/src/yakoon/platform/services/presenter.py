@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.runtime.session import Session
@@ -75,7 +77,6 @@ class Presenter:
             key=template_key,
             prefix=template_prefix,
             lang=session.lang,
-            format=session.output_format,
         )
 
     @property
@@ -84,44 +85,17 @@ class Presenter:
             self._prompts = PresenterPrompts(self._ctx, self._session, self._services)
         return self._prompts
 
-    async def emit(self, section: str, **data):
-        """
-        Renders and emits a section of the current template via session.emit().
+    async def emit(self, section: str, **data) -> None:
+        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        await self._session.emit(asdict(spec))
 
-        Used for standard informational output (e.g. success, details, confirmations).
+    async def fail(self, section: str, **data) -> None:
+        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        await self._session.fail(asdict(spec))
 
-        Args:
-            section (str): Template section key (e.g. "success", "info").
-            **data: Optional key-value pairs for template variables.
-        """
-        text = await self._renderer.render(self._ctx, section, **data)
-        await self._session.emit(text)
-
-    async def fail(self, section: str, **data):
-        """
-        Renders and sends a failure message via session.fail().
-
-        Used to communicate errors, invalid inputs, or blocked operations.
-
-        Args:
-            section (str): Template section key (e.g. "not_found", "denied").
-            **data: Optional key-value pairs for template variables.
-        """
-        text = await self._renderer_srv.render(self._ctx, section, **data)
-        await self._session.fail(text)
-
-    async def notify(self, section: str, **data):
-        """
-        Renders and sends a passive notification via session.notify().
-
-        Used for non-critical messages, hints or background updates.
-
-        Args:
-            section (str): Template section key (e.g. "hint", "auto_saved").
-            **data: Optional key-value pairs for template variables.
-        """
-        text = await self._renderer_srv.render(self._ctx, section, **data)
-        await self._session.notify(text)
+    async def notify(self, section: str, **data) -> None:
+        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        await self._session.notify(asdict(spec))
 
 
 class PresenterService:

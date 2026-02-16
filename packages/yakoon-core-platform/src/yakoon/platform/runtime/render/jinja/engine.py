@@ -73,19 +73,25 @@ class JinjaEngine(BaseRenderEngine):
 
     async def render(self, ctx: RenderContext, section: RenderSection) -> str:
         """
-        Renders a template from templates/<template_key>/<format>.
-        Fallbacks to js.txt if preferred format not found.
+        Renders a template from templates/<lang>/<key>/<section>.j2.<format>.
+        Fallbacks to <section>.j2.plain if preferred format not found.
         """
 
-        format = ctx.format or settings.output.format
-        preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.{format.value}"
-        fallback = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/j2.plain"
+        fmt = ctx.format or settings.output.format
+        # Section key is the filename. No multi-section templates.
+        preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key}.yaml"
+        fallback_1 = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key}.yml"
+        fallback_2 = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key}.json"
 
-        for name in [preferred, fallback]:
+        for name in [preferred, fallback_1, fallback_2]:
             try:
                 tmpl = self._env.get_template(name)
+                # we still pass the section object for convenience (data + key)
                 return tmpl.render(section=section)
             except TemplateNotFound:
                 continue
 
-        raise LookupError(f"Template missing: {ctx.lang}/{ctx.key} ({format.value})")
+        raise LookupError(
+            f"Template missing: {ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key} "
+            f"(.yaml or .yml or .json)"
+        )
