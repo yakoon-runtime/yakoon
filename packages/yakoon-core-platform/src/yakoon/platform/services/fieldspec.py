@@ -24,12 +24,12 @@ class FieldSpecRenderService:
         pol = policies.get_policy(policy)
 
         render_srv = self._services.get(ports.RendererService)
-        label = await render_srv.render(ctx, section_key, **data)
+        label = await render_srv.render_spec(ctx, section_key, **data)
 
         # merge: copy base but override label
         return FieldSpec(
             key=pol.key,
-            label=label,
+            label=label.blocks[0].text,  # TODO: Hack das muss später raus..
             type=pol.type,
             required=pol.required,
             hint=pol.hint,

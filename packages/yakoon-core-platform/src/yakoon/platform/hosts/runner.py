@@ -65,4 +65,3 @@ class Runner:
                 await self.host.on_ready(ps1=ps1)
             else:
                 await self.host.on_idle()
-            return

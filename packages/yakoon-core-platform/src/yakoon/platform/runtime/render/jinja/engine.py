@@ -15,7 +15,6 @@ from yakoon.platform.runtime.render.base import BaseRenderEngine
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.jinja.filters import register_filters
 from yakoon.platform.runtime.render.section import RenderSection
-from yakoon.platform.settings import settings
 
 
 def build_env(
@@ -77,7 +76,6 @@ class JinjaEngine(BaseRenderEngine):
         Fallbacks to <section>.j2.plain if preferred format not found.
         """
 
-        fmt = ctx.format or settings.output.format
         # Section key is the filename. No multi-section templates.
         preferred = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key}.yaml"
         fallback_1 = f"{ctx.prefix}:{ctx.lang}/{ctx.key}/{section.key}.yml"
