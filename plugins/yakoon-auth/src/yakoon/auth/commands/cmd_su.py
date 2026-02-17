@@ -1,6 +1,5 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
-from yakoon.base.models.fields import SecretValue
 from yakoon.base.ports import (
     AuthenticationService,
     NamespaceService,
@@ -26,11 +25,11 @@ class CmdSu(Command):
         username = (
             request.arg(0)
             or request.option("user")
-            or await presenter.prompts.ask("ask_user")
+            or (await presenter.prompts.ask("ask_user")).first()
         )
         secret = request.option("password")
         if not secret:
-            secret: SecretValue = await presenter.prompts.ask_secret("ask_secret")
+            secret = (await presenter.prompts.ask("ask_secret")).first()
             if secret:
                 secret = secret.reveal()
 

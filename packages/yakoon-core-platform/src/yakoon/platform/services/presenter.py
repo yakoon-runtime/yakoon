@@ -2,6 +2,7 @@ from dataclasses import asdict
 
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.models.prompt import PromptResult
 from yakoon.base.runtime.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
 
@@ -13,32 +14,14 @@ class PresenterPrompts:
     ):
         self._ctx = ctx
         self._session = session
-        self._renderfields = services.get(ports.FieldSpecRenderService)
+        self._renderer = services.get(ports.RendererService)
         self._inputs = services.get(ports.InputService)
 
-    async def ask(
-        self,
-        section_key: str,
-        *,
-        policy: str = ports.PresenterPrompts.DEFAULT_POLICY,
-        **data,
-    ) -> object:
-        field = await self._renderfields.build(
-            self._ctx,
-            section_key=section_key,
-            policy=policy,
-            **data,
-        )
-        return await self._inputs.ask_field(self._session, field)
-
-    async def ask_secret(
-        self,
-        section_key: str,
-        *,
-        policy: str = ports.PresenterPrompts.DEFAULT_MASK_POLICY,
-        **data,
-    ) -> object:
-        return await self.ask(section_key, policy=policy, **data)
+    async def ask(self, section_key: str, **data) -> PromptResult:
+        view = await self._renderer.render_view(self._ctx, section_key, **data)
+        if not view.input:
+            raise TypeError(f"View {section_key!r} has no input")
+        return await self._inputs.ask_view(self._session, asdict(view))
 
 
 class Presenter:
@@ -86,15 +69,15 @@ class Presenter:
         return self._prompts
 
     async def emit(self, section: str, **data) -> None:
-        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        spec = await self._renderer.render_view(self._ctx, section, **data)
         await self._session.emit(asdict(spec))
 
     async def fail(self, section: str, **data) -> None:
-        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        spec = await self._renderer.render_view(self._ctx, section, **data)
         await self._session.fail(asdict(spec))
 
     async def notify(self, section: str, **data) -> None:
-        spec = await self._renderer.render_spec(self._ctx, section, **data)
+        spec = await self._renderer.render_view(self._ctx, section, **data)
         await self._session.notify(asdict(spec))
 
 

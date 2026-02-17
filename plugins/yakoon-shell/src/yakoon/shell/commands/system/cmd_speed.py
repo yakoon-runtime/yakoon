@@ -4,6 +4,7 @@ from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.runtime.session import Session
+from yakoon.base.runtime.session.views import v_text
 
 
 class CmdSpeedTest(Command):
@@ -29,4 +30,4 @@ class CmdSpeedTest(Command):
             f"rate={per_sec:.2f}/sec"
         )
         # if CmdTest._counter % 1000 == 0:
-        await session.emit(msg)
+        await session.emit(v_text(msg))

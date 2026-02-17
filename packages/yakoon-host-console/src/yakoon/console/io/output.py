@@ -6,53 +6,63 @@ from yakoon.platform.output.default import DefaultOutput
 
 class ConsoleOutput(DefaultOutput):
     """
-    Console renderer: prints text, optionally prefixes for non-main channels/regions.
+    Console renderer (view-only).
+
+    - expects mime: application/yakoon.view+json
+    - renders only view.message
+    - ignores view.input (handled by Host)
     """
 
     def __init__(self):
         super().__init__(out_fn=self._print_out, err_fn=self._print_err)
 
     async def _print_out(self, evt: OutputEvent) -> None:
-        print(self._render(evt))
+        text = self._render(evt)
+        if text:
+            print(text)
 
     async def _print_err(self, evt: OutputEvent) -> None:
-        print(self._render(evt))
+        text = self._render(evt)
+        if text:
+            print(text)
 
     def _render(self, evt: OutputEvent) -> str:
         prefix = ""
         if evt.channel != "main":
             prefix += f"[{evt.channel}] "
-        # if evt.region is "output":
-        #    prefix += f"({evt.region}) "
-        if evt.region == "information":
-            prefix += f"({evt.region}) "
-        if evt.region == "status":
+        if evt.region in {"information", "status"}:
             prefix += f"({evt.region}) "
 
-        if evt.mime == "application/yakoon.message+json":
-            return prefix + self._render_spec(evt.payload)
+        # strict: view-only, but still tolerate dict payload if mime mismatches
+        payload = evt.payload
 
-        # fallback (legacy)
-        return prefix + str(evt.payload)
+        if isinstance(payload, dict) and payload.get("kind") == "view":
+            msg = payload.get("message")
+            if isinstance(msg, dict):
+                return prefix + self._render_message(msg)
+            return ""  # input-only views
 
-    def _render_spec(self, spec: dict) -> str:
+        # If strictness is desired everywhere, keeping this fallback helps debugging:
+        return prefix + str(payload)
+
+    def _render_message(self, spec: dict) -> str:
         lines: list[str] = []
 
         title = spec.get("title")
         if title:
             lines.append(str(title))
-            lines.append("")  # blank line
+            lines.append("")
 
         for block in spec.get("blocks", []):
             t = block.get("type")
 
             if t == "text":
-                lines.append(self._render_inline(block.get("text", "")))
+                lines.append(str(block.get("text", "")))
                 lines.append("")
 
             elif t == "list":
                 for item in block.get("items", []):
-                    lines.append(f"- {self._render_inline(item)}")
+                    lines.append(f"- {item}")
                 lines.append("")
 
             elif t == "kv":
@@ -63,28 +73,3 @@ class ConsoleOutput(DefaultOutput):
                 lines.append("")
 
         return "\n".join(lines).rstrip()
-
-    def _render_inline(self, value: object) -> str:
-        if isinstance(value, str):
-            return value
-
-        if isinstance(value, list):
-            parts: list[str] = []
-            for node in value:
-                if not isinstance(node, dict):
-                    parts.append(str(node))
-                    continue
-                t = node.get("type")
-                if t == "text":
-                    parts.append(str(node.get("text", "")))
-                elif t == "code":
-                    parts.append(f"`{node.get('code', '')}`")
-                elif t == "link":
-                    text = node.get("text", "")
-                    href = node.get("href", "")
-                    parts.append(f"{text} ({href})")
-                else:
-                    parts.append(str(node))
-            return "".join(parts)
-
-        return str(value)

@@ -1,0 +1,36 @@
+kind: command_view
+
+views:
+
+  show_help:
+    title: 
+    role: info
+    blocks:
+      - type: text
+        text: >  
+          {%- if section.data.mode == "shell" -%}
+          Commands: {{ "\n" }}
+          {{ section.data.shell_commands | map(attribute='key') | join(', ') }}
+          {{ "\n" -}}
+          Available programs: {{ "\n" }}
+          {{ section.data.controllers | map(attribute='id') | join(', ') }}          
+          {%- elif section.data.mode == "program" -%}
+          Commands:
+          {{ section.data.shell_commands | map(attribute='key') | join(', ') }}
+          {% endif %}
+
+  no_manual_entry:
+    role: info
+    title: 
+    blocks:
+      - type: text
+        text: No manual entry for {{section.data.command_key}}
+
+  man_page:
+    role: info
+    title: 
+    blocks:
+      - type: text
+        text: Manual comming soon ....
+
+inputs: {}

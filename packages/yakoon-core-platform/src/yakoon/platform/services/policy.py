@@ -49,55 +49,40 @@ class PolicyService:
             ]
         )
 
-    def validate_field(
-        self, *, field: FieldSpec, raw: RawValue
-    ) -> PolicyValidationResult:
-        # normalize raw -> string when needed
+    def validate(self, *, policy_key: str, raw: RawValue) -> PolicyValidationResult:
+        pol = self.get_policy(policy_key)
+
         raw_str = "" if raw is None else str(raw).strip()
 
-        # required
-        if field.required and raw_str == "":
+        # required (policy-level default)
+        if pol.required and raw_str == "":
             return PolicyValidationResult(
                 ok=False,
-                errors=(PolicyValidationError(field.key, "Wert ist erforderlich."),),
+                errors=(PolicyValidationError("", "Wert ist erforderlich."),),
             )
 
-        # empty but not required: treat as None (or "" for STRING if you prefer)
         if raw_str == "":
-            coerced: object = None
-            return PolicyValidationResult(
-                ok=True, value=self._wrap_secret(field, coerced)
-            )
+            return PolicyValidationResult(ok=True, value=None)
 
-        # type coercion
         try:
-            coerced = self._coerce(field, raw_str)
+            coerced = self._coerce_policy(pol, raw_str)
         except ValueError as e:
             return PolicyValidationResult(
                 ok=False,
-                errors=(PolicyValidationError(field.key, str(e)),),
+                errors=(PolicyValidationError("", str(e)),),
             )
 
-        # pattern (optional)
-        pattern = getattr(field, "pattern", None)
-        if pattern:
-            if not re.fullmatch(pattern, str(coerced)):
+        if pol.pattern:
+            if not re.fullmatch(pol.pattern, str(coerced)):
                 return PolicyValidationResult(
                     ok=False,
-                    errors=(PolicyValidationError(field.key, "Ungültiges Format."),),
+                    errors=(PolicyValidationError("", "Ungültiges Format."),),
                 )
 
-        # select membership
-        if field.type == FieldType.SELECT:
-            opts = field.options or []
-            valid = {o.value for o in opts}
-            if str(coerced) not in valid:
-                return PolicyValidationResult(
-                    ok=False,
-                    errors=(PolicyValidationError(field.key, "Ungültige Auswahl."),),
-                )
-
-        return PolicyValidationResult(ok=True, value=self._wrap_secret(field, coerced))
+        return PolicyValidationResult(
+            ok=True,
+            value=self._wrap_secret_policy(pol, coerced),
+        )
 
     def materialize_field(
         self,
@@ -135,8 +120,9 @@ class PolicyService:
             validators=pol.validators,
         )
 
-    def _coerce(self, field: FieldSpec, raw: str) -> object:
-        t = field.type
+    def _coerce_policy(self, pol: FieldPolicy, raw: str) -> object:
+
+        t = pol.type
 
         if t == FieldType.STRING:
             return raw
@@ -173,8 +159,8 @@ class PolicyService:
 
         return raw
 
-    def _wrap_secret(self, field: FieldSpec, value: object) -> object:
-        if getattr(field, "secret", False):
+    def _wrap_secret_policy(self, pol: FieldPolicy, value: object) -> object:
+        if getattr(pol, "secret", False):
             # store secrets as SecretValue; None stays None
             if value is None:
                 return SecretValue("")

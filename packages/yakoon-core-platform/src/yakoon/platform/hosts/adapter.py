@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from yakoon.base.models.fields import FormSpec
+from yakoon.base.models.view import ViewSpec
 
 
 class HostAdapter(Protocol):
@@ -13,7 +13,7 @@ class HostAdapter(Protocol):
     UI -> Engine goes via Runner callbacks.
     """
 
-    async def on_input(self, *, ps1: str, spec: FormSpec) -> None: ...
+    async def on_view(self, *, ps1: str, spec: ViewSpec) -> None: ...
     async def on_input_submit(self, values: list) -> None: ...
 
     async def on_ready(self, *, ps1: str) -> None: ...

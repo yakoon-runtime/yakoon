@@ -13,8 +13,7 @@ from yakoon.platform.hosts.runner import Runner
 from yakoon.shell.controller import ShellCoreController
 
 
-async def run_console():
-
+async def run_console() -> None:
     engine = compose_engine(
         controllers=ControllerDirectory(
             controllers=[
@@ -28,36 +27,36 @@ async def run_console():
 
     sessions = engine.services.get(ports.SessionService)
     session, _ = await sessions.get_or_create(
-        Key.from_parts(
-            "yakoon",
-            "bucket",
-            "develop",
-            "1",
-        )
+        Key.from_parts("yakoon", "bucket", "develop", "1")
     )
 
+    # All visible output is rendered via session IO.
     session.bind_io(ConsoleOutput())
 
     permissions = engine.services.get(ports.PermissionService)
     permissions.set_bootstrap_permissions(session)
 
+    runner: Runner | None = None
+
+    async def submit(payload) -> None:
+
+        if isinstance(payload, dict):
+            await runner.on_input_submit(payload)
+            return
+
+        await runner.on_user_input(str(payload))
+
     try:
-
-        async def submit(text: str):
-            await runner.on_user_input(text)
-
         host = ConsoleHost(submit=submit)
         runner = Runner(engine=engine, session=session, host=host)
 
-        inits = ["use crm-customer", "customer-create"]
-        inits = []
+        inits: list[str] = []
         await runner.start(inits)
 
     except KeyboardInterrupt:
-        # Ctrl+C: if a prompt is active, cancel it; otherwise ignore or exit
         dialogs = engine.services.get(ports.DialogService)
         if dialogs.is_waiting(session):
-            await runner.on_cancel()
+            await runner.on_cancel()  # type: ignore[union-attr]
     finally:
         sessions.release(session.key)
 

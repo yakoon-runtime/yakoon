@@ -1,22 +1,20 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-from yakoon.base.models.fields import FormSpec
-from yakoon.base.ports import DialogState
+from yakoon.base.models.view import ViewSpec
 from yakoon.base.runtime.devtools.prompt import UnresolvedPromptMonitor
 from yakoon.base.runtime.session.session import Session
+from yakoon.base.runtime.session.views import v_error
 from yakoon.platform.settings import settings
 
 
 class DefaultDialogService:
     """
-    Unified input dialog service.
+    Unified input dialog service (view-driven).
 
     There is exactly one interactive shape:
-      - WAITING_INPUT → FormSpec (1..n fields)
+      - WAITING_INPUT → ViewSpec (as dict) with optional input definition
       - resolve_input() → dict[str, object]
-
-    A single-field "wizard" is just a FormSpec with one field.
     """
 
     DEFAULT_TIMEOUT = 60 * 15  # 15 minutes
@@ -25,15 +23,9 @@ class DefaultDialogService:
         self._waiting: dict[str, asyncio.Future] = {}
         self._timeouts: dict[str, asyncio.Task] = {}
         self._edges: dict[str, asyncio.Event] = {}
-        self._states: dict[str, DialogState] = {}
-        self._form_specs: dict[str, FormSpec] = {}
 
-    # -----------------------------------------------------
-    # State
-    # -----------------------------------------------------
-
-    def state(self, session: Session) -> DialogState:
-        return self._states.get(str(session.key), DialogState.IDLE)
+        # pending view payload for the host/runner
+        self._views: dict[str, dict] = {}
 
     def is_waiting(self, session: Session) -> bool:
         return str(session.key) in self._waiting
@@ -46,39 +38,30 @@ class DefaultDialogService:
             self._edges[session_key] = ev
         return ev
 
-    # -----------------------------------------------------
-    # Input registration
-    # -----------------------------------------------------
+    def get_view(self, session: Session) -> dict:
+        view = self._views.get(str(session.key))
+        if view is None:
+            raise RuntimeError("No View available (not waiting for input).")
+        return view
 
-    def get_form_spec(self, session: Session) -> FormSpec:
-        spec = self._form_specs.get(str(session.key))
-        if spec is None:
-            raise RuntimeError("No FormSpec available (not in WAITING_INPUT).")
-        return spec
-
-    def wait_input(
+    def wait_view(
         self,
         session: Session,
         *,
-        spec: FormSpec,
+        view: ViewSpec,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
     ) -> asyncio.Future:
         """
-        Register an input request (FormSpec).
+        Register an input request (ViewSpec as dict).
         Future resolves with dict[str, object].
         """
         return self._set_waiting(
             session=session,
-            state=DialogState.WAITING_FORM,  # reuse enum, semantics now unified
-            spec=spec,
+            view=view,
             timeout=timeout,
             on_timeout=on_timeout,
         )
-
-    # -----------------------------------------------------
-    # Resolution
-    # -----------------------------------------------------
 
     def resolve_input(self, session: Session, values: dict[str, object]) -> bool:
         """
@@ -93,8 +76,8 @@ class DefaultDialogService:
             self.edge_event(session).set()
             return True
 
-        self._states.pop(session_key, None)
-        self._form_specs.pop(session_key, None)
+        # nothing to resolve; ensure pending view is gone
+        self._views.pop(session_key, None)
         return False
 
     def cancel_input(self, session: Session) -> None:
@@ -107,10 +90,6 @@ class DefaultDialogService:
             fut.cancel()
             self.edge_event(session).set()
 
-    # -----------------------------------------------------
-    # Cleanup
-    # -----------------------------------------------------
-
     def cleanup(self, session: Session) -> None:
         session_key = str(session.key)
 
@@ -120,24 +99,18 @@ class DefaultDialogService:
         if task:
             task.cancel()
 
-        self._states.pop(session_key, None)
-        self._form_specs.pop(session_key, None)
+        self._views.pop(session_key, None)
 
         if settings.base.dev_mode:
             UnresolvedPromptMonitor.untrack(session_key)
 
         self.edge_event(session).set()
 
-    # -----------------------------------------------------
-    # Internal
-    # -----------------------------------------------------
-
     def _set_waiting(
         self,
         *,
         session: Session,
-        state: DialogState,
-        spec: FormSpec,
+        view: dict,
         timeout: float | None,
         on_timeout: Callable[[], Awaitable[None]] | None,
     ) -> asyncio.Future:
@@ -148,8 +121,7 @@ class DefaultDialogService:
             UnresolvedPromptMonitor.track(session_key, fut)
 
         self._waiting[session_key] = fut
-        self._states[session_key] = state
-        self._form_specs[session_key] = spec
+        self._views[session_key] = view
 
         self.edge_event(session).set()
 
@@ -165,7 +137,7 @@ class DefaultDialogService:
                     if on_timeout:
                         await on_timeout()
                     else:
-                        await session.fail("Input timed out.")
+                        await session.fail(v_error("Input timed out."))
 
             self._timeouts[session_key] = asyncio.create_task(auto_expire())
 

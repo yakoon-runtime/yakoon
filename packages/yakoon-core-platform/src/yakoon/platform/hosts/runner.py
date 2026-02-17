@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 from yakoon.base import ports
 from yakoon.base.models.input import DispatchInput
-from yakoon.base.ports import DialogState
 from yakoon.base.runtime.session.session import Session
 from yakoon.base.utils.format import format_ps1
 from yakoon.platform.engines.command.engine import Engine
@@ -25,8 +24,7 @@ class Runner:
         await self.drive()
 
     async def on_input_submit(self, values: dict[str, object]) -> None:
-        dialogs = self.engine.services.get(ports.DialogService)
-        dialogs.resolve_input(self.session, values)
+        await self.engine.dispatch(self.session, DispatchInput(values))  # type: ignore[arg-type]
         await self.drive()
 
     async def on_cancel(self) -> None:
@@ -47,12 +45,11 @@ class Runner:
                 await self.host.on_exit()
                 return
 
-            state = dialogs.state(self.session)
             ps1 = format_ps1(self.session)
 
-            if state == DialogState.WAITING_FORM:
-                spec = dialogs.get_form_spec(self.session)
-                await self.host.on_input(ps1=ps1, spec=spec)
+            if dialogs.is_waiting(self.session):
+                view = dialogs.get_view(self.session)
+                await self.host.on_view(ps1=ps1, view=view)
                 return
 
             # Drain queued command handling

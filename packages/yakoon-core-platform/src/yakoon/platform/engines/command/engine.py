@@ -9,8 +9,10 @@ from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.perm import Permission
 from yakoon.base.models.workflow import WorkflowContextRequired
 from yakoon.base.runtime.session import Session
+from yakoon.base.runtime.session.views import v_error
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.router import CommandDirectory
+from yakoon.platform.services.viewspec import ViewSpecValidationError
 
 
 class Engine:
@@ -120,7 +122,7 @@ class Engine:
         controller_id = session.get_active_controller()
         controller = self._directory.get(controller_id) if controller_id else None
         if not controller:
-            await session.fail("Kein aktiver Controller gesetzt.")
+            await session.fail(v_error("Kein aktiver Controller gesetzt."))
             return
 
         command = None
@@ -166,36 +168,46 @@ class Engine:
         except WorkflowContextRequired:
             failed = True
             await session.fail(
-                f"{request.command}': may only be executed from within a workflow.'"
+                v_error(
+                    f"{request.command}': may only be executed from within a workflow.'"
+                )
             )
 
         except CmdNotFound as exc:
             failed = True
-            await session.fail(f"{request.command}': command not found... use 'man'")
+            await session.fail(
+                v_error(f"{request.command}': command not found... use 'man'")
+            )
             self.wf_failed(exc, command, session, di)
 
         except PermissionError as exc:
             failed = True
 
             # command may be None if permission fails early
+            command_key = command.key if command else request.command
             audit = self._services.get(ports.AuditLogService)
-            await audit.permission(
-                session, "command", command.key if command else request.command
-            )
+            await audit.permission(session, "command", command_key)
 
-            await session.fail(str(exc))
+            await session.fail(v_error(str(exc)))
             self.wf_failed(exc, command, session, di)
 
         except ValueError as exc:
             failed = True
-            await session.fail(str(exc))
+            await session.fail(v_error(str(exc)))
             self.wf_failed(exc, command, session, di)
+
+        except ViewSpecValidationError as exc:
+            audit = self._services.get(ports.AuditLogService)
+            await audit.error(exc)
+            await session.fail(
+                v_error("Ein interner Konfigurationsfehler ist aufgetreten.")
+            )
 
         except Exception as exc:
             failed = True
             audit = self._services.get(ports.AuditLogService)
             await audit.error(exc)
-            await session.fail("Ein interner Fehler ist aufgetreten.")
+            await session.fail(v_error("Ein interner Fehler ist aufgetreten."))
             self.wf_failed(exc, command, session, di)
 
         finally:

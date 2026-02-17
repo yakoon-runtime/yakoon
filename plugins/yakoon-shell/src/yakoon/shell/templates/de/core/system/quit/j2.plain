@@ -1,3 +1,0 @@
-{%- if section.key == "ask_really" %}
-Wirklich beenden? (Ja/Nein)
-{%- endif %}

@@ -1,44 +1,59 @@
+# yakoon/console/host.py
 import asyncio
 
-from yakoon.base.models.fields import FormSpec
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.platform.hosts.adapter import HostAdapter
 
 
 class ConsoleHost(HostAdapter):
     """
-    Console UI adapter.
+    Console input adapter (view-driven, silent).
 
-    It does NOT run the engine.
-    It only:
-    - renders field/form requests
-    - collects user input
-    - forwards input via the provided submit callback
+    - does NOT render output (Session/Output owns rendering)
+    - only collects input from view.input and submits values
     """
 
     def __init__(self, submit):
         self._submit = submit
         self._lock = asyncio.Lock()
 
-    async def on_input(self, *, ps1: str, spec: FormSpec) -> None:
+    async def on_view(self, *, ps1: str, view: dict) -> None:
+        input_def = view.get("input")
+        if not input_def:
+            return
+
+        if input_def.get("kind") != "form":
+            raise RuntimeError("ConsoleHost supports only form inputs")
+
+        fields = input_def.get("fields") or {}
+        if not isinstance(fields, dict) or not fields:
+            await self._submit({})
+            return
 
         values: dict[str, object] = {}
 
-        for field in spec.fields:
-            prompt = field.label or field.key
-            if field.hint:
-                prompt = f"{prompt} ({field.hint})"
+        for key, fd in fields.items():
+            if not isinstance(fd, dict):
+                fd = {}
+
+            label = fd.get("title") or key
+            hint = fd.get("hint")
+            ui = fd.get("ui") or {}
+
+            prompt = label
+            if hint:
+                prompt = f"{prompt} ({hint})"
             prompt = f"{ps1}[{prompt}]"
 
             async with self._lock:
-                if getattr(field, "secret", False):
+                secret = bool(ui.get("secret", False))
+                if secret:
                     value = await safe_input_secret(ps1=prompt)
                 else:
                     value = await safe_input(ps1=prompt)
 
-            values[field.key] = value
+            values[key] = value
 
-        # For console, we submit the whole form as a dict.
         await self._submit(values)
 
     async def on_ready(self, *, ps1: str) -> None:

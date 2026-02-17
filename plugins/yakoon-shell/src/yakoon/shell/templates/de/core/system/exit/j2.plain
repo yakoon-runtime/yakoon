@@ -1,2 +1,0 @@
-{%- if section.key == "shell.exit_app" %}
-{%- endif %}

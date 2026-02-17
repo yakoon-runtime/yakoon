@@ -2,6 +2,7 @@ from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
 from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.runtime.session import Session
+from yakoon.base.runtime.session.views import v_text
 
 
 class CmdTest(Command):
@@ -14,9 +15,15 @@ class CmdTest(Command):
     async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         presenter = await self.get_presenter(session)
-        ask1 = await presenter.prompts.ask("ask1")
-        await session.emit(f" -> {ask1}")
-        ask2 = await presenter.prompts.ask("ask2", policy="customer.age")
-        await session.emit(f" -> {ask2}")
-        ask3 = await presenter.prompts.ask_secret("ask3")
-        await session.emit(f" -> {ask3}")
+        result = await presenter.prompts.ask("ask1")
+        await session.emit(v_text(f" -> {result.first()}"))
+
+        result = await presenter.prompts.ask("ask2")
+        await session.emit(v_text(result.get("result")))
+
+        result = await presenter.prompts.ask("ask3")
+        await session.emit(v_text(result.get("the_key")))
+
+        items = await presenter.prompts.ask("ask4")
+        for item in items.list():
+            await session.emit(v_text(item))

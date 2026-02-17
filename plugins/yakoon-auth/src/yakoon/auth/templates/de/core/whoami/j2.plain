@@ -1,5 +1,0 @@
-{%- if section.key == "show_user" %}
-{{section.data.user}}
-{%- elif section.key == "show_hint" %}
-use 'su' to login
-{%- endif %}

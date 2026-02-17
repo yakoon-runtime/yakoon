@@ -2,91 +2,123 @@ from __future__ import annotations
 
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.models.fields import FieldSpec, FormSpec
+from yakoon.base.models.prompt import PromptResult
 from yakoon.base.runtime.session.session import Session
+from yakoon.base.runtime.session.views import v_error
 from yakoon.platform.settings import settings
 
 
 class InputService:
     """
-    Unified interaction layer.
+    Unified interaction layer (view-only).
 
-    Always communicates with DialogService via FormSpec.
-    A single field is represented as FormSpec with one field.
+    Contract:
+      - ask_view(session, view) -> dict[str, object]
+      - DialogService waits on view and returns raw dict[str, object]
+      - Policy validation is performed directly via PolicyService using policy key.
     """
 
     def __init__(self, services: ServiceDirectory):
         self._dialogs = services.get(ports.DialogService)
         self._policy = services.get(ports.PolicyService)
 
-    async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]:
-        """
-        Central input mechanism.
-        Waits for FormSpec submission, validates via PolicyService,
-        repeats on validation errors.
-        """
+    async def ask_view(self, session: Session, view: dict) -> dict[str, object]:
+        input_def = view.get("input")
+        if not input_def:
+            raise TypeError("View has no input")
+
+        if input_def.get("kind") != "form":
+            raise TypeError("Only input.kind='form' supported")
+
+        fields_def = input_def.get("fields")
+        if not isinstance(fields_def, dict) or not fields_def:
+            raise TypeError("View.input.fields must be a non-empty mapping")
+
+        meta = input_def.get("meta") or {}
+        aliases = meta.get("aliases") or {}
+        order = meta.get("order") or list(fields_def.keys())
+
+        if not isinstance(aliases, dict) or not all(
+            isinstance(k, str) and isinstance(v, str) for k, v in aliases.items()
+        ):
+            aliases = {}
+        if not isinstance(order, list) or not all(isinstance(x, str) for x in order):
+            order = list(fields_def.keys())
+
         while True:
-            raw = await self._dialogs.wait_input(
+            raw = await self._dialogs.wait_view(
                 session,
-                spec=spec,
+                view=view,
                 timeout=settings.network.prompt_timed_out,
             )
 
             errors = []
             out: dict[str, object] = {}
 
-            for field in spec.fields:
-                val = raw.get(field.key)
-                res = self._policy.validate_field(field=field, raw=val)
+            for key, fd in fields_def.items():
+                if not isinstance(fd, dict):
+                    errors.append(_err(key, "Field def must be a mapping"))
+                    continue
+
+                policy_key = fd.get("policy")
+                if not isinstance(policy_key, str) or not policy_key:
+                    errors.append(_err(key, "Missing policy"))
+                    continue
+
+                required = bool(fd.get("required", False))
+                val = raw.get(key)
+
+                if required and (val is None or val == ""):
+                    errors.append(_err(key, "Required"))
+                    continue
+
+                # PolicyService should validate by policy key (view-native).
+                try:
+                    res = self._policy.validate(policy_key=policy_key, raw=val)
+                except KeyError:
+                    await session.fail(v_error(f"[{key}] Unknown policy: {policy_key}"))
+                    raise
+                except Exception as exc:  # noqa: BLE001
+                    await session.fail(
+                        v_error(
+                            f"[{key}] Policy error: {policy_key} ({type(exc).__name__})"
+                        )
+                    )
+                    raise
+
                 if res.ok:
                     coerced = res.value
 
-                    for vkey in getattr(field, "validators", ()):
+                    # Optional async validators referenced by key
+                    for vkey in fd.get("validators", ()) or ():
                         validator = self._policy.get_validator(vkey)
                         vres = await validator(
                             session=session,
-                            field=field,
+                            field={"key": key, "policy": policy_key},
                             value=coerced,
                             values=out,
                         )
                         if not vres.ok:
                             errors.extend(vres.errors)
 
-                    out[field.key] = coerced
+                    out[key] = coerced
                 else:
                     errors.extend(res.errors)
 
-            # unknown keys?
-            unknown = set(raw.keys()) - {f.key for f in spec.fields}
+            unknown = set(raw.keys()) - set(fields_def.keys())
             if unknown:
-                errors.append(
-                    type(
-                        "Err",
-                        (),
-                        {
-                            "field_key": "form",
-                            "message": f"Unknown fields: {sorted(unknown)}",
-                        },
-                    )()
-                )
+                errors.append(_err("form", f"Unknown fields: {sorted(unknown)}"))
 
             if not errors:
-                return out
+                return PromptResult(out, aliases, order)
 
             for e in errors:
-                await session.emit(f"[{e.field_key}] {e.message}")
+                await session.emit(
+                    v_error(
+                        f"[{getattr(e, 'field_key', 'form')}] {getattr(e, 'message', str(e))}"
+                    )
+                )
 
-    async def ask_field(self, session: Session, field: FieldSpec) -> object:
-        """
-        Convenience wrapper for single-field interaction.
-        """
-        spec = FormSpec(
-            form_id=f"field:{field.key}",
-            batch_id=None,
-            step_key=None,
-            title="",
-            fields=[field],
-        )
 
-        values = await self.ask_form(session, spec)
-        return values[field.key]
+def _err(field_key: str, message: str):
+    return type("Err", (), {"field_key": field_key, "message": message})()

@@ -1,9 +1,0 @@
-{%- if section.key == "success" %}
- > su {{section.data.user}}
-{%- elif section.key == "ask_user" %}
-Username:
-{%- elif section.key == "ask_secret" %}
-Password:
-{%- elif section.key == "failed" %}
-  NO! Reason: {{section.data.reason}}  
-{%- endif %}

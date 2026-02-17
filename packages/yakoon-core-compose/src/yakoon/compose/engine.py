@@ -8,7 +8,7 @@ from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.engine import Engine
 from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
-from yakoon.platform.runtime.render.jinja.engine import JinjaEngine
+from yakoon.platform.runtime.render.jinja.engine import JinjaRenderer
 from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
 from yakoon.platform.services.auth import AuthenticationService, ZeroSecretVerifier
@@ -20,7 +20,6 @@ from yakoon.platform.services.catalog import (
 )
 from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialogservice import DefaultDialogService
-from yakoon.platform.services.fieldspec import FieldSpecRenderService
 from yakoon.platform.services.input import InputService
 from yakoon.platform.services.message import MessageSpecService
 from yakoon.platform.services.namespace import NamespaceService
@@ -30,6 +29,8 @@ from yakoon.platform.services.presenter import PresenterService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
+from yakoon.platform.services.template import TemplateLoader
+from yakoon.platform.services.viewspec import ViewSpecService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
 from yakoon.workflow.services.compile import WorkflowCompileService
@@ -187,14 +188,10 @@ def _compose_services(
     services.register_static(ports.PolicyService, PolicyService())
     services.register_static(ports.InputService, InputService(services))
     services.register_static(ports.MessageSpecService, MessageSpecService())
-
-    services.register_static(
-        ports.FieldSpecRenderService, FieldSpecRenderService(services)
-    )
-
-    services.register_static(
-        ports.RendererService, RendererService(services, JinjaEngine(template_sources))
-    )
+    services.register_static(ports.ViewSpecService, ViewSpecService())
+    services.register_static(ports.TemplateLoader, TemplateLoader(template_sources))
+    services.register_static(ports.RendererService, RendererService(services))
+    services.register_static(ports.RenderEngine, JinjaRenderer())
 
     services.register_static(
         ports.ShardedCounterService,

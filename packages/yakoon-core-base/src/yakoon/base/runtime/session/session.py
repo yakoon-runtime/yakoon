@@ -1,3 +1,4 @@
+# yakoon/base/runtime/session/session.py
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -12,37 +13,15 @@ from yakoon.base.runtime.output.event import OutputEvent
 
 @dataclass
 class SessionState:
-    """Persistable session state.
-
-    Contains only serializable data.
-    The session key is part of the state and is immutable for the lifetime of the session.
-
-    Attributes:
-        key: Unique session identifier.
-        active_controller_id: ID of the active controller, if any.
-        account_key: Associated account key, if any.
-        username: Associated username, if any.
-        last_active: Timestamp of last activity.
-        lang: Language preference. Defaults to "de".
-        data: Arbitrary session data as key-value pairs.
-    """
-
     key: Key
-
     active_controller_id: str | None = None
     account_key: str | None = None
     username: str | None = None
     last_active: datetime | None = None
     lang: str | None = "de"
-
     data: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
-        """Serializes the session state to a dictionary.
-
-        Returns:
-            dict: A dictionary representation of the session state.
-        """
         d = asdict(self)
         if self.last_active:
             d["last_active"] = self.last_active.astimezone(UTC).isoformat()
@@ -54,17 +33,6 @@ class SessionState:
 
     @classmethod
     def from_dict(cls, d: dict) -> SessionState:
-        """Deserializes a session state from a dictionary.
-
-        Args:
-            d: Dictionary containing session state data.
-
-        Returns:
-            SessionState: A SessionState instance.
-
-        Raises:
-            ValueError: If the dictionary lacks a 'key'.
-        """
         if not d or "key" not in d:
             raise ValueError("SessionState requires a 'key'")
 
@@ -74,234 +42,116 @@ class SessionState:
         state = cls(key=Key.from_str(raw_key), **d)
         if raw_last_active:
             state.last_active = datetime.fromisoformat(raw_last_active)
-
         return state
 
 
 @dataclass
 class SessionRuntime:
-    """Runtime state and behavior for an active session.
-
-    Attributes:
-        permissions: Set of permissions for the session.
-        output_format: Preferred output format.
-        signals: Set of active signal flags.
-        io: I/O handler for the session.
-        meta: Arbitrary runtime metadata.
-    """
-
     permissions: PermissionSet = field(default_factory=PermissionSet)
     signals: set[str] = field(default_factory=set)
     io: object | None = None
-
     meta: dict[str, Any] = field(default_factory=dict)
 
 
 class Session:
-    """Represents a single interactive session.
-
-    A Session is a runtime façade that combines:
-    - a persistent SessionState (identity, controller, timestamps)
-    - a volatile SessionRuntime (IO bindings, signals, host-specific state)
-
-    The session itself is not persisted directly.
-    Only its state is serializable and stored by the SessionService.
+    """
+    Session output contract is strict:
+      - emit/notify/fail accept ONLY ViewSpec mappings (kind='view')
+      - mime is always application/yakoon.view+json
     """
 
-    def __init__(self, state: SessionState):
-        """Creates a new session with the given state and fresh runtime context.
+    VIEW_MIME = "application/yakoon.view+json"
 
-        Args:
-            state: The persistent state of the session.
-        """
+    def __init__(self, state: SessionState):
         self._state = state
         self._runtime = SessionRuntime()
 
     @property
     def lang(self) -> str:
-        """Returns the language preference of the session."""
         return self._state.lang
 
     @property
     def key(self) -> Key:
-        """Returns the unique session identifier."""
         return self._state.key
 
     @property
     def state(self) -> SessionState:
-        """Returns the persistent state of the session."""
         return self._state
 
     @property
     def permissions(self) -> PermissionSet:
-        """Returns the set of permissions for the session."""
         return self._runtime.permissions
 
     def set_permissions(self, permset: PermissionSet) -> None:
-        """Sets the permissions for the session.
-
-        Args:
-            permset: The new set of permissions.
-        """
         self._runtime.permissions = permset
 
     @classmethod
     def from_state(cls, state: SessionState) -> Session:
-        """
-        Reconstructs a session from a previously persisted SessionState.
-
-        A new runtime context is created automatically.
-        This method is typically used by SessionService when loading sessions
-        from storage.
-
-        Args:
-            state (SessionState): The persisted session state.
-
-        Returns:
-            Session: A fully initialized session with fresh runtime data.
-        """
         return cls(state)
 
     def touch(self) -> None:
-        """
-        Marks the session as recently active.
-
-        Updates the last_active timestamp in the persistent session state.
-        This should be called on user interaction (e.g. dispatch, user input),
-        not on every internal execution step.
-        """
         self._state.last_active = datetime.now(UTC)
 
     def bind_io(self, io):
-        """
-        Binds an output channel to the session runtime.
-
-        This is a runtime-only operation and is not persisted.
-        Different hosts (console, WebSocket, telnet) may bind different IO adapters.
-
-        Args:
-            io: Output adapter providing out() and err() coroutines.
-        """
         self._runtime.io = io
 
     def set_username(self, username: str | None):
-        """
-        Sets or clears the username associated with this session.
-
-        Args:
-            username (str | None): The username to set, or None to clear it.
-        """
         self._state.username = username
 
     def get_username(self) -> str | None:
-        """
-        Returns the current username associated with the session.
-
-        Returns:
-            str | None: The username, or None if no identity is set.
-        """
         return self._state.username
 
     def set_active_controller(self, controller_id: str | None) -> None:
-        """
-        Sets the active controller for the session.
-
-        The active controller determines which command set is currently in scope
-        (e.g. shell, auth, domain-specific controllers).
-
-        Args:
-            controller_id (str | None): Controller identifier or None.
-        """
         self._state.active_controller_id = controller_id
 
     def get_active_controller(self, default=None):
-        """
-        Returns the currently active controller.
-
-        Args:
-            default: Value to return if no controller is active.
-
-        Returns:
-            The active controller ID or the provided default.
-        """
         return self._state.active_controller_id or default
 
     def set_identity(self, account_key, username: str) -> None:
-        """
-        Assigns an authenticated identity to the session.
-
-        This method sets both the account key and username in the persistent
-        session state.
-
-        Args:
-            account_key: Unique identifier of the account.
-            username (str): Human-readable username.
-        """
         self._state.account_key = str(account_key)
         self._state.username = username
 
     def clear_identity(self) -> None:
-        """
-        Removes any authenticated identity from the session.
-
-        This effectively logs the user out while keeping the session alive.
-        """
         self._state.account_key = None
         self._state.username = None
 
     def has_identity(self) -> bool:
-        """
-        Checks whether the session currently has an authenticated identity.
-
-        Returns:
-            bool: True if an account is associated with the session.
-        """
         return self._state.account_key is not None
 
     def signal(self, name: str) -> None:
-        """
-        Emits a runtime-only signal for the session.
-
-        Signals are used to communicate intentions to the host
-        (e.g. quit application, logout, reload shell).
-        They are not persisted.
-
-        Args:
-            name (str): Signal identifier.
-        """
         self._runtime.signals.add(name)
 
     def has_signal(self, name: str) -> bool:
-        """
-        Checks whether a given signal is currently set.
-
-        Args:
-            name (str): Signal identifier.
-
-        Returns:
-            bool: True if the signal is present.
-        """
         return name in self._runtime.signals
 
     def clear_signals(self) -> None:
-        """
-        Clears all runtime signals associated with the session.
-        """
         self._runtime.signals.clear()
+
+    # ----------------------------
+    # Strict View output
+    # ----------------------------
+
+    def _ensure_view(self, payload: Any) -> dict[str, Any]:
+        if not isinstance(payload, Mapping):
+            raise TypeError("Session output must be a ViewSpec mapping (kind='view').")
+        view = dict(payload)
+        if view.get("kind") != "view":
+            raise TypeError("Session output must be a ViewSpec with kind='view'.")
+        return view
 
     async def emit(
         self,
         payload: Any,
         *,
-        mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "output",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
+        view = self._ensure_view(payload)
         evt = OutputEvent(
-            payload=payload,
-            mime=mime,
+            payload=view,
+            mime=self.VIEW_MIME,
             channel=channel,
             op=op,
             region=region,
@@ -313,15 +163,15 @@ class Session:
         self,
         payload: Any,
         *,
-        mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "information",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
+        view = self._ensure_view(payload)
         evt = OutputEvent(
-            payload=payload,
-            mime=mime,
+            payload=view,
+            mime=self.VIEW_MIME,
             channel=channel,
             op=op,
             region=region,
@@ -333,16 +183,15 @@ class Session:
         self,
         payload: Any,
         *,
-        mime: str = "application/yakoon.text",
-        # mime: str = "application/yakoon.message+json",
         channel: str = "main",
         op: str = "append",
         region: str = "status",
         meta: Mapping[str, Any] | None = None,
     ) -> None:
+        view = self._ensure_view(payload)
         evt = OutputEvent(
-            payload=payload,
-            mime=mime,
+            payload=view,
+            mime=self.VIEW_MIME,
             channel=channel,
             op=op,
             region=region,

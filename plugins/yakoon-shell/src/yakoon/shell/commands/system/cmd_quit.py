@@ -11,6 +11,6 @@ class CmdQuit(Command):
     async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         presenter = await self.get_presenter(session)
-        ok = await presenter.prompts.ask("ask_really", policy="system:bool")
-        if bool(ok):
+        result = await presenter.prompts.ask("really_quit")
+        if bool(result.first()):
             session.signal("exit_app")

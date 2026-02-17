@@ -18,25 +18,20 @@ from yakoon.base.models.policy import (
     PolicyValidationResult,
     RawValue,
 )
+from yakoon.base.models.prompt import PromptResult
+from yakoon.base.models.view import ViewSpec
 from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
 from yakoon.base.runtime.session.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
+from yakoon.platform.runtime.render.section import RenderSection
+
+
+class ViewSpecService(Protocol):
+    def parse_spec(self, yaml_text: str) -> ViewSpec: ...
 
 
 class MessageSpecService(Protocol):
-
     async def parse_spec(self, yaml_text: str) -> MessageSpec: ...
-
-
-class FieldSpecRenderService(Protocol):
-    async def build(
-        self,
-        ctx,
-        *,
-        section_key: str,
-        policy: str,
-        **data,
-    ) -> FieldSpec: ...
 
 
 class PolicyService(Protocol):
@@ -144,29 +139,25 @@ class InputService(Protocol):
 
     async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]: ...
     async def ask_field(self, session: Session, field: FieldSpec) -> object: ...
+    async def ask_view(self, session: Session, field: ViewSpec) -> object: ...
 
 
 class DialogService(Protocol):
 
-    # lifecycle
-    def cleanup(self, session: Session) -> None: ...
-
-    # state
     def state(self, session: Session) -> DialogState: ...
-    def is_waiting(self, session: Session) -> bool: ...
     def edge_event(self, session: Session) -> asyncio.Event: ...
 
-    # resolution / cancellation
     def resolve_input(self, session: Session, value: DialogValue) -> bool: ...
     def cancel_input(self, session: Session) -> None: ...
+    def cleanup(self, session: Session) -> None: ...
 
-    # form (multiple fields)
-    def get_form_spec(self, session: Session) -> FormSpec: ...
-    def wait_input(
+    def is_waiting(self, session: Session) -> bool: ...
+    def get_view(self, session: Session) -> ViewSpec: ...
+    def wait_view(
         self,
         session: Session,
         *,
-        spec: FormSpec,
+        view: ViewSpec,
         timeout: float | None = None,
         on_timeout: Callable[[], Awaitable[None]] | None = None,
     ) -> asyncio.Future: ...
@@ -254,6 +245,7 @@ class SessionService(Protocol):
 
 class RendererService(Protocol):
     async def render_text(self, ctx: RenderContext, key: str, **data) -> str: ...
+    async def render_view(self, ctx: RenderContext, key: str, **data) -> ViewSpec: ...
     async def render_spec(
         self, ctx: RenderContext, key: str, **data
     ) -> MessageSpec: ...
@@ -272,18 +264,20 @@ class AuditLogService(Protocol):
     async def permission(self, session, obj, action): ...
 
 
+class TemplateLoader(Protocol):
+
+    async def load(self, ctx: RenderContext) -> str: ...
+
+
+class RenderEngine(Protocol):
+
+    async def render_str(self, template_str: str, *, section: RenderSection) -> str: ...
+    async def render_any(self, obj: Any, *, section: RenderSection) -> Any: ...
+
+
 class PresenterPrompts(Protocol):
 
-    DEFAULT_POLICY = "system:string"
-    DEFAULT_MASK_POLICY = "system:masked"
-
-    async def ask(
-        self, section_key: str, *, policy: str = DEFAULT_POLICY, **data
-    ) -> object: ...
-
-    async def ask_secret(
-        self, section_key: str, *, policy: str = DEFAULT_MASK_POLICY, **data
-    ) -> object: ...
+    async def ask(self, section_key: str, **data) -> PromptResult: ...
 
 
 class Presenter(Protocol):
