@@ -1,6 +1,7 @@
 # yakoon/console/host.py
 import asyncio
 
+from yakoon.base.models.view import ViewSpec
 from yakoon.base.utils.input import safe_input, safe_input_secret
 from yakoon.platform.hosts.adapter import HostAdapter
 
@@ -17,15 +18,14 @@ class ConsoleHost(HostAdapter):
         self._submit = submit
         self._lock = asyncio.Lock()
 
-    async def on_view(self, *, ps1: str, view: dict) -> None:
-        input_def = view.get("input")
+    async def on_view(self, *, ps1: str, view: ViewSpec) -> None:
+        input_def = view.input
         if not input_def:
             return
-
-        if input_def.get("kind") != "form":
+        if input_def.kind != "form":
             raise RuntimeError("ConsoleHost supports only form inputs")
 
-        fields = input_def.get("fields") or {}
+        fields = input_def.fields or {}
         if not isinstance(fields, dict) or not fields:
             await self._submit({})
             return
@@ -33,12 +33,10 @@ class ConsoleHost(HostAdapter):
         values: dict[str, object] = {}
 
         for key, fd in fields.items():
-            if not isinstance(fd, dict):
-                fd = {}
-
-            label = fd.get("title") or key
-            hint = fd.get("hint")
-            ui = fd.get("ui") or {}
+            label = fd.title or key
+            hint = getattr(fd, "hint", "") or ""
+            ui = fd.ui or {}
+            secret = bool(ui.get("secret", False))
 
             prompt = label
             if hint:

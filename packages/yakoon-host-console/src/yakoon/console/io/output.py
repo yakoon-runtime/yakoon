@@ -1,75 +1,59 @@
 from __future__ import annotations
 
-from yakoon.base.runtime.output.event import OutputEvent
-from yakoon.platform.output.default import DefaultOutput
+from yakoon.base.models.view import MessageSpec, ViewSpec  # pfade anpassen
 
 
-class ConsoleOutput(DefaultOutput):
+class ConsoleOutput:
     """
-    Console renderer (view-only).
-
-    - expects mime: application/yakoon.view+json
-    - renders only view.message
-    - ignores view.input (handled by Host)
+    Console renderer (typed, view-only).
+    Renders only view.message. Ignores view.input (handled by Host).
     """
 
-    def __init__(self):
-        super().__init__(out_fn=self._print_out, err_fn=self._print_err)
-
-    async def _print_out(self, evt: OutputEvent) -> None:
-        text = self._render(evt)
+    async def view(self, view: ViewSpec) -> None:
+        text = self.render(view)
         if text:
             print(text)
 
-    async def _print_err(self, evt: OutputEvent) -> None:
-        text = self._render(evt)
-        if text:
-            print(text)
+    def render(self, view: ViewSpec) -> str:
+        msg = view.message
+        if msg is None:
+            return ""
 
-    def _render(self, evt: OutputEvent) -> str:
         prefix = ""
-        if evt.channel != "main":
-            prefix += f"[{evt.channel}] "
-        if evt.region in {"information", "status"}:
-            prefix += f"({evt.region}) "
+        if msg.role == "error":
+            prefix = "(Status) "
+        if msg.role == "info":
+            prefix = "(Information) "
 
-        # strict: view-only, but still tolerate dict payload if mime mismatches
-        payload = evt.payload
+        body = self._render_message(msg)
+        if not body:
+            return ""
 
-        if isinstance(payload, dict) and payload.get("kind") == "view":
-            msg = payload.get("message")
-            if isinstance(msg, dict):
-                return prefix + self._render_message(msg)
-            return ""  # input-only views
+        return prefix + body
 
-        # If strictness is desired everywhere, keeping this fallback helps debugging:
-        return prefix + str(payload)
-
-    def _render_message(self, spec: dict) -> str:
+    def _render_message(self, msg: MessageSpec) -> str:
         lines: list[str] = []
 
-        title = spec.get("title")
-        if title:
-            lines.append(str(title))
+        if msg.title:
+            lines.append(str(msg.title))
             lines.append("")
 
-        for block in spec.get("blocks", []):
-            t = block.get("type")
+        for block in msg.blocks or []:
+            t = getattr(block, "type", None)
 
             if t == "text":
-                lines.append(str(block.get("text", "")))
+                lines.append(str(getattr(block, "text", "")))
                 lines.append("")
 
             elif t == "list":
-                for item in block.get("items", []):
+                for item in getattr(block, "items", []) or []:
                     lines.append(f"- {item}")
                 lines.append("")
 
             elif t == "kv":
-                items = block.get("items", [])
-                if isinstance(items, list):
-                    for key, value in items:
-                        lines.append(f"{key}: {value}")
+                items = getattr(block, "items", []) or []
+                for k, v in items:
+                    lines.append(f"{k}: {v}")
                 lines.append("")
 
         return "\n".join(lines).rstrip()

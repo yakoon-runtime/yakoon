@@ -253,53 +253,25 @@ class RenderEngine(Protocol):
     async def render_any(self, obj: Any, *, section: RenderSection) -> Any: ...
 
 
-class PresenterPrompts(Protocol):
+class PresenterViews(Protocol):
+    async def emit(self, section_key: str, **data) -> None: ...
 
+
+class PresenterInputs(Protocol):
     async def ask(self, section_key: str, **data) -> PromptResult: ...
 
 
 class Presenter(Protocol):
 
-    prompts: PresenterPrompts
-
-    async def emit(self, section: str, **data) -> None: ...
-
-    """
-    Renders and emits a section of the current template via session.emit().
-
-    Used for standard informational output (e.g. success, details, confirmations).
-
-    Args:
-        section (str): Template section key (e.g. "success", "info").
-        **data: Optional key-value pairs for template variables.
-    """
-
-    async def fail(self, section: str, **data) -> None: ...
-
-    """
-    Renders and sends a failure message via session.fail().
-
-    Used to communicate errors, invalid inputs, or blocked operations.
-
-    Args:
-        section (str): Template section key (e.g. "not_found", "denied").
-        **data: Optional key-value pairs for template variables.
-    """
-
-    async def notify(self, section: str, **data) -> None: ...
-
-    """
-    Renders and sends a passive notification via session.notify().
-
-    Used for non-critical messages, hints or background updates.
-
-    Args:
-        section (str): Template section key (e.g. "hint", "auto_saved").
-        **data: Optional key-value pairs for template variables.
-    """
+    inputs: PresenterInputs
+    views: PresenterViews
 
 
 class PresenterService(Protocol):
     async def create_presenter(
         self, template_prefix: str, template_key: str, session: Session
     ) -> Presenter: ...
+
+
+class IO(Protocol):
+    async def view(self, view: ViewSpec) -> None: ...

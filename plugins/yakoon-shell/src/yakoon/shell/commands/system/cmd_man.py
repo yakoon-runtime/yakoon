@@ -44,7 +44,7 @@ class CmdMan(Command):
 
         if not command:
             presenter = await self.get_presenter(session)
-            await presenter.emit("no_manual_entry", command_key=command_key)
+            await presenter.views.emit("no_manual_entry", command_key=command_key)
         else:
             # controller has to exists - command was found before.
             controller = controller_service.get(active_controller_id)
@@ -62,7 +62,7 @@ class CmdMan(Command):
                 template_source.package, template_key, session
             )
 
-            await presenter.emit("man_page")
+            await presenter.views.emit("man_page")
 
     async def show_index(self, session: Session, request: Request):
 
@@ -93,7 +93,7 @@ class CmdMan(Command):
                     controllers.append(c)
 
             controllers = sorted(controllers, key=lambda c: c.id)
-            await presenter.emit(
+            await presenter.views.emit(
                 "show_help",
                 mode="shell",
                 shell_commands=shell_commands,
@@ -118,7 +118,7 @@ class CmdMan(Command):
             )
 
             commands = sorted(commands, key=lambda c: c.key)
-            await presenter.emit("show_help", mode="program", commands=commands)
+            await presenter.views.emit("show_help", mode="program", commands=commands)
 
     def resolve_man_mode(self, request: Request) -> str:
         if request.has_option("internal"):

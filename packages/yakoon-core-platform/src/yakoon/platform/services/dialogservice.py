@@ -136,7 +136,7 @@ class DefaultDialogService:
                     if on_timeout:
                         await on_timeout()
                     else:
-                        await session.fail(v_error("Input timed out."))
+                        await session.emit(v_error("Input timed out."))
 
             self._timeouts[session_key] = asyncio.create_task(auto_expire())
 

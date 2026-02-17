@@ -51,7 +51,7 @@ async def run_console() -> None:
         runner = Runner(engine=engine, session=session, host=host)
 
         inits: list[str] = []
-        inits = ["use crm-customer", "customer-create"]
+        # inits = ["use crm-customer", "customer-create"]
         await runner.start(inits)
 
     except KeyboardInterrupt:

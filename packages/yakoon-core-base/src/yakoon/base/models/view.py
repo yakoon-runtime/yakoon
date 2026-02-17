@@ -63,6 +63,17 @@ InputDef = ViewFormDef
 
 
 @dataclass(frozen=True, slots=True)
+class ViewUI:
+    secret: bool = False  # für Fields; bei Message später optional
+    # später: focus, disabled, placeholder, etc.
+
+
+@dataclass(frozen=True, slots=True)
+class ViewMeta:
+    ui: ViewUI | None
+
+
+@dataclass(frozen=True, slots=True)
 class ViewSpec:
     """
     Canonical view contract.
@@ -80,4 +91,4 @@ class ViewSpec:
     message: MessageSpec | None = None
     input: InputDef | None = None
 
-    meta: dict[str, Any] | None = None
+    meta: ViewMeta | None = None

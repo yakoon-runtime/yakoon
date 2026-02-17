@@ -15,15 +15,15 @@ class CmdTest(Command):
     async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
         presenter = await self.get_presenter(session)
-        result = await presenter.prompts.ask("ask1")
+        result = await presenter.inputs.ask("ask1")
         await session.emit(v_text(f" -> {result.first()}"))
 
-        result = await presenter.prompts.ask("ask2")
+        result = await presenter.inputs.ask("ask2")
         await session.emit(v_text(result.get("result")))
 
-        result = await presenter.prompts.ask("ask3")
+        result = await presenter.inputs.ask("ask3")
         await session.emit(v_text(result.get("the_key")))
 
-        items = await presenter.prompts.ask("ask4")
+        items = await presenter.inputs.ask("ask4")
         for item in items.list():
             await session.emit(v_text(item))

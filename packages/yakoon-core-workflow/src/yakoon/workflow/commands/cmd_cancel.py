@@ -2,6 +2,7 @@ from yakoon.base import ports
 from yakoon.base.commands.command import CommandVisibility, WfCommand
 from yakoon.base.commands.request import Request
 from yakoon.base.runtime.session.session import Session
+from yakoon.base.runtime.session.views import v_error
 
 
 class CmdWfCancel(WfCommand):
@@ -19,7 +20,7 @@ class CmdWfCancel(WfCommand):
         batch_id = self.context.batch_id
         batch = rt.get(batch_id)
         if not batch:
-            await session.notify("Kein aktiver Workflow.")
+            await session.emit(v_error("Kein aktiver Workflow."))
             return
 
         # 1) Queue abbrechen

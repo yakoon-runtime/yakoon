@@ -1,6 +1,4 @@
-from yakoon.base.runtime.output.event import OutputEvent
 from yakoon.kivy.runtime.context.view_context import ViewContext
-from yakoon.platform.output.default import DefaultOutput
 
 
 class KivyOutput:
@@ -9,14 +7,14 @@ class KivyOutput:
         self._on_context = on_context
         self._ui_state_provider = ui_state_provider
 
-    def emit(self, session, evt: OutputEvent):
+    def emit(self, session, evt):
         ctx = ViewContext(
             session=session, envelope=evt, ui_state_provider=self._ui_state_provider
         )
         self._on_context(ctx)
 
 
-class SessionBoundKivyOutput(DefaultOutput):
+class SessionBoundKivyOutput:
 
     def __init__(self, session, kivy_output: KivyOutput):
         super().__init__(

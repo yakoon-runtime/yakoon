@@ -121,7 +121,7 @@ class Engine:
         controller_id = session.get_active_controller()
         controller = self._directory.get(controller_id) if controller_id else None
         if not controller:
-            await session.fail(v_error("Kein aktiver Controller gesetzt."))
+            await session.emit(v_error("Kein aktiver Controller gesetzt."))
             return
 
         command = None
@@ -166,7 +166,7 @@ class Engine:
 
         except WorkflowContextRequired:
             failed = True
-            await session.fail(
+            await session.emit(
                 v_error(
                     f"{request.command}': may only be executed from within a workflow.'"
                 )
@@ -174,7 +174,7 @@ class Engine:
 
         except CmdNotFound as exc:
             failed = True
-            await session.fail(
+            await session.emit(
                 v_error(f"{request.command}': command not found... use 'man'")
             )
             self.wf_failed(exc, command, session, di)
@@ -187,18 +187,18 @@ class Engine:
             audit = self._services.get(ports.AuditLogService)
             await audit.permission(session, "command", command_key)
 
-            await session.fail(v_error(str(exc)))
+            await session.emit(v_error(str(exc)))
             self.wf_failed(exc, command, session, di)
 
         except ValueError as exc:
             failed = True
-            await session.fail(v_error(str(exc)))
+            await session.emit(v_error(str(exc)))
             self.wf_failed(exc, command, session, di)
 
         except ViewSpecValidationError as exc:
             audit = self._services.get(ports.AuditLogService)
             await audit.error(exc)
-            await session.fail(
+            await session.emit(
                 v_error("Ein interner Konfigurationsfehler ist aufgetreten.")
             )
 
@@ -206,7 +206,7 @@ class Engine:
             failed = True
             audit = self._services.get(ports.AuditLogService)
             await audit.error(exc)
-            await session.fail(v_error("Ein interner Fehler ist aufgetreten."))
+            await session.emit(v_error("Ein interner Fehler ist aufgetreten."))
             self.wf_failed(exc, command, session, di)
 
         finally:

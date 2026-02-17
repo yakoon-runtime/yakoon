@@ -76,10 +76,10 @@ class InputService:
                 try:
                     res = self._policy.validate(policy_key=policy_key, raw=val)
                 except KeyError:
-                    await session.fail(v_error(f"[{key}] Unknown policy: {policy_key}"))
+                    await session.emit(v_error(f"[{key}] Unknown policy: {policy_key}"))
                     raise
                 except Exception as exc:  # noqa: BLE001
-                    await session.fail(
+                    await session.emit(
                         v_error(
                             f"[{key}] Policy error: {policy_key} ({type(exc).__name__})"
                         )

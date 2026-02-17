@@ -25,11 +25,11 @@ class CmdSu(Command):
         username = (
             request.arg(0)
             or request.option("user")
-            or (await presenter.prompts.ask("ask_user")).first()
+            or (await presenter.inputs.ask("ask_user")).first()
         )
         secret = request.option("password")
         if not secret:
-            secret = (await presenter.prompts.ask("ask_secret")).first()
+            secret = (await presenter.inputs.ask("ask_secret")).first()
             if secret:
                 secret = secret.reveal()
 
@@ -40,7 +40,7 @@ class CmdSu(Command):
             permissions.apply_account_permissions(session, account)
 
             await self.services.get(SessionService).save(session)
-            await presenter.emit("success", user=username)
+            presenter.views.emit("success", user=username)
 
         else:
-            await presenter.emit("failed", user=username, reason=result.reason)
+            await presenter.views.emit("failed", user=username, reason=result.reason)

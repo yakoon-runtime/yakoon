@@ -1,14 +1,15 @@
-# yakoon/base/runtime/session/session.py
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from yakoon.base.models.key import Key
 from yakoon.base.models.perm import PermissionSet
-from yakoon.base.runtime.output.event import OutputEvent
+from yakoon.base.models.view import ViewSpec
+
+if TYPE_CHECKING:
+    from yakoon.base.ports import IO
 
 
 @dataclass
@@ -49,7 +50,7 @@ class SessionState:
 class SessionRuntime:
     permissions: PermissionSet = field(default_factory=PermissionSet)
     signals: set[str] = field(default_factory=set)
-    io: object | None = None
+    io: IO | None = None
     meta: dict[str, Any] = field(default_factory=dict)
 
 
@@ -92,7 +93,7 @@ class Session:
     def touch(self) -> None:
         self._state.last_active = datetime.now(UTC)
 
-    def bind_io(self, io):
+    def bind_io(self, io: IO):
         self._runtime.io = io
 
     def set_username(self, username: str | None):
@@ -127,74 +128,17 @@ class Session:
     def clear_signals(self) -> None:
         self._runtime.signals.clear()
 
+    async def emit(self, payload: ViewSpec) -> None:
+        view = self._ensure_view(payload)
+        await self._runtime.io.view(view)
+
     # ----------------------------
     # Strict View output
     # ----------------------------
 
-    def _ensure_view(self, payload: Any) -> dict[str, Any]:
-        if not isinstance(payload, Mapping):
-            raise TypeError("Session output must be a ViewSpec mapping (kind='view').")
-        view = dict(payload)
-        if view.get("kind") != "view":
+    def _ensure_view(self, payload: ViewSpec) -> ViewSpec:
+        if not isinstance(payload, ViewSpec):
+            raise TypeError("Session output must be a ViewSpec object.")
+        if payload.kind != "view":
             raise TypeError("Session output must be a ViewSpec with kind='view'.")
-        return view
-
-    async def emit(
-        self,
-        payload: Any,
-        *,
-        channel: str = "main",
-        op: str = "append",
-        region: str = "output",
-        meta: Mapping[str, Any] | None = None,
-    ) -> None:
-        view = self._ensure_view(payload)
-        evt = OutputEvent(
-            payload=view,
-            mime=self.VIEW_MIME,
-            channel=channel,
-            op=op,
-            region=region,
-            meta=dict(meta or {}),
-        )
-        await self._runtime.io.out(evt)
-
-    async def notify(
-        self,
-        payload: Any,
-        *,
-        channel: str = "main",
-        op: str = "append",
-        region: str = "information",
-        meta: Mapping[str, Any] | None = None,
-    ) -> None:
-        view = self._ensure_view(payload)
-        evt = OutputEvent(
-            payload=view,
-            mime=self.VIEW_MIME,
-            channel=channel,
-            op=op,
-            region=region,
-            meta=dict(meta or {}),
-        )
-        await self._runtime.io.out(evt)
-
-    async def fail(
-        self,
-        payload: Any,
-        *,
-        channel: str = "main",
-        op: str = "append",
-        region: str = "status",
-        meta: Mapping[str, Any] | None = None,
-    ) -> None:
-        view = self._ensure_view(payload)
-        evt = OutputEvent(
-            payload=view,
-            mime=self.VIEW_MIME,
-            channel=channel,
-            op=op,
-            region=region,
-            meta=dict(meta or {}),
-        )
-        await self._runtime.io.err(evt)
+        return payload

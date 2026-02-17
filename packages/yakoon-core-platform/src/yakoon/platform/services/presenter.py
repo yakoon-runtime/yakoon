@@ -1,5 +1,3 @@
-from dataclasses import asdict
-
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.prompt import PromptResult
@@ -7,7 +5,7 @@ from yakoon.base.runtime.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
 
 
-class PresenterPrompts:
+class PresenterInputs:
 
     def __init__(
         self, ctx: RenderContext, session: Session, services: ServiceDirectory
@@ -19,9 +17,22 @@ class PresenterPrompts:
 
     async def ask(self, section_key: str, **data) -> PromptResult:
         view = await self._renderer.render_view(self._ctx, section_key, **data)
-        if not view.input:
-            raise TypeError(f"View {section_key!r} has no input")
-        return await self._inputs.ask_view(self._session, asdict(view))
+        await self._session.emit(view)
+        return await self._inputs.ask_view(self._session, view)
+
+
+class PresenterViews:
+
+    def __init__(
+        self, ctx: RenderContext, session: Session, services: ServiceDirectory
+    ):
+        self._ctx = ctx
+        self._session = session
+        self._renderer = services.get(ports.RendererService)
+
+    async def emit(self, section_key: str, **data) -> None:
+        view = await self._renderer.render_view(self._ctx, section_key, **data)
+        await self._session.emit(view)
 
 
 class Presenter:
@@ -63,22 +74,16 @@ class Presenter:
         )
 
     @property
-    def prompts(self) -> PresenterPrompts:
+    def inputs(self) -> PresenterInputs:
         if not self._prompts:
-            self._prompts = PresenterPrompts(self._ctx, self._session, self._services)
+            self._prompts = PresenterInputs(self._ctx, self._session, self._services)
         return self._prompts
 
-    async def emit(self, section: str, **data) -> None:
-        spec = await self._renderer.render_view(self._ctx, section, **data)
-        await self._session.emit(asdict(spec))
-
-    async def fail(self, section: str, **data) -> None:
-        spec = await self._renderer.render_view(self._ctx, section, **data)
-        await self._session.fail(asdict(spec))
-
-    async def notify(self, section: str, **data) -> None:
-        spec = await self._renderer.render_view(self._ctx, section, **data)
-        await self._session.notify(asdict(spec))
+    @property
+    def views(self) -> PresenterViews:
+        if not self._prompts:
+            self._prompts = PresenterViews(self._ctx, self._session, self._services)
+        return self._prompts
 
 
 class PresenterService:
