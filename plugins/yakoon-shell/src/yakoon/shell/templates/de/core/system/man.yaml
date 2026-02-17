@@ -16,7 +16,7 @@ views:
           {{ section.data.controllers | map(attribute='id') | join(', ') }}          
           {%- elif section.data.mode == "program" -%}
           Commands:
-          {{ section.data.shell_commands | map(attribute='key') | join(', ') }}
+          {{ section.data.commands | map(attribute='key') | join(', ') }}
           {% endif %}
 
   no_manual_entry:
