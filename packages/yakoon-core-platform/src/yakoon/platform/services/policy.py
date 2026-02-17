@@ -1,6 +1,6 @@
 import re
 
-from yakoon.base.models.fields import FieldSpec, FieldType, SecretValue, SelectOption
+from yakoon.base.models.fields import FieldType, SecretValue
 from yakoon.base.models.policy import (
     FieldPolicy,
     PolicyValidationError,
@@ -82,42 +82,6 @@ class PolicyService:
         return PolicyValidationResult(
             ok=True,
             value=self._wrap_secret_policy(pol, coerced),
-        )
-
-    def materialize_field(
-        self,
-        policy_key: str,
-        *,
-        key: str,
-        label: str,
-        required: bool | None = None,
-        hint: str | None = None,
-        secret: bool | None = None,
-        options: list[dict] | None = None,
-        default: object | None = None,
-    ) -> FieldSpec:
-        pol = self.get_policy(policy_key)
-
-        # base from policy
-        opt = options if options is not None else (pol.options or None)
-        sel = (
-            None
-            if not opt
-            else [SelectOption(value=o["value"], label=o["label"]) for o in opt]
-        )
-
-        return FieldSpec(
-            key=key,
-            label=label,
-            type=pol.type,
-            required=pol.required if required is None else required,
-            hint=pol.hint if hint is None else hint,
-            secret=pol.secret if secret is None else secret,
-            pattern=pol.pattern,
-            default=pol.default if default is None else default,
-            options=sel,
-            # if you add validators to FieldSpec:
-            validators=pol.validators,
         )
 
     def _coerce_policy(self, pol: FieldPolicy, raw: str) -> object:

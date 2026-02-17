@@ -3,12 +3,11 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
-from typing import Any, Protocol, TypeAlias
+from typing import Any, Protocol
 
 from yakoon.base.models.account import Account, AuthResult
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.models.command import CommandKind
-from yakoon.base.models.fields import FieldSpec, FormSpec
 from yakoon.base.models.input import DispatchInput
 from yakoon.base.models.key import Key
 from yakoon.base.models.message import MessageSpec
@@ -41,21 +40,7 @@ class PolicyService(Protocol):
     def register_validator(self, key: str, fn) -> None: ...
     def get_validator(self, key: str) -> callable: ...
     def register_defaults(self) -> None: ...
-    def validate_field(
-        self, *, field: FieldSpec, raw: RawValue
-    ) -> PolicyValidationResult: ...
-    def materialize_field(
-        self,
-        policy_key: str,
-        *,
-        key: str,
-        label: str,
-        required: bool | None = None,
-        hint: str | None = None,
-        secret: bool | None = None,
-        options: list[dict] | None = None,
-        default: object | None = None,
-    ) -> FieldSpec: ...
+    def validate(self, *, policy_key: str, raw: RawValue) -> PolicyValidationResult: ...
 
 
 class WorkflowService(Protocol):
@@ -130,16 +115,9 @@ class DialogState(StrEnum):
     WAITING_FORM = "waiting_form"
 
 
-FieldValue = object
-FormValues: TypeAlias = dict[str, object]
-DialogValue: TypeAlias = FieldSpec | FormValues
-
-
 class InputService(Protocol):
 
-    async def ask_form(self, session: Session, spec: FormSpec) -> dict[str, object]: ...
-    async def ask_field(self, session: Session, field: FieldSpec) -> object: ...
-    async def ask_view(self, session: Session, field: ViewSpec) -> object: ...
+    async def ask_view(self, session: Session, field: ViewSpec) -> PromptResult: ...
 
 
 class DialogService(Protocol):
@@ -147,7 +125,7 @@ class DialogService(Protocol):
     def state(self, session: Session) -> DialogState: ...
     def edge_event(self, session: Session) -> asyncio.Event: ...
 
-    def resolve_input(self, session: Session, value: DialogValue) -> bool: ...
+    def resolve_input(self, session: Session, values: dict[str, object]) -> bool: ...
     def cancel_input(self, session: Session) -> None: ...
     def cleanup(self, session: Session) -> None: ...
 

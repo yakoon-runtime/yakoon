@@ -50,7 +50,7 @@ class CommandQueueService:
         q = self._q.setdefault(skey, deque())
 
         for c in reversed(cmds):
-            q.appendleft(DispatchInput(command=c, batch_id=batch_id))
+            q.appendleft(DispatchInput(payload=c, batch_id=batch_id))
 
     def next_input(self, session) -> DispatchInput | None:
         """

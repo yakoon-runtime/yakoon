@@ -29,7 +29,7 @@ class Runner:
 
     async def on_cancel(self) -> None:
         await self.engine.dispatch(
-            self.session, DispatchInput(command="shell:wf.cancel")
+            self.session, DispatchInput(payload="shell:wf.cancel")
         )
         await self.drive()
 

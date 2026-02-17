@@ -14,7 +14,6 @@ class DefaultDialogService:
 
     There is exactly one interactive shape:
       - WAITING_INPUT → ViewSpec (as dict) with optional input definition
-      - resolve_input() → dict[str, object]
     """
 
     DEFAULT_TIMEOUT = 60 * 15  # 15 minutes

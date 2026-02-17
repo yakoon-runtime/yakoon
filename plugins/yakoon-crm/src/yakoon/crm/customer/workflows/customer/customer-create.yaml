@@ -10,6 +10,7 @@ steps:
     fields:
       - { var: customer.first_name, policy: system:string, title: "Vorname" }
       - { var: customer.last_name,  policy: system:string, title: "Nachname" }
+      - { var: customer.pw,  policy: system:masked, title: "Password" }
   next: ask_mail
 
 - id: ask_mail

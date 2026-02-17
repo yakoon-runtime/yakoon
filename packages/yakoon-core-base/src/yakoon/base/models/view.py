@@ -15,7 +15,6 @@ class ViewFieldDef:
     Describes one input field as authored in a View template.
 
     Note:
-        - This is NOT the runtime FieldSpec (host/input-engine specific).
         - It's the canonical authoring-time definition used in ViewSpec.input.
     """
 

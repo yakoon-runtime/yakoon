@@ -58,13 +58,12 @@ class Engine:
         async with self._lock(session):
             dialog_service = self.services.get(ports.DialogService)
             if dialog_service.is_waiting(session):
-                dialog_service.resolve_input(session, di.command)
-
-                # Drive the existing active task until it either finishes or asks again
-                await self._drive_until_blocked_or_done(session)
-
-                # print("DISPATCH END")
-                return session
+                if isinstance(di.payload, dict):
+                    dialog_service.resolve_input(session, di.payload)
+                    # Drive the existing active task until it either finishes or asks again
+                    await self._drive_until_blocked_or_done(session)
+                    # print("DISPATCH END")
+                    return session
 
         # 2) Normal command path
         loop = asyncio.get_running_loop()
@@ -112,7 +111,7 @@ class Engine:
 
     async def _dispatch_command(self, session: Session, di: DispatchInput) -> None:
         failed = False
-        request = Request(di.command)
+        request = Request(di.payload)
 
         # Empty input -> noop (or fail, depending on your UX choice)
         if not request.command:

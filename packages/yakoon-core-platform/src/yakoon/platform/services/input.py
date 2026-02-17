@@ -22,7 +22,7 @@ class InputService:
         self._dialogs = services.get(ports.DialogService)
         self._policy = services.get(ports.PolicyService)
 
-    async def ask_view(self, session: Session, view: dict) -> dict[str, object]:
+    async def ask_view(self, session: Session, view: dict) -> PromptResult:
         input_def = view.get("input")
         if not input_def:
             raise TypeError("View has no input")

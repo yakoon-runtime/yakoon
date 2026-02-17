@@ -29,33 +29,3 @@ class SecretValue:
 
     def __repr__(self) -> str:
         return "SecretValue(******)"
-
-
-@dataclass(frozen=True, slots=True)
-class FieldSpec:
-    key: str
-    label: str | None = None
-    type: FieldType = FieldType.STRING
-    required: bool = False
-    hint: str = ""
-    secret: bool = False
-    pattern: str = ""
-    default: str = ""
-    options: list[SelectOption] | None = None
-    validators: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class FormSpec:
-    batch_id: str
-    step_key: str
-    form_id: str
-    title: str | None = None
-    fields: list[FieldSpec] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class FormSubmission:
-    batch_id: str
-    form_id: str
-    values: dict[str, object]  # values raw; conversion is server-side
