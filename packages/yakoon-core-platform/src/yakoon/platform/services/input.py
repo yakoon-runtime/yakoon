@@ -14,7 +14,7 @@ class InputService:
     Unified interaction layer (view-only).
 
     Contract:
-      - ask_view(session, view) -> dict[str, object]
+      - ask_view(session, view) -> PromptResult
       - DialogService waits on view and returns raw dict[str, object]
       - Policy validation is performed directly via PolicyService using policy key.
     """
