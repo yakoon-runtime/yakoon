@@ -37,7 +37,7 @@ class DefaultDialogService:
             self._edges[session_key] = ev
         return ev
 
-    def get_view(self, session: Session) -> dict:
+    def get_view(self, session: Session) -> ViewSpec:
         view = self._views.get(str(session.key))
         if view is None:
             raise RuntimeError("No View available (not waiting for input).")
