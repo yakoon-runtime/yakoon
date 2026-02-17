@@ -7,6 +7,17 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+## 2026-02-17
+**Weiterentwicklung der View- und Input-Architektur**
+Dieser Schritt dient zur Vorbereitung deklarativer Workflows.
+- inputs.<state>.fields wird als Liste von Field-Definitionen geführt.
+- Jedes Feld benötigt ein verpflichtendes var (Zielvariable).
+- Optional kann ein key als Alias definiert werden.
+- prompt.ask() liefert ein PromptResult statt eines rohen dict.
+- UI-spezifische Hinweise (z. B. secret) werden aus der policy abgeleitet und als ui-Metadaten bereitgestellt.
+- Feldbasierte Flags wie secret werden nicht mehr direkt im Template gesetzt.
+Eine DSL für Commands und Workflows: Beide verwenden nun identische Felddefinitionen.
+
 ## 2026-02-15
 **Unified Input Model (FormSpec Only)**
 * Auflösung der Trennung zwischen *Wizard* und *Form* im Kernel.
