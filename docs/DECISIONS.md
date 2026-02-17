@@ -8,6 +8,26 @@
 --
 
 ## 2026-02-17
+**Umstellung auf ViewSpec**
+Der Output-Stack wurde radikal vereinfacht. IO ist nun vollständig View-getrieben.
+Die Architektur ist konsistent mit dem Input-/Workflow-Modell.
+Die Runtime ist leichter verständlich und deutlich schlanker.
+- OutputEvent wird vollständig entfernt.
+- Es existiert nur noch ein IO-Einstiegspunkt: io.view(ViewSpec)
+- Session.emit() akzeptiert ausschließlich ViewSpec.
+- Keine Dict-Views mehr im IO-Pfad.
+- Kein zweiter Kanal (err) mehr.
+- role wird ausschließlich über MessageSpec.role bestimmt.
+- op wird ausschließlich über ViewSpec.mode bestimmt.
+- Transport-Parameter wie channel, region, meta werden entfernt.
+
+## 2026-02-17
+**Vollständige Integration der Workflows**
+Die DSL arbeitet für Commands & Workflows übergreifend.
+InputResult als saubere Datenkapselung (statt PromptResult)
+InputView liefert view contracts für Ausgabe.
+
+## 2026-02-17
 **Weiterentwicklung der View- und Input-Architektur**
 Dieser Schritt dient zur Vorbereitung deklarativer Workflows.
 - inputs.<state>.fields wird als Liste von Field-Definitionen geführt.
