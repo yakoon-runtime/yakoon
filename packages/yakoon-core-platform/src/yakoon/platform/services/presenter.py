@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.prompt import PromptResult
@@ -49,7 +51,7 @@ class Presenter:
         template_key: str,
         session: Session,
         services: ServiceDirectory,
-    ) -> RenderContext:
+    ):
         """
         Constructs a RenderContext based on the current session and template key.
 
@@ -63,6 +65,7 @@ class Presenter:
             RenderContext: Template context with full key and language.
         """
         self._prompts = None
+        self._views = None
         self._session = session
         self._services = services
         self._renderer = self._services.get(ports.RendererService)
@@ -81,9 +84,9 @@ class Presenter:
 
     @property
     def views(self) -> PresenterViews:
-        if not self._prompts:
-            self._prompts = PresenterViews(self._ctx, self._session, self._services)
-        return self._prompts
+        if not self._views:
+            self._views = PresenterViews(self._ctx, self._session, self._services)
+        return self._views
 
 
 class PresenterService:
