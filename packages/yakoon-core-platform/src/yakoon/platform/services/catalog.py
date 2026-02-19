@@ -48,9 +48,6 @@ class CommandCatalogService:
     def keys_for_controller(self, controller_id: str) -> Sequence[str]:
         return tuple(c.key for c in self.for_controller(controller_id))
 
-    def is_shell_builtin(self, key: str) -> bool:
-        return key in self._shell_builtins
-
     def shell_builtins(self) -> Sequence[str]:
         return tuple(sorted(self._shell_builtins))
 

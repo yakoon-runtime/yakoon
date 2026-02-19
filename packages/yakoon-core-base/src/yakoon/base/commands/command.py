@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from yakoon.base.models.command import (
-    CommandAvailability,
     CommandKind,
+    CommandScope,
     CommandVisibility,
 )
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
@@ -71,8 +71,8 @@ class Command(ABC):
 
     # Execution metadata
     kind: CommandKind = CommandKind.USER
+    scope: CommandScope = CommandScope.CONTROLLER
     visibility: CommandVisibility = CommandVisibility.NORMAL
-    availability: CommandAvailability = CommandAvailability.CONTROLLER
 
     # If True, dispatcher or command must enforce workflow context.
     requires_workflow: bool = False

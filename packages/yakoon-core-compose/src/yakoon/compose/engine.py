@@ -23,7 +23,6 @@ from yakoon.platform.services.catalog import (
     ControllerCatalog,
     ControllerCatalogService,
 )
-from yakoon.platform.services.command import CommandQueueService
 from yakoon.platform.services.dialog import DialogService
 from yakoon.platform.services.input import InputService
 from yakoon.platform.services.message import MessageSpecService
@@ -31,6 +30,7 @@ from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.policy import PolicyService
 from yakoon.platform.services.presenter import PresenterService
+from yakoon.platform.services.queue import CommandQueueService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
@@ -149,6 +149,7 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
                 command_info = CommandInfo(
                     command.key,
                     command.kind,
+                    command.scope,
                     command.visibility,
                     sets.group,
                     controller.id,

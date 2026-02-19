@@ -19,7 +19,7 @@ class DiscoveryController(BaseController):
     is_shell: bool = False
     is_listed: bool = True
     is_activatable: bool = True
-    shell_builtins: Sequence[str] = ("lookup",)
+    # shell_builtins: Sequence[str] = ("lookup",)
 
     template_source = TemplateSource(
         package="yakoon.discovery",

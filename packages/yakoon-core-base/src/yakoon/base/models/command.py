@@ -13,7 +13,7 @@ class CommandVisibility(StrEnum):
     INTERNAL = "internal"  # nur in `man --internal`
 
 
-class CommandAvailability(StrEnum):
-    CONTROLLER = "controller"
-    SHELL = "shell"
-    GLOBAL = "global"
+class CommandScope(StrEnum):
+    CONTROLLER = "controller"  # Only in active controller
+    SHELL = "shell"  # Only in shell
+    GLOBAL = "global"  # global usage
