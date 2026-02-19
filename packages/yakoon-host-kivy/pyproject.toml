@@ -12,10 +12,6 @@ dependencies = [
     "yakoon-core-base", 
     "yakoon-core-platform", 
     "yakoon-core-compose",
-
-    "yakoon-auth",
-    "yakoon-shell",
-    "yakoon-office",    
     ]
 
 [tool.setuptools]

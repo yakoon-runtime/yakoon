@@ -1,28 +1,23 @@
 import asyncio
 
-from yakoon.auth.controller import AuthCoreController
 from yakoon.base import ports
 from yakoon.base.models.key import Key
 from yakoon.compose.engine import compose_engine
 from yakoon.console.host import ConsoleHost
 from yakoon.console.io import ConsoleOutput
-from yakoon.crm.customer.controller import CrmCustomerCoreController
-from yakoon.office.mailing.controller import OfficeMailingCoreController
-from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.hosts.runner import Runner
-from yakoon.shell.controller import ShellCoreController
 
 
 async def run_console() -> None:
+
     engine = compose_engine(
-        controllers=ControllerDirectory(
-            controllers=[
-                ShellCoreController(),
-                CrmCustomerCoreController(),
-                AuthCoreController(),
-                OfficeMailingCoreController(),
-            ]
-        )
+        plugin_modules=[
+            "yakoon.shell",
+            "yakoon.auth",
+            "yakoon.discovery",
+            "yakoon.crm",
+            "yakoon.office",
+        ]
     )
 
     sessions = engine.services.get(ports.SessionService)
@@ -30,7 +25,6 @@ async def run_console() -> None:
         Key.from_parts("yakoon", "bucket", "develop", "1")
     )
 
-    # All visible output is rendered via session IO.
     session.bind_io(ConsoleOutput())
 
     permissions = engine.services.get(ports.PermissionService)

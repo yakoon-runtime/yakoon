@@ -7,7 +7,7 @@ class ControllerDirectory:
     Used by the Engine to remain agnostic of domain structure.
     """
 
-    def __init__(self, controllers: list[BaseController]):
+    def __init__(self):
         """
         Defines the interface for a registry that manages all
         available domain controllers.
@@ -24,15 +24,16 @@ class ControllerDirectory:
 
         self._controllers: dict[str, BaseController] = {}
 
+    def register(self, controllers: list[BaseController]):
         has_shell, shell_id = False, None
         for controller in controllers:
-            if controller.id in controllers:
+            if controller.id in self._controllers:
                 raise ValueError(
                     f"Duplicate controller names detected: {controller.id}"
                 )
             if controller.is_shell and has_shell:
                 raise ValueError(
-                    f"Duplicate shell controller: {shell_id.id} / {controller.id}"
+                    f"Duplicate shell controller: {shell_id.id} / {controller.id}"  # type: ignore
                 )
             if controller.is_shell:
                 has_shell = True
@@ -42,12 +43,12 @@ class ControllerDirectory:
         if not has_shell:
             raise ValueError("No shell controller found")
 
-    def find_shell(self) -> BaseController:
+    def find_shell(self) -> BaseController | None:
         for controller in self._controllers.values():
             if controller.is_shell:
                 return controller
 
-    def get(self, controller_id: str) -> BaseController:
+    def get(self, controller_id: str) -> BaseController | None:
         """
         Resolves and returns a domain controller by its unique ID.
 
