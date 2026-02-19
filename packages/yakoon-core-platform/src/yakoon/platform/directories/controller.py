@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from yakoon.base.controllers.base import BaseController
 
 
@@ -35,6 +37,11 @@ class ControllerDirectory:
                 raise ValueError(
                     f"Duplicate shell controller: {shell_id.id} / {controller.id}"  # type: ignore
                 )
+            if not controller.is_shell and controller.shell_builtins:
+                raise ValueError(
+                    f"Shell_builtins are only allowed on the shell controller "
+                    f"(controller='{controller.id}')"
+                )
             if controller.is_shell:
                 has_shell = True
                 shell_id = controller.id
@@ -61,7 +68,7 @@ class ControllerDirectory:
 
         return self._controllers.get(controller_id)
 
-    def get_all(self) -> list[BaseController]:
+    def get_all(self) -> Sequence[BaseController]:
         """
         Returns all registered domain controllers.
 
@@ -69,7 +76,7 @@ class ControllerDirectory:
             list[BaseController]: A list of all available domain controllers.
         """
 
-        return self._controllers.values()
+        return list(self._controllers.values())
 
     def has(self, controller_id: str) -> bool:
         """

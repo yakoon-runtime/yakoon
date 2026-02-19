@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
 
 
-@runtime_checkable
 class CommandSet(Protocol):
     """A named collection of command classes for registration.
 
@@ -20,8 +19,8 @@ class CommandSet(Protocol):
 
     group: str
 
-    @staticmethod
-    def commands() -> Sequence[type[Command]]:
+    @classmethod
+    def commands(cls) -> Sequence[type[Command]]:
         """Return the command classes exposed by this set."""
         ...
 

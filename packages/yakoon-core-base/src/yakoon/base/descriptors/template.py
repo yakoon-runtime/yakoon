@@ -26,7 +26,7 @@ class TemplateSource:
         - Pure descriptor, no logic.
     """
 
-    package: str
+    package: str | None
     template_path: str = "templates"
     template_sub_path: str = ""
     man_folder: str = "man"

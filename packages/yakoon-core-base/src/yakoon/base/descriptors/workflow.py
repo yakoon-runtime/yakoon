@@ -22,7 +22,7 @@ class WorkflowSource:
         - Resolution logic belongs to the workflow service layer.
     """
 
-    package: str
+    package: str | None
     workflow_path: str = "workflows"
     workflow_sub_path: str = ""
 

@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Sequence, Set
 
 from yakoon.base.commands.command import CommandKind, CommandVisibility
 from yakoon.base.directories.service import ServiceDirectory
@@ -19,7 +19,7 @@ class CommandCatalog:
     def all(self):
         return self._commmands
 
-    def builtins(self):
+    def builtins(self) -> Set[str]:
         return self._shell_builtins
 
 
@@ -31,6 +31,8 @@ class CommandCatalogService:
         self._services = services
         by_controller: dict[str, list[CommandInfo]] = {}
         for c in catalog.all():
+            if not c.controller_id:
+                raise RuntimeError("Controller id cannot be none or empty.")
             by_controller.setdefault(c.controller_id, []).append(c)
 
         # stabile Ordnung
@@ -69,7 +71,7 @@ class CommandCatalogService:
         session: Session,
         mode: str,
         kind_filter: CommandKind | None = None,
-    ):
+    ) -> Sequence[CommandInfo]:
         out = []
         allowed = self._allowed_visibilities(mode)
         for cmd in self.for_controller_visible(controller_id, session):

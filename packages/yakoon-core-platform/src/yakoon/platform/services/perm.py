@@ -19,7 +19,7 @@ class PermissionService:
             "shell:welcome|rx",
             "shell:version|rx",
             "shell:test|rx",
-            "shell:speed-test|rx",
+            "shell:speed-test|rwx",
             "shell:man|rx",
             "shell:exit|rx",
             "shell:quit|rx",
@@ -33,6 +33,7 @@ class PermissionService:
             "shell:wf.next|rx",
             "shell:wf.cancel|rx",
             "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
+            "discovery:lookup|rx",
         ]
 
     def register_role(self, name: str, specs: list[str]) -> None:

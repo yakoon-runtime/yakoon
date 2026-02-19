@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -50,7 +51,7 @@ class CommandRouter:
         is_shell: bool,
         is_listed: bool,
         is_activatable: bool,
-        builtins: list[str] | None = None,
+        builtins: Sequence[str] | None = None,
     ):
 
         self.id = id
@@ -65,7 +66,7 @@ class CommandRouter:
         self._aliases: dict[str, str] = {}
 
     def register(
-        self, group: str, cmdsets: list[CommandSet], *, append: bool = False
+        self, group: str, cmdsets: Sequence[type[CommandSet]], *, append: bool = False
     ) -> None:
         if group in self._groups and not append:
             raise ValueError(

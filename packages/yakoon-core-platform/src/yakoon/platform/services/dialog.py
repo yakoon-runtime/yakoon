@@ -8,7 +8,7 @@ from yakoon.base.runtime.session.views import v_error
 from yakoon.platform.settings import settings
 
 
-class DefaultDialogService:
+class DialogService:
     """
     Unified input dialog service (view-driven).
 

@@ -1,4 +1,7 @@
+from collections.abc import Sequence
+
 from yakoon.base import ports
+from yakoon.base.controllers.base import BaseController
 from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
@@ -8,6 +11,8 @@ from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.engine import Engine
 from yakoon.platform.engines.command.router import CommandDirectory, CommandRouter
+from yakoon.platform.plugins.manager import PluginManager
+from yakoon.platform.plugins.registry import PluginRegistry
 from yakoon.platform.runtime.render.jinja.engine import JinjaRenderer
 from yakoon.platform.services.account import AccountService
 from yakoon.platform.services.auditlog import AuditLogService
@@ -19,7 +24,7 @@ from yakoon.platform.services.catalog import (
     ControllerCatalogService,
 )
 from yakoon.platform.services.command import CommandQueueService
-from yakoon.platform.services.dialogservice import DefaultDialogService
+from yakoon.platform.services.dialog import DialogService
 from yakoon.platform.services.input import InputService
 from yakoon.platform.services.message import MessageSpecService
 from yakoon.platform.services.namespace import NamespaceService
@@ -37,24 +42,42 @@ from yakoon.workflow.services.compile import WorkflowCompileService
 from yakoon.workflow.services.engine import WorkflowService
 
 
-def compose_engine(controllers: ControllerDirectory) -> Engine:
+def compose_engine(*, plugin_modules: list[str]) -> Engine:
 
-    command_catalog = _compose_command_catalog(controllers)
-    controller_catalog = _compose_controller_catalog(controllers)
+    directory = ControllerDirectory()
+
+    bootstrap = ServiceDirectory()
+    bootstrap.register_static(ports.PluginRegistry, PluginRegistry())
+
+    loaded = PluginManager(bootstrap).load(plugin_modules)
+
+    controllers: list[BaseController] = []
+    for lp in loaded:
+        for controller_type in lp.export.controllers:
+            ctrl = controller_type()
+            ctrl.connect_services(lp.services)
+            controllers.append(ctrl)
+
+    directory.register(controllers)
 
     stores = _compose_stores()
-    commands = _compose_commands(controllers)
-    templates = _compose_template_sources(controllers)
+    command_catalog = _compose_command_catalog(directory)
+    controller_catalog = _compose_controller_catalog(directory)
+    templates = _compose_template_sources(directory)
+    commands = _compose_commands(directory)
 
-    services = _compose_services(stores, controller_catalog, command_catalog, templates)
+    _compose_services(
+        bootstrap,
+        stores,
+        controller_catalog,
+        command_catalog,
+        templates,
+    )
 
-    _compose_controllers(controllers, services)
-    _compose_permission_roles(services)
-    _compose_policies(services)
+    _compose_permission_roles(bootstrap)
+    _compose_policies(bootstrap)
 
-    engine = Engine(controllers, services, commands)
-
-    return engine
+    return Engine(directory, bootstrap, commands)
 
 
 def _compose_permission_roles(services: ServiceDirectory):
@@ -97,12 +120,6 @@ def _compose_policies(services: ServiceDirectory):
     )
 
 
-def _compose_controllers(directory: ControllerDirectory, services: ServiceDirectory):
-
-    for controller in directory.get_all():
-        controller.connect_services(services.fork())
-
-
 def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCatalog:
 
     controllers_list = []
@@ -122,7 +139,7 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
 
 def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
 
-    shell_builtins = {}
+    shell_builtins: Sequence[str] = []
     command_list = []
     for controller in directory.get_all():
         if controller.is_shell:
@@ -161,13 +178,12 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
 
 
 def _compose_services(
+    services: ServiceDirectory,
     stores: StoreRegistry,
     controller_catalog: ControllerCatalog,
     command_catalog: CommandCatalog,
     template_sources: list[TemplateSource],
 ) -> ServiceDirectory:
-
-    services = ServiceDirectory()
 
     services.register_static(ports.AuditLogService, AuditLogService())
     services.register_static(ports.NamespaceService, NamespaceService())
@@ -182,7 +198,7 @@ def _compose_services(
         ports.AuthenticationService, AuthenticationService(services)
     )
     services.register_static(ports.PermissionService, PermissionService())
-    services.register_static(ports.DialogService, DefaultDialogService())
+    services.register_static(ports.DialogService, DialogService())
     services.register_static(ports.WorkflowService, WorkflowService(services))
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     services.register_static(ports.PolicyService, PolicyService())

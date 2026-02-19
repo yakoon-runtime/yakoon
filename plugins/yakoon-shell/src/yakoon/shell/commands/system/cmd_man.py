@@ -48,7 +48,13 @@ class CmdMan(Command):
         else:
             # controller has to exists - command was found before.
             controller = controller_service.get(active_controller_id)
+            if not controller:
+                raise RuntimeError("Controller not found")
             template_source = controller.template_source
+            if not template_source:
+                raise RuntimeError("Controller has no Templatesource")
+            if not template_source.package:
+                raise RuntimeError("Templatesource has no package")
 
             man_folder = template_source.man_folder
             template_key = str(

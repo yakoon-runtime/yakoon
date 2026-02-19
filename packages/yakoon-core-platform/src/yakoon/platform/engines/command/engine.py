@@ -135,6 +135,12 @@ class Engine:
             result = await self._find_matching_command(controller_id, request)
             if not result:
                 raise CmdNotFound(f"{request.command}")
+                # if request.command != "lookup" and not di.batch_id:
+                #    return self.dispatch(
+                #        session, di=DispatchInput(f"lookup {request.raw}")
+                #    )
+                # else:
+                #    raise CmdNotFound(f"{request.command}")
 
             resolved_controller, command = result
 

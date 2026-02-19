@@ -11,3 +11,9 @@ class CommandVisibility(StrEnum):
     NORMAL = "normal"  # standard in `man`
     DEVELOPER = "dev"  # nur in `man --all` / `man workflows`
     INTERNAL = "internal"  # nur in `man --internal`
+
+
+class CommandAvailability(StrEnum):
+    CONTROLLER = "controller"
+    SHELL = "shell"
+    GLOBAL = "global"

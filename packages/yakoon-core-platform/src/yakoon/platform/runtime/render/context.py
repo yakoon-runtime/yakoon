@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class RenderContext:
     """
     Defines the technical rendering context for a command output.

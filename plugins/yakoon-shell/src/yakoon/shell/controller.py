@@ -30,14 +30,14 @@ class ShellCoreController(BaseController):
     is_listed: bool = True
     is_activatable: bool = True
 
-    shell_builtins: dict[str, str] = {
-        "exit": "exit",
-        "man": "man",
-        "wf.run": "wf.run",
-        "wf.input": "wf.input",
-        "wf.next": "wf.next",
-        "wf.cancel": "wf.cancel",
-    }
+    shell_builtins: Sequence[str] = (
+        "exit",
+        "man",
+        "wf.run",
+        "wf.input",
+        "wf.next",
+        "wf.cancel",
+    )
 
     template_source = TemplateSource(
         package="yakoon.shell",

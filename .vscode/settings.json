@@ -10,9 +10,10 @@
     "packages/yakoon-host-console/src",
     "packages/yakoon-host-kivy/src",
     "plugins/yakoon-auth/src",
+    "plugins/yakoon-discovery/src",
     "plugins/yakoon-crm/src",
     "plugins/yakoon-shell/src",
-    "plugins/yakoon-office/src"
+    "plugins/yakoon-office/src",
   ],
   "editor.formatOnSave": true,
   "[python]": {

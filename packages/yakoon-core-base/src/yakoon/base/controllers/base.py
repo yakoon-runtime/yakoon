@@ -48,7 +48,7 @@ class BaseController(ABC):
     is_activatable: bool = True
     """If False, the controller cannot be activated as an interactive context."""
 
-    shell_builtins: dict[str, type[Command]] = {}
+    shell_builtins: Sequence[str] = []
     """Commands available regardless of active controller context.
 
     Warning:
@@ -72,8 +72,7 @@ class BaseController(ABC):
         The platform is expected to inject a fully configured directory via
         `connect_services()` before command execution.
         """
-        self.services: ServiceDirectory = ServiceDirectory()
-        """Bucket-based access to runtime services (session/account/room etc.)."""
+        self.services: ServiceDirectory | None = None
 
     @property
     @abstractmethod
@@ -106,6 +105,10 @@ class BaseController(ABC):
         Returns:
             The resolved namespace for the session.
         """
+        if not self.services:
+            raise RuntimeError(
+                "Services cannot be None. Call connect_services() before."
+            )
         namespaces = self.services.get(NamespaceService)
         return await namespaces.from_session(session)
 

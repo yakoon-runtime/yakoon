@@ -1,0 +1,11 @@
+kind: command_lookup
+
+commands:
+
+  shell:version:
+    aliases: ["version", "ver"]
+    tags: ["info", "system"]
+
+  shell:man:
+    aliases: ["man", "hilfe"]
+    tags: ["docs"]

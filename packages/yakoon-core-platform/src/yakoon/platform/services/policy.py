@@ -1,4 +1,5 @@
 import re
+from collections.abc import Callable
 
 from yakoon.base.models.fields import FieldType, SecretValue
 from yakoon.base.models.policy import (
@@ -30,7 +31,7 @@ class PolicyService:
     def register_validator(self, key: str, fn) -> None:
         self._validators[key] = fn
 
-    def get_validator(self, key: str) -> callable:
+    def get_validator(self, key: str) -> Callable:
         return self._validators[key]
 
     def register_defaults(self):
