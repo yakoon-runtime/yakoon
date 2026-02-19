@@ -37,11 +37,6 @@ class ControllerDirectory:
                 raise ValueError(
                     f"Duplicate shell controller: {shell_id.id} / {controller.id}"  # type: ignore
                 )
-            if not controller.is_shell and controller.shell_builtins:
-                raise ValueError(
-                    f"Shell_builtins are only allowed on the shell controller "
-                    f"(controller='{controller.id}')"
-                )
             if controller.is_shell:
                 has_shell = True
                 shell_id = controller.id

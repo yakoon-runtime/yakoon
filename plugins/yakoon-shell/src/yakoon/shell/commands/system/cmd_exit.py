@@ -1,5 +1,6 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandScope
 from yakoon.base.ports import ControllerCatalogService, SessionService
 from yakoon.base.runtime.session import Session
 
@@ -8,6 +9,7 @@ class CmdExit(Command):
 
     key = "exit"
     template_prefix = "system"
+    scope = CommandScope.GLOBAL
 
     async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 

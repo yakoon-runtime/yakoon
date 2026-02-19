@@ -8,7 +8,7 @@ views:
     blocks:
       - type: text
         text: > 
-          {{ section.data.controllers | map(attribute='id') | join(' ') }}
+          {{ section.data.controllers | map(attribute='id') | join('  ') }}
 
   name_not_found:
     role: error

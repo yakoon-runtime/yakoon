@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from yakoon.base import ports
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.descriptors.template import TemplateSource
@@ -139,11 +137,8 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
 
 def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
 
-    shell_builtins: Sequence[str] = []
     command_list = []
     for controller in directory.get_all():
-        if controller.is_shell:
-            shell_builtins = controller.shell_builtins
         for sets in controller.commandsets:
             for command in sets.commands():
                 command_info = CommandInfo(
@@ -157,7 +152,7 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
                 )
                 command_list.append(command_info)
 
-    return CommandCatalog(command_list, shell_builtins)
+    return CommandCatalog(command_list)
 
 
 def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
@@ -169,12 +164,12 @@ def _compose_commands(directory: ControllerDirectory) -> CommandDirectory:
             controller.is_shell,
             controller.is_listed,
             controller.is_activatable,
-            controller.shell_builtins,
         )
 
         router.register(controller.id, controller.commandsets)
         commands.register(controller.id, router)
 
+    commands.validate()
     return commands
 
 

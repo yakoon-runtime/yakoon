@@ -3,125 +3,166 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+from yakoon.base.models.command import CommandScope
+
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
     from yakoon.base.commands.commandset import CommandSet
 
 
 class CommandDirectory:
+    """
+    Resolves commands by key and active controller using CommandScope.
 
-    def __init__(self):
+    Responsibilities:
+      - Deterministic routing
+      - Scope enforcement
+      - Global conflict detection
+    """
 
-        self._routers: list[CommandRouter] = []
+    def __init__(self) -> None:
+        self._routers: dict[str, CommandRouter] = {}
+        self._shell_id: str | None = None
 
-    def register(self, router_name, router: CommandRouter):
-        router.id = router_name
-        self._routers.append(router)
+    def register(self, controller_id: str, router: CommandRouter) -> None:
+        if controller_id in self._routers:
+            raise ValueError(f"Duplicate controller router: {controller_id}")
 
-    def find(self, active_router_id: str, cmd_name: str) -> tuple[str, Command] | None:
+        self._routers[controller_id] = router
 
-        eligible_routers = []
-        shell = [r for r in self._routers if r.is_shell and r.is_activatable][0]
+        if router.is_shell:
+            if self._shell_id is not None:
+                raise ValueError(
+                    f"Multiple shell controllers detected: "
+                    f"{self._shell_id} and {controller_id}"
+                )
+            self._shell_id = controller_id
 
-        if shell.id == active_router_id:
-            # only shell router is active
-            eligible_routers = [shell]
-        else:
-            # router from active controller and shell builtins
-            eligible_routers = [
-                r
-                for r in self._routers
-                if r.id == active_router_id and r.is_activatable or r.is_shell
-            ]
+    def find(
+        self,
+        active_controller_id: str,
+        command_key: str,
+    ) -> tuple[str, Command] | None:
+        """
+        Resolve a command key according to CommandScope rules.
 
-        for router in eligible_routers:
-            if active_router_id != shell.id and router.id == shell.id:
-                if cmd_name not in shell.builtins:
-                    continue
-            command = router.instantiate(cmd_name)
-            if command:
-                return router.id, command
+        Returns:
+            (owner_controller_id, Command instance)
+            or None if not found.
+        """
+
+        key = command_key.strip()
+
+        active_router = self._routers.get(active_controller_id)
+        if not active_router:
+            return None
+
+        # ----------------------------------------
+        # 1) Try active controller first
+        # ----------------------------------------
+
+        cmd_type = active_router.get_type(key)
+        if cmd_type:
+            scope = getattr(cmd_type, "scope", CommandScope.CONTROLLER)
+
+            if scope == CommandScope.CONTROLLER:
+                return active_controller_id, cmd_type()
+
+            if scope == CommandScope.SHELL:
+                if active_router.is_shell:
+                    return active_controller_id, cmd_type()
+
+            if scope == CommandScope.GLOBAL:
+                return active_controller_id, cmd_type()
+
+        # ----------------------------------------
+        # 2) Global fallback (search all routers)
+        # ----------------------------------------
+
+        global_hits: list[tuple[str, type[Command]]] = []
+
+        for owner_id, router in self._routers.items():
+            cmd_type = router.get_type(key)
+            if not cmd_type:
+                continue
+
+            scope = getattr(cmd_type, "scope", CommandScope.CONTROLLER)
+            if scope == CommandScope.GLOBAL:
+                global_hits.append((owner_id, cmd_type))
+
+        if len(global_hits) == 1:
+            owner_id, cmd_type = global_hits[0]
+            return owner_id, cmd_type()
+
+        if len(global_hits) > 1:
+            raise ValueError(f"Duplicate GLOBAL command key detected: '{key}'")
+
+        # ----------------------------------------
+        # Not found
+        # ----------------------------------------
+
+        return None
+
+    def validate(self) -> None:
+        """
+        Validate global/shell scope invariants.
+        Call once after all routers are registered.
+        """
+
+        global_keys: dict[str, str] = {}
+        shell_keys: dict[str, str] = {}
+
+        for controller_id, router in self._routers.items():
+            for key, cmd_type in router.all_types().items():
+                scope = getattr(cmd_type, "scope", CommandScope.CONTROLLER)
+
+                if scope == CommandScope.GLOBAL:
+                    if key in global_keys:
+                        raise ValueError(
+                            f"GLOBAL command key conflict: '{key}' "
+                            f"({global_keys[key]} vs {controller_id})"
+                        )
+                    global_keys[key] = controller_id
+
+                if scope == CommandScope.SHELL:
+                    if controller_id != self._shell_id:
+                        raise ValueError(
+                            f"SHELL scoped command '{key}' must belong to "
+                            f"shell controller (found in '{controller_id}')"
+                        )
+
+                    if key in shell_keys:
+                        raise ValueError(f"Duplicate SHELL command key: '{key}'")
+                    shell_keys[key] = controller_id
 
 
 class CommandRouter:
 
     def __init__(
-        self,
-        id: str,
-        is_shell: bool,
-        is_listed: bool,
-        is_activatable: bool,
-        builtins: Sequence[str] | None = None,
+        self, controller_id: str, is_shell: bool, is_listed: bool, is_activatable: bool
     ):
-
-        self.id = id
+        self.controller_id = controller_id
         self.is_shell = is_shell
         self.is_listed = is_listed
         self.is_activatable = is_activatable
-        self.builtins = builtins or []
+        self._by_key: dict[str, type[Command]] = {}
 
-        # group_name -> { command_key -> CommandClass }
-        self._groups: dict[str, dict[str, type[Command]]] = {}
-        # alias -> canonical command_key
-        self._aliases: dict[str, str] = {}
+    def register(self, owner_id: str, commandsets: Sequence[type[CommandSet]]) -> None:
+        for cs_type in commandsets:
+            for cmd_type in cs_type.commands():
+                key = cmd_type.key
+                if key in self._by_key:
+                    raise ValueError(
+                        f"Duplicate command key in controller '{owner_id}': {key}"
+                    )
+                self._by_key[key] = cmd_type
 
-    def register(
-        self, group: str, cmdsets: Sequence[type[CommandSet]], *, append: bool = False
-    ) -> None:
-        if group in self._groups and not append:
-            raise ValueError(
-                f"Command group '{group}' already exists. Use append=True to extend it."
-            )
+    def get_type(self, key: str) -> type[Command] | None:
+        return self._by_key.get(key)
 
-        bucket = self._groups.setdefault(group, {})
-        for cmdset in cmdsets:
-            for cmd in cmdset.commands():
-                key = cmd.key.lower()
-                bucket[key] = cmd
+    def all_types(self) -> dict[str, type[Command]]:
+        return self._by_key
 
-                for alias in getattr(cmd, "aliases", []):
-                    self._aliases[alias.lower()] = key
-
-    def find_by_key_or_alias(self, name: str) -> type[Command] | None:
-        """
-        Resolve a command name or alias to a Command class.
-
-        No permission checks.
-        No group filtering.
-        """
-        if not name:
-            return None
-
-        key = name.lower().strip()
-        resolved = self._aliases.get(key, key)
-
-        # 1) direct match in any group
-        for bucket in self._groups.values():
-            cmd_cls = bucket.get(resolved)
-            if cmd_cls:
-                return cmd_cls
-
-        # 2) wildcard fallback ("*") if present
-        for bucket in self._groups.values():
-            fallback = bucket.get("*")
-            if fallback:
-                return fallback
-
-        return None
-
-    def instantiate(self, name: str) -> Command | None:
-        cmd_cls = self.find_by_key_or_alias(name)
-        if not cmd_cls:
-            return None
-        return cmd_cls()
-
-    def iter_commands(self):
-        """
-        For man/help only.
-        Yields (group_name, command_key, command_cls)
-        """
-        for group_name, bucket in self._groups.items():
-            for cmd_key, cmd_cls in bucket.items():
-                if cmd_key == "*":
-                    continue
-                yield group_name, cmd_key, cmd_cls
+    def instantiate(self, key: str) -> Command | None:
+        t = self.get_type(key)
+        return t() if t else None

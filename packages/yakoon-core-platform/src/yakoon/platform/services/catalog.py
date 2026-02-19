@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence, Set
+from collections.abc import Iterable, Sequence
 
 from yakoon.base.commands.command import CommandKind, CommandVisibility
 from yakoon.base.directories.service import ServiceDirectory
@@ -10,22 +10,16 @@ from yakoon.base.runtime.session.session import Session
 
 class CommandCatalog:
 
-    def __init__(
-        self, commands: Iterable[CommandInfo], shell_builtins: Sequence[str] = ()
-    ):
-        self._commmands = commands
-        self._shell_builtins = set(shell_builtins)
+    def __init__(self, commands: Iterable[CommandInfo]):
+        self._commands: tuple[CommandInfo, ...] = tuple(commands)
 
-    def all(self):
-        return self._commmands
-
-    def builtins(self) -> Set[str]:
-        return self._shell_builtins
+    def all(self) -> tuple[CommandInfo, ...]:
+        return self._commands
 
 
 class CommandCatalogService:
 
-    __slots__ = ("_services", "_by_controller", "_shell_builtins")
+    __slots__ = ("_services", "_by_controller")
 
     def __init__(self, services: ServiceDirectory, catalog: CommandCatalog):
         self._services = services
@@ -40,16 +34,12 @@ class CommandCatalogService:
             items.sort(key=lambda x: x.key)
 
         self._by_controller = by_controller
-        self._shell_builtins = set(catalog.builtins())
 
     def for_controller(self, controller_id: str) -> Sequence[CommandInfo]:
         return tuple(self._by_controller.get(controller_id, ()))
 
     def keys_for_controller(self, controller_id: str) -> Sequence[str]:
         return tuple(c.key for c in self.for_controller(controller_id))
-
-    def shell_builtins(self) -> Sequence[str]:
-        return tuple(sorted(self._shell_builtins))
 
     def for_controller_visible(
         self, controller_id: str, session: Session

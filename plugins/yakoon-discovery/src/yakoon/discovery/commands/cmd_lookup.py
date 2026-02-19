@@ -3,6 +3,7 @@ from __future__ import annotations
 from yakoon.base import ports as base_ports
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandScope, CommandVisibility
 from yakoon.base.runtime.session import Session
 from yakoon.discovery import ports
 from yakoon.discovery.models.discovery import Candidates, Resolved
@@ -12,6 +13,8 @@ class CmdLookup(Command):
 
     key = "lookup"
     template_prefix = "system"
+    scope = CommandScope.GLOBAL
+    visibility = CommandVisibility.INTERNAL
 
     async def run(self, session: Session, request: Request) -> None:
 

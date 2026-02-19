@@ -1,10 +1,16 @@
 from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandKind, CommandScope, CommandVisibility
 from yakoon.base.ports import WorkflowService
 from yakoon.base.runtime.session.session import Session
 
 
-def CmdWfStart(command_key: str) -> type[Command]:
+def CmdWfStart(
+    command_key: str,
+    scope: CommandScope = CommandScope.CONTROLLER,
+    kind: CommandKind = CommandKind.USER,
+    visibility: CommandVisibility = CommandVisibility.NORMAL,
+) -> type[Command]:
     """
     Generates a Command class that starts a workflow.
 
@@ -12,10 +18,16 @@ def CmdWfStart(command_key: str) -> type[Command]:
     - alt_command_key: workflow file key; defaults to command_key
     """
 
+    _scope = scope
+    _kind = kind
+    _visibility = visibility
+
     class _CmdWorkflowStart(Command):
 
         key = command_key
-        template_prefix = None
+        scope = _scope
+        kind = _kind
+        visibility = _visibility
 
         async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
             wf = self.services.get(WorkflowService)

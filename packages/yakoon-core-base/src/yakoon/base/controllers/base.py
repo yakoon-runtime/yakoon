@@ -48,14 +48,6 @@ class BaseController(ABC):
     is_activatable: bool = True
     """If False, the controller cannot be activated as an interactive context."""
 
-    shell_builtins: Sequence[str] = []
-    """Commands available regardless of active controller context.
-
-    Warning:
-        Avoid mutating this mapping at runtime for public-framework stability.
-        If you need dynamic builtins, provide them via `on_before_resolve`.
-    """
-
     template_source: TemplateSource = TemplateSource(None)
     """Template source used by presenters for command output and man pages.
 
