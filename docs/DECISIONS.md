@@ -7,6 +7,35 @@
 > 3. Security: Permissions sind pro Command (rx), nicht über CommandSet-Gruppen.
 --
 
+
+## 2026-02-20
+**Dispatch-System neu modelliert**
+- Union statt Vererbung.
+- Zwei explizite Transporttypen.
+- Keine implizite Payload-Semantik.
+
+## 2026-02-20
+**TemplateSource / WorkflowSource**
+TemplateSource und WorkflowSource wurden konzeptionell ersetzt.
+Dazu wurde ein einziges ResourceReferences-Objekt pro Controller eingeführt.
+Subpath wird nicht länger unterstützt. Dafür {lang} als placeholder.
+
+## 2026-02-19
+**Alias-Mechanismus**
+Der Alias-Mechanismus wurde entfernt, der dieser im Code definiert wurde. 
+Alias ist nun über Lookup multilanguagefähig.
+Lookup wird über Discovery-Strategien gelöst.
+
+## 2026-02-18
+**WorkflowCompileService entkoppelt**
+Der WorkflowCompileService übernimmt nun nur noch Parsing + Modellierung.
+Dafür wurde der FileLoader eingeführt. Dieser übernimmt alle Dateizugriff im System.
+
+## 2026-02-18
+**CommandScope eingeführt**
+- CommandScope ersetzt shell_builtins. Routing ist jetzt explizit und deklarativ.
+- Visibility von Scope getrennt; Scope ist nicht Sichtbarkeit.
+
 ## 2026-02-17
 **Umstellung auf ViewSpec**
 Der Output-Stack wurde radikal vereinfacht. IO ist nun vollständig View-getrieben.
@@ -27,7 +56,7 @@ Die DSL arbeitet für Commands & Workflows übergreifend.
 InputResult als saubere Datenkapselung (statt PromptResult)
 InputView liefert view contracts für Ausgabe.
 
-## 2026-02-17
+## 2026-02-16
 **Weiterentwicklung der View- und Input-Architektur**
 Dieser Schritt dient zur Vorbereitung deklarativer Workflows.
 - inputs.<state>.fields wird als Liste von Field-Definitionen geführt.
