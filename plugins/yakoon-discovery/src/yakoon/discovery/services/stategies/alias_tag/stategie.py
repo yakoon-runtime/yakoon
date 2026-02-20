@@ -3,6 +3,7 @@ from __future__ import annotations
 from yakoon.base import ports
 from yakoon.base.commands.request import Request
 from yakoon.base.directories.service import ServiceDirectory
+from yakoon.base.resources.reference import resolve_resource
 from yakoon.base.runtime.session import Session
 from yakoon.discovery.models.discovery import (
     Candidates,
@@ -36,18 +37,17 @@ def _first_token(line: str) -> str:
 
 
 class LookupAliasTagStrategy(DiscoveryStrategy):
-    """
-    Deterministic, controller-scoped strategy:
-      - alias match => Resolved (if unique) else Candidates
-      - tag match   => Candidates
-    """
 
     def __init__(
         self,
         services: ServiceDirectory,
-        lookup_filename: str = "lookup.yaml",
+        # loader: FileLoader,
+        # parser,
+        lookup_filename: str = "lookup",
     ) -> None:
         self._services = services
+        # self._loader = loader
+        # self._parser = parser
         self._lookup_filename = lookup_filename
 
     async def discover(self, session: Session, request: Request) -> DiscoveryResult:
@@ -55,32 +55,41 @@ class LookupAliasTagStrategy(DiscoveryStrategy):
         if not token:
             return NoMatch()
 
-        # Active controller (S1)
         controller_id = session.get_active_controller()
         if not controller_id:
             return NoMatch()
 
         controllers = self._services.get(ports.ControllerCatalogService)
         ctrl = controllers.get(controller_id)
-        if not ctrl or not ctrl.template_source:
+        if not ctrl or not ctrl.resources or not ctrl.resources.lookup:
             return NoMatch()
 
-        ts = ctrl.template_source
-        lang = getattr(session, "lang", None) or "de"
+        resources = ctrl.resources
+        if not resources:
+            raise RuntimeError("ControllerInfo has no Resources.")
 
-        return NoMatch()  # TODO:
+        # Build resource reference
+        ref = resolve_resource(
+            resources,
+            i18n_root=resources.lookup,
+            lang=session.lang,
+            key=self._lookup_filename,
+        )
 
-        text = self._loader.load_text(ts=ts, lang=lang)
-        if not text:
+        try:
+            text = self._loader.load_text(ref)
+        except LookupError:
             return NoMatch()
 
         index = self._parser.parse(text)
         if not index.commands:
             return NoMatch()
 
-        # Permission-aware visible command keys (empfohlen)
+        command_service = self._services.get(ports.CommandCatalogService)
+
         visible = {
-            c.key for c in self._commands.for_controller_visible(controller_id, session)
+            c.key
+            for c in command_service.for_controller_visible(controller_id, session)
         }
 
         alias_hits: list[str] = []
@@ -94,7 +103,6 @@ class LookupAliasTagStrategy(DiscoveryStrategy):
             if token in entry.tags:
                 tag_hits.append(command_key)
 
-        # Alias: unique -> resolved
         if len(alias_hits) == 1:
             return Resolved(
                 capability=Capability(
@@ -105,7 +113,6 @@ class LookupAliasTagStrategy(DiscoveryStrategy):
                 )
             )
 
-        # Multiple alias hits -> candidates
         if len(alias_hits) > 1:
             return Candidates(
                 items=[
@@ -119,7 +126,6 @@ class LookupAliasTagStrategy(DiscoveryStrategy):
                 ]
             )
 
-        # Tags -> candidates (discovery)
         if tag_hits:
             return Candidates(
                 items=[

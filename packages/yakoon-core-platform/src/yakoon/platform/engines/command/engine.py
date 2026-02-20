@@ -5,7 +5,7 @@ from yakoon.base.commands.command import CmdNotFound, Command, CommandContext
 from yakoon.base.commands.request import Request
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.input import CommandDispatch, DispatchInput, ResolveDispatch
 from yakoon.base.models.perm import Permission
 from yakoon.base.models.workflow import WorkflowContextRequired
 from yakoon.base.runtime.session import Session
@@ -39,11 +39,11 @@ class Engine:
 
     async def _find_matching_command(
         self, active_router_id, request: Request
-    ) -> tuple[BaseController, Command] | None:
+    ) -> tuple[BaseController | None, Command | None] | None:
 
         find = self._commands.find
         result: tuple[str, Command] | None = find(active_router_id, request.command)
-        if result:
+        if result and isinstance(result, tuple):
             active_router_id, command = result
             return self._directory.get(active_router_id), command
 
@@ -51,6 +51,8 @@ class Engine:
 
         skey = str(session.key)
         shell = self._directory.find_shell()
+        if not shell:
+            raise RuntimeError("Shell was not found.")
         if not session.get_active_controller():
             session.set_active_controller(shell.id)
 
@@ -58,8 +60,9 @@ class Engine:
         async with self._lock(session):
             dialog_service = self.services.get(ports.DialogService)
             if dialog_service.is_waiting(session):
-                if isinstance(di.payload, dict):
-                    dialog_service.resolve_input(session, di.payload)
+
+                if isinstance(di, ResolveDispatch):
+                    dialog_service.resolve_input(session, di.values)
                     # Drive the existing active task until it either finishes or asks again
                     await self._drive_until_blocked_or_done(session)
                     # print("DISPATCH END")
@@ -110,10 +113,11 @@ class Engine:
                 edge_task.cancel()
 
     async def _dispatch_command(self, session: Session, di: DispatchInput) -> None:
-        failed = False
-        request = Request(di.payload)
+        if not isinstance(di, CommandDispatch):
+            return
 
-        # Empty input -> noop (or fail, depending on your UX choice)
+        failed = False
+        request = Request(di.text)
         if not request.command:
             return
 
@@ -143,6 +147,10 @@ class Engine:
                 #    raise CmdNotFound(f"{request.command}")
 
             resolved_controller, command = result
+            if not resolved_controller:
+                raise RuntimeError("Controller missing in result")
+            if not command:
+                raise RuntimeError("Command missing in result")
 
             # check workflow context
             # user cannot start workflow commands without batch

@@ -6,10 +6,9 @@ from typing import TYPE_CHECKING
 
 from yakoon.base.commands.commandset import CommandSet
 from yakoon.base.commands.request import Request
-from yakoon.base.descriptors.template import TemplateSource
-from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.ports import NamespaceService
+from yakoon.base.resources.reference import ResourceReferences
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
@@ -48,15 +47,8 @@ class BaseController(ABC):
     is_activatable: bool = True
     """If False, the controller cannot be activated as an interactive context."""
 
-    template_source: TemplateSource = TemplateSource(None)
-    """Template source used by presenters for command output and man pages.
-
-    Template selection should be based on conventions (e.g. `cmd_*`, `man_*`),
-    not hard-coded paths in commands.
-    """
-
-    workflow_source: WorkflowSource = WorkflowSource(None)
-    """Workflow source providing workflow definitions owned by this controller."""
+    resources: ResourceReferences = ResourceReferences("")
+    """Resource references used by classes for command input, output man pages, workflows etc."""
 
     def __init__(self) -> None:
         """Initialize a controller with an empty service directory.

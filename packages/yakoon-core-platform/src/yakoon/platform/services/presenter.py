@@ -3,6 +3,7 @@ from __future__ import annotations
 from yakoon.base import ports
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.prompt import PromptResult
+from yakoon.base.models.resource import ResourceRef
 from yakoon.base.runtime.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
 
@@ -47,23 +48,10 @@ class Presenter:
 
     def __init__(
         self,
-        template_prefix: str,
-        template_key: str,
+        resource: ResourceRef,
         session: Session,
         services: ServiceDirectory,
     ):
-        """
-        Constructs a RenderContext based on the current session and template key.
-
-        Args:
-            template_prefix (str): the template prefix
-            template_key (str): Relative template path (e.g. 'account/cmd_login').
-            session: Session object with language information.
-            renderer: Renderservice to render the template.
-
-        Returns:
-            RenderContext: Template context with full key and language.
-        """
         self._prompts = None
         self._views = None
         self._session = session
@@ -71,8 +59,7 @@ class Presenter:
         self._renderer = self._services.get(ports.RendererService)
 
         self._ctx = RenderContext(
-            key=template_key,
-            prefix=template_prefix,
+            resource=resource,
             lang=session.lang,
         )
 
@@ -94,13 +81,10 @@ class PresenterService:
     def __init__(self, services: ServiceDirectory):
         self._services = services
 
-    async def create_presenter(
-        self, template_prefix: str, template_key: str, session: Session
-    ) -> Presenter:
+    async def create_presenter(self, resource: ResourceRef, session) -> Presenter:
 
         return Presenter(
-            template_prefix,
-            template_key,
+            resource,
             session,
             self._services,
         )

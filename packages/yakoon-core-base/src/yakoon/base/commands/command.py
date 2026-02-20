@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from yakoon.base.models.command import (
@@ -11,6 +10,7 @@ from yakoon.base.models.command import (
     CommandVisibility,
 )
 from yakoon.base.ports import NamespaceService, Presenter, PresenterService
+from yakoon.base.resources.reference import resolve_resource
 
 if TYPE_CHECKING:
 
@@ -78,15 +78,18 @@ class Command(ABC):
     requires_workflow: bool = False
 
     # Runtime-provided
-    context: CommandContext | None
-
-    # Optional template prefix (controller-dependent)
-    template_prefix: str = ""
+    context: CommandContext | None = None
 
     @property
     def services(self) -> ServiceDirectory:
         """Service directory exposed by the active controller."""
-        return self._ensure_controller().services
+        if not self.context:
+            raise RuntimeError("Context cannot be None")
+        if not self.context.controller:
+            raise RuntimeError("Context controller cannot be None")
+        if not self.context.controller.services:
+            raise RuntimeError("Controller services cannot be None")
+        return self.context.controller.services
 
     def ensure_workflow_context(self) -> str:
         """Return the workflow batch id or raise if missing.
@@ -106,29 +109,31 @@ class Command(ABC):
         # mypy: batch_id is Optional[str], but context.is_batch guarantees it exists
         return self.context.batch_id  # type: ignore[return-value]
 
-    def get_template_path(self) -> str:
-        """Compute the template path for this command within the controller."""
-        template_sub_path = self._ensure_controller().template_source.template_sub_path
-        return str(Path(template_sub_path).joinpath(self.template_prefix, self.key))
-
     async def get_namespace(self, session: Session) -> Namespace:
         """Resolve the namespace for the current session."""
         namespaces = self.services.get(NamespaceService)
         return await namespaces.from_session(session)
 
     async def get_presenter(self, session: Session) -> Presenter:
-        """Create a presenter bound to this command's template path and session."""
-        presenter = self.services.get(PresenterService)
-        return await presenter.create_presenter(
-            self._ensure_controller().template_source.package,
-            self.get_template_path(),
-            session,
+        if not self.context:
+            raise RuntimeError("Context cannot be None")
+        if not self.context.controller:
+            raise RuntimeError("Context controller cannot be None")
+        controller = self.context.controller
+        presenter_service = self.services.get(PresenterService)
+
+        resources = controller.resources
+        if not resources.contracts:
+            raise RuntimeError("Controller has no contracts root defined.")
+
+        ref = resolve_resource(
+            resources,
+            i18n_root=resources.contracts,
+            lang=session.lang,
+            key=self.key,
         )
 
-    def _ensure_controller(self) -> BaseController:
-        if self.context:
-            return self.context.controller
-        raise Exception("controller not exits")
+        return await presenter_service.create_presenter(ref, session)
 
     @abstractmethod
     async def run(self, session: Session, request: Request) -> None:

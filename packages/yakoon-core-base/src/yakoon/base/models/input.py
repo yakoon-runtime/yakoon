@@ -1,10 +1,19 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
 
-DispatchPayload = str | dict[str, Any]
+
+@dataclass(frozen=True)
+class CommandDispatch:
+    text: str
+    batch_id: str | None = None
 
 
 @dataclass(frozen=True)
-class DispatchInput:
-    payload: DispatchPayload
+class ResolveDispatch:
+    values: dict[str, Any]
     batch_id: str | None = None
+
+
+DispatchInput = CommandDispatch | ResolveDispatch

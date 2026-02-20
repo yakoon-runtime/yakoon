@@ -1,6 +1,6 @@
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.plugins.plugin import PluginExport, PluginMeta
-from yakoon.crm.customer.controller import CrmCustomerCoreController
+from yakoon.crm.controller import CrmCustomerCoreController
 
 meta = PluginMeta(
     name="yakoon.crm",

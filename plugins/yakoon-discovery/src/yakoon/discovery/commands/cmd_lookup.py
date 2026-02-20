@@ -12,7 +12,6 @@ from yakoon.discovery.models.discovery import Candidates, Resolved
 class CmdLookup(Command):
 
     key = "lookup"
-    template_prefix = "system"
     scope = CommandScope.GLOBAL
     visibility = CommandVisibility.INTERNAL
 

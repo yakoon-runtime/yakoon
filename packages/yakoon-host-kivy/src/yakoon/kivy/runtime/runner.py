@@ -4,7 +4,7 @@ from collections.abc import Coroutine
 from concurrent.futures import Future
 from typing import Any
 
-from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.input import CommandDispatch
 
 
 class SessionRunner:
@@ -44,6 +44,7 @@ class SessionRunner:
         assert self._queue is not None
         while True:
             session, text = await self._queue.get()
-            await self.engine.dispatch(session, DispatchInput(text))
+            await self.engine.dispatch(session, CommandDispatch(text=text))
+
             if hasattr(session, "has_signal") and session.has_signal("exit_app"):
                 break

@@ -1,6 +1,6 @@
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.plugins.plugin import PluginExport, PluginMeta
-from yakoon.office.mailing.controller import OfficeMailingCoreController
+from yakoon.office.controller import OfficeMailingCoreController
 
 meta = PluginMeta(
     name="yakoon.office",

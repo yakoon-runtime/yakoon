@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from yakoon.base import ports
-from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.input import CommandDispatch, ResolveDispatch
 from yakoon.base.runtime.session.session import Session
 from yakoon.base.utils.format import format_ps1
 from yakoon.platform.engines.command.engine import Engine
@@ -20,17 +20,15 @@ class Runner:
         await self.drive(commands=commands)
 
     async def on_user_input(self, text: str) -> None:
-        await self.engine.dispatch(self.session, DispatchInput(text))
+        await self.engine.dispatch(self.session, CommandDispatch(text=text))
         await self.drive()
 
     async def on_input_submit(self, values: dict[str, object]) -> None:
-        await self.engine.dispatch(self.session, DispatchInput(values))  # type: ignore[arg-type]
+        await self.engine.dispatch(self.session, ResolveDispatch(values=values))
         await self.drive()
 
     async def on_cancel(self) -> None:
-        await self.engine.dispatch(
-            self.session, DispatchInput(payload="shell:wf.cancel")
-        )
+        await self.engine.dispatch(self.session, CommandDispatch("shell:wf.cancel"))
         await self.drive()
 
     async def drive(self, *, commands: list[str] | None = None) -> None:

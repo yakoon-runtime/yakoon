@@ -6,7 +6,11 @@ from typing import Any
 import yaml
 
 from yakoon.base.models.message import KvBlock, ListBlock, MessageSpec, TextBlock
-from yakoon.base.models.view import ViewFieldDef, ViewFormDef, ViewSpec
+from yakoon.base.models.view import (
+    ViewFieldDef,
+    ViewFormDef,
+    ViewSpec,
+)
 
 
 class ViewSpecError(Exception): ...
@@ -351,6 +355,7 @@ class ViewSpecService:
                 )
             input_def = self._parse_input(input_raw)
 
+        # view_meta = ViewMeta(ui=ViewUI(secret=meta.get("secret")))
         return ViewSpec(
             kind="view",
             mode=mode,

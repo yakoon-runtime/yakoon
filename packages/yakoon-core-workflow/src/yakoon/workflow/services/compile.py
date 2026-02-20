@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.resources as ir
 import json
 import re
 from dataclasses import dataclass
@@ -8,7 +7,6 @@ from typing import Any
 
 import yaml
 
-from yakoon.base.descriptors.workflow import WorkflowSource
 from yakoon.base.models.workflow import (
     InputBranchesDef,
     InputDef,
@@ -375,50 +373,25 @@ class GraphValidator:
 
 
 class WorkflowCompileService:
-    """
-    Loads exactly ONE workflow definition from package resources.
 
-    Rules:
-    - 1 workflow == 1 file
-    - filename == <command_key>.(yaml|yml|json)
-    - no caching, no bulk loading
-    """
-
-    def load_def(self, source: WorkflowSource, command_key: str) -> WorkflowDef:
-        root = (
-            ir.files(source.package) / source.workflow_path / source.workflow_sub_path
-        )
-        if not root.is_dir():
-            raise WorkflowFileNotFound(f"Workflow directory not found: {root}")
-
-        path = self._find_file(root, command_key)
-        raw_text = path.read_text(encoding="utf-8")
-        raw = self._parse(path.name, raw_text)
-
+    def compile(self, command_key: str, raw_text: str) -> WorkflowDef:
+        raw = self._parse(command_key, raw_text)
         return self._build_workflow_def(command_key, raw)
 
-    def _find_file(self, root, command_key: str):
-        for ext in (".yaml", ".yml", ".json"):
-            p = root / f"{command_key}{ext}"
-            if p.is_file():
-                return p
-        raise WorkflowFileNotFound(f"Workflow not found: {root}/{command_key}")
-
-    def _parse(self, filename: str, raw: str) -> dict[str, Any]:
-        if filename.endswith(".json"):
-            data = json.loads(raw)
-            if data is None:
-                raise ValueError(f"Workflow file '{filename}' is empty.")
-            if not isinstance(data, dict):
-                raise ValueError(
-                    f"Workflow file '{filename}' must contain a mapping at root."
-                )
-            return data
-
-        if filename.endswith((".yaml", ".yml")):
+    def _parse(self, command_key: str, raw: str) -> dict[str, Any]:
+        try:
+            # try YAML first
             return _yaml12_safe_load(raw)
-
-        raise ValueError(f"Unsupported workflow file: {filename}")
+        except Exception:
+            try:
+                data = json.loads(raw)
+                if not isinstance(data, dict):
+                    raise ValueError(
+                        f"{command_key}: workflow must contain mapping at root."
+                    )
+                return data
+            except Exception as e:
+                raise ValueError(f"{command_key}: invalid workflow format") from e
 
     def _build_workflow_def(self, command_key: str, raw: dict[str, Any]) -> WorkflowDef:
         start = raw.get("start")

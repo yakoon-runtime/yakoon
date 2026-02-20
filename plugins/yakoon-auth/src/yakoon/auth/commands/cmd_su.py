@@ -40,7 +40,7 @@ class CmdSu(Command):
             permissions.apply_account_permissions(session, account)
 
             await self.services.get(SessionService).save(session)
-            presenter.views.emit("success", user=username)
+            await presenter.views.emit("success", user=username)
 
         else:
             await presenter.views.emit("failed", user=username, reason=result.reason)

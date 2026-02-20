@@ -1,6 +1,6 @@
 from collections import deque
 
-from yakoon.base.models.input import DispatchInput
+from yakoon.base.models.input import CommandDispatch, DispatchInput
 
 
 class CommandQueueService:
@@ -50,7 +50,7 @@ class CommandQueueService:
         q = self._q.setdefault(skey, deque())
 
         for c in reversed(cmds):
-            q.appendleft(DispatchInput(payload=c, batch_id=batch_id))
+            q.appendleft(CommandDispatch(text=c, batch_id=batch_id))
 
     def next_input(self, session) -> DispatchInput | None:
         """

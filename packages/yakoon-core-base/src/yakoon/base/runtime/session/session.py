@@ -61,8 +61,6 @@ class Session:
       - mime is always application/yakoon.view+json
     """
 
-    VIEW_MIME = "application/yakoon.view+json"
-
     def __init__(self, state: SessionState):
         self._state = state
         self._runtime = SessionRuntime()
@@ -102,7 +100,7 @@ class Session:
     def get_username(self) -> str | None:
         return self._state.username
 
-    def set_active_controller(self, controller_id: str | None) -> None:
+    def set_active_controller(self, controller_id: str) -> None:
         self._state.active_controller_id = controller_id
 
     def get_active_controller(self, default=None):

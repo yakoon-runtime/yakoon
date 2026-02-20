@@ -12,6 +12,7 @@ from yakoon.base.models.workflow import (
     WorkflowRuntime,
     WorkflowStatus,
 )
+from yakoon.base.resources.reference import resolve_resource
 from yakoon.workflow.runtime.compiler import compile_run_command
 
 
@@ -48,13 +49,27 @@ class WorkflowService:
     def get_def(self, controller_id: str, command_key: str) -> WorkflowDef:
         catalog = self.services.get(ports.ControllerCatalogService)
         info = catalog.get(controller_id)
-        if not info or not info.workflow_source:
-            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{command_key}")
+        if not info:
+            raise RuntimeError("ControllerInfo cannot be None.")
 
-        loader = self.services.get(ports.WorkflowCompileService)
-        wf = loader.load_def(info.workflow_source, command_key)
-        if not wf:
-            raise WorkflowNotFound(f"Workflow not found: {controller_id}:{command_key}")
+        resources = info.resources
+        if not resources:
+            raise RuntimeError("ControllerInfo has no Resources.")
+
+        ref = resolve_resource(
+            resources,
+            i18n_root=resources.workflows,
+            lang=None,
+            key=command_key,
+        )
+
+        file_loader = self.services.get(ports.FileLoader)
+        raw_text = file_loader.load_text(ref)
+        if not raw_text:
+            raise RuntimeError("Workflow definition not found.")
+
+        compiler = self.services.get(ports.WorkflowCompileService)
+        wf = compiler.compile(command_key, raw_text)
 
         return wf
 

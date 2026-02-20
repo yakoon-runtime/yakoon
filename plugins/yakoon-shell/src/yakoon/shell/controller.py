@@ -4,9 +4,8 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.descriptors.template import TemplateSource
-from yakoon.base.descriptors.workflow import WorkflowSource
-from yakoon.shell.commands.system.cmdset import ShellSystemCommands
+from yakoon.base.resources.reference import ResourceReferences
+from yakoon.shell.commands.core.cmdset import ShellSystemCommands
 from yakoon.shell.commands.workflow.cmdset import ShellWorkflowCommands
 
 if TYPE_CHECKING:
@@ -30,14 +29,8 @@ class ShellCoreController(BaseController):
     is_listed: bool = True
     is_activatable: bool = True
 
-    template_source = TemplateSource(
+    resources = ResourceReferences(
         package="yakoon.shell",
-        template_sub_path="core",
-    )
-
-    workflow_source = WorkflowSource(
-        package="yakoon.shell",
-        workflow_sub_path="core",
     )
 
     @property

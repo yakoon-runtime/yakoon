@@ -22,8 +22,8 @@ class RendererService:
     async def render_view(
         self, ctx: RenderContext, section_key: str, **data
     ) -> ViewSpec:
-        loader = self._services.get(ports.TemplateLoader)
-        source = await loader.load(ctx)
+        loader = self._services.get(ports.FileLoader)
+        source = loader.load_text(ctx.resource)
 
         raw = yaml.safe_load(source)
         if not isinstance(raw, dict):
@@ -68,6 +68,5 @@ class RendererService:
         minimal[selected_ns][section_key] = rendered_selected
 
         yaml_text = yaml.safe_dump(minimal, sort_keys=False, allow_unicode=True)
-
         viewspec = self._services.get(ports.ViewSpecService)
-        return viewspec.parse_spec(yaml_text, section_key=section_key, base_id=ctx.key)
+        return viewspec.parse_spec(yaml_text, section_key=section_key)

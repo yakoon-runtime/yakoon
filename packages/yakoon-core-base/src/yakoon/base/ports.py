@@ -21,17 +21,21 @@ from yakoon.base.models.prompt import PromptResult
 from yakoon.base.models.view import ViewSpec
 from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
 from yakoon.base.plugins.plugin import PluginMeta
+from yakoon.base.resources.reference import ResourceRef
 from yakoon.base.runtime.session.session import Session
 from yakoon.platform.runtime.render.context import RenderContext
 from yakoon.platform.runtime.render.section import RenderSection
 
 
 class ViewSpecService(Protocol):
-    def parse_spec(self, yaml_text: str) -> ViewSpec: ...
 
-
-class MessageSpecService(Protocol):
-    async def parse_spec(self, yaml_text: str) -> MessageSpec: ...
+    def parse_spec(
+        self,
+        yaml_text: str,
+        *,
+        section_key: str | None = None,
+        base_id: str | None = None,
+    ) -> ViewSpec: ...
 
 
 class PolicyService(Protocol):
@@ -107,7 +111,7 @@ class WorkflowService(Protocol):
 
 
 class WorkflowCompileService(Protocol):
-    def load_def(self, source: Any, command_key: str) -> WorkflowDef: ...
+    def compile(self, command_key: str, raw_text: str) -> WorkflowDef: ...
 
 
 class DialogState(StrEnum):
@@ -241,9 +245,15 @@ class AuditLogService(Protocol):
     async def permission(self, session, obj, action): ...
 
 
-class TemplateLoader(Protocol):
+class FileLoader(Protocol):
 
-    async def load(self, ctx: RenderContext) -> str: ...
+    def load_text(
+        self,
+        ref: ResourceRef,
+        *,
+        exts: tuple[str, ...] = (".yaml", ".yml", ".json"),
+        encoding: str = "utf-8",
+    ) -> str: ...
 
 
 class RenderEngine(Protocol):
@@ -260,16 +270,14 @@ class PresenterInputs(Protocol):
     async def ask(self, section_key: str, **data) -> PromptResult: ...
 
 
+class PresenterService(Protocol):
+    async def create_presenter(self, resource: ResourceRef, session) -> Presenter: ...
+
+
 class Presenter(Protocol):
 
     inputs: PresenterInputs
     views: PresenterViews
-
-
-class PresenterService(Protocol):
-    async def create_presenter(
-        self, template_prefix: str, template_key: str, session: Session
-    ) -> Presenter: ...
 
 
 class IO(Protocol):

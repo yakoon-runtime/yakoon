@@ -1,10 +1,10 @@
 from yakoon.base import ports
 from yakoon.base.controllers.base import BaseController
-from yakoon.base.descriptors.template import TemplateSource
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.catalog import CommandInfo, ControllerInfo
 from yakoon.base.models.fields import FieldType
 from yakoon.base.models.policy import FieldPolicy
+from yakoon.base.resources.reference import ResourceReferences
 from yakoon.base.stores.base.registry import StoreRegistry
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.engine import Engine
@@ -23,7 +23,6 @@ from yakoon.platform.services.catalog import (
 )
 from yakoon.platform.services.dialog import DialogService
 from yakoon.platform.services.input import InputService
-from yakoon.platform.services.message import MessageSpecService
 from yakoon.platform.services.namespace import NamespaceService
 from yakoon.platform.services.perm import PermissionService
 from yakoon.platform.services.policy import PolicyService
@@ -32,7 +31,7 @@ from yakoon.platform.services.queue import CommandQueueService
 from yakoon.platform.services.render import RendererService
 from yakoon.platform.services.session import SessionService
 from yakoon.platform.services.shard import ShardAllocator, ShardedCounterService
-from yakoon.platform.services.template import TemplateLoader
+from yakoon.platform.services.template import FileLoader
 from yakoon.platform.services.viewspec import ViewSpecService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
@@ -61,7 +60,7 @@ def compose_engine(*, plugin_modules: list[str]) -> Engine:
     stores = _compose_stores()
     command_catalog = _compose_command_catalog(directory)
     controller_catalog = _compose_controller_catalog(directory)
-    templates = _compose_template_sources(directory)
+    templates = _compose_resource_references(directory)
     commands = _compose_commands(directory)
 
     _compose_services(
@@ -127,8 +126,7 @@ def _compose_controller_catalog(directory: ControllerDirectory) -> ControllerCat
             controller.is_shell,
             controller.is_activatable,
             controller.is_listed,
-            controller.template_source.clone(),
-            controller.workflow_source.clone(),
+            controller.resources.clone(),
         )
         controllers_list.append(controller_info)
 
@@ -148,7 +146,6 @@ def _compose_command_catalog(directory: ControllerDirectory) -> CommandCatalog:
                     command.visibility,
                     sets.group,
                     controller.id,
-                    command.template_prefix,
                 )
                 command_list.append(command_info)
 
@@ -178,7 +175,7 @@ def _compose_services(
     stores: StoreRegistry,
     controller_catalog: ControllerCatalog,
     command_catalog: CommandCatalog,
-    template_sources: list[TemplateSource],
+    resources: list[ResourceReferences],
 ) -> ServiceDirectory:
 
     services.register_static(ports.AuditLogService, AuditLogService())
@@ -199,9 +196,8 @@ def _compose_services(
     services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     services.register_static(ports.PolicyService, PolicyService())
     services.register_static(ports.InputService, InputService(services))
-    services.register_static(ports.MessageSpecService, MessageSpecService())
     services.register_static(ports.ViewSpecService, ViewSpecService())
-    services.register_static(ports.TemplateLoader, TemplateLoader(template_sources))
+    services.register_static(ports.FileLoader, FileLoader())
     services.register_static(ports.RendererService, RendererService(services))
     services.register_static(ports.RenderEngine, JinjaRenderer())
 
@@ -221,14 +217,14 @@ def _compose_services(
     return services
 
 
-def _compose_template_sources(directory: ControllerDirectory) -> list[TemplateSource]:
+def _compose_resource_references(
+    directory: ControllerDirectory,
+) -> list[ResourceReferences]:
 
-    template_sources: list[TemplateSource] = []
-
+    resources: list[ResourceReferences] = []
     for controller in directory.get_all():
-        template_sources.append(controller.template_source)
-
-    return template_sources
+        resources.append(controller.resources)
+    return resources
 
 
 def _compose_stores() -> StoreRegistry:
