@@ -3,8 +3,8 @@ import asyncio
 from yakoon.base import ports
 from yakoon.base.models.key import Key
 from yakoon.compose.engine import compose_engine
-from yakoon.console.host import ConsoleHost
-from yakoon.console.io import ConsoleOutput
+from yakoon.console.host.console import ConsoleHost
+from yakoon.console.host.output import ConsoleOutput
 from yakoon.platform.hosts.runner import Runner
 
 
@@ -17,6 +17,7 @@ async def run_console() -> None:
             "yakoon.discovery",
             "yakoon.crm",
             "yakoon.office",
+            "yakoon.workflow",
         ]
     )
 

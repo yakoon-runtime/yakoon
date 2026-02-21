@@ -4,15 +4,16 @@ from collections.abc import Mapping
 from typing import Any
 from uuid import uuid4
 
-from yakoon.base import ports
+from yakoon.base import ports as base_ports
 from yakoon.base.directories.service import ServiceDirectory
-from yakoon.base.models.workflow import (
+from yakoon.base.resources.reference import resolve_resource
+from yakoon.workflow import ports as wf_ports
+from yakoon.workflow.models.workflow import (
     WorkflowDef,
     WorkflowError,
     WorkflowRuntime,
     WorkflowStatus,
 )
-from yakoon.base.resources.reference import resolve_resource
 from yakoon.workflow.runtime.compiler import compile_run_command
 
 
@@ -21,15 +22,6 @@ class WorkflowNotFound(KeyError):
 
 
 class WorkflowService:
-    """
-    Keine Caches hier: jedes get_def() lädt on-demand über ControllerCatalog +
-    WorkflowLoaderService.
-
-    Regeln:
-    - Workflows sind controller-scoped (controller_id + command_key).
-    - Commands müssen keine split_id/normalize machen
-    (Engine/Router verhindert Cross-Controller).
-    """
 
     def __init__(self, services: ServiceDirectory):
         self.services = services
@@ -47,7 +39,7 @@ class WorkflowService:
     # ---- loading (no caching) ----
 
     def get_def(self, controller_id: str, command_key: str) -> WorkflowDef:
-        catalog = self.services.get(ports.ControllerCatalogService)
+        catalog = self.services.get(base_ports.ControllerCatalogService)
         info = catalog.get(controller_id)
         if not info:
             raise RuntimeError("ControllerInfo cannot be None.")
@@ -63,12 +55,12 @@ class WorkflowService:
             key=command_key,
         )
 
-        file_loader = self.services.get(ports.FileLoader)
+        file_loader = self.services.get(base_ports.FileLoader)
         raw_text = file_loader.load_text(ref)
         if not raw_text:
             raise RuntimeError("Workflow definition not found.")
 
-        compiler = self.services.get(ports.WorkflowCompileService)
+        compiler = self.services.get(wf_ports.WorkflowCompileService)
         wf = compiler.compile(command_key, raw_text)
 
         return wf
@@ -205,7 +197,7 @@ class WorkflowService:
 
         self._ensure_running(batch)
 
-        queue = self.services.get(ports.CommandQueueService)
+        queue = self.services.get(base_ports.CommandQueueService)
 
         if step.end:
             self._enqueue_end(rt, batch_id, batch)
@@ -386,5 +378,5 @@ class WorkflowService:
         batch.status = WorkflowStatus.CANCELLED
         batch.error = None
 
-        queue = self.services.get(ports.CommandQueueService)
+        queue = self.services.get(base_ports.CommandQueueService)
         queue.cancel_batch(session, batch_id)

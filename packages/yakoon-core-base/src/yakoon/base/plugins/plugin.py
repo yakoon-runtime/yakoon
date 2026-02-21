@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from yakoon.base.controllers.base import BaseController
@@ -19,6 +19,7 @@ class PluginMeta:
 class PluginExport:
     meta: PluginMeta
     controllers: list[type[BaseController]]
+    public_services: list[type[Any]] = field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)

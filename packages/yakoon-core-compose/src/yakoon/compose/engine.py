@@ -35,8 +35,6 @@ from yakoon.platform.services.template import FileLoader
 from yakoon.platform.services.viewspec import ViewSpecService
 from yakoon.platform.stores.factory import create_system_stores
 from yakoon.platform.stores.memory.account import InMemoryAccountStore
-from yakoon.workflow.services.compile import WorkflowCompileService
-from yakoon.workflow.services.engine import WorkflowService
 
 
 def compose_engine(*, plugin_modules: list[str]) -> Engine:
@@ -50,6 +48,8 @@ def compose_engine(*, plugin_modules: list[str]) -> Engine:
 
     controllers: list[BaseController] = []
     for lp in loaded:
+        for port_type in lp.export.public_services:
+            bootstrap.register_static(port_type, lp.services.get(port_type))
         for controller_type in lp.export.controllers:
             ctrl = controller_type()
             ctrl.connect_services(lp.services)
@@ -192,8 +192,6 @@ def _compose_services(
     )
     services.register_static(ports.PermissionService, PermissionService())
     services.register_static(ports.DialogService, DialogService())
-    services.register_static(ports.WorkflowService, WorkflowService(services))
-    services.register_static(ports.WorkflowCompileService, WorkflowCompileService())
     services.register_static(ports.PolicyService, PolicyService())
     services.register_static(ports.InputService, InputService(services))
     services.register_static(ports.ViewSpecService, ViewSpecService())

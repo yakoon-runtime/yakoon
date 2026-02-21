@@ -7,12 +7,12 @@ from yakoon.base.controllers.base import BaseController
 from yakoon.base.directories.service import ServiceDirectory
 from yakoon.base.models.input import CommandDispatch, DispatchInput, ResolveDispatch
 from yakoon.base.models.perm import Permission
-from yakoon.base.models.workflow import WorkflowContextRequired
 from yakoon.base.runtime.session import Session
 from yakoon.base.runtime.session.views import v_error
 from yakoon.platform.directories.controller import ControllerDirectory
 from yakoon.platform.engines.command.router import CommandDirectory
 from yakoon.platform.services.viewspec import ViewSpecValidationError
+from yakoon.workflow.models.workflow import WorkflowContextRequired
 
 
 class Engine:
@@ -228,7 +228,7 @@ class Engine:
                 command.context = None
 
             if failed and di.batch_id:
-                wf = self._services.get(ports.WorkflowService)
+                wf = self._services.get(ports.WorkflowInternal)
                 wf.cancel_batch(session, batch_id=di.batch_id)
 
             # Policy 2: cleanup the controller that executed this command
@@ -244,7 +244,7 @@ class Engine:
         di: DispatchInput,
     ) -> None:
         if di.batch_id and command:
-            wf = self._services.get(ports.WorkflowService)
+            wf = self._services.get(ports.WorkflowInternal)
             wf.fail_batch(
                 session,
                 batch_id=di.batch_id,

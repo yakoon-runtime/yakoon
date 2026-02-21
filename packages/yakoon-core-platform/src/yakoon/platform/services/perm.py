@@ -28,11 +28,11 @@ class PermissionService:
             "crm-customer:customer-create|rx",
             "crm-customer:wf:crm.customer.store|rx",
             "crm-customer:wf:crm.customer.validate|rx",
-            "shell:wf.run|rx",
-            "shell:wf.input|rx",
-            "shell:wf.next|rx",
-            "shell:wf.cancel|rx",
-            "shell:use|rx",  # falls use schon vor su erlaubt sein soll (meist nein)
+            "workflow:wf.run|rx",
+            "workflow:wf.input|rx",
+            "workflow:wf.next|rx",
+            "workflow:wf.cancel|rx",
+            "shell:use|rx",
             "discovery:lookup|rx",
         ]
 

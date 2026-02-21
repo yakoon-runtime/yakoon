@@ -144,12 +144,3 @@ class Command(ABC):
               exceptional states.
         """
         raise NotImplementedError
-
-
-class WfCommand(Command):
-    """Base class for workflow-only (internal) commands."""
-
-    kind = CommandKind.WORKFLOW
-    scope = CommandScope.GLOBAL
-    visibility = CommandVisibility.DEVELOPER
-    requires_workflow = True

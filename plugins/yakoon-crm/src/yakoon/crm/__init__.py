@@ -13,7 +13,7 @@ def register(services: ServiceDirectory) -> PluginExport:
 
     return PluginExport(
         meta,
-        [
+        controllers=[
             CrmCustomerCoreController,
         ],
     )

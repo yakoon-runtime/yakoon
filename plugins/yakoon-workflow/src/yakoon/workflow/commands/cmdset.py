@@ -8,7 +8,7 @@ from yakoon.workflow.commands.cmd_next import CmdWfNext
 from yakoon.workflow.commands.cmd_run import CmdWfRun
 
 
-class ShellWorkflowCommands(CommandSet):
+class WorkflowCommands(CommandSet):
 
     group = "workflow"
 

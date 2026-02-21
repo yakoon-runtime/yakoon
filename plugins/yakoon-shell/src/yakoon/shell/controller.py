@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 from yakoon.base.controllers.base import BaseController
 from yakoon.base.resources.reference import ResourceReferences
 from yakoon.shell.commands.core.cmdset import ShellSystemCommands
-from yakoon.shell.commands.workflow.cmdset import ShellWorkflowCommands
 
 if TYPE_CHECKING:
     from yakoon.base.commands.command import Command
@@ -36,7 +35,7 @@ class ShellCoreController(BaseController):
     @property
     def commandsets(self) -> Sequence[type[CommandSet]]:
         """Command sets exported by the shell controller."""
-        return (ShellSystemCommands, ShellWorkflowCommands)
+        return (ShellSystemCommands,)
 
     async def on_before_run_command(
         self, session: Session, request: Request, command: Command

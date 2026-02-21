@@ -1,30 +1,106 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
-from yakoon.base.models.account import Account, AuthResult
-from yakoon.base.models.catalog import CommandInfo, ControllerInfo
-from yakoon.base.models.command import CommandKind
-from yakoon.base.models.input import DispatchInput
-from yakoon.base.models.key import Key
-from yakoon.base.models.message import MessageSpec
-from yakoon.base.models.ns import Namespace
-from yakoon.base.models.policy import (
-    FieldPolicy,
-    PolicyValidationResult,
-    RawValue,
-)
-from yakoon.base.models.prompt import PromptResult
-from yakoon.base.models.view import ViewSpec
-from yakoon.base.models.workflow import StepDef, WorkflowDef, WorkflowRuntime
-from yakoon.base.plugins.plugin import PluginMeta
-from yakoon.base.resources.reference import ResourceRef
-from yakoon.base.runtime.session.session import Session
-from yakoon.platform.runtime.render.context import RenderContext
-from yakoon.platform.runtime.render.section import RenderSection
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable, Mapping, Sequence
+
+    from yakoon.base.models.account import Account, AuthResult
+    from yakoon.base.models.catalog import CommandInfo, ControllerInfo
+    from yakoon.base.models.command import CommandKind
+    from yakoon.base.models.input import DispatchInput
+    from yakoon.base.models.key import Key
+    from yakoon.base.models.message import MessageSpec
+    from yakoon.base.models.ns import Namespace
+    from yakoon.base.models.policy import (
+        FieldPolicy,
+        PolicyValidationResult,
+        RawValue,
+    )
+    from yakoon.base.models.prompt import PromptResult
+    from yakoon.base.models.view import ViewSpec
+    from yakoon.base.plugins.plugin import PluginMeta
+    from yakoon.base.resources.reference import ResourceRef
+    from yakoon.base.runtime.session.session import Session
+    from yakoon.platform.runtime.render.context import RenderContext
+    from yakoon.platform.runtime.render.section import RenderSection
+
+
+class WorkflowPublic(Protocol):
+
+    def enqueue_next(self, session: Any, batch_id: str) -> None: ...
+
+    def start(
+        self,
+        session: Session,
+        controller_id: str,
+        command_key: str,
+        *,
+        enqueue_first: bool = True,
+    ) -> str: ...
+
+    def set_value(
+        self, session: Session, batch_id: str, key: str, value: Any
+    ) -> None: ...
+
+    def start_with_values(
+        self,
+        session: Session,
+        controller_id: str,
+        command_key: str,
+        values: Mapping[str, Any],
+        *,
+        enqueue_first: bool = True,
+        ignore_none: bool = True,
+    ) -> str: ...
+
+    def resume_with_values(
+        self,
+        session: Session,
+        batch_id: str,
+        values: Mapping[str, Any],
+        *,
+        ignore_none: bool = True,
+        enqueue_next: bool = True,
+    ) -> None: ...
+
+    def cancel_batch(self, session: Session, *, batch_id: str) -> None: ...
+
+
+class WorkflowInternal(Protocol):
+    def enqueue_next(self, session: Session, batch_id: str) -> None: ...
+
+    def complete_input_step(
+        self,
+        session: Session,
+        *,
+        batch_id: str,
+        step_id: str,
+        values: Mapping[str, Any],
+        ignore_none: bool = True,
+    ) -> None: ...
+
+    def complete_run_step(
+        self, session: Session, *, batch_id: str, step_id: str
+    ) -> None: ...
+
+    def set_value(
+        self, session: Session, batch_id: str, key: str, value: Any
+    ) -> None: ...
+
+    def fail_batch(
+        self,
+        session: Session,
+        *,
+        batch_id: str,
+        code: str,
+        message: str,
+        command: str | None = None,
+    ) -> None: ...
+
+    def cancel_batch(self, session: Session, *, batch_id: str) -> None: ...
 
 
 class ViewSpecService(Protocol):
@@ -46,72 +122,6 @@ class PolicyService(Protocol):
     def get_validator(self, key: str) -> Callable: ...
     def register_defaults(self) -> None: ...
     def validate(self, *, policy_key: str, raw: RawValue) -> PolicyValidationResult: ...
-
-
-class WorkflowService(Protocol):
-    def runtime(self, session: Any) -> WorkflowRuntime: ...
-
-    def enqueue_next(self, session: Any, batch_id: str) -> None: ...
-    def complete_input_step(
-        self,
-        session,
-        *,
-        batch_id: str,
-        step_id: str,
-        values: Mapping[str, Any],
-        ignore_none: bool = True,
-    ) -> None: ...
-
-    def complete_run_step(
-        self, session: Any, *, batch_id: str, step_id: str
-    ) -> None: ...
-
-    def set_value(self, session: Any, batch_id: str, key: str, value: Any) -> None: ...
-    def get_def(self, controller_id: str, command_key: str) -> WorkflowDef: ...
-    def get_step(self, session: Any, batch_id: str, step_id: str) -> StepDef: ...
-
-    def fail_batch(
-        self,
-        session,
-        *,
-        batch_id: str,
-        code: str,
-        message: str,
-        command: str | None = None,
-    ) -> None: ...
-    def cancel_batch(self, session, *, batch_id: str) -> None: ...
-
-    def start(
-        self,
-        session,
-        controller_id: str,
-        command_key: str,
-        *,
-        enqueue_first: bool = True,
-    ) -> str: ...
-    def start_with_values(
-        self,
-        session,
-        controller_id: str,
-        command_key: str,
-        values: Mapping[str, Any],
-        *,
-        enqueue_first: bool = True,
-        ignore_none: bool = True,
-    ) -> str: ...
-    def resume_with_values(
-        self,
-        session,
-        batch_id: str,
-        values: Mapping[str, Any],
-        *,
-        ignore_none: bool = True,
-        enqueue_next: bool = True,
-    ) -> None: ...
-
-
-class WorkflowCompileService(Protocol):
-    def compile(self, command_key: str, raw_text: str) -> WorkflowDef: ...
 
 
 class DialogState(StrEnum):

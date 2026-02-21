@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from yakoon.base.models.workflow import (
+from yakoon.workflow.models.workflow import (
     InputBranchesDef,
     InputDef,
     InputFieldDef,

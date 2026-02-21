@@ -1,14 +1,20 @@
 from uuid import uuid4
 
-from yakoon.base.commands.command import WfCommand
+from yakoon.base.commands.command import Command
 from yakoon.base.commands.request import Request
+from yakoon.base.models.command import CommandKind, CommandVisibility
 from yakoon.base.ports import AuditLogService
 from yakoon.base.runtime.session import Session
 
 
-class CmdCustomerStore(WfCommand):
+class CmdCustomerStore(Command):
 
     key = "wf:crm.customer.store"
+
+    kind = CommandKind.WORKFLOW
+    visibility = CommandVisibility.INTERNAL
+
+    requires_workflow = True
 
     async def run(self, session: Session, request: Request) -> None:  # noqa: ARG002
 
