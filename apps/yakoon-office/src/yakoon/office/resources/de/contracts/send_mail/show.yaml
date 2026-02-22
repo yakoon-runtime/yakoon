@@ -1,0 +1,12 @@
+kind: state
+
+state:
+  role: infi
+  title: "Bestätigung"
+  blocks:
+    blocks:
+      - type: text
+        text: | 
+          📧 Mail sent!
+          Message:
+          {{ message }}
