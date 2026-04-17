@@ -1,11 +1,11 @@
 import asyncio
 
 import websockets
+from host.connection import WebSocketConnection
+from host.runner import handle
 
 from yakoon.compose.demo_data import seed_demo_system_data
 from yakoon.compose.engine import compose_engine, initialize_storage
-from yakoon.host_ws.host.connection import WebSocketConnection
-from yakoon.host_ws.host.runner import handle
 from yakoon.platform.machine import RuntimeHost
 from yakoon.platform.runtime.bus import SessionBus
 
