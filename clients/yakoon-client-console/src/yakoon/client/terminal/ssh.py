@@ -1,3 +1,5 @@
+import asyncio
+
 from .base import Terminal
 
 
@@ -6,24 +8,30 @@ class SSHTerminal(Terminal):
     def __init__(self, stdin, stdout):
         self.stdin = stdin
         self.stdout = stdout
-        self._running = True
-
         self.on_input = None  # wird vom Client gesetzt
+
+        self._running = True
+        self._buffer = ""
 
     # ------------------------
     # Lifecycle
     # ------------------------
-
     async def run(self):
-        while self._running:
-            line = await self.stdin.readline()
-            if not line:
-                break
+        # nichts aktiv lesen – SSH pusht Daten
+        # self.reset_prompt()
+        await asyncio.Future()  # block forever
 
-            text = line.strip()
+    def data_received(self, data, datatype):
+        self._buffer += data
+
+        self.reset_prompt()
+
+        while "\n" in self._buffer:
+            line, self._buffer = self._buffer.split("\n", 1)
+            line = line.strip()
 
             if self.on_input:
-                await self.on_input(text)
+                asyncio.create_task(self.on_input(line))
 
     async def stop(self):
         self._running = False

@@ -1,6 +1,5 @@
 import asyncio
 
-from yakoon.app_console.terminal.prompt import PromptToolkitTerminal
 from yakoon.base.projection import ProjectionEvent, ProjectionQuery
 from yakoon.base.runtime import InputEvent
 from yakoon.base.transports import Transport
@@ -8,7 +7,7 @@ from yakoon.base.transports import Transport
 from ..output import ConsoleOutput
 
 
-class ConsoleClient:
+class Client:
 
     def __init__(self, transport: Transport):
         self.transport = transport
@@ -19,15 +18,25 @@ class ConsoleClient:
 
         self.query = ProjectionQuery()
 
-    async def run(self):
+    async def run(self, terminal):
 
-        # ------------------------
-        # Setup
-        # ------------------------
-
-        terminal = PromptToolkitTerminal()
-        # terminal = SimpleTerminal()
         renderer = ConsoleOutput(terminal)
+
+        # ------------------------
+        # View Handling
+        # ------------------------
+
+        async def on_view(event: ProjectionEvent):
+
+            self.query.apply(event)
+            await renderer.view(event)
+
+            if not event.is_final():
+                return
+
+            self._handle_view_ready(terminal)
+
+        connection = await self.transport.connect(on_view)
 
         # ------------------------
         # Input Handling
@@ -35,12 +44,10 @@ class ConsoleClient:
 
         async def on_input(text: str):
 
-            # Command Mode
             if not self._current_fields:
                 await connection.send_input(InputEvent.from_raw(text))
                 return
 
-            # Form Mode
             field = self._current_fields[self._current_index]
 
             self._current_values[field.name] = text
@@ -60,27 +67,11 @@ class ConsoleClient:
 
         terminal.on_input = on_input
 
-        # ------------------------
-        # View Handling
-        # ------------------------
-
-        async def on_view(event: ProjectionEvent):
-
-            self.query.apply(event)
-            await renderer.view(event)
-
-            if not event.is_final():
-                return
-
-            self._handle_view_ready(terminal)
-
-        connection = await self.transport.connect(on_emit=on_view)
+        # terminal.reset_prompt()
 
         # ------------------------
         # Start
         # ------------------------
-
-        # terminal.reset_prompt()
 
         asyncio.create_task(renderer.run())
         await terminal.run()
