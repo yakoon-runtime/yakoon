@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from y5ncli.console.client.terminal import Terminal
-
 from textual.app import App, ComposeResult
 from textual.widgets import Input, RichLog
 
@@ -32,19 +30,17 @@ class _InnerApp(App):
         await self._terminal.on_input(text)
 
 
-class TextualTerminal(Terminal):
+class TextualTerminal:
 
     def __init__(self):
         self._app = _InnerApp(self)
+        self.on_input = _noop
 
     async def run(self):
         await self._app.run_async()
 
     async def stop(self):
         self._app.exit()
-
-    async def on_input(self, text: str):
-        pass
 
     def write(self, text: str):
         if self._app.output:
@@ -57,3 +53,7 @@ class TextualTerminal(Terminal):
     def set_prompt(self, text: str):
         if self._app.input:
             self._app.input.placeholder = text
+
+
+async def _noop(text: str) -> None:
+    pass
