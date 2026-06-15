@@ -1,41 +1,26 @@
-#!/usr/bin/env python3
-"""Start the web client (static file server).
-
-Usage:
-    python scripts/serve-webclient.py 8000
-
-The browser connects directly to a local runtime via WebSocket.
-Start the runtime first:
-    python scripts/serve-runtime.py 9100
-Then open http://localhost:8000 in a browser.
-"""
+from __future__ import annotations
 
 import json
 import os
-import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pathlib import Path
+from importlib.resources import files
 
-from themes import THEMES
 from y5n.base.config import load_config
+from y5n.base.theme import ThemeManager, default_themes
 
-HOST = "127.0.0.1"
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-
-WEB_DIR = Path(__file__).resolve().parent.parent / "apps" / "y5napp-web"
+THEMES = default_themes()
+STATIC = files("y5napp.web").joinpath("static")
 
 
 def _inject_config(html: str) -> str:
     cfg, _ = load_config()
     runtimes = []
     for rt in cfg.runtimes or []:
-        runtimes.append(
-            {
-                "name": rt.name,
-                "url": rt.url,
-                "autoconnect": rt.autoconnect,
-            }
-        )
+        runtimes.append({
+            "name": rt.name,
+            "url": rt.url,
+            "autoconnect": rt.autoconnect,
+        })
     script = f"<script>window.__YAKOON_RUNTIMES = {json.dumps(runtimes)}</script>"
     return html.replace("</head>", f"{script}\n</head>")
 
@@ -44,23 +29,17 @@ def _inject_theme(html: str) -> str:
     cfg, _ = load_config()
     if not cfg.theme:
         return html
-
-    colors = THEMES.get(cfg.theme)
-    if not colors:
+    mgr = ThemeManager(THEMES)
+    css = mgr.as_css_vars(cfg.theme)
+    if not css:
         return html
-
-    css_vars = "\n".join(f"    --{k}: {v};" for k, v in colors.items())
-    style = f"""<style>
-  :root {{
-{css_vars}
-  }}
-</style>"""
+    style = f"<style>\n{css}\n</style>"
     return html.replace("</head>", f"{style}\n</head>")
 
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(WEB_DIR), **kwargs)
+        super().__init__(*args, directory=str(STATIC), **kwargs)
 
     def _serve_html(self, path: str) -> None:
         with open(path, "rb") as f:
@@ -85,8 +64,8 @@ class Handler(SimpleHTTPRequestHandler):
         super().do_GET()
 
 
-if __name__ == "__main__":
-    server = HTTPServer((HOST, PORT), Handler)
-    print(f"Web client serving {WEB_DIR} on http://{HOST}:{PORT}")
+def serve(host: str = "127.0.0.1", port: int = 8000) -> HTTPServer:
+    server = HTTPServer((host, port), Handler)
+    print(f"Web client serving {STATIC} on http://{host}:{port}")
     print("Connect to runtime at ws://localhost:9100 (default)")
-    server.serve_forever()
+    return server
