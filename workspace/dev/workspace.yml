@@ -1,0 +1,4 @@
+workspace:
+  /: repos/yakoon-root/src
+  /opt/crm: repos/yakoon-crm/src
+  /opt/luma: repos/yakoon-luma/src
