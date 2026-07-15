@@ -1,13 +1,14 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: permission
-      required: true
-      positional: true
-
+  - key: permission
+    required: true
+    positional: true
 projection:
   default: resources/default.yak
-
 man:
   default: resources/man.yak

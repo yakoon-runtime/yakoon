@@ -1,7 +1,10 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: prompt
-      required: true
-      positional: true
+  - key: prompt
+    required: true
+    positional: true

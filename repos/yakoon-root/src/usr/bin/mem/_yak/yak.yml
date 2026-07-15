@@ -1,6 +1,7 @@
 version: 1.0.0
-executor: runtime
+runtime:
+  executor:
+    kind: runtime
 title: Memory
 navigable: false
 resolvable: true
-

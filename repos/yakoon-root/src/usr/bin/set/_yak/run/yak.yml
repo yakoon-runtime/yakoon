@@ -1,9 +1,11 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   min_options: 1
   params:
-    - key: interaction
-
+  - key: interaction
 man:
   default: resources/man.yak

@@ -1,10 +1,12 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: world
-      required: true
-    - key: parent
-
+  - key: world
+    required: true
+  - key: parent
 man:
   default: resources/man.yak

@@ -1,6 +1,9 @@
-executor: process
-
+runtime:
+  executor:
+    kind: process
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: name
-      positional: true
+  - key: name
+    positional: true

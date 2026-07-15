@@ -117,7 +117,7 @@ class Tree:
         meta = _read_yaml(cap_dir / "yak.yml")
         if not meta:
             return None
-        executor_kind = ExecutorKind(meta.get("executor", "runtime"))
+        executor_kind = ExecutorKind(_executor_from_meta(meta))
 
         invocations: list[Invocation] = []
         inv_data = meta.get("invocation")
@@ -249,7 +249,7 @@ class Tree:
             app_file = fs_path / "_yak" / "setup" / "app.py"
             if not app_file.is_file():
                 continue
-            kind = ExecutorKind(meta.get("executor", "runtime"))
+            kind = ExecutorKind(_executor_from_meta(meta))
             executor = self._executors.get(kind)
             if executor is None:
                 continue
@@ -328,7 +328,7 @@ class Tree:
                 meta = _read_yaml(phase_dir / "yak.yml")
                 if not meta:
                     continue
-                kind_name = meta.get("executor", "runtime")
+                kind_name = _executor_from_meta(meta)
                 try:
                     kind = ExecutorKind(kind_name)
                 except ValueError:
@@ -369,6 +369,16 @@ class Tree:
         rel = path.lstrip("/")
         dir_path = self._root_path / rel if rel else self._root_path
         self._assemble_node(node, dir_path, BuildState(search_paths=node.search_paths))
+
+
+def _executor_from_meta(meta: dict) -> str:
+    """Read executor kind from new (runtime.executor.kind) or legacy (executor) format."""
+    runtime = meta.get("runtime")
+    if isinstance(runtime, dict):
+        executor = runtime.get("executor")
+        if isinstance(executor, dict):
+            return executor.get("kind", "runtime")
+    return meta.get("executor", "runtime")
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:

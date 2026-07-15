@@ -1,8 +1,9 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 projection:
   default: resources/default.yak
-
 man:
   default: resources/man.yak
-

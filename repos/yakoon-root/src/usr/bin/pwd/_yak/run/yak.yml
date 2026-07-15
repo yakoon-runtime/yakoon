@@ -1,4 +1,7 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 man:
   default: resources/man.yak

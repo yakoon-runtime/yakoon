@@ -1,13 +1,15 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: name
-      required: true
-      positional: true
-    - key: direction
-    - key: via
-    - key: twoway
-
+  - key: name
+    required: true
+    positional: true
+  - key: direction
+  - key: via
+  - key: twoway
 man:
   default: resources/man.yak

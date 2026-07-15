@@ -1,16 +1,17 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: user
-      required: true
-      positional: true
-    - key: group
-      required: true
-      positional: true
-
+  - key: user
+    required: true
+    positional: true
+  - key: group
+    required: true
+    positional: true
 projection:
   default: resources/default.yak
-
 man:
   default: resources/man.yak

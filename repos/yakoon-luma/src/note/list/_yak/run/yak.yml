@@ -1,9 +1,11 @@
-executor: runtime
-
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: box
-    - key: world
-
+  - key: box
+  - key: world
 man:
   default: resources/man.yak

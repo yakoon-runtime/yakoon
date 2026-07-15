@@ -1,6 +1,9 @@
-executor: python
-
+runtime:
+  executor:
+    kind: python
+  transport:
+    kind: direct
 invocation:
   params:
-    - key: script
-      positional: true
+  - key: script
+    positional: true
