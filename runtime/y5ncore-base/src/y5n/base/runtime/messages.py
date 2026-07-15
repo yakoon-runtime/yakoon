@@ -7,13 +7,20 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import auto, StrEnum
+from enum import StrEnum, auto
 
 
-class Visibility(StrEnum):
-    LOCAL = auto()
+class Placement(StrEnum):
+    """Where to register a provider in the tree.
+
+    SELF    → am aufrufenden Node (heutiges provide)
+    PARENT  → eine Ebene höher      (heutiges publish)
+    ROOT    → systemweit            (heutiges promote)
+    """
+
+    SELF = auto()
     PARENT = auto()
-    GLOBAL = auto()
+    ROOT = auto()
 
 
 @dataclass
@@ -21,7 +28,7 @@ class RegisterProvider:
     provider_id: str
     exports: dict[str, Sequence[str]]
     service: dict | None = None
-    visibility: Visibility = Visibility.GLOBAL
+    placement: Placement = Placement.SELF
     caller_path: str | None = None
 
 

@@ -16,11 +16,6 @@ if TYPE_CHECKING:
 
 
 class CallHandler:
-    """Handles Call messages.
-
-    Uses the Resolver to find a provider and the Transport to deliver.
-    """
-
     def __init__(self, resolver: Resolver, transport: DirectTransport) -> None:
         self._resolver = resolver
         self._transport = transport
@@ -40,11 +35,11 @@ class RegisterProviderHandler:
         self._transport = transport
 
     def __call__(self, msg: RegisterProvider) -> Ok:
+        effective = self._resolver.effective_path(msg.caller_path or "/", msg.placement)
         self._resolver.register(
             msg.provider_id,
             msg.exports,
-            scope=msg.caller_path or "/",
-            visibility=msg.visibility,
+            path=effective,
         )
         if msg.service is not None:
             self._transport.register_provider(msg.provider_id, msg.service)

@@ -31,7 +31,7 @@ async def run(space):
         on_next_id=sequencer.next_id,
     )
 
-    ports.register(
+    ports.provide(
         "crm.contact.service",
         {
             "list_contacts": contacts.list_contacts,
@@ -43,7 +43,7 @@ async def run(space):
         },
     )
 
-    ports.register(
+    ports.provide(
         "crm.namespaces",
         {
             "contact_namespace": namespaces.contact_namespace,

@@ -4,8 +4,7 @@ Copyright 2024 Yakoon. Apache 2.0 license.
 Demonstrates context and port access from a Python command.
 """
 
-from y5n.sdk import context
-from y5n.sdk import ports
+from y5n.sdk import context, ports
 
 
 def main():
@@ -16,7 +15,7 @@ def main():
     print(f"Session: {(ctx.session or {}).get('key', '-')}")
     print()
 
-    ports.register("hello", {"greet": lambda name="World": f"Hello, {name}!"})
+    ports.provide("hello", {"greet": lambda name="World": f"Hello, {name}!"})
     hello = ports.get("hello")
     print(hello.greet())
     print(hello.greet(name="Yakoon"))
