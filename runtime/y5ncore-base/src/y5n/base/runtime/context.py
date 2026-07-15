@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from contextvars import ContextVar
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 
 @dataclass
@@ -61,17 +61,12 @@ class Response:
 def invoke(call: Call) -> Response:
     """Execute a protocol-level Call against the port registry.
 
-    Serializes Call to the wire format and delegates to _handle_wire().
-    Every executor transport (direct, socket, pipe, …) follows this
-    same pattern: serialize → transport → deserialize.
-
-    The transport below this function does NOT know it is Python — it
-    exchanges JSON strings as if speaking to a foreign process.
+    Delegates to the executor's transport. The transport handles
+    serialization and the actual communication channel.
     """
-    wire = json.dumps(asdict(call))
-    wire_result = _handle_wire(wire)
-    data = json.loads(wire_result)
-    return Response(result=data.get("result"), error=data.get("error"))
+    from .transport import get_transport
+
+    return get_transport().send(call)
 
 
 def _handle_wire(wire: str) -> str:
@@ -88,7 +83,9 @@ def _handle_wire(wire: str) -> str:
     fn = service.get(data.get("method"))
     if fn is None:
         return json.dumps(
-            {"error": f"method '{data.get('method')}' not found on port '{data.get('port')}'"}
+            {
+                "error": f"method '{data.get('method')}' not found on port '{data.get('port')}'"
+            }
         )
 
     args = data.get("args") or {}

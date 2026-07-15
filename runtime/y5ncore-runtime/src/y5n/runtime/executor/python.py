@@ -12,6 +12,7 @@ from y5n.base.flow.dsl import Outcome
 from y5n.base.flow.primitives import EmitView
 from y5n.base.projection import to_text
 from y5n.base.runtime.context import CommandContext, _set_context
+from y5n.base.runtime.transport import DirectTransport, set_transport
 
 from .base import Executor, ExecutorKind, Phase, RunResult
 
@@ -81,6 +82,7 @@ class PythonExecutor(Executor):
                     def _run():
                         req = space.request
                         ses = space.session
+                        set_transport(DirectTransport())
                         _set_context(
                             CommandContext(
                                 path=str(node.path) if node.path else None,
