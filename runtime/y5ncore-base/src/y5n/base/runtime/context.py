@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 
 @dataclass
@@ -60,25 +61,42 @@ class Response:
 def invoke(call: Call) -> Response:
     """Execute a protocol-level Call against the port registry.
 
-    This is the Runtime's invocation kernel. Every executor transport
-    (direct call, socket, pipe, …) feeds into this function.
-    """
-    service = _port_registry.get(call.port)
-    if service is None:
-        return Response(error=f"port '{call.port}' not registered")
+    Serializes Call to the wire format and delegates to _handle_wire().
+    Every executor transport (direct, socket, pipe, …) follows this
+    same pattern: serialize → transport → deserialize.
 
-    fn = service.get(call.method)
+    The transport below this function does NOT know it is Python — it
+    exchanges JSON strings as if speaking to a foreign process.
+    """
+    wire = json.dumps(asdict(call))
+    wire_result = _handle_wire(wire)
+    data = json.loads(wire_result)
+    return Response(result=data.get("result"), error=data.get("error"))
+
+
+def _handle_wire(wire: str) -> str:
+    """Process a wire-format invocation and return a wire-format result.
+
+    This is the "server side" of the protocol. In a subprocess executor
+    it would run in the parent process over a pipe. Here it runs inline.
+    """
+    data = json.loads(wire)
+    service = _port_registry.get(data.get("port"))
+    if service is None:
+        return json.dumps({"error": f"port '{data.get('port')}' not registered"})
+
+    fn = service.get(data.get("method"))
     if fn is None:
-        return Response(
-            error=f"method '{call.method}' not found on port '{call.port}'"
+        return json.dumps(
+            {"error": f"method '{data.get('method')}' not found on port '{data.get('port')}'"}
         )
 
-    args = call.args or {}
+    args = data.get("args") or {}
     try:
         result = fn(**args)
-        return Response(result=result)
+        return json.dumps({"result": result})
     except Exception as e:
-        return Response(error=str(e))
+        return json.dumps({"error": str(e)})
 
 
 def _set_context(ctx: CommandContext) -> None:
