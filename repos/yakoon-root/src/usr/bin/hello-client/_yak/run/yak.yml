@@ -1,5 +1,0 @@
-runtime:
-  executor:
-    kind: python
-  transport:
-    kind: direct
