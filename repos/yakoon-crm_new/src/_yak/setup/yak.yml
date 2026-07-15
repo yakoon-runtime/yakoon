@@ -1,0 +1,5 @@
+runtime:
+  executor:
+    kind: runtime
+  transport:
+    kind: direct

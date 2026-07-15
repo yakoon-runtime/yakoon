@@ -12,6 +12,7 @@ from y5n.base.flow.dsl import Outcome
 from y5n.base.flow.primitives import EmitView
 from y5n.base.projection import to_text
 from y5n.base.runtime.context import CommandContext, _set_context
+from y5n.base.runtime.transport import set_main_loop
 
 from .base import Executor, ExecutorKind, Phase, RunResult
 
@@ -65,13 +66,16 @@ class PythonExecutor(Executor):
             return _empty()
 
         old_argv = sys.argv
+        old_path = list(sys.path)
         old_main = sys.modules.pop("__main__", None)
+        sys.path.insert(0, str(fs_path))
         sys.argv = [str(app_file)]
         if space.request:
             sys.argv.extend(space.request.args())
 
         async def _stream():
-            nonlocal old_argv, old_main
+            nonlocal old_argv, old_path, old_main
+            set_main_loop(asyncio.get_running_loop())
             q: queue.Queue[str] = queue.Queue()
             old_out = sys.stdout
             sys.stdout = _StreamCapture(q)
@@ -136,6 +140,7 @@ class PythonExecutor(Executor):
             finally:
                 sys.stdout = old_out
                 sys.argv = old_argv
+                sys.path[:] = old_path
                 if old_main is not None:
                     sys.modules["__main__"] = old_main
                 else:

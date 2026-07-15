@@ -1,0 +1,5 @@
+version: 1.0.0
+title: Contacts
+resolvable: false
+navigable: true
+contextual: true

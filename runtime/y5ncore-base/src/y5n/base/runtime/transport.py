@@ -10,7 +10,17 @@ a provider by provider_id, but knows nothing about ports or methods.
 
 from __future__ import annotations
 
+import asyncio
+import inspect
+
 from .context import Call, Response
+
+_main_loop: asyncio.AbstractEventLoop | None = None
+
+
+def set_main_loop(loop: asyncio.AbstractEventLoop) -> None:
+    global _main_loop
+    _main_loop = loop
 
 
 class DirectTransport:
@@ -34,7 +44,17 @@ class DirectTransport:
             return Response(error=f"method '{call.method}' not found")
         args = call.args or {}
         try:
-            return Response(result=fn(**args))
+            result = fn(**args)
+            if inspect.iscoroutine(result):
+                try:
+                    loop = asyncio.get_running_loop()
+                    result = loop.run_until_complete(result)
+                except RuntimeError:
+                    if _main_loop is None:
+                        return Response(error="no event loop available")
+                    future = asyncio.run_coroutine_threadsafe(result, _main_loop)
+                    result = future.result()
+            return Response(result=result)
         except Exception as e:
             return Response(error=str(e))
 

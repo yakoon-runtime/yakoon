@@ -1,0 +1,5 @@
+version: 1.0.0
+title: Customer Relationship Management
+resolvable: false
+navigable: true
+contextual: true
