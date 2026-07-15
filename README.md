@@ -33,6 +33,9 @@ If processes are real objects of an enterprise, software must be designed around
 
 Yakoon is an experiment to test that assumption.
 
+> **Yakoon is a runtime with a language-neutral Runtime Bus.**
+> **Applications do not communicate with each other — they communicate exclusively with the Runtime through a stable ABI.**
+
 ```
 ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
 │   Texture   │  │     Web     │  │   Console   │

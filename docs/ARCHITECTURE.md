@@ -1,5 +1,8 @@
 # Architecture
 
+> **Yakoon is a runtime with a language-neutral Runtime Bus.**
+> **Applications do not communicate with each other — they communicate exclusively with the Runtime through a stable ABI.**
+
 ## Evolution
 
 Yakoon started as a Python framework and evolved into a
