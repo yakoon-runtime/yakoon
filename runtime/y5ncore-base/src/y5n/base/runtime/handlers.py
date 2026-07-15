@@ -26,33 +26,32 @@ class CallHandler:
         self._transport = transport
 
     def __call__(self, call: Call) -> Response:
-        provider_id = self._resolver.resolve(call.port, call.method)
+        provider_id = self._resolver.resolve(
+            call.port, call.method, caller_path=call.caller_path
+        )
         if provider_id is None:
             return Response(error=f"no provider for '{call.port}:{call.method}'")
         return self._transport.send(provider_id, call)
 
 
 class RegisterProviderHandler:
-    """Handles RegisterProvider messages.
-
-    Registers the provider with the Resolver and stores the service
-    callables in the Transport (for in-process DirectTransport).
-    """
-
     def __init__(self, resolver: Resolver, transport: DirectTransport) -> None:
         self._resolver = resolver
         self._transport = transport
 
     def __call__(self, msg: RegisterProvider) -> Ok:
-        self._resolver.register(msg.provider_id, msg.exports)
+        self._resolver.register(
+            msg.provider_id,
+            msg.exports,
+            scope=msg.caller_path or "/",
+            visibility=msg.visibility,
+        )
         if msg.service is not None:
             self._transport.register_provider(msg.provider_id, msg.service)
         return Ok()
 
 
 class UnregisterProviderHandler:
-    """Handles UnregisterProvider messages."""
-
     def __init__(self, resolver: Resolver, transport: DirectTransport) -> None:
         self._resolver = resolver
         self._transport = transport

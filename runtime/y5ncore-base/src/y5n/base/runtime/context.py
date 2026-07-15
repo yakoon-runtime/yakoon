@@ -35,6 +35,7 @@ class Call:
     port: str
     method: str
     args: dict | None = None
+    caller_path: str | None = None
 
 
 @dataclass

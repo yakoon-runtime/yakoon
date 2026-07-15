@@ -12,8 +12,8 @@ Usage:
 import uuid
 
 from y5n.base.runtime.bus import get_bus
-from y5n.base.runtime.context import Call, invoke
-from y5n.base.runtime.messages import RegisterProvider
+from y5n.base.runtime.context import Call, context, invoke
+from y5n.base.runtime.messages import RegisterProvider, Visibility
 
 
 class _PortProxy:
@@ -22,7 +22,15 @@ class _PortProxy:
 
     def __getattr__(self, name: str):
         def caller(**kwargs):
-            response = invoke(Call(port=self._port, method=name, args=kwargs))
+            ctx = context.current()
+            response = invoke(
+                Call(
+                    port=self._port,
+                    method=name,
+                    args=kwargs,
+                    caller_path=ctx.path,
+                )
+            )
             if response.error:
                 raise RuntimeError(response.error)
             return response.result
@@ -30,14 +38,22 @@ class _PortProxy:
         return caller
 
 
-def register(name: str, service: dict) -> None:
+def register(
+    name: str,
+    service: dict,
+    *,
+    visibility: Visibility = Visibility.GLOBAL,
+) -> None:
     """Register a port service in the runtime."""
+    ctx = context.current()
     provider_id = f"provider:{uuid.uuid4().hex}"
     get_bus().dispatch(
         RegisterProvider(
             provider_id=provider_id,
             exports={name: list(service.keys())},
             service=service,
+            visibility=visibility,
+            caller_path=ctx.path,
         )
     )
 
