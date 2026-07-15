@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextvars import ContextVar
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -40,7 +41,7 @@ class Call:
 class Response:
     """A protocol-level invocation result."""
 
-    result: object = None
+    result: Any = None
     error: str | None = None
 
 
