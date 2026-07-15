@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from contextvars import ContextVar
 from dataclasses import dataclass
 
@@ -27,20 +26,10 @@ class CommandContext:
 
 _context_var: ContextVar[CommandContext] = ContextVar("y5n_command_context")
 
-_port_registry: dict[str, dict] = {}
-"""Global port registry. Lives in the runtime, not in any command.
-
-Commands register services here via y5n.sdk.ports.register().
-Services persist across command invocations within the same process.
-"""
-
 
 @dataclass
 class Call:
-    """A protocol-level invocation request.
-
-    Language-neutral — can be serialized to JSON for non-Python transports.
-    """
+    """A protocol-level invocation request."""
 
     port: str
     method: str
@@ -49,51 +38,21 @@ class Call:
 
 @dataclass
 class Response:
-    """A protocol-level invocation result.
-
-    Language-neutral — can be serialized to JSON for non-Python transports.
-    """
+    """A protocol-level invocation result."""
 
     result: object = None
     error: str | None = None
 
 
 def invoke(call: Call) -> Response:
-    """Execute a protocol-level Call against the port registry.
+    """Execute a Call through the Runtime Bus.
 
-    Delegates to the executor's transport. The transport handles
-    serialization and the actual communication channel.
+    The bus routes to CallHandler, which resolves the provider
+    and delivers the call via the executor's transport.
     """
-    from .transport import get_transport
+    from y5n.base.runtime.bus import get_bus
 
-    return get_transport().send(call)
-
-
-def _handle_wire(wire: str) -> str:
-    """Process a wire-format invocation and return a wire-format result.
-
-    This is the "server side" of the protocol. In a subprocess executor
-    it would run in the parent process over a pipe. Here it runs inline.
-    """
-    data = json.loads(wire)
-    service = _port_registry.get(data.get("port"))
-    if service is None:
-        return json.dumps({"error": f"port '{data.get('port')}' not registered"})
-
-    fn = service.get(data.get("method"))
-    if fn is None:
-        return json.dumps(
-            {
-                "error": f"method '{data.get('method')}' not found on port '{data.get('port')}'"
-            }
-        )
-
-    args = data.get("args") or {}
-    try:
-        result = fn(**args)
-        return json.dumps({"result": result})
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+    return get_bus().dispatch(call)
 
 
 def _set_context(ctx: CommandContext) -> None:
@@ -101,13 +60,6 @@ def _set_context(ctx: CommandContext) -> None:
 
 
 class _Context:
-    """Entry point for accessing the runtime context.
-
-    Usage:
-        ctx = context.current()
-        print(ctx["request"])
-    """
-
     @staticmethod
     def current() -> CommandContext:
         try:

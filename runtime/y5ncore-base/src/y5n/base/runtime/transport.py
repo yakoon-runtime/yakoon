@@ -1,45 +1,44 @@
-"""Transport layer — IPC between SDK and Runtime Port Registry.
+"""Transport layer — delivers Calls to providers.
 
-The transport is owned by the Executor, not by the Runtime.
-Each executor kind creates its own transport:
+The transport is owned by the Executor. It knows how to reach
+a provider by provider_id, but knows nothing about ports or methods.
 
-  PythonExecutor  →  DirectTransport (in-process, synchronous)
-  ProcessExecutor →  PipeTransport   (subprocess stdin/stdout)
-  RemoteExecutor  →  SocketTransport (TCP/WebSocket)
-
-The transport has exactly two operations:
-  send(call) → Response    (used by the SDK)
-  serve()                   (used by the Runtime to process calls)
+  DirectTransport  →  in-process callables (PythonExecutor)
+  PipeTransport    →  subprocess stdin/stdout (ProcessExecutor)
+  SocketTransport  →  TCP/WebSocket (RemoteExecutor)
 """
 
 from __future__ import annotations
 
-import json
-from dataclasses import asdict
-
-from .context import (
-    Call,
-    Response,
-    _handle_wire,
-)
+from .context import Call, Response
 
 
 class DirectTransport:
-    """In-process transport. Synchronous call/response.
+    """In-process transport. Provider callables live in a local dict."""
 
-    Used by the PythonExecutor. Both send() and serve() operate
-    in the same process — no actual IPC. The JSON serialization
-    layer is preserved so the protocol boundary stays visible.
-    """
+    def __init__(self) -> None:
+        self._providers: dict[str, dict] = {}
 
-    def send(self, call: Call) -> Response:
-        wire = json.dumps(asdict(call))
-        wire_result = _handle_wire(wire)
-        data = json.loads(wire_result)
-        return Response(result=data.get("result"), error=data.get("error"))
+    def register_provider(self, provider_id: str, service: dict) -> None:
+        self._providers[provider_id] = service
+
+    def unregister_provider(self, provider_id: str) -> None:
+        self._providers.pop(provider_id, None)
+
+    def send(self, provider_id: str, call: Call) -> Response:
+        service = self._providers.get(provider_id)
+        if service is None:
+            return Response(error=f"provider '{provider_id}' not found")
+        fn = service.get(call.method)
+        if fn is None:
+            return Response(error=f"method '{call.method}' not found")
+        args = call.args or {}
+        try:
+            return Response(result=fn(**args))
+        except Exception as e:
+            return Response(error=str(e))
 
     def serve(self) -> None:
-        """In-process: no listener needed — calls are processed synchronously."""
         return
 
 
