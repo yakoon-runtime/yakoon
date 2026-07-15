@@ -60,18 +60,3 @@ class DirectTransport:
 
     def serve(self) -> None:
         return
-
-
-_default_transport: DirectTransport | None = None
-
-
-def get_transport() -> DirectTransport:
-    global _default_transport
-    if _default_transport is None:
-        _default_transport = DirectTransport()
-    return _default_transport
-
-
-def set_transport(transport: DirectTransport) -> None:
-    global _default_transport
-    _default_transport = transport

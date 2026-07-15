@@ -13,9 +13,9 @@ from enum import StrEnum, auto
 class Placement(StrEnum):
     """Where to register a provider in the tree.
 
-    SELF    → am aufrufenden Node (heutiges provide)
-    PARENT  → eine Ebene höher      (heutiges publish)
-    ROOT    → systemweit            (heutiges promote)
+    SELF    → at the caller's node       (classic provide)
+    PARENT  → one level up               (classic publish)
+    ROOT    → system-wide                (classic promote)
     """
 
     SELF = auto()
