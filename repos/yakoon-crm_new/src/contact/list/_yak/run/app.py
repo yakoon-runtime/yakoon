@@ -5,7 +5,7 @@ Part of the Yakoon CRM reference implementation.
 """
 
 from collections.abc import Sequence
-from typing import Protocol
+from typing import Protocol, cast
 
 from y5n.base.naming import Namespace
 from y5n.sdk import ports
@@ -55,7 +55,7 @@ def main():
     The transport handles async provider methods transparently —
     you can call await or not, both work.
     """
-    svc: ContactService = ports.get("crm.contact.service")
+    svc = cast(ContactService, ports.get("crm.contact.service"))
     ns = ports.get("crm.namespaces").contact_namespace()
     all_contacts = svc.list_contacts(namespace=ns)
 
