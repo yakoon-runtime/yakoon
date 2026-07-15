@@ -3,3 +3,5 @@ runtime:
     kind: python
   transport:
     kind: direct
+man:
+  default: resources/man.yak
