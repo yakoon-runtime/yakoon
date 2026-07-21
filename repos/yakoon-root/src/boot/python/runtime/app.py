@@ -13,8 +13,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from python._shared import (
+    _build_context_dict,
     build_app_file,
     load_and_capture,
+    parse_entry,
     read_entry,
     resolve_tree_path,
     unload_module,
@@ -24,6 +26,8 @@ from y5n.base.flow.dsl import Outcome
 from y5n.base.flow.primitives import EmitView
 from y5n.base.host import HANDLERS, MarkerKind, drive
 from y5n.base.nodes import NodeSpace
+from y5n.sdk import context as sdk_context
+from y5n.sdk.libs.models import Context as SdkContext
 
 
 async def run(space: NodeSpace):
@@ -51,9 +55,20 @@ async def run(space: NodeSpace):
         )
         return
 
-    if ":" in entry:
+    try:
+        scheme, value = parse_entry(entry)
+    except ValueError as e:
+        yield Outcome(effects=[EmitView(to_text(str(e)))])
+        return
+
+    if scheme == "pack":
         os.environ.setdefault("YAK_ENDPOINT", "inprocess://")
-        mod_name, _, func_name = entry.partition(":")
+        mod_name, _, func_name = value.rpartition(":")
+        if not mod_name or not func_name:
+            yield Outcome(
+                effects=[EmitView(to_text(f"error: invalid pack entry '{value}'"))]
+            )
+            return
         try:
             mod = importlib.import_module(mod_name)
         except ImportError as e:
@@ -71,17 +86,16 @@ async def run(space: NodeSpace):
                 ]
             )
             return
-        mod_name_for_cleanup = mod_name
-    else:
-        app_file = build_app_file(root, target_path)
-        if app_file is None:
+        ctx = SdkContext.from_dict(_build_context_dict(space, target_path))
+        sdk_context._set(ctx)
+        mod_name_for_cleanup = ""
+    elif scheme == "file":
+        app_file = root / value
+        if not app_file.is_file():
             yield Outcome(
-                effects=[
-                    EmitView(to_text(f"error: no command or script at '{target_path}'"))
-                ]
+                effects=[EmitView(to_text(f"error: file not found: '{app_file}'"))]
             )
             return
-
         errors, _, mod, mod_name_for_cleanup = load_and_capture(
             space, target_path, app_file
         )
@@ -89,11 +103,13 @@ async def run(space: NodeSpace):
             for err in errors:
                 yield Outcome(effects=[EmitView(to_text(err))])
             return
-
         main_fn = getattr(mod, "main", None)
         if main_fn is None:
             yield Outcome(effects=[EmitView(to_text("error: command has no main()"))])
             return
+    else:
+        yield Outcome(effects=[EmitView(to_text(f"error: unknown scheme '{scheme}'"))])
+        return
 
     coro = main_fn()
 
