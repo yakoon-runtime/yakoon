@@ -1,4 +1,4 @@
 workspace:
   /: ../../structure
-  /opt/crm: repos/yakoon-crm/src
+  /opt/crm: repos/y5napp-crm/src
   /opt/luma: repos/yakoon-luma/src
