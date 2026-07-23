@@ -1,4 +1,4 @@
 workspace:
   /: ../../structure
   /opt/crm: ../../structure/opt/crm
-  /opt/luma: repos/y5napp-luma/src
+  /opt/luma: ../../structure/opt/luma
