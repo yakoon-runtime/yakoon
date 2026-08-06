@@ -1,0 +1,23 @@
+title: Err
+resolvable: true
+navigable: false
+contextual: false
+anonymous: true
+host: /boot/python/runtime
+entry:
+  run: pack:y5n.packs.system.err:main
+resources:
+  ref: resource:y5n.packs.system.resources.loader:content
+  error:
+    default:
+      path: err/error.ydf
+    denied:
+      path: err/denied.ydf
+    not_found:
+      path: err/not_found.ydf
+    not_executable:
+      path: err/not_executable.ydf
+    usage:
+      path: err/usage.ydf
+    unknown_options:
+      path: err/unknown_options.ydf
