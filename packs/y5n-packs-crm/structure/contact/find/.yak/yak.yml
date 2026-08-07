@@ -5,3 +5,11 @@ contextual: false
 host: /boot/python/runtime
 entry:
   run: pack:y5n.packs.crm.apps.contact.find:main
+invocation:
+  params:
+  - key: name
+  - key: company
+  - key: email
+  - key: phone
+  - key: city
+  - key: country

@@ -9,6 +9,8 @@ Usage
 <pre>
   su USER
   su USER --password SECRET
+  su USER --password SECRET --administrative
+  su USER --password SECRET --temporary
 </pre>
 
 <heading level="2">
@@ -37,6 +39,14 @@ su root
 
 su stefan --password 123
   Log in as stefan with the given password.
+
+su stefan --password 123 --administrative
+  Log in and establish an administrative security context.
+  The password is the conscious confirmation of that context.
+
+su stefan --password 123 --temporary
+  Log in with a temporary context that elevates exactly one
+  invocation and falls back to normal afterwards.
 </pre>
 
 <heading level="2">

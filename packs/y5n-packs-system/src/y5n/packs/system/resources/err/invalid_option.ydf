@@ -1,4 +1,6 @@
-{% if state.usages %}
+<text>{{ state.reason }}</text>
+
+<space count="1"/>
 <text>Usage:</text>
 
 <list>
@@ -27,7 +29,3 @@
   </item>
 {% endfor %}
 </list>
-{% else %}
-  <text>No usage available.</text>
-  <text>See 'man {{ state.command }}' for documentation.</text>
-{% endif %}

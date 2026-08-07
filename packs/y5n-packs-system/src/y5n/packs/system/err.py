@@ -22,6 +22,7 @@ _VARIANTS = {
     "NodeNotExecutable": "not_executable",
     "UsageError": "usage",
     "UnknownOptionsError": "unknown_options",
+    "InvalidOptionError": "invalid_option",
 }
 
 

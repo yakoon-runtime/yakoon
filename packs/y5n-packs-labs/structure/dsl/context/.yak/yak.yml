@@ -7,3 +7,7 @@ host: /boot/python/runtime
 
 entry:
   run: pack:y5n.packs.labs.dsl.context:main
+
+invocation:
+  params:
+  - key: greet
