@@ -12,15 +12,14 @@ from unittest.mock import AsyncMock
 import pytest
 from y5n.packs.ident.services.authentication import AuthenticationService
 from y5n.runtime.api.naming import Key, Namespace
-from y5n.runtime.api.runtime.sessions import SecurityContext
 
 
 @pytest.fixture(autouse=True)
 def _sdk_endpoint(monkeypatch):
     monkeypatch.setenv("YAK_ENDPOINT", "inprocess://")
-    from y5n.sdk import ports
+    from y5n.sdk import ports, security
 
-    yield ports
+    yield ports, security
 
 
 def _account(username: str):
@@ -54,38 +53,39 @@ async def _authenticate(ports, **kwargs) -> dict:
 
 @pytest.mark.asyncio
 async def test_login_defaults_to_normal_context(_sdk_endpoint):
-    result, session = await _authenticate(
-        _sdk_endpoint, username="stefan", secret="secret"
-    )
+    ports, security = _sdk_endpoint
+    result, session = await _authenticate(ports, username="stefan", secret="secret")
 
     assert result["ok"] is True
     patch = session.update.await_args.kwargs["patch"]
-    assert patch["security_context"] == SecurityContext.NORMAL
+    assert patch["security_context"] == security.SecurityContext.NORMAL
 
 
 @pytest.mark.asyncio
 async def test_administrative_login_sets_administrative_context(_sdk_endpoint):
+    ports, security = _sdk_endpoint
     result, session = await _authenticate(
-        _sdk_endpoint,
+        ports,
         username="stefan",
         secret="secret",
-        security_context=SecurityContext.ADMINISTRATIVE,
+        security_context=security.SecurityContext.ADMINISTRATIVE,
     )
 
     assert result["ok"] is True
     patch = session.update.await_args.kwargs["patch"]
-    assert patch["security_context"] == SecurityContext.ADMINISTRATIVE
+    assert patch["security_context"] == security.SecurityContext.ADMINISTRATIVE
 
 
 @pytest.mark.asyncio
 async def test_temporary_login_sets_temporary_context(_sdk_endpoint):
+    ports, security = _sdk_endpoint
     result, session = await _authenticate(
-        _sdk_endpoint,
+        ports,
         username="stefan",
         secret="secret",
-        security_context=SecurityContext.TEMPORARY,
+        security_context=security.SecurityContext.TEMPORARY,
     )
 
     assert result["ok"] is True
     patch = session.update.await_args.kwargs["patch"]
-    assert patch["security_context"] == SecurityContext.TEMPORARY
+    assert patch["security_context"] == security.SecurityContext.TEMPORARY

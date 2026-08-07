@@ -1,5 +1,4 @@
-from y5n.runtime.api.runtime.sessions import SecurityContext
-from y5n.sdk import context, io, ports
+from y5n.sdk import context, io, ports, security
 
 
 async def main():
@@ -8,11 +7,11 @@ async def main():
     secret = req.option("password")
 
     if req.has_option("administrative"):
-        security_context = SecurityContext.ADMINISTRATIVE
+        security_context = security.SecurityContext.ADMINISTRATIVE
     elif req.has_option("temporary"):
-        security_context = SecurityContext.TEMPORARY
+        security_context = security.SecurityContext.TEMPORARY
     else:
-        security_context = SecurityContext.NORMAL
+        security_context = security.SecurityContext.NORMAL
 
     auth = ports.get("ident.auth")
     result = await auth.authenticate(

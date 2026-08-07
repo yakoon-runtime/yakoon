@@ -1,4 +1,4 @@
-"""End-to-end experiment test: permissions are granted to accounts on runtime paths.
+"""End-to-end test: permissions are granted to accounts on runtime paths.
 
 Covers the full pipeline without process boundaries:
   store -> services -> bootstrap -> resolver -> parser -> PermissionSet -> check
