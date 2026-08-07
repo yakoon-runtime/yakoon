@@ -7,9 +7,9 @@ Usage
 </heading>
 
 <pre>
-  add NAME PERMISSION
-  add NAME PERMISSION --bits rwx
-  add NAME PERMISSION --deny
+  add NAME PATH
+  add NAME PATH --bits rwx
+  add NAME PATH --deny
 </pre>
 
 <heading level="2">
@@ -36,5 +36,5 @@ See also
 </heading>
 
 <paragraph>
-account/show, account/remove, group/add, permission/show
+account/show, account/remove, group/add, path/show
 </paragraph>

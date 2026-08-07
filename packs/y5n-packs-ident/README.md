@@ -28,7 +28,7 @@ permission grants, and authentication services.
 | `grants group add` | `y5n.packs.ident.apps.grants.group_add` | Grant permission to group |
 | `grants group remove` | `y5n.packs.ident.apps.grants.group_remove` | Revoke permission from group |
 | `grants group show` | `y5n.packs.ident.apps.grants.group_show` | Show group permissions |
-| `grants perm show` | `y5n.packs.ident.apps.grants.perm_show` | Show all permissions |
+| `grants path show` | `y5n.packs.ident.apps.grants.perm_show` | Show who has access to a path |
 
 ## Model
 
@@ -38,8 +38,8 @@ permission grants, and authentication services.
   account without one. There is no separate user concept.
 - **Group** — a bundle of accounts that may itself carry grants.
 - **Join** — account-to-group membership.
-- **PermissionGrant** — a grant of operations on a runtime path, set on an
-  account or a group.
+- **PermissionGrant** — grants access to a runtime path, set on an account
+  or a group. A grant is `path + bits (+ deny)`.
 
 ## Services
 

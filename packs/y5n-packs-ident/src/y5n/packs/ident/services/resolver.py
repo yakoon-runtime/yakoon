@@ -73,7 +73,7 @@ class PermissionResolver:
         grants: list[PermissionGrant],
     ):
         for grant in grants:
-            spec = f"{grant.permission_key}|{grant.bits}"
+            spec = f"{grant.path}|{grant.bits}"
             if grant.deny:
                 spec = f"-{spec}"
 

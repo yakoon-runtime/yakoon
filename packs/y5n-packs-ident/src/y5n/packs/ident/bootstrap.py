@@ -19,10 +19,10 @@ from .services import (
 )
 
 _root_grant_specs = [
-    "/usr/bin|rwx",
-    "/usr/sbin/ident|rwx",
-    "/opt|rwx",
-    "/dsl|rwx",
+    ("/usr/bin", "rwx"),
+    ("/usr/sbin/ident", "rwx"),
+    ("/opt", "rwx"),
+    ("/dsl", "rwx"),
 ]
 
 
@@ -108,12 +108,12 @@ async def bootstrap(
     # --- ROOT GRANTS ---
     # -------------------
 
-    for spec in _root_grant_specs:
+    for path, bits in _root_grant_specs:
 
         grant_key = PermissionGrant.build_key(
             namespace=grant_ns,
             subject_key=admins_key,
-            permission_key=spec,
+            path=path,
         )
 
         if await permgrant.get_by_key(grant_key):
@@ -124,7 +124,8 @@ async def bootstrap(
                 key=grant_key,
                 data=PermissionGrantData(
                     subject_key=admins_key,
-                    permission_key=spec,
+                    path=path,
+                    bits=bits,
                 ),
             )
         )

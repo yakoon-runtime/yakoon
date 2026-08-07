@@ -7,7 +7,7 @@ Usage
 </heading>
 
 <pre>
-  remove NAME PERMISSION
+  remove NAME PATH
 </pre>
 
 <heading level="2">
@@ -24,8 +24,8 @@ Examples
 </heading>
 
 <pre>
-remove admins note:app
-  Remove note:app permission from the admins group.
+remove admins /usr/bin
+  Remove /usr/bin access from the admins group.
 </pre>
 
 <heading level="2">
@@ -33,5 +33,5 @@ See also
 </heading>
 
 <paragraph>
-group/show, group/add, user/remove, permission/show
+group/show, group/add, account/remove, path/show
 </paragraph>

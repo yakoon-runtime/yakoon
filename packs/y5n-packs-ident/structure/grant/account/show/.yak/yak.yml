@@ -10,9 +10,6 @@ invocation:
   - key: name
     positional: true
     required: true
-  - key: permission
-    positional: true
-    required: true
 resources:
   ref: resource:y5n.packs.ident.resources.loader:content
   document:

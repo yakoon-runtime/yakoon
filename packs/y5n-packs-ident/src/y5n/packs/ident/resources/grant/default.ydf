@@ -3,7 +3,7 @@ No permissions found for account '{{ subject }}'.
 {% else %}
 Permissions for account '{{ subject }}': <list>
 {% for g in grants %}
-<item>{{ g.permission_key }} [{{ g.bits }}]{% if g.deny %} (deny){% endif %}</item>
+<item>{{ g.path }} [{{ g.bits }}]{% if g.deny %} (deny){% endif %}</item>
 {% endfor %}
 </list>
 {% endif %}

@@ -10,7 +10,7 @@ invocation:
   - key: name
     positional: true
     required: true
-  - key: permission
+  - key: path
     positional: true
     required: true
 resources:

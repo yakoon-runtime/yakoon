@@ -25,18 +25,18 @@ from ..models import (
 # INDEX
 # ----------------------------------
 
-IDX_PERMISSION_SUBJECT_KEY = IndexKey("permission.subject_key")
+IDX_GRANT_SUBJECT_KEY = IndexKey("grant.subject_key")
 
-IDX_PERMISSION_SUBJECT_SPEC = IndexSpec(
-    key=IDX_PERMISSION_SUBJECT_KEY,
+IDX_GRANT_SUBJECT_SPEC = IndexSpec(
+    key=IDX_GRANT_SUBJECT_KEY,
     value_type=ValueType.TEXT,
     unique=False,
 )
 
-IDX_PERMISSION_KEY = IndexKey("permission.permission_key")
+IDX_GRANT_PATH = IndexKey("grant.path")
 
-IDX_PERMISSION_SPEC = IndexSpec(
-    key=IDX_PERMISSION_KEY,
+IDX_GRANT_PATH_SPEC = IndexSpec(
+    key=IDX_GRANT_PATH,
     value_type=ValueType.TEXT,
     unique=False,
 )
@@ -51,8 +51,8 @@ class PermissionGrantService:
     @staticmethod
     def index_specs():
         return [
-            IDX_PERMISSION_SUBJECT_SPEC,
-            IDX_PERMISSION_SPEC,
+            IDX_GRANT_SUBJECT_SPEC,
+            IDX_GRANT_PATH_SPEC,
         ]
 
     def __init__(
@@ -85,18 +85,18 @@ class PermissionGrantService:
 
         return PermissionGrant.from_row(row=row)
 
-    async def get_by_subject_and_permission(
+    async def get_by_subject_and_path(
         self,
         *,
         namespace: Namespace,
         subject_key: Key,
-        permission_key: str,
+        path: str,
     ) -> PermissionGrant | None:
 
         key = PermissionGrant.build_key(
             namespace=namespace,
             subject_key=subject_key,
-            permission_key=permission_key,
+            path=path,
         )
 
         return await self.get_by_key(key)
@@ -109,7 +109,7 @@ class PermissionGrantService:
 
         keys, _ = await self.on_scan(
             namespace=namespace,
-            index_key=IDX_PERMISSION_SUBJECT_KEY,
+            index_key=IDX_GRANT_SUBJECT_KEY,
         )
 
         rows = await self.on_get_many(keys=keys)
@@ -127,7 +127,7 @@ class PermissionGrantService:
 
         keys, _ = await self.on_scan(
             namespace=namespace,
-            index_key=IDX_PERMISSION_SUBJECT_KEY,
+            index_key=IDX_GRANT_SUBJECT_KEY,
             value=str(subject_key),
         )
 
@@ -137,17 +137,17 @@ class PermissionGrantService:
 
         return [g for g in grants if g.data.enabled]
 
-    async def list_permission_grants(
+    async def list_path_grants(
         self,
         *,
         namespace: Namespace,
-        permission_key: str,
+        path: str,
     ) -> list[PermissionGrant]:
 
         keys, _ = await self.on_scan(
             namespace=namespace,
-            index_key=IDX_PERMISSION_KEY,
-            value=permission_key,
+            index_key=IDX_GRANT_PATH,
+            value=path,
         )
 
         rows = await self.on_get_many(keys=keys)
@@ -168,25 +168,25 @@ class PermissionGrantService:
         doc = grant.data.to_dict()
 
         subject_key = doc.get("subject_key")
-        permission_key = doc.get("permission_key")
+        path = doc.get("path")
 
         if not isinstance(subject_key, str):
             raise TypeError("PermissionGrant.subject_key " "must be a string")
 
-        if not isinstance(permission_key, str):
-            raise TypeError("PermissionGrant.permission_key " "must be a string")
+        if not isinstance(path, str):
+            raise TypeError("PermissionGrant.path " "must be a string")
 
         await self.on_replace(
             key=grant.key,
             doc=doc,
             indexes=[
                 IndexTerm(
-                    key=IDX_PERMISSION_SUBJECT_KEY,
+                    key=IDX_GRANT_SUBJECT_KEY,
                     value=subject_key,
                 ),
                 IndexTerm(
-                    key=IDX_PERMISSION_KEY,
-                    value=permission_key,
+                    key=IDX_GRANT_PATH,
+                    value=path,
                 ),
             ],
             snapshot_hint=SnapshotHint.COMMIT,
@@ -201,7 +201,7 @@ class PermissionGrantService:
         *,
         namespace: Namespace,
         subject_key: Key,
-        permission_key: str,
+        path: str,
         bits: str = "x",
         deny: bool = False,
     ) -> PermissionGrant:
@@ -209,14 +209,14 @@ class PermissionGrantService:
         key = PermissionGrant.build_key(
             namespace=namespace,
             subject_key=subject_key,
-            permission_key=permission_key,
+            path=path,
         )
 
         grant = PermissionGrant(
             key=key,
             data=PermissionGrantData(
                 subject_key=subject_key,
-                permission_key=permission_key,
+                path=path,
                 bits=bits,
                 deny=deny,
                 enabled=True,
@@ -232,13 +232,13 @@ class PermissionGrantService:
         *,
         namespace: Namespace,
         subject_key: Key,
-        permission_key: str,
+        path: str,
     ) -> PermissionGrant:
 
-        grant = await self.get_by_subject_and_permission(
+        grant = await self.get_by_subject_and_path(
             namespace=namespace,
             subject_key=subject_key,
-            permission_key=permission_key,
+            path=path,
         )
 
         if not grant:

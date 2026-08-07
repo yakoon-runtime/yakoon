@@ -1,0 +1,38 @@
+<heading>grants path show - Show who has access to a path.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  show PATH
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Lists all subjects (accounts and groups) that have been granted
+access to a specific runtime path, either directly or through
+group memberships.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+show /usr/bin
+  Show who has access to /usr/bin.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+account/show, group/show
+</paragraph>

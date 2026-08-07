@@ -1,15 +1,20 @@
-title: Permission Grants
+title: Show Path Grants
 resolvable: true
-navigable: true
+navigable: false
 contextual: false
 host: /boot/python/runtime
 entry:
   run: pack:y5n.packs.ident.apps.grants.perm_show:main
+invocation:
+  params:
+  - key: path
+    positional: true
+    required: true
 resources:
   ref: resource:y5n.packs.ident.resources.loader:content
   document:
     default:
-      path: grant/permission/default.ydf
+      path: grant/path/show/default.ydf
   man:
     default:
-      path: grant/permission/man.ydf
+      path: grant/path/show/man.ydf

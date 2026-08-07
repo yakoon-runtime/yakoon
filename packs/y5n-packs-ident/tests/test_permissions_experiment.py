@@ -130,7 +130,7 @@ async def test_root_deny_grant_subtracts_group_allow(services):
     await services["permgrant"].add_grant(
         namespace=services["ns"].permgrant_namespace(),
         subject_key=account.key,
-        permission_key="/usr/bin",
+        path="/usr/bin",
         bits="x",
         deny=True,
     )

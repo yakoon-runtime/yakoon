@@ -1,7 +1,7 @@
 {% if not grants %}
-No grants found for permission '{{ permission }}'.
+No grants found for path '{{ path }}'.
 {% else %}
-Subjects with permission '{{ permission }}': <list>
+Subjects with access to '{{ path }}': <list>
 {% for g in grants %}
 <item>{{ g.subject_key.id }} [{{ g.bits }}]{% if g.deny %} (deny){% endif %}</item>
 {% endfor %}

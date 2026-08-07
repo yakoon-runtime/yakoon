@@ -7,7 +7,7 @@ Usage
 </heading>
 
 <pre>
-  remove NAME PERMISSION
+  remove NAME PATH
 </pre>
 
 <heading level="2">
@@ -33,5 +33,5 @@ See also
 </heading>
 
 <paragraph>
-account/show, account/add, group/remove, permission/show
+account/show, account/add, group/remove, path/show
 </paragraph>
