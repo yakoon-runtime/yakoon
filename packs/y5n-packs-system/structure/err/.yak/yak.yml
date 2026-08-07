@@ -23,3 +23,5 @@ resources:
       path: err/usage.ydf
     unknown_options:
       path: err/unknown_options.ydf
+    invalid_option:
+      path: err/invalid_option.ydf

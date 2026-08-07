@@ -14,7 +14,9 @@ invocation:
   - key: password
     required: true
   - key: administrative
+    kind: flag
   - key: temporary
+    kind: flag
 resources:
   ref: resource:y5n.packs.system.resources.loader:content
   document:

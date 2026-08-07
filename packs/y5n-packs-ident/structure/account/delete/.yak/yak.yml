@@ -8,7 +8,7 @@ entry:
   run: pack:y5n.packs.ident.apps.accounts.delete:main
 invocation:
   params:
-  - key: name
+  - key: username
     positional: true
     required: true
 resources:

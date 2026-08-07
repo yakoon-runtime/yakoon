@@ -7,11 +7,12 @@ entry:
   run: pack:y5n.packs.ident.apps.accounts.edit:main
 invocation:
   params:
-  - key: name
+  - key: username
     positional: true
     required: true
   - key: password
   - key: enabled
+  - key: name
   - key: mail
   - key: language
 resources:

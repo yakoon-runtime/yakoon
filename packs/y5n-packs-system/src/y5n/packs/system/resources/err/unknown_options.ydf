@@ -18,6 +18,10 @@
            <space/> --{{ opt }} 
            <space/> <arg>{{ opt }}</arg>
         {% endfor %}
+
+        {% for flag in usage.flags %}
+           <space/> --{{ flag }}
+        {% endfor %}
     </cmd>
   </item>
 {% endfor %}

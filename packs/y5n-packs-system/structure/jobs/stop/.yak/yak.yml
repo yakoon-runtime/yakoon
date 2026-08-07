@@ -5,6 +5,12 @@ contextual: false
 host: /boot/python/runtime
 entry:
   run: pack:y5n.packs.system.jobs.stop:main
+invocation:
+  params:
+  - key: index
+    positional: true
+  - key: current
+    kind: flag
 resources:
   ref: resource:y5n.packs.system.resources.loader:content
   man:
