@@ -13,6 +13,8 @@ invocation:
     required: true
   - key: password
     required: true
+  - key: administrative
+  - key: temporary
 resources:
   ref: resource:y5n.packs.system.resources.loader:content
   document:

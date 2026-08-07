@@ -25,7 +25,13 @@ class AuthenticationService:
         self.on_after_verify = on_after_verify
         self._namespace = namespace
 
-    async def authenticate(self, *, username: str, secret: str) -> dict:
+    async def authenticate(
+        self,
+        *,
+        username: str,
+        secret: str,
+        security_context: str = "normal",
+    ) -> dict:
 
         account = await self.on_get_account(
             namespace=self._namespace, username=username
@@ -46,6 +52,7 @@ class AuthenticationService:
             patch={
                 "user_key": str(account.key),
                 "user_name": account.username,
+                "security_context": security_context,
             }
         )
 

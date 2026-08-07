@@ -17,6 +17,7 @@ ERROR_NODE = "/usr/bin/err"
 # Fachlichkeit; the engine only knows the payload, never the variants.
 _VARIANTS = {
     "PermissionDenied": "denied",
+    "ElevationRequired": "elevation",
     "NodeNotFound": "not_found",
     "NodeNotExecutable": "not_executable",
     "UsageError": "usage",
