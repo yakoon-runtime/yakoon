@@ -1,0 +1,37 @@
+<heading>accounts delete - Remove an account.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  delete NAME
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Deletes an account. The account is soft-deleted: it is deactivated
+(enabled=false) but its history remains.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+delete bob
+  Delete the bob account.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+add, list, edit, groups, grants
+</paragraph>

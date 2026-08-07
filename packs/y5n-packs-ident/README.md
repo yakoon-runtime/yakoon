@@ -2,47 +2,59 @@
 
 *Identity and permission management for Yakoon.*
 
-This package provides user administration, group management,
+This package provides account administration, group management,
 permission grants, and authentication services.
 
 ## Commands
 
 | Command | Module | Description |
 |---------|--------|-------------|
-| `su` | `y5n.packs.ident.su` | Switch user |
-| `users add` | `y5n.packs.ident.apps.users.add` | Create a user |
-| `users list` | `y5n.packs.ident.apps.users.list` | List users |
-| `users edit` | `y5n.packs.ident.apps.users.edit` | Modify a user |
-| `users delete` | `y5n.packs.ident.apps.users.delete` | Remove a user |
+| `su` | `y5n.packs.ident.su` | Authenticate (switch account) |
+| `accounts add` | `y5n.packs.ident.apps.accounts.add` | Create an account (with optional profile) |
+| `accounts list` | `y5n.packs.ident.apps.accounts.list` | List accounts |
+| `accounts edit` | `y5n.packs.ident.apps.accounts.edit` | Modify an account |
+| `accounts delete` | `y5n.packs.ident.apps.accounts.delete` | Remove an account |
 | `groups add` | `y5n.packs.ident.apps.groups.add` | Create a group |
 | `groups list` | `y5n.packs.ident.apps.groups.list` | List groups |
 | `groups edit` | `y5n.packs.ident.apps.groups.edit` | Modify a group |
 | `groups delete` | `y5n.packs.ident.apps.groups.delete` | Remove a group |
-| `joins add` | `y5n.packs.ident.apps.joins.add` | Add user to group |
-| `joins remove` | `y5n.packs.ident.apps.joins.remove` | Remove user from group |
-| `joins groups` | `y5n.packs.ident.apps.joins.groups` | List groups for a user |
-| `joins users` | `y5n.packs.ident.apps.joins.users` | List users in a group |
-| `grants user add` | `y5n.packs.ident.apps.grants.user_add` | Grant permission to user |
-| `grants user remove` | `y5n.packs.ident.apps.grants.user_remove` | Revoke permission from user |
-| `grants user show` | `y5n.packs.ident.apps.grants.user_show` | Show user permissions |
+| `joins add` | `y5n.packs.ident.apps.joins.add` | Add account to group |
+| `joins remove` | `y5n.packs.ident.apps.joins.remove` | Remove account from group |
+| `joins groups` | `y5n.packs.ident.apps.joins.groups` | List groups for an account |
+| `joins accounts` | `y5n.packs.ident.apps.joins.accounts` | List accounts in a group |
+| `grants account add` | `y5n.packs.ident.apps.grants.account_add` | Grant permission to account |
+| `grants account remove` | `y5n.packs.ident.apps.grants.account_remove` | Revoke permission from account |
+| `grants account show` | `y5n.packs.ident.apps.grants.account_show` | Show account permissions |
 | `grants group add` | `y5n.packs.ident.apps.grants.group_add` | Grant permission to group |
 | `grants group remove` | `y5n.packs.ident.apps.grants.group_remove` | Revoke permission from group |
 | `grants group show` | `y5n.packs.ident.apps.grants.group_show` | Show group permissions |
 | `grants perm show` | `y5n.packs.ident.apps.grants.perm_show` | Show all permissions |
 
+## Model
+
+- **Account** — the only security identity: login, credentials, groups,
+  grants. An account may optionally carry profile information (`name`,
+  `mail`, `language`). A human is an account with a profile; a bot is an
+  account without one. There is no separate user concept.
+- **Group** — a bundle of accounts that may itself carry grants.
+- **Join** — account-to-group membership.
+- **PermissionGrant** — a grant of operations on a runtime path, set on an
+  account or a group.
+
 ## Services
 
 The package also provides backend services used by the runtime:
 
-- **AccountService** — user creation, lookup, password verification
+- **AccountService** — account creation, lookup, password verification
 - **AuthenticationService** — credential validation, session auth
 - **GroupService** — group CRUD
-- **JoinService** — user-group membership
+- **JoinService** — account-group membership
 - **PermissionGrantService** — permission grants
-- **Resolver** — user/group resolution by key
+- **PermissionResolver** — resolves an account's effective permissions into
+  spec strings the engine parses into a session PermissionSet
 - **Verifier** — password policy enforcement
 
 ## Setup
 
-On first start, `bootstrap.py` creates the default admin account
+On first start, `bootstrap.py` creates the default root account
 and initial permission set.

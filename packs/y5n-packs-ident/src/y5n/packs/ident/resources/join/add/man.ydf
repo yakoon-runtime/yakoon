@@ -1,4 +1,4 @@
-<heading>joins add - Add a user to a group.</heading>
+<heading>joins add - Add an account to a group.</heading>
 
 <rule/>
 
@@ -7,7 +7,7 @@ Usage
 </heading>
 
 <pre>
-  add USER GROUP
+  add ACCOUNT GROUP
 </pre>
 
 <heading level="2">
@@ -15,8 +15,8 @@ Description
 </heading>
 
 <paragraph>
-Adds a user to a group, creating a membership relation.
-The user inherits all permissions granted to the group.
+Adds an account to a group, creating a membership relation.
+The account inherits all permissions granted to the group.
 </paragraph>
 
 <heading level="2">
@@ -24,8 +24,8 @@ Examples
 </heading>
 
 <pre>
-add bob admins
-  Add bob to the admins group.
+add admin admins
+  Add the admin account to the admins group.
 </pre>
 
 <heading level="2">
@@ -33,5 +33,5 @@ See also
 </heading>
 
 <paragraph>
-remove, users, groups
+remove, accounts, groups
 </paragraph>

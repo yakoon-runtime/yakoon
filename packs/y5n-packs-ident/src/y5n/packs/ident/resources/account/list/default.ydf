@@ -1,0 +1,9 @@
+{% if not accounts %}
+No accounts found.
+{% else %}
+Accounts: <list>
+{% for a in accounts %}
+<item>{{ a.username }}{% if a.name %} ({{ a.name }}){% endif %}</item>
+{% endfor %}
+</list>
+{% endif %}

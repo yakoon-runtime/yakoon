@@ -1,0 +1,44 @@
+<heading>accounts add - Create an account.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  add NAME
+  add NAME --password SECRET
+  add NAME --password SECRET --name "Stefan Bergmann" --mail s@b.de --language de
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Creates a new account with the given login name. Use --password to set
+credentials. Profile options (--name, --mail, --language) are optional —
+a human account carries them, a bot account does not.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+add alice
+  Create account alice without a password.
+add backup --password secret
+  Create a bot account without a profile.
+add stefan --name "Stefan Bergmann" --mail s@b.de
+  Create a human account with profile information.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+list, edit, delete, groups, grants
+</paragraph>

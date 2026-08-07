@@ -11,7 +11,7 @@ class JoinData:
 
     CURRENT_VERSION = 1
 
-    user_key: Key
+    account_key: Key
     group_key: Key
 
     enabled: bool = True
@@ -23,7 +23,7 @@ class JoinData:
 
     def to_dict(self) -> dict:
         return {
-            "user_key": str(self.user_key),
+            "account_key": str(self.account_key),
             "group_key": str(self.group_key),
             "enabled": self.enabled,
             "_v": self._v,
@@ -34,7 +34,7 @@ class JoinData:
         d = dict(d or {})
 
         return cls(
-            user_key=Key.from_str(d["user_key"]),
+            account_key=Key.from_str(d["account_key"]),
             group_key=Key.from_str(d["group_key"]),
             enabled=d.get("enabled", True),
             _v=d.get("_v", 0),
@@ -47,12 +47,12 @@ class Join:
         self.data = data
 
     @staticmethod
-    def build_key(*, namespace: Namespace, user_key: Key, group_key: Key) -> Key:
-        return Key(namespace=namespace, id=f"{group_key}:{user_key}")
+    def build_key(*, namespace: Namespace, account_key: Key, group_key: Key) -> Key:
+        return Key(namespace=namespace, id=f"{group_key}:{account_key}")
 
     @property
-    def user_key(self) -> Key:
-        return self.data.user_key
+    def account_key(self) -> Key:
+        return self.data.account_key
 
     @property
     def group_key(self) -> Key:

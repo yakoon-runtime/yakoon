@@ -10,8 +10,8 @@ class Namespaces:
     # NAMESPACES
     # ----------------------------------
 
-    def user_namespace(self) -> Namespace:
-        return Namespace(self.domain, "user", self.space)
+    def account_namespace(self) -> Namespace:
+        return Namespace(self.domain, "account", self.space)
 
     def group_namespace(self) -> Namespace:
         return Namespace(self.domain, "group", self.space)

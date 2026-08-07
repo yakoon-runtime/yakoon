@@ -1,4 +1,4 @@
-<heading>joins remove - Remove a user from a group.</heading>
+<heading>joins remove - Remove an account from a group.</heading>
 
 <rule/>
 
@@ -7,7 +7,7 @@ Usage
 </heading>
 
 <pre>
-  remove USER GROUP
+  remove ACCOUNT GROUP
 </pre>
 
 <heading level="2">
@@ -15,7 +15,7 @@ Description
 </heading>
 
 <paragraph>
-Removes a user from a group. The user loses all permissions
+Removes an account from a group. The account loses all permissions
 that were inherited through the group.
 </paragraph>
 
@@ -24,8 +24,8 @@ Examples
 </heading>
 
 <pre>
-remove bob admins
-  Remove bob from the admins group.
+remove admin admins
+  Remove the admin account from the admins group.
 </pre>
 
 <heading level="2">
@@ -33,5 +33,5 @@ See also
 </heading>
 
 <paragraph>
-add, users, groups
+add, accounts, groups
 </paragraph>

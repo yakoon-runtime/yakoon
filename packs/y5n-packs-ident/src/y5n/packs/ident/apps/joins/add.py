@@ -3,20 +3,20 @@ from y5n.sdk import context, io, ports
 
 async def main():
     req = context.request()
-    username = req.arg(0)
+    accountname = req.arg(0)
     groupname = req.arg(1)
 
     ns_svc = ports.get("ident.namespaces")
-    users_svc = ports.get("ident.users")
+    accounts_svc = ports.get("ident.accounts")
     groups_svc = ports.get("ident.groups")
     joins_svc = ports.get("ident.joins")
 
-    user = await users_svc.get_by_username(
-        namespace=await ns_svc.user_namespace(),
-        username=username,
+    account = await accounts_svc.get_by_username(
+        namespace=await ns_svc.account_namespace(),
+        username=accountname,
     )
-    if not user:
-        await io.write(f"User '{username}' not found.")
+    if not account:
+        await io.write(f"Account '{accountname}' not found.")
         return
 
     group = await groups_svc.get_by_name(
@@ -29,7 +29,7 @@ async def main():
 
     join_obj = await joins_svc.add_join(
         namespace=await ns_svc.join_namespace(),
-        user_key=user.key,
+        account_key=account.key,
         group_key=group.key,
     )
 

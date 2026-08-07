@@ -1,0 +1,9 @@
+{% if not joins %}
+No accounts found.
+{% else %}
+Accounts in '{{ group }}': <list>
+{% for m in joins %}
+  <item>{{ m.account_key.id }}</item>
+{% endfor %}
+</list>
+{% endif %}

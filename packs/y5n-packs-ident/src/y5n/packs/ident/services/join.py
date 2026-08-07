@@ -22,9 +22,9 @@ from ..models import Join, JoinData
 # INDEX
 # ----------------------------------
 
-IDX_JOIN_USER_KEY = IndexKey("join.user_key")
-IDX_JOIN_USER_SPEC = IndexSpec(
-    key=IDX_JOIN_USER_KEY,
+IDX_JOIN_ACCOUNT_KEY = IndexKey("join.account_key")
+IDX_JOIN_ACCOUNT_SPEC = IndexSpec(
+    key=IDX_JOIN_ACCOUNT_KEY,
     value_type=ValueType.TEXT,
     unique=False,
 )
@@ -47,7 +47,7 @@ class JoinService:
     @staticmethod
     def index_specs():
         return [
-            IDX_JOIN_USER_SPEC,
+            IDX_JOIN_ACCOUNT_SPEC,
             IDX_JOIN_GROUP_SPEC,
         ]
 
@@ -81,17 +81,17 @@ class JoinService:
 
         return Join.from_row(row=row)
 
-    async def get_by_user_and_group(
+    async def get_by_account_and_group(
         self,
         *,
         namespace: Namespace,
-        user_key: Key,
+        account_key: Key,
         group_key: Key,
     ) -> Join | None:
 
         key = Join.build_key(
             namespace=namespace,
-            user_key=user_key,
+            account_key=account_key,
             group_key=group_key,
         )
 
@@ -105,7 +105,7 @@ class JoinService:
 
         keys, _ = await self.on_scan(
             namespace=namespace,
-            index_key=IDX_JOIN_USER_KEY,
+            index_key=IDX_JOIN_ACCOUNT_KEY,
         )
 
         rows = await self.on_get_many(keys=keys)
@@ -113,17 +113,17 @@ class JoinService:
         joins = [Join.from_row(row) for row in rows if row.ok]
         return [m for m in joins if m.data.enabled]
 
-    async def list_user_joins(
+    async def list_account_joins(
         self,
         *,
         namespace: Namespace,
-        user_key: Key,
+        account_key: Key,
     ) -> list[Join]:
 
         keys, _ = await self.on_scan(
             namespace=namespace,
-            index_key=IDX_JOIN_USER_KEY,
-            value=str(user_key),
+            index_key=IDX_JOIN_ACCOUNT_KEY,
+            value=str(account_key),
         )
 
         rows = await self.on_get_many(keys=keys)
@@ -156,11 +156,11 @@ class JoinService:
 
         doc = join_obj.data.to_dict()
 
-        user_key = doc.get("user_key")
+        account_key = doc.get("account_key")
         group_key = doc.get("group_key")
 
-        if not isinstance(user_key, str):
-            raise TypeError("Join.user_key must be a string")
+        if not isinstance(account_key, str):
+            raise TypeError("Join.account_key must be a string")
 
         if not isinstance(group_key, str):
             raise TypeError("Join.group_key must be a string")
@@ -170,8 +170,8 @@ class JoinService:
             doc=doc,
             indexes=[
                 IndexTerm(
-                    key=IDX_JOIN_USER_KEY,
-                    value=user_key,
+                    key=IDX_JOIN_ACCOUNT_KEY,
+                    value=account_key,
                 ),
                 IndexTerm(
                     key=IDX_JOIN_GROUP_KEY,
@@ -182,27 +182,27 @@ class JoinService:
         )
 
     # ----------------------------------
-    # CONNECTION USER / GROUP
+    # CONNECTION ACCOUNT / GROUP
     # ----------------------------------
 
     async def add_join(
         self,
         *,
         namespace: Namespace,
-        user_key: Key,
+        account_key: Key,
         group_key: Key,
     ) -> Join:
 
         key = Join.build_key(
             namespace=namespace,
-            user_key=user_key,
+            account_key=account_key,
             group_key=group_key,
         )
 
         join_obj = Join(
             key=key,
             data=JoinData(
-                user_key=user_key,
+                account_key=account_key,
                 group_key=group_key,
                 enabled=True,
             ),
@@ -215,13 +215,13 @@ class JoinService:
         self,
         *,
         namespace: Namespace,
-        user_key: Key,
+        account_key: Key,
         group_key: Key,
     ) -> Join:
 
-        join_obj = await self.get_by_user_and_group(
+        join_obj = await self.get_by_account_and_group(
             namespace=namespace,
-            user_key=user_key,
+            account_key=account_key,
             group_key=group_key,
         )
 

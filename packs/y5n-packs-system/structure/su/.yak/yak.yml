@@ -2,6 +2,7 @@ title: Su
 resolvable: true
 navigable: false
 contextual: false
+anonymous: true
 host: /boot/python/runtime
 entry:
   run: pack:y5n.packs.ident.apps.su:main

@@ -1,0 +1,40 @@
+<heading>grants account add - Grant a permission to an account.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  add NAME PERMISSION
+  add NAME PERMISSION --bits rwx
+  add NAME PERMISSION --deny
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Grants a permission to an account. Use --bits to control
+read/write/execute access and --deny to explicitly forbid
+an action.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+add admin /crm/contact/edit --bits r
+  Grant the admin account read access to /crm/contact/edit.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+account/show, account/remove, group/add, permission/show
+</paragraph>

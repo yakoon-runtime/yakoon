@@ -1,0 +1,5 @@
+Account '{{ account.username }}' was added.
+{% if account.name %}Name: {{ account.name }}
+{% endif %}{% if account.mail %}Mail: {{ account.mail }}
+{% endif %}{% if account.language %}Language: {{ account.language }}
+{% endif %}
