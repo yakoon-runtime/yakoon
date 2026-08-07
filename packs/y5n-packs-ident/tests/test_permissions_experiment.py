@@ -116,10 +116,13 @@ async def test_root_account_gets_admin_group_permissions(services):
 
     permset = await _effective(services, account.key)
 
+    # root grant covers the whole tree via inheritance
+    assert permset.check("/", "rwx")
     assert permset.check("/usr/bin/ls", "x")
     assert permset.check("/usr/sbin/ident/accounts", "rwx")
     assert permset.check("/opt/crm", "rwx")
     assert permset.check("/dsl", "rwx")
+    assert permset.check("/boot", "r")
 
 
 @pytest.mark.asyncio
