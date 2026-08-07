@@ -19,9 +19,13 @@ class PermissionResolver:
 
     def __init__(
         self,
+        grant_namespace: Namespace,
+        join_namespace: Namespace,
         on_list_account_joins: OnListAccountJoins,
         on_list_subject_grants: OnListSubjectGrants,
     ):
+        self._grant_namespace = grant_namespace
+        self._join_namespace = join_namespace
         self.on_list_account_joins = on_list_account_joins
         self.on_list_subject_grants = on_list_subject_grants
 
@@ -32,28 +36,26 @@ class PermissionResolver:
     async def resolve_account_permissions(
         self,
         *,
-        grant_namespace: Namespace,
-        join_namespace: Namespace,
         account_key: Key,
     ) -> list[str]:
 
         out: list[str] = []
 
         direct_grants = await self.on_list_subject_grants(
-            namespace=grant_namespace,
+            namespace=self._grant_namespace,
             subject_key=account_key,
         )
 
         self._merge_grants(out, direct_grants)
 
         joins = await self.on_list_account_joins(
-            namespace=join_namespace,
+            namespace=self._join_namespace,
             account_key=account_key,
         )
 
         for join in joins:
             grants = await self.on_list_subject_grants(
-                namespace=grant_namespace,
+                namespace=self._grant_namespace,
                 subject_key=(join.group_key),
             )
 

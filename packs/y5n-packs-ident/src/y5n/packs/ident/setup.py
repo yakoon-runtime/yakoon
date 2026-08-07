@@ -60,6 +60,8 @@ async def main():
     )
 
     resolver = PermissionResolver(
+        grant_namespace=service_ns.permgrant_namespace(),
+        join_namespace=service_ns.join_namespace(),
         on_list_account_joins=join_svc.list_account_joins,
         on_list_subject_grants=permgrant.list_subject_grants,
     )

@@ -73,6 +73,8 @@ async def services():
         on_scan=store.objects.scan,
     )
     resolver = PermissionResolver(
+        grant_namespace=ns.permgrant_namespace(),
+        join_namespace=ns.join_namespace(),
         on_list_account_joins=joins.list_account_joins,
         on_list_subject_grants=permgrant.list_subject_grants,
     )
@@ -96,8 +98,6 @@ async def services():
 
 async def _effective(svcs, account_key: Key) -> PermissionSet:
     specs = await svcs["resolver"].resolve_account_permissions(
-        grant_namespace=svcs["ns"].permgrant_namespace(),
-        join_namespace=svcs["ns"].join_namespace(),
         account_key=account_key,
     )
     parser = PermissionParser()
@@ -116,9 +116,10 @@ async def test_root_account_gets_admin_group_permissions(services):
 
     permset = await _effective(services, account.key)
 
-    assert permset.check("/ident/accounts", "x")
-    assert permset.check("/ident/accounts", "rwx")
-    assert permset.check("/ident/grants", "rwx")
+    assert permset.check("/usr/bin/ls", "x")
+    assert permset.check("/usr/sbin/ident/accounts", "rwx")
+    assert permset.check("/opt/crm", "rwx")
+    assert permset.check("/dsl", "rwx")
 
 
 @pytest.mark.asyncio
@@ -129,15 +130,16 @@ async def test_root_deny_grant_subtracts_group_allow(services):
     await services["permgrant"].add_grant(
         namespace=services["ns"].permgrant_namespace(),
         subject_key=account.key,
-        permission_key="/ident/accounts",
-        bits="rwx",
+        permission_key="/usr/bin",
+        bits="x",
         deny=True,
     )
 
     permset = await _effective(services, account.key)
 
-    assert not permset.check("/ident/accounts", "x")
-    assert permset.check("/ident/grants", "rwx")
+    assert not permset.check("/usr/bin/shutdown", "x")
+    assert permset.check("/usr/bin/ls", "r")
+    assert permset.check("/usr/sbin/ident/accounts", "rwx")
 
 
 @pytest.mark.asyncio
@@ -150,5 +152,5 @@ async def test_new_account_without_grants_has_no_permissions(services):
 
     permset = await _effective(services, account.key)
 
-    assert not permset.check("/ident/accounts", "x")
-    assert not permset.check("/ident/grants", "rwx")
+    assert not permset.check("/usr/bin/ls", "x")
+    assert not permset.check("/usr/sbin/ident", "rwx")

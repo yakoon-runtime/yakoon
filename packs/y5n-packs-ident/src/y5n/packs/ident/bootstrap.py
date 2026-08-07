@@ -19,10 +19,10 @@ from .services import (
 )
 
 _root_grant_specs = [
-    "/ident/accounts|rwx",
-    "/ident/groups|rwx",
-    "/ident/joins|rwx",
-    "/ident/grants|rwx",
+    "/usr/bin|rwx",
+    "/usr/sbin/ident|rwx",
+    "/opt|rwx",
+    "/dsl|rwx",
 ]
 
 
