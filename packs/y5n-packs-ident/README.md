@@ -10,10 +10,21 @@
 | What may you do? | **Grants** |
 | How are you currently working? | **Session** |
 
-The three are kept strictly separate. A permission system that mixes
-them (a "user" that is also a role, a login that is also a rights set)
-makes every change unpredictable. `ident` keeps each concept to a single
-question — and Yakoon's security is built on that separation.
+Keeping identity, authorization and session state independent makes the
+security model predictable: every concept answers exactly one question.
+A permission system that mixes them (a "user" that is also a role, a
+login that is also a rights set) makes every change unpredictable.
+`ident` keeps each concept to a single question — and Yakoon's security
+is built on that separation.
+
+The layers close the loop to the runtime:
+
+```
+Identity       → Account
+Authorization  → Grants
+Security       → Session
+Execution      → Runtime
+```
 
 Everything fits together in one picture:
 
@@ -84,7 +95,7 @@ mount structure of the runtime tree *is* the security model.
 
 ---
 
-## Permissions
+## Authorization
 
 > **The runtime tree is the authorization tree.**
 
@@ -115,7 +126,8 @@ you are and what you may do:
 ```
 Normal Session         → privileged operations ask for confirmation
 Temporary Elevation    → the next privileged operation is confirmed once
-Administrative Session → no additional confirmation for privileged operations
+Administrative Session → no additional confirmation for privileged
+                         operations within the already granted permissions
 ```
 
 > **A session never grants additional permissions. It only changes how
