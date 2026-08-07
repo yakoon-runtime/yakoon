@@ -16,6 +16,8 @@ resources:
   document:
     default:
       path: account/delete/default.ydf
+    denied:
+      path: account/delete/denied.ydf
   man:
     default:
       path: account/delete/man.ydf

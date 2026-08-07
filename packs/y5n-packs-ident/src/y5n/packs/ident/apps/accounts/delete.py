@@ -5,6 +5,16 @@ async def main():
     req = context.request()
     username = req.arg(0)
 
+    me = context.session().user
+    if me and me == username:
+        doc = ports.get("document")
+        projection = await doc.render(
+            name="denied",
+            state={"name": username},
+        )
+        await io.write(projection)
+        return
+
     ns_svc = ports.get("ident.namespaces")
     namespace = await ns_svc.account_namespace()
 
