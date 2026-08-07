@@ -13,6 +13,8 @@ resources:
       path: err/error.ydf
     denied:
       path: err/denied.ydf
+    elevation:
+      path: err/elevation.ydf
     not_found:
       path: err/not_found.ydf
     not_executable:

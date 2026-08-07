@@ -1,4 +1,4 @@
-title: show
+title: Show Group Grants
 resolvable: true
 navigable: false
 contextual: false
@@ -8,9 +8,6 @@ entry:
 invocation:
   params:
   - key: name
-    positional: true
-    required: true
-  - key: permission
     positional: true
     required: true
 resources:

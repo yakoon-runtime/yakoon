@@ -1,0 +1,41 @@
+<heading>accounts edit - Update an account.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  edit NAME [--password SECRET] [--enabled true|false]
+           [--name NAME] [--mail MAIL] [--language LANG]
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Updates an existing account. At least one option must be provided.
+Use --enabled to activate or deactivate an account, --password to change
+credentials, and --name/--mail/--language to update profile information.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+edit stefan --name "Stefan Bergmann"
+  Update the profile name of account stefan.
+edit bob --enabled false
+  Deactivate the bob account.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+add, list, delete, groups, grants
+</paragraph>

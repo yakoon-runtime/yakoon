@@ -5,56 +5,57 @@ from __future__ import annotations
 from typing import Protocol
 
 from y5n.runtime.api.naming import Key, Namespace
-from y5n.runtime.api.permissions import PermissionSet
-from y5n.runtime.api.ports.protocols import OnNewPermissionSet, OnParsePermissionSpec
 
 from ..models import Join, PermissionGrant
 
 
 class PermissionResolver:
-    """IAM-Architecture"""
+    """Resolves an account's effective permissions to spec strings.
+
+    The pack owns the sources (direct grants, group grants). The result
+    is a list of serializable spec strings (e.g. "/crm/contact/edit|rwx",
+    "-/crm/contact/edit|x") that the engine parses into a PermissionSet.
+    """
 
     def __init__(
         self,
-        on_new_permissionset: OnNewPermissionSet,
-        on_list_user_joins: OnListUserJoins,
+        grant_namespace: Namespace,
+        join_namespace: Namespace,
+        on_list_account_joins: OnListAccountJoins,
         on_list_subject_grants: OnListSubjectGrants,
-        on_parse_spec: OnParsePermissionSpec,
     ):
-        self.on_new_permissionset = on_new_permissionset
-        self.on_list_user_joins = on_list_user_joins
+        self._grant_namespace = grant_namespace
+        self._join_namespace = join_namespace
+        self.on_list_account_joins = on_list_account_joins
         self.on_list_subject_grants = on_list_subject_grants
-        self.on_parse_spec = on_parse_spec
 
     # ----------------------------------
     # RESOLVE
     # ----------------------------------
 
-    async def resolve_user_permissions(
+    async def resolve_account_permissions(
         self,
         *,
-        grant_namespace: Namespace,
-        join_namespace: Namespace,
-        user_key: Key,
-    ) -> PermissionSet:
+        account_key: Key,
+    ) -> list[str]:
 
-        out = self.on_new_permissionset()
+        out: list[str] = []
 
         direct_grants = await self.on_list_subject_grants(
-            namespace=grant_namespace,
-            subject_key=user_key,
+            namespace=self._grant_namespace,
+            subject_key=account_key,
         )
 
         self._merge_grants(out, direct_grants)
 
-        joins = await self.on_list_user_joins(
-            namespace=join_namespace,
-            user_key=user_key,
+        joins = await self.on_list_account_joins(
+            namespace=self._join_namespace,
+            account_key=account_key,
         )
 
         for join in joins:
             grants = await self.on_list_subject_grants(
-                namespace=grant_namespace,
+                namespace=self._grant_namespace,
                 subject_key=(join.group_key),
             )
 
@@ -66,18 +67,17 @@ class PermissionResolver:
     # INTERNAL
     # ----------------------------------
 
+    @staticmethod
     def _merge_grants(
-        self,
-        target: PermissionSet,
+        target: list[str],
         grants: list[PermissionGrant],
     ):
         for grant in grants:
-            spec = f"{grant.permission_key}" f"|{grant.bits}"
+            spec = f"{grant.path}|{grant.bits}"
             if grant.deny:
                 spec = f"-{spec}"
 
-            permission = self.on_parse_spec(spec=spec)
-            target.add(permission)
+            target.append(spec)
 
 
 # ----------------------------------
@@ -85,12 +85,12 @@ class PermissionResolver:
 # ----------------------------------
 
 
-class OnListUserJoins(Protocol):
+class OnListAccountJoins(Protocol):
     async def __call__(
         self,
         *,
         namespace: Namespace,
-        user_key: Key,
+        account_key: Key,
     ) -> list[Join]: ...
 
 

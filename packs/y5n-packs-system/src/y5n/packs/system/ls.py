@@ -55,7 +55,11 @@ async def main():
             fs_entries = [p for p in fs_entries if (p / ".yak").is_dir()]
 
     merged = []
+    permissions = ports.get("permissions")
     for p in fs_entries:
+        child_tree_path = _child_tree_path(tree_path, p.name)
+        if not await _can_read(permissions, child_tree_path):
+            continue
         is_dir = p.is_dir()
         node = node_map.get(p.name)
         kind = node.get("kind") if node else ("dir" if is_dir else "file")
@@ -152,3 +156,15 @@ def _tree_path(ctx, target: str | None) -> str:
             return target
         return f"{raw}/{target}"
     return raw
+
+
+def _child_tree_path(tree_path: str, name: str) -> str:
+    base = tree_path if tree_path != "/" else ""
+    return f"{base}/{name}"
+
+
+async def _can_read(permissions, tree_path: str) -> bool:
+    try:
+        return await permissions.check(path=tree_path, operation="read")
+    except Exception:
+        return True

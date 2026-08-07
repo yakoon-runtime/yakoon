@@ -1,0 +1,37 @@
+<heading>grants account remove - Revoke a permission from an account.</heading>
+
+<rule/>
+
+<heading level="2">
+Usage
+</heading>
+
+<pre>
+  remove NAME PATH
+</pre>
+
+<heading level="2">
+Description
+</heading>
+
+<paragraph>
+Removes a previously granted permission from an account.
+The account loses access to the specified action.
+</paragraph>
+
+<heading level="2">
+Examples
+</heading>
+
+<pre>
+remove admin /crm/contact/edit
+  Remove the admin account's /crm/contact/edit permission.
+</pre>
+
+<heading level="2">
+See also
+</heading>
+
+<paragraph>
+account/show, account/add, group/remove, path/show
+</paragraph>

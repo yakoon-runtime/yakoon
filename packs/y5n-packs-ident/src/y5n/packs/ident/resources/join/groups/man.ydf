@@ -1,4 +1,4 @@
-<heading>joins groups - List groups for a user.</heading>
+<heading>joins groups - List groups for an account.</heading>
 
 <rule/>
 
@@ -7,7 +7,7 @@ Usage
 </heading>
 
 <pre>
-  groups USER
+  groups ACCOUNT
 </pre>
 
 <heading level="2">
@@ -15,7 +15,7 @@ Description
 </heading>
 
 <paragraph>
-Lists all groups that a user belongs to.
+Lists all groups that an account belongs to.
 </paragraph>
 
 <heading level="2">
@@ -23,8 +23,8 @@ Examples
 </heading>
 
 <pre>
-groups bob
-  List all groups bob is a member of.
+groups admin
+  List all groups the admin account is a member of.
 </pre>
 
 <heading level="2">

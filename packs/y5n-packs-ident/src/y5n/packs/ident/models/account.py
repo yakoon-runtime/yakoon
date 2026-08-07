@@ -12,8 +12,14 @@ class AccountData:
 
     CURRENT_VERSION = 1
 
-    name: str
-    enabled: bool = False
+    username: str
+    password_hash: str | None = None
+    enabled: bool = True
+
+    name: str | None = None
+    mail: str | None = None
+    language: str | None = None
+
     data: dict[str, Any] = field(default_factory=dict)
 
     _v: int = field(default=CURRENT_VERSION)
@@ -23,8 +29,12 @@ class AccountData:
 
     def to_dict(self) -> dict:
         return {
-            "name": self.name,
+            "username": self.username,
+            "password_hash": self.password_hash,
             "enabled": self.enabled,
+            "name": self.name,
+            "mail": self.mail,
+            "language": self.language,
             "_v": self._v,
             "data": dict(self.data),
         }
@@ -34,8 +44,12 @@ class AccountData:
         d = dict(d or {})
 
         return cls(
-            name=d["name"],
+            username=d["username"],
+            password_hash=d.get("password_hash"),
             enabled=d.get("enabled", True),
+            name=d.get("name"),
+            mail=d.get("mail"),
+            language=d.get("language"),
             data=dict(d.get("data", {})),
             _v=d.get("_v", 0),
         )
@@ -48,8 +62,20 @@ class Account:
         self.data = data
 
     @property
-    def name(self) -> str:
+    def username(self) -> str:
+        return self.data.username
+
+    @property
+    def name(self) -> str | None:
         return self.data.name
+
+    @property
+    def mail(self) -> str | None:
+        return self.data.mail
+
+    @property
+    def language(self) -> str | None:
+        return self.data.language
 
     def is_active(self) -> bool:
         return self.data.is_active()

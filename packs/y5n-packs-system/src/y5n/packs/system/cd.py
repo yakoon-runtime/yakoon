@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from y5n.sdk import context, fs, io
+from y5n.sdk import context, fs, io, ports
 
 
 async def main():
@@ -49,8 +49,21 @@ async def main():
         return
 
     display = _to_display(raw, root)
+
+    if not await _can_read(ctx, display):
+        await io.write(f"Access denied: {display}")
+        return
+
     await fs.chdir(display)
     await io.write("")
+
+
+async def _can_read(ctx, tree_path: str) -> bool:
+    permissions = ports.get("permissions")
+    try:
+        return await permissions.check(path=tree_path, operation="read")
+    except Exception:
+        return True
 
 
 def _get_root(ctx) -> Path:

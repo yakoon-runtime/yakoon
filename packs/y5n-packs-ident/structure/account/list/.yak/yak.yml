@@ -1,0 +1,15 @@
+title: Account List
+resolvable: true
+navigable: false
+contextual: false
+host: /boot/python/runtime
+entry:
+  run: pack:y5n.packs.ident.apps.accounts.list:main
+resources:
+  ref: resource:y5n.packs.ident.resources.loader:content
+  document:
+    default:
+      path: account/list/default.ydf
+  man:
+    default:
+      path: account/list/man.ydf

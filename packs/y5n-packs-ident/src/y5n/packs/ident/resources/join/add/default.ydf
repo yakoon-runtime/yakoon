@@ -1,1 +1,1 @@
-Added '{{ join.user_key.id }}' to group '{{ join.group_key.id }}'.
+Added '{{ join.account_key.id }}' to group '{{ join.group_key.id }}'.

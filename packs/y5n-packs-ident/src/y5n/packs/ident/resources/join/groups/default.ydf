@@ -1,7 +1,7 @@
 {% if not joins %}
 No groups found.
 {% else %}
-Groups for '{{ user }}': <list>
+Groups for '{{ account }}': <list>
 {% for m in joins %}
   <item>{{ m.group_key.id }}</item>
 {% endfor %}

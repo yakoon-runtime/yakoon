@@ -12,7 +12,7 @@ class PermissionGrantData:
     CURRENT_VERSION = 1
 
     subject_key: Key
-    permission_key: str
+    path: str
 
     bits: str = "x"
     deny: bool = False
@@ -26,7 +26,7 @@ class PermissionGrantData:
     def to_dict(self) -> dict:
         return {
             "subject_key": str(self.subject_key),
-            "permission_key": self.permission_key,
+            "path": self.path,
             "bits": self.bits,
             "deny": self.deny,
             "enabled": self.enabled,
@@ -43,7 +43,7 @@ class PermissionGrantData:
 
         return cls(
             subject_key=Key.from_str(d["subject_key"]),
-            permission_key=d["permission_key"],
+            path=d.get("path") or d.get("permission_key", ""),
             bits=d.get("bits", "x"),
             deny=d.get("deny", False),
             enabled=d.get("enabled", True),
@@ -66,12 +66,12 @@ class PermissionGrant:
         *,
         namespace: Namespace,
         subject_key: Key,
-        permission_key: str,
+        path: str,
     ) -> Key:
 
         return Key(
             namespace=namespace,
-            id=f"{subject_key}:{permission_key}",
+            id=f"{subject_key}:{path}",
         )
 
     @property
@@ -79,8 +79,8 @@ class PermissionGrant:
         return self.data.subject_key
 
     @property
-    def permission_key(self) -> str:
-        return self.data.permission_key
+    def path(self) -> str:
+        return self.data.path
 
     @property
     def bits(self) -> str:

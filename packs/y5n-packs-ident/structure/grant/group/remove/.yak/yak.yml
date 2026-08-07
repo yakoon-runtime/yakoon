@@ -1,4 +1,4 @@
-title: remove
+title: Revoke from Group
 resolvable: true
 navigable: false
 contextual: false
@@ -10,7 +10,7 @@ invocation:
   - key: name
     positional: true
     required: true
-  - key: permission
+  - key: path
     positional: true
     required: true
 resources:

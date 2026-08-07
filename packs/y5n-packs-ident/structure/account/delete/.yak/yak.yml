@@ -1,0 +1,23 @@
+title: Account Delete
+resolvable: true
+navigable: false
+contextual: false
+privileged: true
+host: /boot/python/runtime
+entry:
+  run: pack:y5n.packs.ident.apps.accounts.delete:main
+invocation:
+  params:
+  - key: name
+    positional: true
+    required: true
+resources:
+  ref: resource:y5n.packs.ident.resources.loader:content
+  document:
+    default:
+      path: account/delete/default.ydf
+    denied:
+      path: account/delete/denied.ydf
+  man:
+    default:
+      path: account/delete/man.ydf
